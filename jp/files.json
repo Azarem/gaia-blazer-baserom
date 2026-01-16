@@ -1,0 +1,9 @@
+{
+    "system": {
+        "": {
+            "bmp_029009": {"start":167945,"end":177779,"type":"Bitmap","compressed":true},
+            "bmp_02B673": {"start":177779,"end":194163,"type":"Bitmap"},
+            "music_02F673": {"start":194163,"end":196584,"type":"Music"}
+        }
+    }
+}

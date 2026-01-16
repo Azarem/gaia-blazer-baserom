@@ -1,0 +1,89 @@
+{
+    "system": {
+        "chunk_000000": { 
+            "parts": {
+                "emulation_mode_reset_000000": { "start": 0, "end": 834, "type": "Code" },
+                "native_mode_nmi_000342": { "start": 834, "end": 1445, "type": "Code" },
+                "native_mode_irq_0005A5": { "start": 1445, "end": 6955, "type": "Code" },
+                "code_list_001B2B": { "start": 6955, "end": 22012, "type": "&Code" },
+                "native_mode_cop_00561E": { "start": 22046, "end": 30419, "type": "Code" },
+                "data_0076D3": { "start": 30419, "end": 30447, "type": "unk4" },
+                "code_0076EF": { "start": 30447, "end": 31319, "type": "Code" }
+            } 
+        },
+        "native_mode_brk_0055FC": {
+            "parts": {
+                "native_mode_brk_0055FC": { "start": 22012, "end": 22046, "type": "Code" }
+            }
+        },
+        "meta_tables_008000": {
+            "parts": {
+                "meta_tables_008000": { "start": 32768, "end": 39348, "type": "&meta_entry" }
+            }
+        },
+        "table_0099B4": {
+            "parts": {
+                "table_0099B4": { "start": 39348, "end": 43486, "type": "unk1" }
+            }
+        },
+        "table_00A9DE": {
+            "parts": {
+                "table_00A9DE": { "start": 43486, "end": 44182, "type": "&Binary" }
+            }
+        },
+        "table_00AC96": {
+            "parts": {
+                "table_00AC96": { "start": 44182, "end": 46746, "type": "&Binary" }
+            }
+        },
+        "table_00B69A": {
+            "parts": {
+                "table_00B69A": { "start": 46746, "end": 47629, "type": "&Binary" }
+            }
+        },
+        "chunk_010000": { 
+            "order": -1, 
+            "parts": {
+                "code_010000": { "start": 65536, "end": 80679, "type": "Code" },
+                "asciistring_013B27": { "start": 80679, "end": 82957, "type": "ASCIIString" },
+                "binary_01440D": { "start": 82957, "end": 83037, "type": "Binary" },
+                "asciistring_01445D": { "start": 83037, "end": 83757, "type": "ASCIIString" }
+            } 
+        },
+        "chunk_018000": {
+            "parts": {
+                "code_018000": { "start": 98304, "end": 131072, "type": "Code" }
+            }
+        },
+        "chunk_020000": {
+            "parts": {
+                "code_020000": { "start": 131072, "end": 163840, "type": "Code" }
+            }
+        },
+        "asset_list_028000": {
+            "parts": {
+                "asset_list_028000": { "start": 163840, "end": 167938, "type": "asset_list" }
+            }
+        },
+        "string_lookup_080000": {
+            "parts": {
+                "lookup_080000": { "start": 524288, "end": 525824, "type": "ASCIIString(12)" }
+            }
+        },
+        "table_058000": {
+            "parts": {
+                "table_058000": { "start": 360448, "end": 365596, "type": "&unk3" }
+            }
+        },
+        "table_060000": {
+            "parts": {
+                "table_060000": { "start": 393216, "end": 395766, "type": "&unk3" }
+            }
+        },
+        "chunk_0F8000": {
+            "parts": {
+                "code_0F8000": { "start": 1015808, "end": 1048576, "type": "Code" }
+            }
+        }
+    }
+}

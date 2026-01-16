@@ -1,0 +1,259 @@
+{
+    "system": {
+        "chunk_000000": { 
+            "parts": {
+                "emulation_mode_reset_000000": { "start": 0, "end": 753, "type": "Code" },
+                "native_mode_nmi_0002F1": { "start": 753, "end": 1364, "type": "Code" },
+                "native_mode_irq_000554": { "start": 1364, "end": 6615, "type": "Code" },
+                "code_0019D7": { "start": 6615, "end": 6874, "type": "Code" },
+                "code_list_001ADA": { "start": 6874, "end": 11043, "type": "&Code" },
+                "code_list_002B23": { "start": 11043, "end": 12302, "type": "&Code" },
+                "code_00300E": { "start": 12302, "end": 20153, "type": "Code" },
+                "code_004EB9": { "start": 20153, "end": 20351, "type": "Code" },
+                "code_004F7F": { "start": 20351, "end": 21760, "type": "Code" },
+                "binary_005500": { "start": 21760, "end": 21767, "type": "Binary" },
+                "native_mode_cop_005529": { "start": 21801, "end": 21949, "type": "Code" },
+                "cop_junk": { "start": 21949, "end": 22083, "type": "Word" },
+                "cop_tail_80": { "start": 22083, "end": 29696, "type": "&Code" },
+                "data_007400": { "start": 29696, "end": 29724, "type": "unk4" },
+                "code_00741C": { "start": 29724, "end": 30391, "type": "Code" },
+                "code_0076B7": { "start": 30391, "end": 30655, "type": "Code" },
+                "code_0077BF": { "start": 30655, "end": 32219, "type": "Code" },
+                "code_007DDB": { "start": 32219, "end": 32253, "type": "Code" },
+                "asciistring_007DFD": { "start": 32253, "end": 32283, "type": "ASCIIString" },
+                "code_007E1B": { "start": 32283, "end": 32353, "type": "Code" },
+                "asciistring_007E61": { "start": 32353, "end": 32358, "type": "ASCIIString" },
+                "code_007E66": { "start": 32358, "end": 32389, "type": "Code" },
+                "asciistring_007E85": { "start": 32389, "end": 32669, "type": "ASCIIString" }
+            } 
+        },
+        "native_mode_brk_005507": {
+            "parts": {
+                "native_mode_brk_005507": { "start": 21767, "end": 21801, "type": "Code" }
+            }
+        },
+        "meta_tables_008000": {
+            "order": -1,
+            "parts": {
+                "meta_tables_008000": { "start": 32768, "end": 39348, "type": "&meta_entry" }
+            }
+        },
+        "table_0099B4": {
+            "parts": {
+                "table_0099B4": { "start": 39348, "end": 43486, "type": "unk1" }
+            }
+        },
+        "table_00A9DE": {
+            "parts": {
+                "table_00A9DE": { "start": 43486, "end": 44182, "type": "&Binary" }
+            }
+        },
+        "table_00AC96": {
+            "parts": {
+                "table_00AC96": { "start": 44182, "end": 46746, "type": "&Binary" }
+            }
+        },
+        "table_00B69A": {
+            "parts": {
+                "table_00B69A": { "start": 46746, "end": 47629, "type": "&Binary" }
+            }
+        },
+        "chunk_010000": { 
+            "order": -1, 
+            "parts": {
+                "code_010000": { "start": 65536, "end": 80679, "type": "Code" },
+                "asciistring_0143CB": { "start": 82891, "end": 82996, "type": "ASCIIString" },
+                "asciistring_014434": { "start": 82996, "end": 84103, "type": "ASCIIString" },
+                "binary_01440D": { "start": 84103, "end": 84183, "type": "Binary" },
+                "asciistring_01445D": { "start": 84183, "end": 85090, "type": "ASCIIString" }
+            }
+        },
+        "chunk_018000": {
+            "parts": {
+                "code_018000": { "start": 98304, "end": 98562, "type": "Code" },
+                "code_018102": { "start": 98562, "end": 99134, "type": "Code" },
+                "code_01833E": { "start": 99134, "end": 99469, "type": "Code" },
+                "code_01848D": { "start": 99469, "end": 99963, "type": "Code" },
+                "code_0185A6": { "start": 99750, "end": 99963, "type": "Code" },
+                "code_01867B": { "start": 99963, "end": 100580, "type": "Code" },
+                "code_0188E4": { "start": 100580, "end": 100926, "type": "Code" },
+                "code_018A3E": { "start": 100926, "end": 102403, "type": "Code" },
+                "code_019003": { "start": 102403, "end": 102590, "type": "Code" },
+                "code_0190BE": { "start": 102590, "end": 102794, "type": "Code" },
+                "code_01918A": { "start": 102794, "end": 103167, "type": "Code" },
+                "code_0192FF": { "start": 103167, "end": 103402, "type": "Code" },
+                "code_0193EA": { "start": 103402, "end": 103851, "type": "Code" },
+                "code_0195AB": { "start": 103851, "end": 104264, "type": "Code" },
+                "code_019748": { "start": 104264, "end": 104467, "type": "Code" },
+                "code_019813": { "start": 104467, "end": 104844, "type": "Code" },
+                "code_01998C": { "start": 104844, "end": 105535, "type": "Code" },
+                "code_019C3F": { "start": 105535, "end": 105987, "type": "Code" },
+                "code_019E03": { "start": 105987, "end": 106093, "type": "Code" },
+                "code_019E6D": { "start": 106093, "end": 106213, "type": "Code" },
+                "code_019EE5": { "start": 106213, "end": 106350, "type": "Code" },
+                "code_019F6E": { "start": 106350, "end": 107033, "type": "Code" },
+                "code_01A219": { "start": 107033, "end": 107154, "type": "Code" },
+                "code_01A292": { "start": 107154, "end": 107285, "type": "Code" },
+                "code_01A315": { "start": 107285, "end": 107470, "type": "Code" },
+                "asciistring_01A3CE": { "start": 107470, "end": 108253, "type": "ASCIIString" },
+                "code_01A6DD": { "start": 108253, "end": 108898, "type": "Code" },
+                "code_01A962": { "start": 108898, "end": 109212, "type": "Code" },
+                "code_01AA9C": { "start": 109212, "end": 109419, "type": "Code" },
+                "code_01AB6B": { "start": 109419, "end": 109928, "type": "Code" },
+                "code_01AD68": { "start": 109928, "end": 110092, "type": "Code" },
+                "code_01AE0C": { "start": 110092, "end": 110282, "type": "Code" },
+                "code_01AECA": { "start": 110282, "end": 110443, "type": "Code" },
+                "code_01AF6B": { "start": 110443, "end": 110512, "type": "Code" },
+                "binary_01AFB0": { "start": 110512, "end": 110545, "type": "Binary" },
+                "binary_01AFD1": { "start": 110545, "end": 110610, "type": "Binary" },
+                "binary_01B012": { "start": 110610, "end": 110627, "type": "Binary" },
+                "binary_01B023": { "start": 110627, "end": 110708, "type": "Binary" },
+                "binary_01B074": { "start": 110708, "end": 110765, "type": "Binary" },
+                "binary_01B0AD": { "start": 110765, "end": 110774, "type": "Binary" },
+                "binary_01B0B6": { "start": 110774, "end": 110791, "type": "Binary" },
+                "code_01B0C7": { "start": 110791, "end": 110933, "type": "Code" },
+                "code_01B155": { "start": 110933, "end": 110968, "type": "Code" },
+                "code_01B178": { "start": 110968, "end": 111003, "type": "Code" },
+                "code_01B19B": { "start": 111003, "end": 111020, "type": "Code" },
+                "binary_01B1AC": { "start": 111020, "end": 111057, "type": "Binary" },
+                "code_01B1D1": { "start": 111057, "end": 111074, "type": "Code" },
+                "binary_01B1E2": { "start": 111074, "end": 111113, "type": "Binary" },
+                "code_01B209": { "start": 111113, "end": 111261, "type": "Code" },
+                "code_01B29D": { "start": 111261, "end": 111698, "type": "Code" },
+                "code_01B452": { "start": 111698, "end": 112099, "type": "Code" },
+                "code_01B5E3": { "start": 112099, "end": 112311, "type": "Code" },
+                "code_01B6B7": { "start": 112311, "end": 112620, "type": "Code" },
+                "code_01B7EC": { "start": 112620, "end": 113577, "type": "Code" },
+                "code_01BBA9": { "start": 113577, "end": 113795, "type": "Code" },
+                "code_01BC83": { "start": 113795, "end": 114121, "type": "Code" },
+                "code_01BDC9": { "start": 114121, "end": 114893, "type": "Code" },
+                "code_01C0CD": { "start": 114893, "end": 115064, "type": "Code" },
+                "code_01C178": { "start": 115064, "end": 115822, "type": "Code" },
+                "code_01C46E": { "start": 115822, "end": 116082, "type": "Code" },
+                "code_01C572": { "start": 116082, "end": 116662, "type": "Code" },
+                "code_01C7B6": { "start": 116662, "end": 116944, "type": "Code" },
+                "code_01C8D0": { "start": 116944, "end": 117738, "type": "Code" },
+                "code_01CBEA": { "start": 117738, "end": 118292, "type": "Code" },
+                "code_01CE14": { "start": 118292, "end": 118616, "type": "Code" },
+                "code_01CF58": { "start": 118616, "end": 118760, "type": "Code" },
+                "code_01CFE8": { "start": 118760, "end": 119165, "type": "Code" },
+                "code_01D17D": { "start": 119165, "end": 119279, "type": "Code" },
+                "code_01D1EF": { "start": 119279, "end": 119482, "type": "Code" },
+                "code_01D2BA": { "start": 119482, "end": 119922, "type": "Code" },
+                "code_01D472": { "start": 119922, "end": 120093, "type": "Code" },
+                "code_01D51D": { "start": 120093, "end": 120523, "type": "Code" },
+                "code_01D6CB": { "start": 120523, "end": 121033, "type": "Code" },
+                "code_01D8C9": { "start": 121033, "end": 121180, "type": "Code" },
+                "code_01D95C": { "start": 121180, "end": 121450, "type": "Code" },
+                "code_01DA6A": { "start": 121450, "end": 121591, "type": "Code" },
+                "code_01DAF7": { "start": 121591, "end": 121714, "type": "Code" },
+                "code_01DB72": { "start": 121714, "end": 121861, "type": "Code" },
+                "code_01DC05": { "start": 121861, "end": 122115, "type": "Code" },
+                "code_01DD03": { "start": 122115, "end": 122239, "type": "Code" },
+                "code_01DD7F": { "start": 122239, "end": 122292, "type": "Code" },
+                "code_01DDB4": { "start": 122292, "end": 122507, "type": "Code" },
+                "code_01DE8B": { "start": 122507, "end": 122939, "type": "Code" },
+                "code_01E03B": { "start": 122939, "end": 123741, "type": "Code" },
+                "word_01E35D": { "start": 123741, "end": 123805, "type": "Word" },
+                "word_01E39D": { "start": 123805, "end": 123869, "type": "Word" },
+                "code_01E3DD": { "start": 123869, "end": 124217, "type": "Code" },
+                "code_01E539": { "start": 124217, "end": 124815, "type": "Code" },
+                "code_01E78F": { "start": 124815, "end": 124903, "type": "Code" },
+                "asciistring_01E7E7": { "start": 124903, "end": 124908, "type": "ASCIIString" },
+                "code_01E7EC": { "start": 124908, "end": 126236, "type": "Code" },
+                "code_01EC1F": { "start": 125983, "end": 126236, "type": "Code" },
+                "code_01ED1C": { "start": 126236, "end": 126380, "type": "Code" },
+                "code_01EDAC": { "start": 126380, "end": 126580, "type": "Code" },
+                "code_01EE74": { "start": 126580, "end": 127071, "type": "Code" },
+                "code_01F05F": { "start": 127071, "end": 127224, "type": "Code" },
+                "code_01F0F8": { "start": 127224, "end": 127809, "type": "Code" },
+                "code_01F341": { "start": 127809, "end": 128092, "type": "Code" },
+                "code_01F45C": { "start": 128092, "end": 128667, "type": "Code" },
+                "code_01F69B": { "start": 128667, "end": 128865, "type": "Code" },
+                "code_01F761": { "start": 128865, "end": 129119, "type": "Code" },
+                "code_01F85F": { "start": 129119, "end": 129314, "type": "Code" },
+                "code_01F922": { "start": 129314, "end": 129399, "type": "Code" },
+                "code_01F977": { "start": 129399, "end": 129523, "type": "Code" },
+                "code_01F9F3": { "start": 129523, "end": 129661, "type": "Code" },
+                "code_01FA7D": { "start": 129661, "end": 129790, "type": "Code" },
+                "code_01FAFE": { "start": 129790, "end": 129964, "type": "Code" },
+                "code_01FBAC": { "start": 129964, "end": 130894, "type": "Code" }
+            }
+        },
+        "chunk_020000": {
+            "order": -1,
+            "parts": {
+                "code_020000": { "start": 131072, "end": 131328, "type": "Code" },
+                "code_020100": { "start": 131328, "end": 131405, "type": "Code" },
+                "code_02014D": { "start": 131405, "end": 131571, "type": "Code" },
+                "code_0201F3": { "start": 131571, "end": 131677, "type": "Code" },
+                "code_02025D": { "start": 131677, "end": 131837, "type": "Code" },
+                "code_0202FD": { "start": 131837, "end": 131956, "type": "Code" },
+                "code_020374": { "start": 131956, "end": 132488, "type": "Code" },
+                "code_020588": { "start": 132488, "end": 134301, "type": "Code" },
+                "code_020C9D": { "start": 134301, "end": 134400, "type": "Code" },
+                "code_020D00": { "start": 134400, "end": 134915, "type": "Code" },
+                "code_020F03": { "start": 134915, "end": 135095, "type": "Code" },
+                "code_020FB7": { "start": 135095, "end": 135205, "type": "Code" },
+                "code_021025": { "start": 135205, "end": 135354, "type": "Code" },
+                "code_0210BA": { "start": 135354, "end": 135811, "type": "Code" },
+                "code_021283": { "start": 135811, "end": 135992, "type": "Code" },
+                "code_021338": { "start": 135992, "end": 136363, "type": "Code" },
+                "code_0214AB": { "start": 136363, "end": 136743, "type": "Code" },
+                "code_021627": { "start": 136743, "end": 137084, "type": "Code" },
+                "code_02177C": { "start": 137084, "end": 137249, "type": "Code" },
+                "code_021821": { "start": 137249, "end": 137439, "type": "Code" },
+                "code_0218DF": { "start": 137439, "end": 137604, "type": "Code" },
+                "code_021984": { "start": 137604, "end": 137709, "type": "Code" },
+                "code_0219ED": { "start": 137709, "end": 137809, "type": "Code" },
+                "code_021A51": { "start": 137809, "end": 137929, "type": "Code" },
+                "code_021AC9": { "start": 137929, "end": 138393, "type": "Code" },
+                "code_021C99": { "start": 138393, "end": 138479, "type": "Code" },
+                "code_021CEF": { "start": 138479, "end": 138670, "type": "Code" },
+                "code_021DAE": { "start": 138670, "end": 138802, "type": "Code" },
+                "code_021E32": { "start": 138802, "end": 138855, "type": "Code" },
+                "code_021E67": { "start": 138855, "end": 139074, "type": "Code" },
+                "data_021F42": { "start": 139074, "end": 139168, "type": "unk5" },
+                "code_021FA0": { "start": 139168, "end": 139211, "type": "Code" },
+                "data_021FCB": { "start": 139211, "end": 139275, "type": "Binary" },
+                "code_02200B": { "start": 139275, "end": 139925, "type": "Code" },
+                "code_022295": { "start": 139925, "end": 140130, "type": "Code" },
+                "word_022362": { "start": 140130, "end": 140194, "type": "Word" },
+                "word_0223A2": { "start": 140194, "end": 140258, "type": "Word" },
+                "code_0223E2": { "start": 140258, "end": 140284, "type": "Code" },
+                "data_0223FC": { "start": 140284, "end": 140325, "type": "Binary" },
+                "asciistring_022425": { "start": 140325, "end": 140476, "type": "ASCIIString" },
+                "code_0224BC": { "start": 140476, "end": 140675, "type": "Code" },
+                "code_022583": { "start": 140675, "end": 140752, "type": "Code" },
+                "code_0225D0": { "start": 140752, "end": 140940, "type": "Code" },
+                "code_02268C": { "start": 140940, "end": 141149, "type": "Code" },
+                "code_02275D": { "start": 141149, "end": 141390, "type": "Code" },
+                "code_02284E": { "start": 141390, "end": 141623, "type": "Code" },
+                "code_022937": { "start": 141623, "end": 141718, "type": "Code" },
+                "code_022996": { "start": 141718, "end": 142015, "type": "Code" },
+                "code_022ABF": { "start": 142015, "end": 159609, "type": "Code" },
+                "asciistring_026F79": { "start": 159609, "end": 163840, "type": "ASCIIString" }
+            }
+        },
+        "asset_list_028000": {
+            "parts": {
+                "asset_list_028000": { "start": 163840, "end": 167945, "type": "asset_list" }
+            }
+        },
+        "table_058000": {
+            "parts": {
+                "table_058000": { "start": 360448, "end": 365596, "type": "&unk3" }
+            }
+        },
+        "table_060000": {
+            "parts": {
+                "table_060000": { "start": 393216, "end": 395766, "type": "&unk3" }
+            }
+        },
+        "chunk_0F8000": {
+            "parts": {
+                "code_0F8000": { "start": 1015808, "end": 1048576, "type": "Code" }
+            }
+        }
+    }
+}

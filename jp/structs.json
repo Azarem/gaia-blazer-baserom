@@ -1,0 +1,18 @@
+{
+    "meta_entry": { "types": [ "Byte", "Byte", "Byte", "Word", "Byte", "Word", "Address", "@Code" ] },
+    "unk1": { "delimiter": 255, "types": [ "Byte", "Byte", "&unk2" ] },
+    "unk2": { "delimiter": 255, "types": [ "Byte", "Byte", "Byte", "Byte" ] },
+    "unk3": { "delimiter": 65535, "types": [ "Byte", "Byte", "Byte", "Byte", "Byte", "Byte", "&Binary" ] },
+    "unk4": { "types": [ "Word", "Word" ] },
+    "unk5": { "delimiter": 65535, "types": [ "Word", "Word", "Word" ] },
+    "asset<>": { "discriminator": 0, "delimiter": 0 },
+    "spritemap": { "parent": "asset<>", "discriminator": 1, "types": [ "Byte", "Byte", "Byte", "Location" ] },
+    "music": { "parent": "asset<>", "discriminator": 2, "types": [ "Byte", "Byte", "Location" ] },
+    "meta4": { "parent": "asset<>", "discriminator": 4, "types": [ "Byte", "Byte", "Byte" ] },
+    "asset8": { "parent": "asset<>", "discriminator": 8, "types": [ "Byte" ] },
+    "tilemap": { "parent": "asset<>", "discriminator": 16, "types": [ "Byte", "Location" ] },
+    "tileset": { "parent": "asset<>", "discriminator": 32, "types": [ "Byte", "Byte", "Byte", "Byte", "Location" ] },
+    "palette": { "parent": "asset<>", "discriminator": 64, "types": [ "Byte", "Byte", "Byte", "Location" ] },
+    "graphics": { "parent": "asset<>", "discriminator": 128, "types": [ "Byte", "Byte", "Byte", "Location" ] },
+    "asset_list": { "delimiter": 8481, "types": [ "Byte", "Byte", "asset<>" ] }
+}

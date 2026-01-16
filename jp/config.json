@@ -1,0 +1,49 @@
+{
+  "compression": "QuintetLZ",
+  "sfxLocation": 327680,
+  "sfxCount": 60,
+  "memoryMode": "Lo",
+  "asmFormats": {
+    "Immediate": "#${0:X2}",
+    "Absolute": "${0:X4}",
+    "AbsoluteLong": "${0:X6}",
+    "DirectPage": "${0:X2}",
+    "DirectPageIndirect": "(${0:X2})",
+    "DirectPageIndirectLong": "[${0:X2}]",
+    "AbsoluteIndexedX": "${0:X4}, X",
+    "AbsoluteLongIndexedX": "${0:X6}, X",
+    "AbsoluteIndexedY": "${0:X4}, Y",
+    "AbsoluteIndirect": "(${0})",
+    "AbsoluteIndirectLong": "[${0}]",
+    "AbsoluteIndexedIndirect":  "(${0}, X)",
+    "DirectPageIndexedX": "${0:X2}, X",
+    "DirectPageIndexedIndirectX": "(${0:X2}, X)",
+    "DirectPageIndirectIndexedY": "(${0:X2}), Y",
+    "DirectPageIndirectLongIndexedY": "[${0:X2}], Y",
+    "StackInterrupt": "#${0:X2}",
+    "StackRelative": "${0:X2}, S",
+    "StackRelativeIndirectIndexedY": "(${0:X2}, S), Y",
+    "PCRelative": "{0}",
+    "PCRelativeLong": "{0}",
+    "BlockMove": "#${0:X2}, #${1:X2}"
+  },
+  "paths": {
+    "Bitmap": { "folder": "graphics", "extension": "bin" },
+    "Palette": { "folder": "palettes", "extension": "pal" },
+    "Music": { "folder": "music", "extension": "bgm" },
+    "Tileset": { "folder": "tilesets", "extension": "set" },
+    "Tilemap": { "folder": "tilemaps", "extension": "map" },
+    "Spritemap": { "folder": "spritemaps", "extension": "spm" },
+    "Assembly": { "folder": "asm", "extension": "asm" },
+    "Sound": { "folder": "sfx", "extension": "sfx" },
+    "Unknown": { "folder": "misc", "extension": "unk" },
+    "Patch": { "folder": "patches", "extension": "asm" }
+  },
+  "entryPoints": [
+    { "location": 65508, "name": "native_mode_cop_008007" },
+    { "location": 65510, "name": "native_mode_irq_00800F" },
+    { "location": 65514, "name": "native_mode_nmi_00800B" },
+    { "location": 65518, "name": "native_mode_irq_00800F" },
+    { "location": 65532, "name": "emulation_mode_reset_008000" }
+  ]
+}
