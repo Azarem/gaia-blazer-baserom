@@ -17,28 +17,31 @@
     ],
     "scripts": {
         "prebuild": "node -p \"'export const BASEROM_VERSION = ' + JSON.stringify(require('./package.json').version) + ';'\" > src/version.ts",
-        "build": "tsup",
-        "dev": "tsup --watch",
+        "build": "tsdown",
+        "dev": "tsdown --watch",
         "lint": "eslint src --ext .ts,.tsx",
         "lint:fix": "eslint src --ext .ts,.tsx --fix",
         "test": "vitest run",
         "test:watch": "vitest --watch",
         "type-check": "tsc --noEmit",
         "clean": "rm -rf dist",
-        "publish": "tsup && npm publish --access public",
+        "publish": "tsdown && npm publish --access public",
         "extract": "ts-node src/index.ts extract",
         "extract-jp": "ts-node src/index.ts extract-jp",
         "extract-strings": "ts-node src/extractStrings.ts",
         "rebuild": "ts-node src/index.ts rebuild"
     },
+    "dependencies": {
+        "@gaialabs/core": "^0.2.1"
+    },
     "devDependencies": {
-        "@types/node": "^20.10.0",
-        "@typescript-eslint/eslint-plugin": "^8.36.0",
-        "@typescript-eslint/parser": "^8.36.0",
-        "eslint": "^9.30.1",
-        "tsup": "^8.5.0",
-        "typescript": "^5.8.3",
-        "vitest": "^3.2.4"
+        "@types/node": "^20.19.29",
+        "@typescript-eslint/eslint-plugin": "^8.53.0",
+        "@typescript-eslint/parser": "^8.53.0",
+        "eslint": "^9.39.2",
+        "tsdown": "^0.20.0-beta.3",
+        "typescript": "^5.9.3",
+        "vitest": "^4.0.17"
     },
     "exports": {
         ".": {
@@ -56,8 +59,5 @@
         "universal"
     ],
     "author": "GaiaLabs Team",
-    "license": "MIT",
-    "dependencies": {
-        "@gaialabs/core": "file:../gaia-core"
-    }
+    "license": "MIT"
 }
