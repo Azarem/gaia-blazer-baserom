@@ -10,5 +10,5 @@ export default defineConfig({
   treeshake: true,
   minify: false,
   target: 'es2022',
-  external: ['fs', 'path'],
+  external: ['fs', 'path', '@gaialabs/core'],
 }); 

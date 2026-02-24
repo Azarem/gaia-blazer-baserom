@@ -1,2 +1,6 @@
 {
+    "chunk_000000": [
+        { "key": "&meta_tables_008000\\+", "value": "800" },
+        { "key": "&meta_tables_00", "value": "" }
+    ]
 }

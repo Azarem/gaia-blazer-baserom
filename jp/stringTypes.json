@@ -23,7 +23,7 @@
     ],
     "commands": {
       "00": { "id": 0, "types": [], "halt": true },
-      "01": { "id": 1, "types": [ "Word" ] },
+      "CUR": { "id": 1, "types": [ "Word" ] },
       "02": { "id": 2, "types": [ "Byte" ] },
       "03": { "id": 3, "types": [ "Byte" ] },
       "04": { "id": 4, "types": [ "Word", "Word" ] },

@@ -92,7 +92,7 @@ export async function rebuild(inPath: string, outPath: string, baseRomPath: stri
     
     var dbRoot = DbRootUtils.fromGameModule(db);
 
-    await DbRootUtils.rebuildAllContent(dbRoot, [inPath, baseRomPath], `${outPath}/GaiaLabs.smc`);
+    await DbRootUtils.rebuildAllContent(dbRoot, [inPath, baseRomPath], `${outPath}/GaiaLabs-Blazer.smc`);
 }
 
 // CLI handler - only execute when run directly (not when imported as a module)

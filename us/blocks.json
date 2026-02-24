@@ -2,13 +2,36 @@
     "system": {
         "chunk_000000": { 
             "parts": {
-                "emulation_mode_reset_000000": { "start": 0, "end": 834, "type": "Code" },
+                "emulation_mode_reset_000000": { "start": 0, "end": 517, "type": "Code" },
+                "code_000205": { "start": 517, "end": 781, "type": "Code" },
+                "binary_00030D": { "start": 781, "end": 797, "type": "Binary" },
+                "code_00031D": { "start": 797, "end": 834, "type": "Code" },
                 "native_mode_nmi_000342": { "start": 834, "end": 1445, "type": "Code" },
-                "native_mode_irq_0005A5": { "start": 1445, "end": 6955, "type": "Code" },
-                "code_list_001B2B": { "start": 6955, "end": 22012, "type": "&Code" },
-                "native_mode_cop_00561E": { "start": 22046, "end": 30419, "type": "Code" },
+                "native_mode_irq_0005A5": { "start": 1445, "end": 4783, "type": "Code" },
+                "code_0012AF": { "start": 4783, "end": 5394, "type": "Code" },
+                "code_001512": { "start": 5394, "end": 5512, "type": "Code" },
+                "word_001588": { "start": 5512, "end": 5600, "type": "Word" },
+                "code_0015E0": { "start": 5600, "end": 6955, "type": "Code" },
+                "code_list_001B2B": { "start": 6955, "end": 11124, "type": "&Code" },
+                "code_002928": { "start": 10536, "end": 10590, "type": "Code" },
+                "code_00295E": { "start": 10590, "end": 10732, "type": "Code" },
+                "code_0029EC": { "start": 10732, "end": 10768, "type": "Code" },
+                "code_002A10": { "start": 10768, "end": 11124, "type": "Code" },
+                "data_002B74": { "start": 11124, "end": 11134, "type": "Binary" },
+                "code_002B7E": { "start": 11134, "end": 11142, "type": "Code" },
+                "code_002B84": { "start": 11142, "end": 11496, "type": "Code" },
+                "code_002CE8": { "start": 11496, "end": 11623, "type": "Code" },
+                "code_002D67": { "start": 11623, "end": 12383, "type": "Code" },
+                "code_00305F": { "start": 12383, "end": 21332, "type": "Code" },
+                "code_005354": { "start": 21332, "end": 22012, "type": "Code" },
+                "native_mode_cop_00561E": { "start": 22046, "end": 22194, "type": "Code" },
+                "cop_junk": { "start": 22194, "end": 22328, "type": "Word" },
+                "cop_tail_80": { "start": 22328, "end": 25878, "type": "&Code" },
+                "binary_06516": { "start": 25878, "end": 25886, "type": "Binary" },
+                "code_00651E": { "start": 25886, "end": 30419, "type": "Code" },
                 "data_0076D3": { "start": 30419, "end": 30447, "type": "unk4" },
-                "code_0076EF": { "start": 30447, "end": 31319, "type": "Code" }
+                "code_0076EF": { "start": 30447, "end": 31099, "type": "Code" },
+                "code_00797B": { "start": 31099, "end": 31319, "type": "Code" }
             } 
         },
         "native_mode_brk_0055FC": {
@@ -33,31 +56,148 @@
         },
         "table_00AC96": {
             "parts": {
-                "table_00AC96": { "start": 44182, "end": 46746, "type": "&Binary" }
+                "table_00AC96": { "start": 44182, "end": 46746, "type": "&unk6" }
             }
         },
         "table_00B69A": {
             "parts": {
-                "table_00B69A": { "start": 46746, "end": 47629, "type": "&Binary" }
+                "table_00B69A": { "start": 46746, "end": 47629, "type": "&unk7" }
+            }
+        },
+        "data_00BA0D": {
+            "parts": {
+                "data_00BA0D": { "start": 47629, "end": 61070, "type": "unk8" }
+            }
+        },
+        "data_00EE8E": {
+            "parts": {
+                "data_00EE8E": { "start": 61070, "end": 63898, "type": "&unk9" }
+            }
+        },
+        "data_00F99A": {
+            "parts": {
+                "data_00F99A": { "start": 63898, "end": 63991, "type": "unk10" }
+            }
+        },
+        "data_00F9F7": {
+            "parts": {
+                "word_00F9F7": { "start": 63991, "end": 64007, "type": "Word" },
+                "word_00FA07": { "start": 64007, "end": 64023, "type": "Word" },
+                "word_00FA17": { "start": 64023, "end": 64039, "type": "Word" },
+                "word_00FA27": { "start": 64039, "end": 64119, "type": "Word" },
+                "binary_00FA77": { "start": 64119, "end": 64127, "type": "Binary" },
+                "binary_00FA7F": { "start": 64127, "end": 64171, "type": "Binary" },
+                "binary_00FAAB": { "start": 64171, "end": 64215, "type": "Binary" },
+                "word_00FAD7": { "start": 64215, "end": 64303, "type": "Word" },
+                "word_00FB2F": { "start": 64303, "end": 64329, "type": "Word" },
+                "table_00FB49": { "start": 64329, "end": 64392, "type": "Address" },
+                "table_00FB88": { "start": 64392, "end": 64416, "type": "Address" },
+                "table_00FBA0": { "start": 64416, "end": 64440, "type": "Address" },
+                "word_00FBB8": { "start": 64440, "end": 64644, "type": "Word" },
+                "binary_00FC84": { "start": 64644, "end": 64708, "type": "Binary" },
+                "binary_00FCC4": { "start": 64708, "end": 64964, "type": "Binary" },
+                "binary_00FDC4": { "start": 64964, "end": 65092, "type": "Binary" }
             }
         },
         "chunk_010000": { 
             "order": -1, 
             "parts": {
-                "code_010000": { "start": 65536, "end": 80679, "type": "Code" },
+                "code_010000": { "start": 65536, "end": 67771, "type": "Code" },
+                "code_0108BB": { "start": 67771, "end": 68054, "type": "Code" },
+                "code_0109D6": { "start": 68054, "end": 71038, "type": "Code" },
+                "code_01157E": { "start": 71038, "end": 71341, "type": "Code" },
+                "binary_0116AD": { "start": 71341, "end": 71363, "type": "Binary" },
+                "code_0116C3": { "start": 71363, "end": 71868, "type": "Code" },
+                "binary_0118BC": { "start": 71868, "end": 71932, "type": "Binary" },
+                "code_0118FC": { "start": 71932, "end": 74359, "type": "Code" },
+                "word_012277": { "start": 74359, "end": 74369, "type": "Word" },
+                "code_012281": { "start": 74369, "end": 80679, "type": "Code" },
                 "asciistring_013B27": { "start": 80679, "end": 82957, "type": "ASCIIString" },
                 "binary_01440D": { "start": 82957, "end": 83037, "type": "Binary" },
-                "asciistring_01445D": { "start": 83037, "end": 83757, "type": "ASCIIString" }
+                "asciistring_01445D": { "start": 83037, "end": 83849, "type": "ASCIIString" },
+                "binary_list_014789": { "start": 83849, "end": 83906, "type": "&Binary" },
+                "asciistring_list_0147C2": { "start": 83906, "end": 85876, "type": "&ASCIIString" },
+                "asciistring_list_014F74": { "start": 85876, "end": 86758, "type": "&ASCIIString" },
+                "asciistring_list_0152E6": { "start": 86758, "end": 87410, "type": "&ASCIIString" },
+                "asciistring_list_015572": { "start": 87410, "end": 90412, "type": "&ASCIIString" },
+                "word_01612C": { "start": 90412, "end": 90540, "type": "Word" },
+                "binary_0161AC": { "start": 90540, "end": 90574, "type": "Binary(17)" },
+                "word_0161CE": { "start": 90574, "end": 90590, "type": "Word" },
+                "asciistring_0161DE": { "start": 90590, "end": 92321, "type": "ASCIIString" },
+                "binary_list_0168A1": { "start": 92321, "end": 93741, "type": "&Binary" },
+                "binary_016E2D": { "start": 93741, "end": 94861, "type": "Binary(32)" },
+                "unk13_01728D": { "start": 94861, "end": 95492, "type": "unk13" },
+                "unk14_017504": { "start": 95492, "end": 95788, "type": "unk14" },
+                "word_01762C": { "start": 95788, "end": 96048, "type": "Word" }
             } 
         },
         "chunk_018000": {
             "parts": {
-                "code_018000": { "start": 98304, "end": 131072, "type": "Code" }
+                "code_018000": { "start": 98304, "end": 107769, "type": "Code" },
+                "asciistring_01A4F9": { "start": 107769, "end": 110658, "type": "ASCIIString" },
+                "unk16_01B042": { "start": 110658, "end": 110945, "type": "unk16" },
+                "code_01B161": { "start": 110945, "end": 111182, "type": "Code" },
+                "palette_01B24E": { "start": 111182, "end": 111218, "type": "Word" },
+                "code_01B273": { "start": 111219, "end": 111236, "type": "Code" },
+                "palette_01B284": { "start": 111236, "end": 111274, "type": "Word" },
+                "asciistring_01B2AB": { "start": 111275, "end": 113032, "type": "ASCIIString" },
+                "asciistring_01B988": { "start": 113032, "end": 113037, "type": "ASCIIString" }
+            }
+        },
+        "chunk_01B98D": {
+            "parts": {
+                "code_01B98D": { "start": 113037, "end": 125563, "type": "Code" },
+                "word_01EA7B": { "start": 125563, "end": 125691, "type": "Word" },
+                "code_01EAFB": { "start": 125691, "end": 125826, "type": "Code" },
+                "word_01EB82": { "start": 125826, "end": 125890, "type": "Word" },
+                "asciistring_01EBC2": { "start": 125890, "end": 126027, "type": "ASCIIString" }
+            }
+        },
+        "chunk_01EC4B": {
+            "parts": {
+                "code_01EC4B": { "start": 126027, "end": 126661, "type": "Code" },
+                "asciistring_01EEC5": { "start": 126661, "end": 126819, "type": "ASCIIString" },
+                "word_01EF63": { "start": 126819, "end": 127075, "type": "Word" },
+                "code_01F063": { "start": 127075, "end": 127183, "type": "Code" },
+                "word_01F0CF": { "start": 127183, "end": 127311, "type": "Word" },
+                "code_01F14F": { "start": 127311, "end": 127482, "type": "Code" }
             }
         },
         "chunk_020000": {
             "parts": {
-                "code_020000": { "start": 131072, "end": 163840, "type": "Code" }
+                "code_020000": { "start": 131072, "end": 139177, "type": "Code" },
+                "unk15_021FA9": { "start": 139177, "end": 139271, "type": "unk15" },
+                "code_022007": { "start": 139271, "end": 139314, "type": "Code" },
+                "byte_022032": { "start": 139314, "end": 139378, "type": "Byte" },
+                "code_022072": { "start": 139378, "end": 139837, "type": "Code" },
+                "unk16_02223D": { "start": 139837, "end": 139913, "type": "unk16" },
+                "code_022289": { "start": 139913, "end": 140247, "type": "Code" },
+                "word_0223D7": { "start": 140247, "end": 140375, "type": "Word" },
+                "code_022457": { "start": 140375, "end": 140401, "type": "Code" },
+                "word_022471": { "start": 140401, "end": 140442, "type": "Word" },
+                "asciistring_02249A": { "start": 140442, "end": 140579, "type": "ASCIIString" }
+            }
+        },
+        "chunk_022523": {
+            "parts": {
+                "code_022523": { "start": 140579, "end": 147368, "type": "Code" }
+            }
+        },
+        "chunk_023FA8": {
+            "parts": {
+                "code_023FA8": { "start": 147368, "end": 159218, "type": "Code" },
+                "asciistring_026DF2": { "start": 159218, "end": 159416, "type": "ASCIIString" },
+                "asciistring_026EB8": { "start": 159416, "end": 159787, "type": "ASCIIString" },
+                "unk16_02702B": { "start": 159787, "end": 159852, "type": "unk16" },
+                "asciistring_02706C": { "start": 159852, "end": 159972, "type": "ASCIIString" }
+            }
+        },
+        "chunk_0270E4": {
+            "parts": {
+                "code_0270E4": { "start": 159972, "end": 160344, "type": "Code" },
+                "word_027258": { "start": 160344, "end": 160352, "type": "Word" },
+                "code_027260": { "start": 160352, "end": 160375, "type": "Code" },
+                "code_027277": { "start": 160375, "end": 162515, "type": "Code" }
             }
         },
         "asset_list_028000": {
@@ -65,9 +205,22 @@
                 "asset_list_028000": { "start": 163840, "end": 167938, "type": "asset_list" }
             }
         },
-        "string_lookup_080000": {
+        "spc_030000": {
             "parts": {
-                "lookup_080000": { "start": 524288, "end": 525824, "type": "ASCIIString(12)" }
+                "spc_030000": { "start": 196608, "end": 198414, "type": "Binary(16)" }
+            }
+        },
+        "data_048800": {
+            "parts": {
+                "unk17_048800": { "start": 296960, "end": 297984, "type": "unk17" }
+            }
+        },
+        "data_04F000": {
+            "parts": {
+                "binary_04F000": { "start": 323584, "end": 323840, "type": "Binary(16)" },
+                "binary_04F100": { "start": 323840, "end": 324096, "type": "Binary(16)" },
+                "binary_04F200": { "start": 324096, "end": 324352, "type": "Binary(16)" },
+                "binary_04F300": { "start": 324352, "end": 324512, "type": "Binary(16)" }
             }
         },
         "table_058000": {
@@ -80,9 +233,41 @@
                 "table_060000": { "start": 393216, "end": 395766, "type": "&unk3" }
             }
         },
+        "table_068000": {
+            "parts": {
+                "table_068000": { "start": 425984, "end": 440320, "type": "&unk11" }
+            }
+        },
+        "table_070000": {
+            "parts": {
+                "table_070000": { "start": 458752, "end": 460527, "type": "&unk12" }
+            }
+        },
+        "table_078000": {
+            "parts": {
+                "table_078000": { "start": 491520, "end": 500834, "type": "&unk12" }
+            }
+        },
+        "string_lookup_080000": {
+            "parts": {
+                "lookup_080000": { "start": 524288, "end": 525824, "type": "ASCIIString(12)" }
+            }
+        },
         "chunk_0F8000": {
             "parts": {
-                "code_0F8000": { "start": 1015808, "end": 1048576, "type": "Code" }
+                "code_0F8000": { "start": 1015808, "end": 1025454, "type": "Code" },
+                "unk16_0FA5AE": { "start": 1025454, "end": 1025471, "type": "unk16" },
+                "code_0FA5BF": { "start": 1025471, "end": 1026100, "type": "Code" },
+                "word_0FA834": { "start": 1026100, "end": 1026164, "type": "Word" },
+                "code_0FA874": { "start": 1026164, "end": 1026309, "type": "Code" },
+                "word_0FA905": { "start": 1026309, "end": 1026373, "type": "Word" },
+                "code_0FA945": { "start": 1026373, "end": 1026633, "type": "Code" }
+            }
+        },
+        "chunk_0FAA49": {
+            "parts": {
+                "code_0FAA49": { "start": 1026633, "end": 1044814, "type": "Code" },
+                "spc_0FF14E": { "start": 1044814, "end": 1047709, "type": "Binary(16)" }
             }
         }
     }

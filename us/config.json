@@ -1,8 +1,12 @@
 {
   "compression": "QuintetLZ",
-  "sfxLocation": 327680,
-  "sfxCount": 60,
+  "sfxLocation": 229376,
+  "sfxCount": 32,
+  "sfxType": "Sequential",
   "memoryMode": "Lo",
+  "cpuMode": "Slow",
+  "chipset": 2,
+  "ramSize": 3,
   "asmFormats": {
     "Immediate": "#${0:X2}",
     "Absolute": "${0:X4}",
@@ -40,10 +44,10 @@
     "Patch": { "folder": "patches", "extension": "asm" }
   },
   "entryPoints": [
-    { "location": 65508, "name": "native_mode_cop_008007" },
-    { "location": 65510, "name": "native_mode_irq_00800F" },
-    { "location": 65514, "name": "native_mode_nmi_00800B" },
-    { "location": 65518, "name": "native_mode_irq_00800F" },
-    { "location": 65532, "name": "emulation_mode_reset_008000" }
+    { "location": 32740, "name": "native_mode_cop_00561E" },
+    { "location": 32742, "name": "native_mode_brk_0055FC" },
+    { "location": 32746, "name": "native_mode_nmi_000342" },
+    { "location": 32750, "name": "native_mode_irq_0005A5" },
+    { "location": 32764, "name": "emulation_mode_reset_000000" }
   ]
 }
