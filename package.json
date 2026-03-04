@@ -26,10 +26,10 @@
         "type-check": "tsc --noEmit",
         "clean": "rm -rf dist",
         "publish": "tsdown && npm publish --access public",
-        "extract": "ts-node src/index.ts extract",
-        "extract-jp": "ts-node src/index.ts extract-jp",
-        "extract-strings": "ts-node src/extractStrings.ts",
-        "rebuild": "ts-node src/index.ts rebuild"
+        "extract": "tsx src/index.ts extract",
+        "extract-jp": "tsx src/index.ts extract-jp",
+        "extract-strings": "tsx src/extractStrings.ts",
+        "rebuild": "tsx src/index.ts rebuild"
     },
     "dependencies": {
         "@gaialabs/core": "^0.2.2"
