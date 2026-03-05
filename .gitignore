@@ -2,3 +2,4 @@ node_modules
 dist
 extracted
 rebuilt
+package-lock.json

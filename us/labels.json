@@ -75,6 +75,8 @@
     { "location": 160170, "label": "^graphics_054000" },
     { "location": 160204, "label": "&graphics_05C000+2" },
     { "location": 160211, "label": "^graphics_05C000" },
+    { "location": 160245, "label": "&graphics_04D000+2" },
+    { "location": 160252, "label": "^graphics_04D000" },
     { "location": 161168, "label": "$2" },
     { "location": 161190, "label": "$2" },
     { "location": 161212, "label": "$2" },
