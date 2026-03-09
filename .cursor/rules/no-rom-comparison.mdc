@@ -1,0 +1,5 @@
+---
+alwaysApply: true
+---
+
+Do not make binary or location comparisons between the original ROM and rebuilt ROM.

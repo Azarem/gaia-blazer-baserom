@@ -14,7 +14,9 @@
     },
     "Spritemap": {
         "extension": "spm",
-        "type": "Spritemap"
+        "type": "Spritemap",
+        "struct": "&spritemap",
+        "base": 14336
     },
     "Music": {
         "extension": "bgm",

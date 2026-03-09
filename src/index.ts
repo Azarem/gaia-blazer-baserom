@@ -32,6 +32,7 @@ import fileTypesJP from '../jp/fileTypes.json' with { type: 'json' };
 //import neutralsJP from '../jp/neutrals.json' with { type: 'json' };
 
 import addrModes from '../snes/addressingModes.json' with { type: 'json' };
+import path from 'path';
 
 export const db : DbGameRomModule = {
     mnemonics,
@@ -70,9 +71,10 @@ export const jp : DbGameRomModule = {
 };
 
 export async function extract(romPath: string, outPath: string) {
+    if(!romPath) romPath = './rebuilt/Soul Blazer (USA).sfc';
     if(!outPath) outPath = './extracted';
 
-    var dbRoot = DbRootUtils.fromGameModule(db);
+    const dbRoot = DbRootUtils.fromGameModule(db);
 
     await DbRootUtils.extractAllContent(dbRoot, romPath, outPath);
 }
@@ -80,7 +82,7 @@ export async function extract(romPath: string, outPath: string) {
 export async function extractJP(romPath: string, outPath: string) {
     if(!outPath) outPath = './extracted';
 
-    var dbRoot = DbRootUtils.fromGameModule(jp);
+    const dbRoot = DbRootUtils.fromGameModule(jp);
 
     await DbRootUtils.extractAllContent(dbRoot, romPath, outPath);
 }
@@ -90,9 +92,17 @@ export async function rebuild(inPath: string, outPath: string, baseRomPath: stri
     if(!outPath) outPath = './rebuilt';
     if(!baseRomPath) baseRomPath = './baserom';
     
-    var dbRoot = DbRootUtils.fromGameModule(db);
+    const dbRoot = DbRootUtils.fromGameModule(db);
 
-    await DbRootUtils.rebuildAllContent(dbRoot, [inPath, baseRomPath], `${outPath}/GaiaLabs-Blazer.smc`);
+    const files = await DbRootUtils.rebuildAllContent(dbRoot, [inPath, baseRomPath], `${outPath}/GaiaLabs-Blazer.smc`);
+    
+    const layoutJson = JSON.stringify(files
+        .sort((a, b) => a.location - b.location)
+        .map(file => (
+            { name: file.name, type: file.type.name, compressed: file.compressed, location: file.location, size: file.size }
+        ))
+    , null, 2);
+    saveFileAsText(path.join(outPath, 'layout.json'), layoutJson);
 }
 
 // CLI handler - only execute when run directly (not when imported as a module)

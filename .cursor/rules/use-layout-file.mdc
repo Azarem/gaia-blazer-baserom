@@ -1,0 +1,5 @@
+---
+alwaysApply: true
+---
+
+The rebuilt ROM has completely different data locations. Please use the rebuilt/layout.json file for referencing all file location/information.

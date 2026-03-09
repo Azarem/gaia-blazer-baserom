@@ -23,7 +23,7 @@
   "17": { "id": 23, "size": 2, "parts": [ "&Code" ] },
   "18": { "id": 24, "size": 3, "parts": [ "Byte", "&Code" ] },
   "19": { "id": 25, "size": 3, "parts": [ "Byte", "&Code" ] },
-  "1A": { "id": 26, "size": 5, "parts": [ "Word", "Byte", "&Code" ] },
+  "1A": { "id": 26, "size": 5, "parts": [ "&ASCIIString$2", "Byte", "&Code" ] },
   "1B": { "id": 27, "size": 4, "parts": [ "&Code", "Word" ] },
   "1C": { "id": 28, "size": 4, "parts": [ "Word", "&Code" ] },
   "1D": { "id": 29, "size": 2, "parts": [ "Word" ] },

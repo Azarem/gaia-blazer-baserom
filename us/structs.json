@@ -7,7 +7,7 @@
     "unk5": { "delimiter": 65535, "types": [ "Word", "Word", "Word" ] },
     "unk6": { "delimiter": 255, "types": [ "Byte", "Byte", "Byte", "Byte", "Byte", "Byte", "Byte", "Byte", "Byte", "Byte", "Byte" ] },
     "unk7": { "delimiter": 255, "types": [ "Byte", "Byte", "Word" ] },
-    "unk8": { "delimiter": 255, "types": [ "Byte", "Byte", "Byte", "Byte", "Byte", "Byte", "Byte", "Byte", "Byte", "Byte", "Byte", "Byte", "Byte", "Byte", "Byte", "Byte", "Word", "Byte", "Byte", "Byte", "Byte", "Word", "Word", "Word", "Word", "Word" ] },
+    "unk8": { "delimiter": 255, "types": [ "Byte", "Byte", "Byte", "Byte", "Byte", "Byte", "Byte", "Byte", "Byte", "Byte", "Byte", "Byte", "Byte", "Byte", "Byte", "Byte", "@Code", "Byte", "Byte", "Byte", "Word", "Word", "Word", "Word", "Word" ] },
     "unk9": { "types": [ "Word", "Word", "Word" ] },
     "unk10": { "delimiter": 255, "types": [ "Byte", "Word", "Byte" ] },
     "unk11": { "delimiter": 0, "types": [ "Byte", "&Binary", "Byte", "Byte", "Byte" ] },
