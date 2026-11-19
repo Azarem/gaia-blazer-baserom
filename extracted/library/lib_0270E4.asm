@@ -5,43 +5,43 @@
 ---------------------------------------------
 
 code_0270E4 {
-    PHP                   ; {159972}
-    PHX                   ; {159973}
-    PHB                   ; {159974}
-    REP #$20              ; {159975}
-    LDA $03BA             ; {159977}
-    INC                   ; {159980}
-    STA $1B90             ; {159981}
-    LDA $03A4             ; {159984}
-    STA $701FFE           ; {159987}
-    XBA                   ; {159991}
-    ASL                   ; {159992}
-    ASL                   ; {159993}
-    TAY                   ; {159994}
-    PHY                   ; {159995}
-    LDX #$0203            ; {159996}
-    LDA #$01FF            ; {159999}
-    MVN #$70, #$7F        ; {160002}
-    LDX #$1A5E            ; {160005}
-    LDA #$01F9            ; {160008}
-    MVN #$70, #$01        ; {160011}
-    PLX                   ; {160014}
-    PLB                   ; {160015}
-    JSL $@lib_shared_02716E.code_02716E ; {160016}
-    LDA $16               ; {160020}
-    STA $7003FA, X        ; {160022}
-    LDA $18               ; {160026}
-    STA $7003FC, X        ; {160028}
-    PHB                   ; {160032}
-    TXY                   ; {160033}
-    TYA                   ; {160034}
-    CLC                   ; {160035}
-    ADC #$1000            ; {160036}
-    TAY                   ; {160039}
-    LDA #$03FD            ; {160040}
-    MVN #$70, #$70        ; {160043}
-    PLB                   ; {160046}
-    PLX                   ; {160047}
-    PLP                   ; {160048}
-    RTL                   ; {160049}
+    PHP 
+    PHX 
+    PHB 
+    REP #$20
+    LDA $03BA
+    INC 
+    STA $1B90
+    LDA $03A4
+    STA $701FFE
+    XBA 
+    ASL 
+    ASL 
+    TAY 
+    PHY 
+    LDX #$0203
+    LDA #$01FF
+    MVN #$70, #$7F
+    LDX #$1A5E
+    LDA #$01F9
+    MVN #$70, #$01
+    PLX 
+    PLB 
+    JSL $@lib_shared_02716E.code_02716E
+    LDA $16
+    STA $7003FA, X
+    LDA $18
+    STA $7003FC, X
+    PHB 
+    TXY 
+    TYA 
+    CLC 
+    ADC #$1000
+    TAY 
+    LDA #$03FD
+    MVN #$70, #$70
+    PLB 
+    PLX 
+    PLP 
+    RTL 
 }

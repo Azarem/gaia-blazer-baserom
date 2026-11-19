@@ -5,29 +5,29 @@
 ---------------------------------------------
 
 code_026D80 {
-    COP [14] ( #$0195, &code_026D8C ) ; {159104}
-    COP [3B] ( #$0195, &code_026D9E ) ; {159110}
+    COP [14] ( #$0195, &code_026D8C )
+    COP [3B] ( #$0195, &code_026D9E )
 }
 
 code_026D8C {
-    LDA $0016, X          ; {159116}
-    AND #$FFEF            ; {159119}
-    STA $0016, X          ; {159122}
-    COP [91]              ; {159125}
-    COP [0D] ( #00, #17, #0F, &code_026D9F ) ; {159127}
+    LDA $0016, X
+    AND #$FFEF
+    STA $0016, X
+    COP [91]
+    COP [0D] ( #00, #17, #0F, &code_026D9F )
 }
 
 code_026D9E {
-    RTL                   ; {159134}
+    RTL 
 }
 
 code_026D9F {
-    COP [01] ( &asciistring_026DB6 ) ; {159135}
-    COP [09] ( #$8900 )   ; {159139}
-    STZ $0419             ; {159143}
-    BRK #$91              ; {159146}
-    COP [10] ( #$0113, #01, #$0170, #$00F0 ) ; {159148}
-    RTL                   ; {159157}
+    COP [01] ( &asciistring_026DB6 )
+    COP [09] ( #$8900 )
+    STZ $0419
+    BRK #$91
+    COP [10] ( #$0113, #01, #$0170, #$00F0 )
+    RTL 
 }
 
 asciistring_026DB6 |[10][02:2] drove [N]the Airship back to [N]the dock- [JMP:&w5_shared_02706C.asciistring_0270DF]|

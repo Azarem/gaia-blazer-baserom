@@ -6,62 +6,62 @@
 ---------------------------------------------
 
 code_021F52 {
-    LDA $location_id      ; {139090}
-    AND #$00FF            ; {139093}
-    CMP #$0045            ; {139096}
-    BEQ loc_021F6D        ; {139099}
-    CMP #$0047            ; {139101}
-    BEQ loc_021F65        ; {139104}
-    COP [86]              ; {139106}
-    RTL                   ; {139108}
+    LDA $location_id
+    AND #$00FF
+    CMP #$0045
+    BEQ loc_021F6D
+    CMP #$0047
+    BEQ loc_021F65
+    COP [86]
+    RTL 
 
   loc_021F65:
-    COP [91]              ; {139109}
-    PHX                   ; {139111}
-    LDX #$&unk15_021FED   ; {139112}
-    BRA loc_021F73        ; {139115}
+    COP [91]
+    PHX 
+    LDX #$&unk15_021FED
+    BRA loc_021F73
 
   loc_021F6D:
-    COP [91]              ; {139117}
-    PHX                   ; {139119}
-    LDX #$&unk15_021FA9   ; {139120}
+    COP [91]
+    PHX 
+    LDX #$&unk15_021FA9
 
   loc_021F73:
-    LDY $player_actor     ; {139123}
+    LDY $player_actor
 
   loc_021F76:
-    LDA $040000, X        ; {139126}
-    CMP #$FFFF            ; {139130}
-    BEQ loc_021F95        ; {139133}
-    CMP $0000, Y          ; {139135}
-    BNE loc_021F8D        ; {139138}
-    LDA $040002, X        ; {139140}
-    CMP $0002, Y          ; {139144}
-    BEQ loc_021F97        ; {139147}
+    LDA $040000, X
+    CMP #$FFFF
+    BEQ loc_021F95
+    CMP $0000, Y
+    BNE loc_021F8D
+    LDA $040002, X
+    CMP $0002, Y
+    BEQ loc_021F97
 
   loc_021F8D:
-    TXA                   ; {139149}
-    CLC                   ; {139150}
-    ADC #$0006            ; {139151}
-    TAX                   ; {139154}
-    BRA loc_021F76        ; {139155}
+    TXA 
+    CLC 
+    ADC #$0006
+    TAX 
+    BRA loc_021F76
 
   loc_021F95:
-    PLX                   ; {139157}
-    RTL                   ; {139158}
+    PLX 
+    RTL 
 
   loc_021F97:
-    LDA $040004, X        ; {139159}
-    BEQ loc_021FA3        ; {139163}
-    COP [09] ( #$8000 )   ; {139165}
-    BRA loc_021FA7        ; {139169}
+    LDA $040004, X
+    BEQ loc_021FA3
+    COP [09] ( #$8000 )
+    BRA loc_021FA7
 
   loc_021FA3:
-    COP [09] ( #$0000 )   ; {139171}
+    COP [09] ( #$0000 )
 
   loc_021FA7:
-    PLX                   ; {139175}
-    RTL                   ; {139176}
+    PLX 
+    RTL 
 }
 ---------------------------------------------
 

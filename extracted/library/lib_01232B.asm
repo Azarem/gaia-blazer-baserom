@@ -12,20 +12,20 @@
 ---------------------------------------------
 
 code_01232B {
-    PHP                   ; {74539}
-    SEP #$20              ; {74540}
-    LDA #$5C              ; {74542}
-    STA $BG2SC            ; {74544}
-    LDA #$20              ; {74547}
-    STA $BG12NBA          ; {74549}
-    LDA #$06              ; {74552}
-    STA $TM               ; {74554}
-    STZ $CGADSUB          ; {74557}
-    LDA #$09              ; {74560}
-    STA $BGMODE           ; {74562}
-    JSR $&lib_shared_012416.code_012416 ; {74565}
-    JSR $&lib_shared_012416.code_01243D ; {74568}
-    JSR $&lib_shared_012390.code_012390 ; {74571}
-    PLP                   ; {74574}
-    RTL                   ; {74575}
+    PHP 
+    SEP #$20
+    LDA #$5C
+    STA $BG2SC
+    LDA #$20
+    STA $BG12NBA
+    LDA #$06
+    STA $TM
+    STZ $CGADSUB
+    LDA #$09
+    STA $BGMODE
+    JSR $&lib_shared_012416.code_012416
+    JSR $&lib_shared_012416.code_01243D
+    JSR $&lib_shared_012390.code_012390
+    PLP 
+    RTL 
 }

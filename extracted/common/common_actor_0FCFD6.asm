@@ -6,70 +6,70 @@
 ---------------------------------------------
 
 code_0FCFD6 {
-    COP [AD] ( #08 )      ; {1036246}
-    COP [80] ( #18 )      ; {1036249}
-    COP [82]              ; {1036252}
-    COP [81] ( #19, #08 ) ; {1036254}
-    COP [83]              ; {1036258}
-    COP [85] ( @code_0FD000 ) ; {1036260}
-    COP [85] ( @code_0FD005 ) ; {1036265}
-    COP [85] ( @code_0FD01D ) ; {1036270}
-    COP [85] ( @code_0FD022 ) ; {1036275}
-    COP [81] ( #18, #0C ) ; {1036280}
-    COP [83]              ; {1036284}
-    BRA code_0FCFD6       ; {1036286}
+    COP [AD] ( #08 )
+    COP [80] ( #18 )
+    COP [82]
+    COP [81] ( #19, #08 )
+    COP [83]
+    COP [85] ( @code_0FD000 )
+    COP [85] ( @code_0FD005 )
+    COP [85] ( @code_0FD01D )
+    COP [85] ( @code_0FD022 )
+    COP [81] ( #18, #0C )
+    COP [83]
+    BRA code_0FCFD6
 }
 
 code_0FD000 {
-    LDA #$FFE0            ; {1036288}
-    BRA loc_0FD008        ; {1036291}
+    LDA #$FFE0
+    BRA loc_0FD008
 }
 
 code_0FD005 {
-    LDA #$0020            ; {1036293}
+    LDA #$0020
 
   loc_0FD008:
-    CLC                   ; {1036296}
-    ADC $player_y         ; {1036297}
-    AND #$FFF0            ; {1036300}
-    STA $0002, X          ; {1036303}
-    LDA $player_x         ; {1036306}
-    AND #$FFF0            ; {1036309}
-    STA $0000, X          ; {1036312}
-    BRA loc_0FD038        ; {1036315}
+    CLC 
+    ADC $player_y
+    AND #$FFF0
+    STA $0002, X
+    LDA $player_x
+    AND #$FFF0
+    STA $0000, X
+    BRA loc_0FD038
 }
 
 code_0FD01D {
-    LDA #$FFE0            ; {1036317}
-    BRA loc_0FD025        ; {1036320}
+    LDA #$FFE0
+    BRA loc_0FD025
 }
 
 code_0FD022 {
-    LDA #$0020            ; {1036322}
+    LDA #$0020
 
   loc_0FD025:
-    CLC                   ; {1036325}
-    ADC $player_x         ; {1036326}
-    AND #$FFF0            ; {1036329}
-    STA $0000, X          ; {1036332}
-    LDA $player_y         ; {1036335}
-    AND #$FFF0            ; {1036338}
-    STA $0002, X          ; {1036341}
+    CLC 
+    ADC $player_x
+    AND #$FFF0
+    STA $0000, X
+    LDA $player_y
+    AND #$FFF0
+    STA $0002, X
 
   loc_0FD038:
-    COP [28] ( &code_0FD055 ) ; {1036344}
-    LDA #$0300            ; {1036348}
-    STA $0016, X          ; {1036351}
-    COP [81] ( #16, #02 ) ; {1036354}
-    COP [83]              ; {1036358}
-    LDA #$0200            ; {1036360}
-    STA $0016, X          ; {1036363}
-    BRK #$5B              ; {1036366}
-    COP [80] ( #17 )      ; {1036368}
-    COP [82]              ; {1036371}
+    COP [28] ( &code_0FD055 )
+    LDA #$0300
+    STA $0016, X
+    COP [81] ( #16, #02 )
+    COP [83]
+    LDA #$0200
+    STA $0016, X
+    BRK #$5B
+    COP [80] ( #17 )
+    COP [82]
 }
 
 code_0FD055 {
-    COP [86]              ; {1036373}
-    RTL                   ; {1036375}
+    COP [86]
+    RTL 
 }

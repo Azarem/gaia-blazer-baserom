@@ -15,53 +15,53 @@
 ---------------------------------------------
 
 code_00766C {
-    COP [37]              ; {30316}
+    COP [37]
 
   code_00766E:
-    COP [91]              ; {30318}
-    COP [0D] ( #00, #07, #04, &code_00767F ) ; {30320}
-    COP [0D] ( #00, #07, #06, &code_007765 ) ; {30327}
-    RTL                   ; {30334}
+    COP [91]
+    COP [0D] ( #00, #07, #04, &code_00767F )
+    COP [0D] ( #00, #07, #06, &code_007765 )
+    RTL 
 }
 
 code_00767F {
-    COP [01] ( &asciistring_0077B0 ) ; {30335}
-    COP [07] ( #$9B00, &code_00769C ) ; {30339}
-    COP [1A] ( &lib_014F43.asciistring_014F43, #02, &code_007754 ) ; {30345}
-    LDA $L_choice_result  ; {30352}
-    BNE loc_007699        ; {30356}
-    BRL code_0076EF       ; {30358}
+    COP [01] ( &asciistring_0077B0 )
+    COP [07] ( #$9B00, &code_00769C )
+    COP [1A] ( &lib_014F43.asciistring_014F43, #02, &code_007754 )
+    LDA $L_choice_result
+    BNE loc_007699
+    BRL code_0076EF
 
   loc_007699:
-    BRL code_007754       ; {30361}
+    BRL code_007754
 }
 
 code_00769C {
-    COP [1A] ( &lib_014F23.asciistring_014F23, #03, &code_007754 ) ; {30364}
-    LDA $L_choice_result  ; {30371}
-    BNE loc_0076AC        ; {30375}
-    BRL code_0076EF       ; {30377}
+    COP [1A] ( &lib_014F23.asciistring_014F23, #03, &code_007754 )
+    LDA $L_choice_result
+    BNE loc_0076AC
+    BRL code_0076EF
 
   loc_0076AC:
-    DEC                   ; {30380}
-    BEQ loc_0076B2        ; {30381}
-    BRL code_007754       ; {30383}
+    DEC 
+    BEQ loc_0076B2
+    BRL code_007754
 
   loc_0076B2:
-    COP [01] ( &asciistring_007866 ) ; {30386}
-    PHX                   ; {30390}
-    LDA #$0009            ; {30391}
-    STA $scene_next       ; {30394}
-    LDA $03BA             ; {30397}
-    ASL                   ; {30400}
-    ASL                   ; {30401}
-    TAX                   ; {30402}
-    LDA $@data_0076D3, X  ; {30403}
-    STA $warp_dest_x      ; {30407}
-    LDA $@data_0076D3+2, X ; {30410}
-    STA $warp_dest_y      ; {30414}
-    PLX                   ; {30417}
-    RTL                   ; {30418}
+    COP [01] ( &asciistring_007866 )
+    PHX 
+    LDA #$0009
+    STA $scene_next
+    LDA $03BA
+    ASL 
+    ASL 
+    TAX 
+    LDA $@data_0076D3, X
+    STA $warp_dest_x
+    LDA $@data_0076D3+2, X
+    STA $warp_dest_y
+    PLX 
+    RTL 
 }
 ---------------------------------------------
 
@@ -77,85 +77,85 @@ data_0076D3 [
 ---------------------------------------------
 
 code_0076EF {
-    COP [01] ( &asciistring_0077D4 ) ; {30447}
-    COP [1A] ( &lib_014F02.asciistring_014F02, #02, &code_007754 ) ; {30451}
-    LDA $L_choice_result  ; {30458}
-    DEC                   ; {30462}
-    BEQ code_007754       ; {30463}
-    BRK #$66              ; {30465}
-    PHX                   ; {30467}
-    JSL $@lib_0270E4.code_0270E4 ; {30468}
-    PLX                   ; {30472}
-    LDA #$7FC0            ; {30473}
-    TSB $joy_block_mask   ; {30476}
-    COP [03] ( #3D )      ; {30479}
-    COP [04]              ; {30482}
-    LDA #$7FC0            ; {30484}
-    TRB $joy_block_mask   ; {30487}
-    COP [01] ( &asciistring_0077FA ) ; {30490}
-    COP [1A] ( &lib_014F02.asciistring_014F02, #02, &code_007754 ) ; {30494}
-    LDA $L_choice_result  ; {30501}
-    BEQ code_007754       ; {30505}
-    COP [01] ( &asciistring_007825 ) ; {30507}
-    LDA #$7F80            ; {30511}
-    TSB $joy_block_mask   ; {30514}
-    COP [03] ( #1F )      ; {30517}
-    COP [04]              ; {30520}
-    BRK #$8E              ; {30522}
-    COP [AC] ( @code_007798, #$0070, #$0050, #$0050 ) ; {30524}
-    COP [34]              ; {30535}
-    COP [03] ( #3D )      ; {30537}
-    COP [04]              ; {30540}
-    COP [31] ( #13 )      ; {30542}
-    COP [91]              ; {30545}
-    RTL                   ; {30547}
+    COP [01] ( &asciistring_0077D4 )
+    COP [1A] ( &lib_014F02.asciistring_014F02, #02, &code_007754 )
+    LDA $L_choice_result
+    DEC 
+    BEQ code_007754
+    BRK #$66
+    PHX 
+    JSL $@lib_0270E4.code_0270E4
+    PLX 
+    LDA #$7FC0
+    TSB $joy_block_mask
+    COP [03] ( #3D )
+    COP [04]
+    LDA #$7FC0
+    TRB $joy_block_mask
+    COP [01] ( &asciistring_0077FA )
+    COP [1A] ( &lib_014F02.asciistring_014F02, #02, &code_007754 )
+    LDA $L_choice_result
+    BEQ code_007754
+    COP [01] ( &asciistring_007825 )
+    LDA #$7F80
+    TSB $joy_block_mask
+    COP [03] ( #1F )
+    COP [04]
+    BRK #$8E
+    COP [AC] ( @code_007798, #$0070, #$0050, #$0050 )
+    COP [34]
+    COP [03] ( #3D )
+    COP [04]
+    COP [31] ( #13 )
+    COP [91]
+    RTL 
 }
 
 code_007754 {
-    COP [01] ( &asciistring_007848 ) ; {30548}
-    COP [91]              ; {30552}
-    COP [0D] ( #00, #07, #04, &code_007764 ) ; {30554}
-    BRL code_00766E       ; {30561}
+    COP [01] ( &asciistring_007848 )
+    COP [91]
+    COP [0D] ( #00, #07, #04, &code_007764 )
+    BRL code_00766E
 }
 
 code_007764 {
-    RTL                   ; {30564}
+    RTL 
 }
 
 code_007765 {
-    LDA $043F             ; {30565}
-    BEQ loc_00777B        ; {30568}
-    STZ $043F             ; {30570}
-    COP [1B] ( &code_007773, #$0002 ) ; {30573}
+    LDA $043F
+    BEQ loc_00777B
+    STZ $043F
+    COP [1B] ( &code_007773, #$0002 )
 }
 
 code_007773 {
-    COP [01] ( &asciistring_00786A ) ; {30579}
-    COP [27] ( &code_00766E ) ; {30583}
+    COP [01] ( &asciistring_00786A )
+    COP [27] ( &code_00766E )
 
   loc_00777B:
-    COP [07] ( #$8602, &code_007794 ) ; {30587}
-    COP [07] ( #$1B00, &code_007794 ) ; {30593}
-    COP [03] ( #03 )      ; {30599}
-    COP [04]              ; {30602}
-    COP [09] ( #$8602 )   ; {30604}
-    COP [01] ( &asciistring_0078BB ) ; {30608}
+    COP [07] ( #$8602, &code_007794 )
+    COP [07] ( #$1B00, &code_007794 )
+    COP [03] ( #03 )
+    COP [04]
+    COP [09] ( #$8602 )
+    COP [01] ( &asciistring_0078BB )
 }
 
 code_007794 {
-    COP [27] ( &code_00766E ) ; {30612}
+    COP [27] ( &code_00766E )
 }
 
 code_007798 {
-    COP [A8] ( #$8000, #0E ) ; {30616}
-    LDA $0372             ; {30621}
-    STA $001C, X          ; {30624}
-    COP [A3]              ; {30627}
-    COP [A2] ( #30 )      ; {30629}
-    COP [80] ( #02 )      ; {30632}
-    COP [82]              ; {30635}
-    COP [86]              ; {30637}
-    RTL                   ; {30639}
+    COP [A8] ( #$8000, #0E )
+    LDA $0372
+    STA $001C, X
+    COP [A3]
+    COP [A2] ( #30 )
+    COP [80] ( #02 )
+    COP [82]
+    COP [86]
+    RTL 
 }
 
 asciistring_0077B0 |[10]A voice came from [N]above- [FIN][JMP:&asciistring_0077C1+M]|

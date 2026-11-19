@@ -6,34 +6,34 @@
 ---------------------------------------------
 
 CopB1_SpawnAfterRelative {
-    TYX                   ; {25649}
-    JSR $&engine_0065A7.code_00663A ; {25650}
-    LDA [$38]             ; {25653}
-    INC $38               ; {25655}
-    INC $38               ; {25657}
-    STA $0018, Y          ; {25659}
-    TXA                   ; {25662}
-    LDA [$38]             ; {25663}
-    INC $38               ; {25665}
-    AND #$00FF            ; {25667}
-    SEP #$20              ; {25670}
-    STA $0036, Y          ; {25672}
-    REP #$20              ; {25675}
-    LDA [$38]             ; {25677}
-    INC $38               ; {25679}
-    INC $38               ; {25681}
-    CLC                   ; {25683}
-    ADC $0000, X          ; {25684}
-    STA $0000, Y          ; {25687}
-    LDA [$38]             ; {25690}
-    INC $38               ; {25692}
-    INC $38               ; {25694}
-    CLC                   ; {25696}
-    ADC $0002, X          ; {25697}
-    STA $0002, Y          ; {25700}
-    LDA [$38]             ; {25703}
-    INC $38               ; {25705}
-    INC $38               ; {25707}
-    STA $0016, Y          ; {25709}
-    BRL cop_handler_006473.loc_0064BF ; {25712}
+    TYX 
+    JSR $&engine_0065A7.code_00663A
+    LDA [$38]
+    INC $38
+    INC $38
+    STA $0018, Y
+    TXA 
+    LDA [$38]
+    INC $38
+    AND #$00FF
+    SEP #$20
+    STA $0036, Y
+    REP #$20
+    LDA [$38]
+    INC $38
+    INC $38
+    CLC 
+    ADC $0000, X
+    STA $0000, Y
+    LDA [$38]
+    INC $38
+    INC $38
+    CLC 
+    ADC $0002, X
+    STA $0002, Y
+    LDA [$38]
+    INC $38
+    INC $38
+    STA $0016, Y
+    BRL cop_handler_006473.loc_0064BF
 }

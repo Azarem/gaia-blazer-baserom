@@ -5,32 +5,32 @@
 ---------------------------------------------
 
 code_027348 {
-    PHP                   ; {160584}
-    REP #$20              ; {160585}
-    PHA                   ; {160587}
-    PHX                   ; {160588}
-    PHY                   ; {160589}
-    PHA                   ; {160590}
-    PHY                   ; {160591}
-    AND #$03F8            ; {160592}
-    LSR                   ; {160595}
-    LSR                   ; {160596}
-    LSR                   ; {160597}
-    CLC                   ; {160598}
-    ADC $01, S            ; {160599}
-    STA $01, S            ; {160601}
-    PLY                   ; {160603}
-    PLA                   ; {160604}
-    AND #$0007            ; {160605}
-    TAX                   ; {160608}
-    SEP #$20              ; {160609}
-    LDA $@data_00F9F7.binary_00FA77, X ; {160611}
-    ORA $0000, Y          ; {160615}
-    STA $0000, Y          ; {160618}
-    REP #$20              ; {160621}
-    PLY                   ; {160623}
-    PLX                   ; {160624}
-    PLA                   ; {160625}
-    PLP                   ; {160626}
-    RTL                   ; {160627}
+    PHP 
+    REP #$20
+    PHA 
+    PHX 
+    PHY 
+    PHA 
+    PHY 
+    AND #$03F8
+    LSR 
+    LSR 
+    LSR 
+    CLC 
+    ADC $01, S
+    STA $01, S
+    PLY 
+    PLA 
+    AND #$0007
+    TAX 
+    SEP #$20
+    LDA $@data_00F9F7.binary_00FA77, X
+    ORA $0000, Y
+    STA $0000, Y
+    REP #$20
+    PLY 
+    PLX 
+    PLA 
+    PLP 
+    RTL 
 }

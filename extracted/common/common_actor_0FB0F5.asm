@@ -5,218 +5,218 @@
 ---------------------------------------------
 
 code_0FB0F5 {
-    COP [A5] ( &code_0FB0FF, &code_0FB172, &code_0FB1E5, &code_0FB25A ) ; {1028341}
+    COP [A5] ( &code_0FB0FF, &code_0FB172, &code_0FB1E5, &code_0FB25A )
 }
 
 code_0FB0FF {
-    LDA $0016, X          ; {1028351}
-    BIT #$8000            ; {1028354}
-    BEQ loc_0FB10D        ; {1028357}
+    LDA $0016, X
+    BIT #$8000
+    BEQ loc_0FB10D
 
   code_0FB107:
-    COP [1B] ( &code_0FB0FF, #$0008 ) ; {1028359}
+    COP [1B] ( &code_0FB0FF, #$0008 )
 
   loc_0FB10D:
-    COP [9A] ( #$0030, &code_0FB107, &code_0FB117, &code_0FB107 ) ; {1028365}
+    COP [9A] ( #$0030, &code_0FB107, &code_0FB117, &code_0FB107 )
 }
 
 code_0FB117 {
-    COP [9B] ( #$0000, &code_0FB107, &code_0FB107, &code_0FB121 ) ; {1028375}
+    COP [9B] ( #$0000, &code_0FB107, &code_0FB107, &code_0FB121 )
 }
 
 code_0FB121 {
-    LDA $0016, X          ; {1028385}
-    AND #$DFFF            ; {1028388}
-    STA $0016, X          ; {1028391}
-    COP [80] ( #03 )      ; {1028394}
-    COP [82]              ; {1028397}
-    LDA $0016, X          ; {1028399}
-    AND #$FDFF            ; {1028402}
-    STA $0016, X          ; {1028405}
-    COP [80] ( #00 )      ; {1028408}
-    COP [82]              ; {1028411}
-    COP [B2] ( @code_0FB2DB, #$0000, #$000C, #$0200 ) ; {1028413}
-    COP [80] ( #09 )      ; {1028424}
-    COP [82]              ; {1028427}
-    COP [80] ( #00 )      ; {1028429}
-    COP [82]              ; {1028432}
-    LDA $0016, X          ; {1028434}
-    ORA #$0200            ; {1028437}
-    STA $0016, X          ; {1028440}
-    COP [80] ( #04 )      ; {1028443}
-    COP [82]              ; {1028446}
-    LDA $0016, X          ; {1028448}
-    ORA #$2000            ; {1028451}
-    STA $0016, X          ; {1028454}
-    JSR $&code_0FB2CD     ; {1028457}
-    COP [1B] ( &code_0FB0FF, #$0078 ) ; {1028460}
+    LDA $0016, X
+    AND #$DFFF
+    STA $0016, X
+    COP [80] ( #03 )
+    COP [82]
+    LDA $0016, X
+    AND #$FDFF
+    STA $0016, X
+    COP [80] ( #00 )
+    COP [82]
+    COP [B2] ( @code_0FB2DB, #$0000, #$000C, #$0200 )
+    COP [80] ( #09 )
+    COP [82]
+    COP [80] ( #00 )
+    COP [82]
+    LDA $0016, X
+    ORA #$0200
+    STA $0016, X
+    COP [80] ( #04 )
+    COP [82]
+    LDA $0016, X
+    ORA #$2000
+    STA $0016, X
+    JSR $&code_0FB2CD
+    COP [1B] ( &code_0FB0FF, #$0078 )
 }
 
 code_0FB172 {
-    LDA $0016, X          ; {1028466}
-    BIT #$8000            ; {1028469}
-    BEQ loc_0FB180        ; {1028472}
+    LDA $0016, X
+    BIT #$8000
+    BEQ loc_0FB180
 
   code_0FB17A:
-    COP [1B] ( &code_0FB172, #$0008 ) ; {1028474}
+    COP [1B] ( &code_0FB172, #$0008 )
 
   loc_0FB180:
-    COP [9B] ( #$0030, &code_0FB17A, &code_0FB18A, &code_0FB17A ) ; {1028480}
+    COP [9B] ( #$0030, &code_0FB17A, &code_0FB18A, &code_0FB17A )
 }
 
 code_0FB18A {
-    COP [9A] ( #$0000, &code_0FB194, &code_0FB17A, &code_0FB17A ) ; {1028490}
+    COP [9A] ( #$0000, &code_0FB194, &code_0FB17A, &code_0FB17A )
 }
 
 code_0FB194 {
-    LDA $0016, X          ; {1028500}
-    AND #$DFFF            ; {1028503}
-    STA $0016, X          ; {1028506}
-    COP [80] ( #07 )      ; {1028509}
-    COP [82]              ; {1028512}
-    LDA $0016, X          ; {1028514}
-    AND #$FDFF            ; {1028517}
-    STA $0016, X          ; {1028520}
-    COP [80] ( #02 )      ; {1028523}
-    COP [82]              ; {1028526}
-    COP [B2] ( @code_0FB2E8, #$FFF0, #$0000, #$0200 ) ; {1028528}
-    COP [80] ( #0B )      ; {1028539}
-    COP [82]              ; {1028542}
-    COP [80] ( #02 )      ; {1028544}
-    COP [82]              ; {1028547}
-    LDA $0016, X          ; {1028549}
-    ORA #$0200            ; {1028552}
-    STA $0016, X          ; {1028555}
-    COP [80] ( #08 )      ; {1028558}
-    COP [82]              ; {1028561}
-    LDA $0016, X          ; {1028563}
-    ORA #$2000            ; {1028566}
-    STA $0016, X          ; {1028569}
-    JSR $&code_0FB2CD     ; {1028572}
-    COP [1B] ( &code_0FB172, #$0078 ) ; {1028575}
+    LDA $0016, X
+    AND #$DFFF
+    STA $0016, X
+    COP [80] ( #07 )
+    COP [82]
+    LDA $0016, X
+    AND #$FDFF
+    STA $0016, X
+    COP [80] ( #02 )
+    COP [82]
+    COP [B2] ( @code_0FB2E8, #$FFF0, #$0000, #$0200 )
+    COP [80] ( #0B )
+    COP [82]
+    COP [80] ( #02 )
+    COP [82]
+    LDA $0016, X
+    ORA #$0200
+    STA $0016, X
+    COP [80] ( #08 )
+    COP [82]
+    LDA $0016, X
+    ORA #$2000
+    STA $0016, X
+    JSR $&code_0FB2CD
+    COP [1B] ( &code_0FB172, #$0078 )
 }
 
 code_0FB1E5 {
-    LDA $0016, X          ; {1028581}
-    BIT #$8000            ; {1028584}
-    BEQ loc_0FB1F3        ; {1028587}
+    LDA $0016, X
+    BIT #$8000
+    BEQ loc_0FB1F3
 
   code_0FB1ED:
-    COP [1B] ( &code_0FB1E5, #$0008 ) ; {1028589}
+    COP [1B] ( &code_0FB1E5, #$0008 )
 
   loc_0FB1F3:
-    COP [9B] ( #$0030, &code_0FB1ED, &code_0FB1FD, &code_0FB1ED ) ; {1028595}
+    COP [9B] ( #$0030, &code_0FB1ED, &code_0FB1FD, &code_0FB1ED )
 }
 
 code_0FB1FD {
-    COP [9A] ( #$0000, &code_0FB1ED, &code_0FB1ED, &code_0FB207 ) ; {1028605}
+    COP [9A] ( #$0000, &code_0FB1ED, &code_0FB1ED, &code_0FB207 )
 }
 
 code_0FB207 {
-    COP [96]              ; {1028615}
-    LDA $0016, X          ; {1028617}
-    AND #$DFFF            ; {1028620}
-    STA $0016, X          ; {1028623}
-    COP [80] ( #07 )      ; {1028626}
-    COP [82]              ; {1028629}
-    LDA $0016, X          ; {1028631}
-    AND #$FDFF            ; {1028634}
-    STA $0016, X          ; {1028637}
-    COP [80] ( #02 )      ; {1028640}
-    COP [82]              ; {1028643}
-    COP [B2] ( @code_0FB2E8, #$0020, #$0000, #$0200 ) ; {1028645}
-    COP [80] ( #0B )      ; {1028656}
-    COP [82]              ; {1028659}
-    COP [80] ( #02 )      ; {1028661}
-    COP [82]              ; {1028664}
-    LDA $0016, X          ; {1028666}
-    ORA #$0200            ; {1028669}
-    STA $0016, X          ; {1028672}
-    COP [80] ( #08 )      ; {1028675}
-    COP [82]              ; {1028678}
-    LDA $0016, X          ; {1028680}
-    ORA #$2000            ; {1028683}
-    STA $0016, X          ; {1028686}
-    JSR $&code_0FB2CD     ; {1028689}
-    COP [1B] ( &code_0FB1E5, #$0078 ) ; {1028692}
+    COP [96]
+    LDA $0016, X
+    AND #$DFFF
+    STA $0016, X
+    COP [80] ( #07 )
+    COP [82]
+    LDA $0016, X
+    AND #$FDFF
+    STA $0016, X
+    COP [80] ( #02 )
+    COP [82]
+    COP [B2] ( @code_0FB2E8, #$0020, #$0000, #$0200 )
+    COP [80] ( #0B )
+    COP [82]
+    COP [80] ( #02 )
+    COP [82]
+    LDA $0016, X
+    ORA #$0200
+    STA $0016, X
+    COP [80] ( #08 )
+    COP [82]
+    LDA $0016, X
+    ORA #$2000
+    STA $0016, X
+    JSR $&code_0FB2CD
+    COP [1B] ( &code_0FB1E5, #$0078 )
 }
 
 code_0FB25A {
-    LDA $0016, X          ; {1028698}
-    BIT #$8000            ; {1028701}
-    BEQ loc_0FB268        ; {1028704}
+    LDA $0016, X
+    BIT #$8000
+    BEQ loc_0FB268
 
   code_0FB262:
-    COP [1B] ( &code_0FB25A, #$0008 ) ; {1028706}
+    COP [1B] ( &code_0FB25A, #$0008 )
 
   loc_0FB268:
-    COP [9A] ( #$0030, &code_0FB262, &code_0FB272, &code_0FB262 ) ; {1028712}
+    COP [9A] ( #$0030, &code_0FB262, &code_0FB272, &code_0FB262 )
 }
 
 code_0FB272 {
-    COP [9B] ( #$0000, &code_0FB27C, &code_0FB262, &code_0FB262 ) ; {1028722}
+    COP [9B] ( #$0000, &code_0FB27C, &code_0FB262, &code_0FB262 )
 }
 
 code_0FB27C {
-    LDA $0016, X          ; {1028732}
-    AND #$DFFF            ; {1028735}
-    STA $0016, X          ; {1028738}
-    COP [80] ( #05 )      ; {1028741}
-    COP [82]              ; {1028744}
-    LDA $0016, X          ; {1028746}
-    AND #$FDFF            ; {1028749}
-    STA $0016, X          ; {1028752}
-    COP [80] ( #01 )      ; {1028755}
-    COP [82]              ; {1028758}
-    COP [B2] ( @code_0FB2F5, #$0000, #$FFE0, #$0200 ) ; {1028760}
-    COP [80] ( #0A )      ; {1028771}
-    COP [82]              ; {1028774}
-    COP [80] ( #01 )      ; {1028776}
-    COP [82]              ; {1028779}
-    LDA $0016, X          ; {1028781}
-    ORA #$0200            ; {1028784}
-    STA $0016, X          ; {1028787}
-    COP [80] ( #06 )      ; {1028790}
-    COP [82]              ; {1028793}
-    LDA $0016, X          ; {1028795}
-    ORA #$2000            ; {1028798}
-    STA $0016, X          ; {1028801}
-    JSR $&code_0FB2CD     ; {1028804}
-    COP [1B] ( &code_0FB25A, #$0078 ) ; {1028807}
+    LDA $0016, X
+    AND #$DFFF
+    STA $0016, X
+    COP [80] ( #05 )
+    COP [82]
+    LDA $0016, X
+    AND #$FDFF
+    STA $0016, X
+    COP [80] ( #01 )
+    COP [82]
+    COP [B2] ( @code_0FB2F5, #$0000, #$FFE0, #$0200 )
+    COP [80] ( #0A )
+    COP [82]
+    COP [80] ( #01 )
+    COP [82]
+    LDA $0016, X
+    ORA #$0200
+    STA $0016, X
+    COP [80] ( #06 )
+    COP [82]
+    LDA $0016, X
+    ORA #$2000
+    STA $0016, X
+    JSR $&code_0FB2CD
+    COP [1B] ( &code_0FB25A, #$0078 )
 }
 
 code_0FB2CD {
-    SEP #$20              ; {1028813}
-    LDY $0038, X          ; {1028815}
-    LDA $&meta_tables_008000+2, Y ; {1028818}
-    STA $0025, X          ; {1028821}
-    REP #$20              ; {1028824}
-    RTS                   ; {1028826}
+    SEP #$20
+    LDY $0038, X
+    LDA $&meta_tables_008000+2, Y
+    STA $0025, X
+    REP #$20
+    RTS 
 }
 
 code_0FB2DB {
-    COP [A3]              ; {1028827}
-    BRK #$5B              ; {1028829}
-    COP [81] ( #16, #08 ) ; {1028831}
-    COP [83]              ; {1028835}
-    COP [86]              ; {1028837}
-    RTL                   ; {1028839}
+    COP [A3]
+    BRK #$5B
+    COP [81] ( #16, #08 )
+    COP [83]
+    COP [86]
+    RTL 
 }
 
 code_0FB2E8 {
-    COP [A3]              ; {1028840}
-    BRK #$5B              ; {1028842}
-    COP [81] ( #18, #08 ) ; {1028844}
-    COP [83]              ; {1028848}
-    COP [86]              ; {1028850}
-    RTL                   ; {1028852}
+    COP [A3]
+    BRK #$5B
+    COP [81] ( #18, #08 )
+    COP [83]
+    COP [86]
+    RTL 
 }
 
 code_0FB2F5 {
-    COP [A3]              ; {1028853}
-    BRK #$5B              ; {1028855}
-    COP [81] ( #17, #08 ) ; {1028857}
-    COP [83]              ; {1028861}
-    COP [86]              ; {1028863}
-    RTL                   ; {1028865}
+    COP [A3]
+    BRK #$5B
+    COP [81] ( #17, #08 )
+    COP [83]
+    COP [86]
+    RTL 
 }

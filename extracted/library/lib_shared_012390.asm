@@ -8,50 +8,50 @@
 ---------------------------------------------
 
 code_012390 {
-    PHP                   ; {74640}
-    PHB                   ; {74641}
-    LDA #$7F              ; {74642}
-    PHA                   ; {74644}
-    PLB                   ; {74645}
-    REP #$20              ; {74646}
-    LDY #$&data_04F000.binary_04F200 ; {74648}
-    STY $00               ; {74651}
-    LDA #$*data_04F000.binary_04F200 ; {74653}
-    STA $02               ; {74656}
-    LDY #$0000            ; {74658}
+    PHP 
+    PHB 
+    LDA #$7F
+    PHA 
+    PLB 
+    REP #$20
+    LDY #$&data_04F000.binary_04F200
+    STY $00
+    LDA #$*data_04F000.binary_04F200
+    STA $02
+    LDY #$0000
 
   loc_0123A5:
-    LDA [$00]             ; {74661}
-    INC $00               ; {74663}
-    AND #$00FF            ; {74665}
-    ASL                   ; {74668}
-    ASL                   ; {74669}
-    ASL                   ; {74670}
-    TAX                   ; {74671}
-    LDA $@data_048000.unk17_048800, X ; {74672}
-    STA $7800, Y          ; {74676}
-    LDA $@data_048000.unk17_048800+2, X ; {74679}
-    STA $7802, Y          ; {74683}
-    LDA $@data_048000.unk17_048800+4, X ; {74686}
-    STA $7840, Y          ; {74690}
-    LDA $@data_048000.unk17_048800+6, X ; {74693}
-    STA $7842, Y          ; {74697}
-    INY                   ; {74700}
-    INY                   ; {74701}
-    INY                   ; {74702}
-    INY                   ; {74703}
-    TYA                   ; {74704}
-    AND #$003F            ; {74705}
-    BNE loc_0123A5        ; {74708}
-    TYA                   ; {74710}
-    CLC                   ; {74711}
-    ADC #$0040            ; {74712}
-    TAY                   ; {74715}
-    CPY #$0800            ; {74716}
-    BNE loc_0123A5        ; {74719}
-    PLB                   ; {74721}
-    LDA #$0002            ; {74722}
-    TSB $vram_upload_flags ; {74725}
-    PLP                   ; {74728}
-    RTS                   ; {74729}
+    LDA [$00]
+    INC $00
+    AND #$00FF
+    ASL 
+    ASL 
+    ASL 
+    TAX 
+    LDA $@data_048000.unk17_048800, X
+    STA $7800, Y
+    LDA $@data_048000.unk17_048800+2, X
+    STA $7802, Y
+    LDA $@data_048000.unk17_048800+4, X
+    STA $7840, Y
+    LDA $@data_048000.unk17_048800+6, X
+    STA $7842, Y
+    INY 
+    INY 
+    INY 
+    INY 
+    TYA 
+    AND #$003F
+    BNE loc_0123A5
+    TYA 
+    CLC 
+    ADC #$0040
+    TAY 
+    CPY #$0800
+    BNE loc_0123A5
+    PLB 
+    LDA #$0002
+    TSB $vram_upload_flags
+    PLP 
+    RTS 
 }

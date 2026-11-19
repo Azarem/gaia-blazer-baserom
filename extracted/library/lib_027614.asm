@@ -6,79 +6,79 @@
 ---------------------------------------------
 
 code_027614 {
-    LDA $043D             ; {161300}
-    ORA $043E             ; {161303}
-    BEQ loc_027686        ; {161306}
-    LDA $frame_counter    ; {161308}
-    AND #$07              ; {161311}
-    BNE loc_027686        ; {161313}
-    REP #$20              ; {161315}
-    BRK #$48              ; {161317}
-    SED                   ; {161319}
-    LDA $043D             ; {161320}
-    AND #$000F            ; {161323}
-    BNE loc_02766D        ; {161326}
-    LDA $043D             ; {161328}
-    AND #$00F0            ; {161331}
-    BNE loc_02765E        ; {161334}
-    LDA $043D             ; {161336}
-    AND #$0F00            ; {161339}
-    BNE loc_02764F        ; {161342}
-    LDA $043D             ; {161344}
-    SEC                   ; {161347}
-    SBC #$1000            ; {161348}
-    STA $043D             ; {161351}
-    LDA #$1000            ; {161354}
-    BRA loc_02767A        ; {161357}
+    LDA $043D
+    ORA $043E
+    BEQ loc_027686
+    LDA $frame_counter
+    AND #$07
+    BNE loc_027686
+    REP #$20
+    BRK #$48
+    SED 
+    LDA $043D
+    AND #$000F
+    BNE loc_02766D
+    LDA $043D
+    AND #$00F0
+    BNE loc_02765E
+    LDA $043D
+    AND #$0F00
+    BNE loc_02764F
+    LDA $043D
+    SEC 
+    SBC #$1000
+    STA $043D
+    LDA #$1000
+    BRA loc_02767A
 
   loc_02764F:
-    LDA $043D             ; {161359}
-    SEC                   ; {161362}
-    SBC #$0100            ; {161363}
-    STA $043D             ; {161366}
-    LDA #$0100            ; {161369}
-    BRA loc_02767A        ; {161372}
+    LDA $043D
+    SEC 
+    SBC #$0100
+    STA $043D
+    LDA #$0100
+    BRA loc_02767A
 
   loc_02765E:
-    LDA $043D             ; {161374}
-    SEC                   ; {161377}
-    SBC #$0010            ; {161378}
-    STA $043D             ; {161381}
-    LDA #$0010            ; {161384}
-    BRA loc_02767A        ; {161387}
+    LDA $043D
+    SEC 
+    SBC #$0010
+    STA $043D
+    LDA #$0010
+    BRA loc_02767A
 
   loc_02766D:
-    LDA $043D             ; {161389}
-    SEC                   ; {161392}
-    SBC #$0001            ; {161393}
-    STA $043D             ; {161396}
-    LDA #$0001            ; {161399}
+    LDA $043D
+    SEC 
+    SBC #$0001
+    STA $043D
+    LDA #$0001
 
   loc_02767A:
-    CLD                   ; {161402}
-    JSL $@code_027687     ; {161403}
-    SEP #$20              ; {161407}
-    LDA #$02              ; {161409}
-    TSB $0332             ; {161411}
+    CLD 
+    JSL $@code_027687
+    SEP #$20
+    LDA #$02
+    TSB $0332
 
   loc_027686:
-    RTL                   ; {161414}
+    RTL 
 }
 
 code_027687 {
-    SED                   ; {161415}
-    CLC                   ; {161416}
-    ADC $player_exp       ; {161417}
-    STA $player_exp       ; {161420}
-    LDA $1B7A             ; {161423}
-    ADC #$0000            ; {161426}
-    STA $1B7A             ; {161429}
-    BCC loc_0276A3        ; {161432}
-    LDA #$9999            ; {161434}
-    STA $player_exp       ; {161437}
-    STA $1B7A             ; {161440}
+    SED 
+    CLC 
+    ADC $player_exp
+    STA $player_exp
+    LDA $1B7A
+    ADC #$0000
+    STA $1B7A
+    BCC loc_0276A3
+    LDA #$9999
+    STA $player_exp
+    STA $1B7A
 
   loc_0276A3:
-    CLD                   ; {161443}
-    RTL                   ; {161444}
+    CLD 
+    RTL 
 }

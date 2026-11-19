@@ -5,57 +5,57 @@
 ---------------------------------------------
 
 code_01D98E {
-    COP [14] ( #$0062, &code_01D995 ) ; {121230}
-    RTL                   ; {121236}
+    COP [14] ( #$0062, &code_01D995 )
+    RTL 
 }
 
 code_01D995 {
-    COP [15]              ; {121237}
-    COP [17] ( &code_01D9BB ) ; {121239}
-    COP [07] ( #$0307, &code_01D9A5 ) ; {121243}
-    COP [17] ( &code_01D9C0 ) ; {121249}
+    COP [15]
+    COP [17] ( &code_01D9BB )
+    COP [07] ( #$0307, &code_01D9A5 )
+    COP [17] ( &code_01D9C0 )
 }
 
 code_01D9A5 {
-    COP [07] ( #$0400, &code_01D9AF ) ; {121253}
-    COP [17] ( &code_01D9D9 ) ; {121259}
+    COP [07] ( #$0400, &code_01D9AF )
+    COP [17] ( &code_01D9D9 )
 }
 
 code_01D9AF {
-    COP [91]              ; {121263}
-    COP [18] ( #1F, &code_01D9BA ) ; {121265}
-    COP [09] ( #$8907 )   ; {121270}
+    COP [91]
+    COP [18] ( #1F, &code_01D9BA )
+    COP [09] ( #$8907 )
 }
 
 code_01D9BA {
-    RTL                   ; {121274}
+    RTL 
 }
 
 code_01D9BB {
-    COP [01] ( &asciistring_01D9DE ) ; {121275}
-    RTL                   ; {121279}
+    COP [01] ( &asciistring_01D9DE )
+    RTL 
 }
 
 code_01D9C0 {
-    COP [01] ( &asciistring_01DA4D ) ; {121280}
-    COP [17] ( &code_01D9D4 ) ; {121284}
-    COP [14] ( #$005C, &code_01D9CF ) ; {121288}
-    RTL                   ; {121294}
+    COP [01] ( &asciistring_01DA4D )
+    COP [17] ( &code_01D9D4 )
+    COP [14] ( #$005C, &code_01D9CF )
+    RTL 
 }
 
 code_01D9CF {
-    COP [09] ( #$8400 )   ; {121295}
-    RTL                   ; {121299}
+    COP [09] ( #$8400 )
+    RTL 
 }
 
 code_01D9D4 {
-    COP [01] ( &asciistring_01DB09 ) ; {121300}
-    RTL                   ; {121304}
+    COP [01] ( &asciistring_01DB09 )
+    RTL 
 }
 
 code_01D9D9 {
-    COP [01] ( &asciistring_01DB0D ) ; {121305}
-    RTL                   ; {121309}
+    COP [01] ( &asciistring_01DB0D )
+    RTL 
 }
 
 asciistring_01D9DE |[10]I am always digging in[N]the ground, sometimes [N]I dig up strange [N]things- [FIN]I just dug up some dog[N]bones to #- [FIN]I got scared and re+ [N]buried them- [JMP:&w1_shared_01EBC2.asciistring_01EC46]|

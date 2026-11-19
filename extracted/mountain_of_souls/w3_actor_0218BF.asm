@@ -6,35 +6,35 @@
 ---------------------------------------------
 
 code_0218BF {
-    COP [14] ( #$00FC, &code_0218C6 ) ; {137407}
-    RTL                   ; {137413}
+    COP [14] ( #$00FC, &code_0218C6 )
+    RTL 
 }
 
 code_0218C6 {
-    COP [85] ( @engine_0026F3.code_00299D ) ; {137414}
-    COP [17] ( &code_0218D4 ) ; {137419}
-    COP [15]              ; {137423}
-    COP [91]              ; {137425}
-    RTL                   ; {137427}
+    COP [85] ( @engine_0026F3.code_00299D )
+    COP [17] ( &code_0218D4 )
+    COP [15]
+    COP [91]
+    RTL 
 }
 
 code_0218D4 {
-    COP [07] ( #$8707, &code_0218F5 ) ; {137428}
-    COP [19] ( #1C, &code_0218F0 ) ; {137434}
-    COP [01] ( &asciistring_021903 ) ; {137439}
-    COP [3C] ( #04 )      ; {137443}
-    COP [10] ( #$030B, #01, #$00A0, #$00E0 ) ; {137446}
-    RTL                   ; {137455}
+    COP [07] ( #$8707, &code_0218F5 )
+    COP [19] ( #1C, &code_0218F0 )
+    COP [01] ( &asciistring_021903 )
+    COP [3C] ( #04 )
+    COP [10] ( #$030B, #01, #$00A0, #$00E0 )
+    RTL 
 }
 
 code_0218F0 {
-    COP [01] ( &asciistring_0218FA ) ; {137456}
-    RTL                   ; {137460}
+    COP [01] ( &asciistring_0218FA )
+    RTL 
 }
 
 code_0218F5 {
-    COP [01] ( &asciistring_021924 ) ; {137461}
-    RTL                   ; {137465}
+    COP [01] ( &asciistring_021924 )
+    RTL 
 }
 
 asciistring_0218FA |[10]Zzzz [JMP:&w3_shared_02249A.asciistring_02251E]|

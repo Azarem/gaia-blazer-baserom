@@ -6,30 +6,30 @@
 ---------------------------------------------
 
 CopAC_SpawnBeforeAbsolute {
-    TYX                   ; {25401}
-    JSR $&engine_0065A7.code_006662 ; {25402}
-    LDA [$38]             ; {25405}
-    INC $38               ; {25407}
-    INC $38               ; {25409}
-    STA $0018, Y          ; {25411}
-    TXA                   ; {25414}
-    LDA [$38]             ; {25415}
-    INC $38               ; {25417}
-    AND #$00FF            ; {25419}
-    SEP #$20              ; {25422}
-    STA $0036, Y          ; {25424}
-    REP #$20              ; {25427}
-    LDA [$38]             ; {25429}
-    INC $38               ; {25431}
-    INC $38               ; {25433}
-    STA $0000, Y          ; {25435}
-    LDA [$38]             ; {25438}
-    INC $38               ; {25440}
-    INC $38               ; {25442}
-    STA $0002, Y          ; {25444}
-    LDA [$38]             ; {25447}
-    INC $38               ; {25449}
-    INC $38               ; {25451}
-    STA $0016, Y          ; {25453}
-    BRL cop_handler_006473.loc_0064BF ; {25456}
+    TYX 
+    JSR $&engine_0065A7.code_006662
+    LDA [$38]
+    INC $38
+    INC $38
+    STA $0018, Y
+    TXA 
+    LDA [$38]
+    INC $38
+    AND #$00FF
+    SEP #$20
+    STA $0036, Y
+    REP #$20
+    LDA [$38]
+    INC $38
+    INC $38
+    STA $0000, Y
+    LDA [$38]
+    INC $38
+    INC $38
+    STA $0002, Y
+    LDA [$38]
+    INC $38
+    INC $38
+    STA $0016, Y
+    BRL cop_handler_006473.loc_0064BF
 }

@@ -3,85 +3,85 @@
 ---------------------------------------------
 
 code_0FBE81 {
-    LDA $0025, X          ; {1031809}
-    AND #$00FF            ; {1031812}
-    STA $0030, X          ; {1031815}
+    LDA $0025, X
+    AND #$00FF
+    STA $0030, X
 
   loc_0FBE8A:
-    COP [AD] ( #08 )      ; {1031818}
-    COP [9C] ( &code_0FBE93, &code_0FBED3 ) ; {1031821}
+    COP [AD] ( #08 )
+    COP [9C] ( &code_0FBE93, &code_0FBED3 )
 }
 
 code_0FBE93 {
-    COP [9A] ( #$0000, &code_0FBE9D, &code_0FBEB8, &code_0FBEB8 ) ; {1031827}
+    COP [9A] ( #$0000, &code_0FBE9D, &code_0FBEB8, &code_0FBEB8 )
 }
 
 code_0FBE9D {
-    COP [97]              ; {1031837}
-    COP [81] ( #16, #08 ) ; {1031839}
-    COP [83]              ; {1031843}
-    JSR $&code_0FBF13     ; {1031845}
-    BCC loc_0FBE8A        ; {1031848}
-    COP [81] ( #19, #04 ) ; {1031850}
-    COP [83]              ; {1031854}
-    COP [81] ( #13, #10 ) ; {1031856}
-    COP [83]              ; {1031860}
-    BRA loc_0FBE8A        ; {1031862}
+    COP [97]
+    COP [81] ( #16, #08 )
+    COP [83]
+    JSR $&code_0FBF13
+    BCC loc_0FBE8A
+    COP [81] ( #19, #04 )
+    COP [83]
+    COP [81] ( #13, #10 )
+    COP [83]
+    BRA loc_0FBE8A
 }
 
 code_0FBEB8 {
-    COP [96]              ; {1031864}
-    COP [81] ( #16, #08 ) ; {1031866}
-    COP [83]              ; {1031870}
-    JSR $&code_0FBF13     ; {1031872}
-    BCC loc_0FBE8A        ; {1031875}
-    COP [81] ( #19, #04 ) ; {1031877}
-    COP [83]              ; {1031881}
-    COP [81] ( #13, #10 ) ; {1031883}
-    COP [83]              ; {1031887}
-    BRA loc_0FBE8A        ; {1031889}
+    COP [96]
+    COP [81] ( #16, #08 )
+    COP [83]
+    JSR $&code_0FBF13
+    BCC loc_0FBE8A
+    COP [81] ( #19, #04 )
+    COP [83]
+    COP [81] ( #13, #10 )
+    COP [83]
+    BRA loc_0FBE8A
 }
 
 code_0FBED3 {
-    COP [9B] ( #$0000, &code_0FBEDD, &code_0FBEF8, &code_0FBEF8 ) ; {1031891}
+    COP [9B] ( #$0000, &code_0FBEDD, &code_0FBEF8, &code_0FBEF8 )
 }
 
 code_0FBEDD {
-    COP [97]              ; {1031901}
-    COP [81] ( #15, #08 ) ; {1031903}
-    COP [83]              ; {1031907}
-    JSR $&code_0FBF13     ; {1031909}
-    BCC loc_0FBE8A        ; {1031912}
-    COP [81] ( #18, #04 ) ; {1031914}
-    COP [83]              ; {1031918}
-    COP [81] ( #12, #10 ) ; {1031920}
-    COP [83]              ; {1031924}
-    BRA loc_0FBE8A        ; {1031926}
+    COP [97]
+    COP [81] ( #15, #08 )
+    COP [83]
+    JSR $&code_0FBF13
+    BCC loc_0FBE8A
+    COP [81] ( #18, #04 )
+    COP [83]
+    COP [81] ( #12, #10 )
+    COP [83]
+    BRA loc_0FBE8A
 }
 
 code_0FBEF8 {
-    COP [97]              ; {1031928}
-    COP [81] ( #14, #08 ) ; {1031930}
-    COP [83]              ; {1031934}
-    JSR $&code_0FBF13     ; {1031936}
-    BCC loc_0FBE8A        ; {1031939}
-    COP [81] ( #17, #04 ) ; {1031941}
-    COP [83]              ; {1031945}
-    COP [80] ( #11 )      ; {1031947}
-    COP [82]              ; {1031950}
-    BRL loc_0FBE8A        ; {1031952}
+    COP [97]
+    COP [81] ( #14, #08 )
+    COP [83]
+    JSR $&code_0FBF13
+    BCC loc_0FBE8A
+    COP [81] ( #17, #04 )
+    COP [83]
+    COP [80] ( #11 )
+    COP [82]
+    BRL loc_0FBE8A
 }
 
 code_0FBF13 {
-    LDA $0025, X          ; {1031955}
-    AND #$00FF            ; {1031958}
-    CMP $0030, X          ; {1031961}
-    BEQ loc_0FBF23        ; {1031964}
-    STA $0030, X          ; {1031966}
-    SEC                   ; {1031969}
-    RTS                   ; {1031970}
+    LDA $0025, X
+    AND #$00FF
+    CMP $0030, X
+    BEQ loc_0FBF23
+    STA $0030, X
+    SEC 
+    RTS 
 
   loc_0FBF23:
-    CLC                   ; {1031971}
-    RTS                   ; {1031972}
+    CLC 
+    RTS 
 }

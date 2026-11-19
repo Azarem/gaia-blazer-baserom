@@ -8,61 +8,61 @@
 ---------------------------------------------
 
 code_0FED09 {
-    PHX                   ; {1043721}
-    LDA $0000, X          ; {1043722}
-    STA $16               ; {1043725}
-    LDA $0002, X          ; {1043727}
-    SEC                   ; {1043730}
-    SBC #$0010            ; {1043731}
-    STA $18               ; {1043734}
-    JSL $@lib_027462_part1.code_0272B8 ; {1043736}
-    TXA                   ; {1043740}
-    PLX                   ; {1043741}
-    STA $0030, X          ; {1043742}
-    COP [A1] ( #$0008, #$FFF1 ) ; {1043745}
+    PHX 
+    LDA $0000, X
+    STA $16
+    LDA $0002, X
+    SEC 
+    SBC #$0010
+    STA $18
+    JSL $@lib_027462_part1.code_0272B8
+    TXA 
+    PLX 
+    STA $0030, X
+    COP [A1] ( #$0008, #$FFF1 )
 
   code_0FED27:
-    COP [AD] ( #10 )      ; {1043751}
-    PHX                   ; {1043754}
-    LDA $0030, X          ; {1043755}
-    TAX                   ; {1043758}
-    LDA $tile_type_map, X ; {1043759}
-    PLX                   ; {1043763}
-    AND #$00FF            ; {1043764}
-    BEQ loc_0FED6E        ; {1043767}
-    LDA $0016, X          ; {1043769}
-    AND #$DFFF            ; {1043772}
-    STA $0016, X          ; {1043775}
-    COP [80] ( #2C )      ; {1043778}
-    COP [82]              ; {1043781}
-    COP [A0] ( #$0008 )   ; {1043783}
-    COP [B2] ( @code_0FED71, #$0000, #$0000, #$0200 ) ; {1043787}
-    COP [80] ( #2D )      ; {1043798}
-    COP [82]              ; {1043801}
-    COP [A0] ( #$FFF8 )   ; {1043803}
-    LDA $0016, X          ; {1043807}
-    ORA #$2000            ; {1043810}
-    STA $0016, X          ; {1043813}
-    COP [1B] ( &code_0FED27, #$0078 ) ; {1043816}
+    COP [AD] ( #10 )
+    PHX 
+    LDA $0030, X
+    TAX 
+    LDA $tile_type_map, X
+    PLX 
+    AND #$00FF
+    BEQ loc_0FED6E
+    LDA $0016, X
+    AND #$DFFF
+    STA $0016, X
+    COP [80] ( #2C )
+    COP [82]
+    COP [A0] ( #$0008 )
+    COP [B2] ( @code_0FED71, #$0000, #$0000, #$0200 )
+    COP [80] ( #2D )
+    COP [82]
+    COP [A0] ( #$FFF8 )
+    LDA $0016, X
+    ORA #$2000
+    STA $0016, X
+    COP [1B] ( &code_0FED27, #$0078 )
 
   loc_0FED6E:
-    COP [86]              ; {1043822}
-    RTL                   ; {1043824}
+    COP [86]
+    RTL 
 }
 
 code_0FED71 {
-    COP [A3]              ; {1043825}
-    BRK #$64              ; {1043827}
-    COP [80] ( #2B )      ; {1043829}
-    COP [82]              ; {1043832}
-    COP [81] ( #2E, #04 ) ; {1043834}
-    COP [83]              ; {1043838}
-    LDY #$002E            ; {1043840}
-    SEP #$20              ; {1043843}
-    LDA #$^common_actor_004659_part1.code_002D67 ; {1043845}
-    PHA                   ; {1043847}
-    REP #$20              ; {1043848}
-    LDA #$&common_actor_004659_part1.code_002D67-1 ; {1043850}
-    PHA                   ; {1043853}
-    RTL                   ; {1043854}
+    COP [A3]
+    BRK #$64
+    COP [80] ( #2B )
+    COP [82]
+    COP [81] ( #2E, #04 )
+    COP [83]
+    LDY #$002E
+    SEP #$20
+    LDA #$^common_actor_004659_part1.code_002D67
+    PHA 
+    REP #$20
+    LDA #$&common_actor_004659_part1.code_002D67-1
+    PHA 
+    RTL 
 }

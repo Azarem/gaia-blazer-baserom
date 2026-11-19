@@ -6,36 +6,36 @@
 ---------------------------------------------
 
 code_01A7AC {
-    COP [14] ( #$0000, &code_01A7B3 ) ; {108460}
-    RTL                   ; {108466}
+    COP [14] ( #$0000, &code_01A7B3 )
+    RTL 
 }
 
 code_01A7B3 {
-    COP [9F] ( #$0008 )   ; {108467}
-    COP [85] ( @engine_0026F3.code_00299D ) ; {108471}
-    COP [17] ( &code_01A7DC ) ; {108476}
-    COP [15]              ; {108480}
-    COP [2A] ( #$0010, #$0000 ) ; {108482}
-    COP [05] ( #$0504 )   ; {108488}
-    COP [16]              ; {108492}
-    COP [2B] ( #$0010, #$0000 ) ; {108494}
-    COP [85] ( @engine_0026F3.code_00299D ) ; {108500}
-    COP [86]              ; {108505}
-    RTL                   ; {108507}
+    COP [9F] ( #$0008 )
+    COP [85] ( @engine_0026F3.code_00299D )
+    COP [17] ( &code_01A7DC )
+    COP [15]
+    COP [2A] ( #$0010, #$0000 )
+    COP [05] ( #$0504 )
+    COP [16]
+    COP [2B] ( #$0010, #$0000 )
+    COP [85] ( @engine_0026F3.code_00299D )
+    COP [86]
+    RTL 
 }
 
 code_01A7DC {
-    COP [01] ( &asciistring_01A7F9 ) ; {108508}
-    BRK #$5E              ; {108512}
-    COP [0A] ( #11 )      ; {108514}
-    COP [01] ( &asciistring_01A913 ) ; {108517}
-    SEP #$20              ; {108521}
-    LDA #$01              ; {108523}
-    STA $1B82             ; {108525}
-    REP #$20              ; {108528}
-    COP [09] ( #$8504 )   ; {108530}
-    BRK #$0E              ; {108534}
-    RTL                   ; {108536}
+    COP [01] ( &asciistring_01A7F9 )
+    BRK #$5E
+    COP [0A] ( #11 )
+    COP [01] ( &asciistring_01A913 )
+    SEP #$20
+    LDA #$01
+    STA $1B82
+    REP #$20
+    COP [09] ( #$8504 )
+    BRK #$0E
+    RTL 
 }
 
 asciistring_01A7F9 |[10]I used to live up [N]in the sky just like [N]you- [FIN]Now, I am living on [N]Earth, away from the [N]Master- [FIN]All the creatures that[N]have been captured by [N]Deathtoll are sealed [N]away in monster lairs-[FIN]Just as you have set [N]me free, you must free[N]everyone- [FIN]Even the release of a [N]small tree or [N]creature, they will [N]aid you in your quest-[FIN]Here, take this- [FIN][02:2] received [N][03:24]the Flame Ball Magic- [03:20][FIN][END]|

@@ -14,437 +14,437 @@
 ---------------------------------------------
 
 code_0026F3 {
-    JSR $&code_002842     ; {9971}
+    JSR $&code_002842
 
   loc_0026F6:
-    COP [91]              ; {9974}
+    COP [91]
 
   code_0026F8:
-    LDA $0016, X          ; {9976}
-    BIT #$8000            ; {9979}
-    BEQ loc_002701        ; {9982}
-    RTL                   ; {9984}
+    LDA $0016, X
+    BIT #$8000
+    BEQ loc_002701
+    RTL 
 
   loc_002701:
-    LDA ($4A)             ; {9985}
-    BNE loc_002709        ; {9987}
-    COP [27] ( &code_0026F8 ) ; {9989}
+    LDA ($4A)
+    BNE loc_002709
+    COP [27] ( &code_0026F8 )
 
   loc_002709:
-    BRK #$53              ; {9993}
-    JSR $&code_0028ED     ; {9995}
-    JSR $&code_002913     ; {9998}
-    COP [91]              ; {10001}
-    JSR $&code_0028C6     ; {10003}
-    BCC loc_0026F6        ; {10006}
-    JMP $&code_002871     ; {10008}
+    BRK #$53
+    JSR $&code_0028ED
+    JSR $&code_002913
+    COP [91]
+    JSR $&code_0028C6
+    BCC loc_0026F6
+    JMP $&code_002871
 }
 ---------------------------------------------
 
 code_00271B {
-    JSR $&code_002842     ; {10011}
-    LDA $002E, X          ; {10014}
-    AND #$00FF            ; {10017}
-    STA $002C, X          ; {10020}
+    JSR $&code_002842
+    LDA $002E, X
+    AND #$00FF
+    STA $002C, X
 
   loc_002727:
-    COP [91]              ; {10023}
+    COP [91]
 
   code_002729:
-    LDA $0016, X          ; {10025}
-    BIT #$8000            ; {10028}
-    BEQ loc_002732        ; {10031}
-    RTL                   ; {10033}
+    LDA $0016, X
+    BIT #$8000
+    BEQ loc_002732
+    RTL 
 
   loc_002732:
-    LDA ($4A)             ; {10034}
-    BNE loc_00273A        ; {10036}
-    COP [27] ( &code_002729 ) ; {10038}
+    LDA ($4A)
+    BNE loc_00273A
+    COP [27] ( &code_002729 )
 
   loc_00273A:
-    BRK #$53              ; {10042}
-    JSR $&code_0028ED     ; {10044}
-    JSR $&code_002913     ; {10047}
-    DEC $002C, X          ; {10050}
-    BNE loc_002727        ; {10053}
-    COP [91]              ; {10055}
-    JSR $&code_0028C6     ; {10057}
-    BCS loc_00274F        ; {10060}
-    RTL                   ; {10062}
+    BRK #$53
+    JSR $&code_0028ED
+    JSR $&code_002913
+    DEC $002C, X
+    BNE loc_002727
+    COP [91]
+    JSR $&code_0028C6
+    BCS loc_00274F
+    RTL 
 
   loc_00274F:
-    JMP $&code_002871     ; {10063}
+    JMP $&code_002871
 }
 ---------------------------------------------
 
 code_002752 {
-    JSR $&code_002842     ; {10066}
-    LDA $002E, X          ; {10069}
-    AND #$00FF            ; {10072}
-    STA $0C               ; {10075}
-    LDA $0026, X          ; {10077}
-    ASL                   ; {10080}
-    TAY                   ; {10081}
-    LDA $&data_00EE8E, Y  ; {10082}
-    STA $00               ; {10085}
+    JSR $&code_002842
+    LDA $002E, X
+    AND #$00FF
+    STA $0C
+    LDA $0026, X
+    ASL 
+    TAY 
+    LDA $&data_00EE8E, Y
+    STA $00
 
   loc_002767:
-    JSR $&code_0028ED     ; {10087}
-    LDA #$&code_00295E    ; {10090}
-    STA $0018, Y          ; {10093}
-    LDA ($00)             ; {10096}
-    INC $00               ; {10098}
-    INC $00               ; {10100}
-    STA $0000, Y          ; {10102}
-    LDA ($00)             ; {10105}
-    INC $00               ; {10107}
-    INC $00               ; {10109}
-    STA $0002, Y          ; {10111}
-    LDA $001C, Y          ; {10114}
-    AND #$3FFF            ; {10117}
-    ORA ($00)             ; {10120}
-    INC $00               ; {10122}
-    INC $00               ; {10124}
-    STA $001C, Y          ; {10126}
-    DEC $0C               ; {10129}
-    BNE loc_002767        ; {10131}
-    COP [91]              ; {10133}
-    JSR $&code_0028C6     ; {10135}
-    BCS loc_00279D        ; {10138}
-    RTL                   ; {10140}
+    JSR $&code_0028ED
+    LDA #$&code_00295E
+    STA $0018, Y
+    LDA ($00)
+    INC $00
+    INC $00
+    STA $0000, Y
+    LDA ($00)
+    INC $00
+    INC $00
+    STA $0002, Y
+    LDA $001C, Y
+    AND #$3FFF
+    ORA ($00)
+    INC $00
+    INC $00
+    STA $001C, Y
+    DEC $0C
+    BNE loc_002767
+    COP [91]
+    JSR $&code_0028C6
+    BCS loc_00279D
+    RTL 
 
   loc_00279D:
-    JMP $&code_002871     ; {10141}
+    JMP $&code_002871
 }
 
 code_0027A0 {
-    JSR $&code_002842     ; {10144}
+    JSR $&code_002842
 
   loc_0027A3:
-    COP [91]              ; {10147}
+    COP [91]
 
   code_0027A5:
-    LDA $0016, X          ; {10149}
-    BIT #$8000            ; {10152}
-    BEQ loc_0027AE        ; {10155}
-    RTL                   ; {10157}
+    LDA $0016, X
+    BIT #$8000
+    BEQ loc_0027AE
+    RTL 
 
   loc_0027AE:
-    LDA ($4A)             ; {10158}
-    BNE loc_0027B6        ; {10160}
-    COP [27] ( &code_0027A5 ) ; {10162}
+    LDA ($4A)
+    BNE loc_0027B6
+    COP [27] ( &code_0027A5 )
 
   loc_0027B6:
-    BRK #$53              ; {10166}
-    JSR $&code_0028ED     ; {10168}
-    LDA $001C, X          ; {10171}
-    CLC                   ; {10174}
-    ADC #$4000            ; {10175}
-    STA $001C, X          ; {10178}
-    JSR $&code_002913     ; {10181}
-    COP [91]              ; {10184}
-    JSR $&code_0028C6     ; {10186}
-    BCC loc_0027A3        ; {10189}
-    JMP $&code_002871     ; {10191}
+    BRK #$53
+    JSR $&code_0028ED
+    LDA $001C, X
+    CLC 
+    ADC #$4000
+    STA $001C, X
+    JSR $&code_002913
+    COP [91]
+    JSR $&code_0028C6
+    BCC loc_0027A3
+    JMP $&code_002871
 }
 ---------------------------------------------
 
 code_0027D2 {
-    JSR $&code_002842     ; {10194}
-    LDA $002E, X          ; {10197}
-    AND #$00FF            ; {10200}
-    STA $002C, X          ; {10203}
+    JSR $&code_002842
+    LDA $002E, X
+    AND #$00FF
+    STA $002C, X
 
   loc_0027DE:
-    COP [91]              ; {10206}
+    COP [91]
 
   code_0027E0:
-    LDA $0016, X          ; {10208}
-    BIT #$8000            ; {10211}
-    BEQ loc_0027E9        ; {10214}
-    RTL                   ; {10216}
+    LDA $0016, X
+    BIT #$8000
+    BEQ loc_0027E9
+    RTL 
 
   loc_0027E9:
-    LDA ($4A)             ; {10217}
-    BNE loc_0027F1        ; {10219}
-    COP [27] ( &code_0027E0 ) ; {10221}
+    LDA ($4A)
+    BNE loc_0027F1
+    COP [27] ( &code_0027E0 )
 
   loc_0027F1:
-    BRK #$53              ; {10225}
-    JSR $&code_0028ED     ; {10227}
-    LDA $001C, X          ; {10230}
-    CLC                   ; {10233}
-    ADC #$4000            ; {10234}
-    STA $001C, X          ; {10237}
-    JSR $&code_002913     ; {10240}
-    DEC $002C, X          ; {10243}
-    BNE loc_0027DE        ; {10246}
-    COP [91]              ; {10248}
-    JSR $&code_0028C6     ; {10250}
-    BCS loc_002810        ; {10253}
-    RTL                   ; {10255}
+    BRK #$53
+    JSR $&code_0028ED
+    LDA $001C, X
+    CLC 
+    ADC #$4000
+    STA $001C, X
+    JSR $&code_002913
+    DEC $002C, X
+    BNE loc_0027DE
+    COP [91]
+    JSR $&code_0028C6
+    BCS loc_002810
+    RTL 
 
   loc_002810:
-    JMP $&code_002871     ; {10256}
+    JMP $&code_002871
 }
 ---------------------------------------------
 
 code_002813 {
-    JSR $&code_002842     ; {10259}
+    JSR $&code_002842
 
   loc_002816:
-    COP [91]              ; {10262}
+    COP [91]
 
   code_002818:
-    LDA $0016, X          ; {10264}
-    BIT #$8000            ; {10267}
-    BEQ loc_002821        ; {10270}
-    RTL                   ; {10272}
+    LDA $0016, X
+    BIT #$8000
+    BEQ loc_002821
+    RTL 
 
   loc_002821:
-    COP [0C] ( #00, #02, &code_002828 ) ; {10273}
-    RTL                   ; {10279}
+    COP [0C] ( #00, #02, &code_002828 )
+    RTL 
 }
 
 code_002828 {
-    LDA ($4A)             ; {10280}
-    BNE loc_002830        ; {10282}
-    COP [27] ( &code_002818 ) ; {10284}
+    LDA ($4A)
+    BNE loc_002830
+    COP [27] ( &code_002818 )
 
   loc_002830:
-    BRK #$53              ; {10288}
-    JSR $&code_0028ED     ; {10290}
-    JSR $&code_002913     ; {10293}
-    COP [91]              ; {10296}
-    JSR $&code_0028C6     ; {10298}
-    BCC loc_002816        ; {10301}
-    JMP $&code_002871     ; {10303}
+    BRK #$53
+    JSR $&code_0028ED
+    JSR $&code_002913
+    COP [91]
+    JSR $&code_0028C6
+    BCC loc_002816
+    JMP $&code_002871
 }
 
 code_002842 {
-    TXY                   ; {10306}
-    LDA $002C, X          ; {10307}
-    BNE loc_00285E        ; {10310}
-    LDA $0000, X          ; {10312}
-    STA $16               ; {10315}
-    LDA $0002, X          ; {10317}
-    SEC                   ; {10320}
-    SBC #$0010            ; {10321}
-    STA $18               ; {10324}
-    JSL $@lib_027462_part1.code_0272B8 ; {10326}
-    TXA                   ; {10330}
-    STA $002C, Y          ; {10331}
+    TXY 
+    LDA $002C, X
+    BNE loc_00285E
+    LDA $0000, X
+    STA $16
+    LDA $0002, X
+    SEC 
+    SBC #$0010
+    STA $18
+    JSL $@lib_027462_part1.code_0272B8
+    TXA 
+    STA $002C, Y
 
   loc_00285E:
-    LDX $002C, Y          ; {10334}
-    LDA $7E8000, X        ; {10337}
-    TYX                   ; {10341}
-    AND #$00FF            ; {10342}
-    CMP #$00FD            ; {10345}
-    BEQ loc_002870        ; {10348}
-    PLA                   ; {10350}
-    RTL                   ; {10351}
+    LDX $002C, Y
+    LDA $7E8000, X
+    TYX 
+    AND #$00FF
+    CMP #$00FD
+    BEQ loc_002870
+    PLA 
+    RTL 
 
   loc_002870:
-    RTS                   ; {10352}
+    RTS 
 }
 
 code_002871 {
-    COP [91]              ; {10353}
-    LDA $vram_write_queue ; {10355}
-    BEQ loc_002879        ; {10358}
-    RTL                   ; {10360}
+    COP [91]
+    LDA $vram_write_queue
+    BEQ loc_002879
+    RTL 
 
   loc_002879:
-    PHX                   ; {10361}
-    LDA $0000, X          ; {10362}
-    STA $16               ; {10365}
-    LDA $0002, X          ; {10367}
-    SEC                   ; {10370}
-    SBC #$0010            ; {10371}
-    STA $18               ; {10374}
-    LDA $0034, X          ; {10376}
-    ASL                   ; {10379}
-    ASL                   ; {10380}
-    ASL                   ; {10381}
-    ASL                   ; {10382}
-    ASL                   ; {10383}
-    TAX                   ; {10384}
-    SEP #$20              ; {10385}
-    LDA $&data_00BA0D+8, X ; {10387}
-    BEQ loc_0028A0        ; {10390}
-    LDA #$FE              ; {10392}
-    JSL $@lib_0109D6_part1.code_0107AC ; {10394}
-    BRA loc_0028A6        ; {10398}
+    PHX 
+    LDA $0000, X
+    STA $16
+    LDA $0002, X
+    SEC 
+    SBC #$0010
+    STA $18
+    LDA $0034, X
+    ASL 
+    ASL 
+    ASL 
+    ASL 
+    ASL 
+    TAX 
+    SEP #$20
+    LDA $&data_00BA0D+8, X
+    BEQ loc_0028A0
+    LDA #$FE
+    JSL $@lib_0109D6_part1.code_0107AC
+    BRA loc_0028A6
 
   loc_0028A0:
-    LDA #$FE              ; {10400}
-    JSL $@lib_0109D6_part1.code_0106F1 ; {10402}
+    LDA #$FE
+    JSL $@lib_0109D6_part1.code_0106F1
 
   loc_0028A6:
-    PLX                   ; {10406}
-    REP #$20              ; {10407}
-    COP [A8] ( #$8000, #0E ) ; {10409}
-    LDA #$0310            ; {10414}
-    STA $0016, X          ; {10417}
-    STZ $001C, X          ; {10420}
-    COP [A3]              ; {10423}
-    COP [A2] ( #30 )      ; {10425}
-    BRK #$83              ; {10428}
-    COP [80] ( #01 )      ; {10430}
-    COP [82]              ; {10433}
-    COP [86]              ; {10435}
-    RTL                   ; {10437}
+    PLX 
+    REP #$20
+    COP [A8] ( #$8000, #0E )
+    LDA #$0310
+    STA $0016, X
+    STZ $001C, X
+    COP [A3]
+    COP [A2] ( #30 )
+    BRK #$83
+    COP [80] ( #01 )
+    COP [82]
+    COP [86]
+    RTL 
 }
 
 code_0028C6 {
-    SEP #$20              ; {10438}
-    LDA $002E, X          ; {10440}
-    CMP $002F, X          ; {10443}
-    REP #$20              ; {10446}
-    BNE loc_0028D4        ; {10448}
-    PLA                   ; {10450}
-    RTL                   ; {10451}
+    SEP #$20
+    LDA $002E, X
+    CMP $002F, X
+    REP #$20
+    BNE loc_0028D4
+    PLA 
+    RTL 
 
   loc_0028D4:
-    TXY                   ; {10452}
-    LDA $0034, X          ; {10453}
-    TAX                   ; {10456}
-    SEP #$20              ; {10457}
-    LDA $002E, Y          ; {10459}
-    STA $002F, Y          ; {10462}
-    CLC                   ; {10465}
-    BNE loc_0028E9        ; {10466}
-    SEC                   ; {10468}
-    STA $7F0203, X        ; {10469}
+    TXY 
+    LDA $0034, X
+    TAX 
+    SEP #$20
+    LDA $002E, Y
+    STA $002F, Y
+    CLC 
+    BNE loc_0028E9
+    SEC 
+    STA $7F0203, X
 
   loc_0028E9:
-    REP #$20              ; {10473}
-    TYX                   ; {10475}
-    RTS                   ; {10476}
+    REP #$20
+    TYX 
+    RTS 
 }
 
 code_0028ED {
-    PHX                   ; {10477}
-    JSR $&engine_0065A7.code_006662 ; {10478}
-    LDA $0038, X          ; {10481}
-    TAX                   ; {10484}
-    LDA $&meta_tables_008000+6, X ; {10485}
-    ORA #$8000            ; {10488}
-    STA $0016, Y          ; {10491}
-    LDA #$&code_002928    ; {10494}
-    STA $0018, Y          ; {10497}
-    SEP #$20              ; {10500}
-    LDA #$^code_002928    ; {10502}
-    STA $0036, Y          ; {10504}
-    REP #$20              ; {10507}
-    PLX                   ; {10509}
-    TXA                   ; {10510}
-    STA $0032, Y          ; {10511}
-    RTS                   ; {10514}
+    PHX 
+    JSR $&engine_0065A7.code_006662
+    LDA $0038, X
+    TAX 
+    LDA $&meta_tables_008000+6, X
+    ORA #$8000
+    STA $0016, Y
+    LDA #$&code_002928
+    STA $0018, Y
+    SEP #$20
+    LDA #$^code_002928
+    STA $0036, Y
+    REP #$20
+    PLX 
+    TXA 
+    STA $0032, Y
+    RTS 
 }
 
 code_002913 {
-    LDA $0026, X          ; {10515}
-    BEQ loc_002927        ; {10518}
-    ASL                   ; {10520}
-    CLC                   ; {10521}
-    ADC $0026, X          ; {10522}
-    DEC                   ; {10525}
-    STA $0014, X          ; {10526}
-    PLA                   ; {10529}
-    INC                   ; {10530}
-    STA $0018, X          ; {10531}
-    RTL                   ; {10534}
+    LDA $0026, X
+    BEQ loc_002927
+    ASL 
+    CLC 
+    ADC $0026, X
+    DEC 
+    STA $0014, X
+    PLA 
+    INC 
+    STA $0018, X
+    RTL 
 
   loc_002927:
-    RTS                   ; {10535}
+    RTS 
 }
 ---------------------------------------------
 
 code_002928 {
-    COP [A8] ( #$8000, #0E ) ; {10536}
-    LDA #$0300            ; {10541}
-    STA $0016, X          ; {10544}
-    LDA $001C, X          ; {10547}
-    STA $0030, X          ; {10550}
-    LDA $0372             ; {10553}
-    STA $001C, X          ; {10556}
-    COP [80] ( #00 )      ; {10559}
-    COP [82]              ; {10562}
-    LDA $0030, X          ; {10564}
-    STA $001C, X          ; {10567}
-    LDA #$003C            ; {10570}
-    STA $0026, X          ; {10573}
-    LDY $0038, X          ; {10576}
-    LDA $&meta_tables_008000+6, Y ; {10579}
-    ORA #$8800            ; {10582}
-    STA $0016, X          ; {10585}
-    BRA loc_00296A        ; {10588}
+    COP [A8] ( #$8000, #0E )
+    LDA #$0300
+    STA $0016, X
+    LDA $001C, X
+    STA $0030, X
+    LDA $0372
+    STA $001C, X
+    COP [80] ( #00 )
+    COP [82]
+    LDA $0030, X
+    STA $001C, X
+    LDA #$003C
+    STA $0026, X
+    LDY $0038, X
+    LDA $&meta_tables_008000+6, Y
+    ORA #$8800
+    STA $0016, X
+    BRA loc_00296A
 }
 ---------------------------------------------
 
 code_00295E {
-    LDY $0038, X          ; {10590}
-    LDA $&meta_tables_008000+6, Y ; {10593}
-    ORA #$8000            ; {10596}
-    STA $0016, X          ; {10599}
+    LDY $0038, X
+    LDA $&meta_tables_008000+6, Y
+    ORA #$8000
+    STA $0016, X
 
   loc_00296A:
-    SEP #$20              ; {10602}
-    LDA $&meta_tables_008000+A, Y ; {10604}
-    STA $0024, X          ; {10607}
-    LDA $&meta_tables_008000+D, Y ; {10610}
-    STA $0036, X          ; {10613}
-    PHA                   ; {10616}
-    REP #$20              ; {10617}
-    LDA $&meta_tables_008000+5, Y ; {10619}
-    STA $001E, X          ; {10622}
-    STZ $0020, X          ; {10625}
-    LDA $&meta_tables_008000+8, Y ; {10628}
-    STA $0022, X          ; {10631}
-    LDA $&meta_tables_008000+B, Y ; {10634}
-    STA $0018, X          ; {10637}
-    DEC                   ; {10640}
-    PHA                   ; {10641}
-    JSL $@engine_000000.code_0008F3 ; {10642}
-    STZ $0004, X          ; {10646}
-    STZ $0006, X          ; {10649}
-    RTL                   ; {10652}
+    SEP #$20
+    LDA $&meta_tables_008000+A, Y
+    STA $0024, X
+    LDA $&meta_tables_008000+D, Y
+    STA $0036, X
+    PHA 
+    REP #$20
+    LDA $&meta_tables_008000+5, Y
+    STA $001E, X
+    STZ $0020, X
+    LDA $&meta_tables_008000+8, Y
+    STA $0022, X
+    LDA $&meta_tables_008000+B, Y
+    STA $0018, X
+    DEC 
+    PHA 
+    JSL $@engine_000000.code_0008F3
+    STZ $0004, X
+    STZ $0006, X
+    RTL 
 }
 
 code_00299D {
-    LDA $scene_active     ; {10653}
-    BEQ loc_0029E5        ; {10656}
-    COP [A8] ( #$8000, #0E ) ; {10658}
-    LDA $0016, X          ; {10663}
-    AND #$DFFF            ; {10666}
-    ORA #$0010            ; {10669}
-    STA $0016, X          ; {10672}
-    LDA $0372             ; {10675}
-    STA $001C, X          ; {10678}
-    COP [A3]              ; {10681}
-    COP [A2] ( #30 )      ; {10683}
-    LDA $0010, X          ; {10686}
-    SEC                   ; {10689}
-    SBC #$0010            ; {10690}
-    LSR                   ; {10693}
-    CLC                   ; {10694}
-    ADC $0000, X          ; {10695}
-    STA $0000, X          ; {10698}
-    LDA $0012, X          ; {10701}
-    SEC                   ; {10704}
-    SBC #$0010            ; {10705}
-    LSR                   ; {10708}
-    EOR #$FFFF            ; {10709}
-    INC                   ; {10712}
-    CLC                   ; {10713}
-    ADC $0002, X          ; {10714}
-    STA $0002, X          ; {10717}
-    COP [80] ( #02 )      ; {10720}
-    COP [82]              ; {10723}
+    LDA $scene_active
+    BEQ loc_0029E5
+    COP [A8] ( #$8000, #0E )
+    LDA $0016, X
+    AND #$DFFF
+    ORA #$0010
+    STA $0016, X
+    LDA $0372
+    STA $001C, X
+    COP [A3]
+    COP [A2] ( #30 )
+    LDA $0010, X
+    SEC 
+    SBC #$0010
+    LSR 
+    CLC 
+    ADC $0000, X
+    STA $0000, X
+    LDA $0012, X
+    SEC 
+    SBC #$0010
+    LSR 
+    EOR #$FFFF
+    INC 
+    CLC 
+    ADC $0002, X
+    STA $0002, X
+    COP [80] ( #02 )
+    COP [82]
 
   loc_0029E5:
-    COP [86]              ; {10725}
-    RTL                   ; {10727}
+    COP [86]
+    RTL 
 }

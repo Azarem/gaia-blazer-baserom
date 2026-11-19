@@ -10,67 +10,67 @@
 ---------------------------------------------
 
 code_025561 {
-    COP [3B] ( #$0195, &code_025577 ) ; {152929}
-    COP [17] ( &w3_shared_022289.code_02229E ) ; {152935}
-    SEP #$20              ; {152939}
-    LDA #$^engine_003005.code_00305F ; {152941}
-    PHA                   ; {152943}
-    REP #$20              ; {152944}
-    LDA #$&engine_003005.code_00305F-1 ; {152946}
-    PHA                   ; {152949}
-    RTL                   ; {152950}
+    COP [3B] ( #$0195, &code_025577 )
+    COP [17] ( &w3_shared_022289.code_02229E )
+    SEP #$20
+    LDA #$^engine_003005.code_00305F
+    PHA 
+    REP #$20
+    LDA #$&engine_003005.code_00305F-1
+    PHA 
+    RTL 
 }
 
 code_025577 {
-    COP [30] ( #$0195, &code_0255E4, #04 ) ; {152951}
-    COP [07] ( #$9F02, &code_02559B ) ; {152958}
-    COP [85] ( @engine_0026F3.code_00299D ) ; {152964}
-    COP [17] ( &code_0255C7 ) ; {152969}
-    COP [15]              ; {152973}
-    COP [05] ( #$0007 )   ; {152975}
-    COP [80] ( #02 )      ; {152979}
-    COP [82]              ; {152982}
-    COP [91]              ; {152984}
-    RTL                   ; {152986}
+    COP [30] ( #$0195, &code_0255E4, #04 )
+    COP [07] ( #$9F02, &code_02559B )
+    COP [85] ( @engine_0026F3.code_00299D )
+    COP [17] ( &code_0255C7 )
+    COP [15]
+    COP [05] ( #$0007 )
+    COP [80] ( #02 )
+    COP [82]
+    COP [91]
+    RTL 
 }
 
 code_02559B {
-    LDA #$BFC0            ; {152987}
-    TSB $joy_block_mask   ; {152990}
-    COP [03] ( #29 )      ; {152993}
-    COP [04]              ; {152996}
-    COP [01] ( &asciistring_02580C ) ; {152998}
-    COP [03] ( #5B )      ; {153002}
-    COP [04]              ; {153005}
-    LDA #$0020            ; {153007}
-    STA $03B4             ; {153010}
-    COP [10] ( #$030D, #01, #$00A0, #$0050 ) ; {153013}
-    LDA #$BFC0            ; {153022}
-    TRB $joy_block_mask   ; {153025}
-    COP [91]              ; {153028}
-    RTL                   ; {153030}
+    LDA #$BFC0
+    TSB $joy_block_mask
+    COP [03] ( #29 )
+    COP [04]
+    COP [01] ( &asciistring_02580C )
+    COP [03] ( #5B )
+    COP [04]
+    LDA #$0020
+    STA $03B4
+    COP [10] ( #$030D, #01, #$00A0, #$0050 )
+    LDA #$BFC0
+    TRB $joy_block_mask
+    COP [91]
+    RTL 
 }
 
 code_0255C7 {
-    COP [09] ( #$8007 )   ; {153031}
-    COP [07] ( #$9B05, &code_0255DF ) ; {153035}
-    COP [01] ( &asciistring_025639 ) ; {153041}
-    BRK #$5E              ; {153045}
-    COP [0A] ( #3F )      ; {153047}
-    COP [09] ( #$9B05 )   ; {153050}
-    RTL                   ; {153054}
+    COP [09] ( #$8007 )
+    COP [07] ( #$9B05, &code_0255DF )
+    COP [01] ( &asciistring_025639 )
+    BRK #$5E
+    COP [0A] ( #3F )
+    COP [09] ( #$9B05 )
+    RTL 
 }
 
 code_0255DF {
-    COP [01] ( &asciistring_0257CA ) ; {153055}
-    RTL                   ; {153059}
+    COP [01] ( &asciistring_0257CA )
+    RTL 
 }
 
 code_0255E4 {
-    COP [01] ( &asciistring_0255ED ) ; {153060}
-    COP [37]              ; {153064}
-    COP [86]              ; {153066}
-    RTL                   ; {153068}
+    COP [01] ( &asciistring_0255ED )
+    COP [37]
+    COP [86]
+    RTL 
 }
 
 asciistring_0255ED |[10][0E:3C]I knew what was [N]happening- [FIN]I could do nothing to [N]prevent the Queen from[N]passing away- [JMP:&w5_shared_02706C.asciistring_0270DF]|

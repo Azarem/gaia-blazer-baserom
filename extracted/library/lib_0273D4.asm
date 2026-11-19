@@ -7,19 +7,19 @@
 ---------------------------------------------
 
 code_0273D4 {
-    PHP                   ; {160724}
-    SEP #$20              ; {160725}
-    LDY $player_actor     ; {160727}
-    LDX $001E, Y          ; {160730}
-    CPX #$002C            ; {160733}
-    BCS loc_0273E8        ; {160736}
-    LDA $&data_00F9F7.binary_00FA7F, X ; {160738}
-    PLP                   ; {160741}
-    CLC                   ; {160742}
-    RTL                   ; {160743}
+    PHP 
+    SEP #$20
+    LDY $player_actor
+    LDX $001E, Y
+    CPX #$002C
+    BCS loc_0273E8
+    LDA $&data_00F9F7.binary_00FA7F, X
+    PLP 
+    CLC 
+    RTL 
 
   loc_0273E8:
-    PLP                   ; {160744}
-    SEC                   ; {160745}
-    RTL                   ; {160746}
+    PLP 
+    SEC 
+    RTL 
 }

@@ -8,17 +8,17 @@
 ---------------------------------------------
 
 code_021EFB {
-    COP [01] ( &w3_shared_02249A.asciistring_0224C2 ) ; {139003}
-    COP [1A] ( &lib_014F5B.asciistring_014F5B, #02, &code_021F1D ) ; {139007}
-    LDA $L_choice_result  ; {139014}
-    BEQ code_021F1D       ; {139018}
-    COP [01] ( &w3_shared_02249A.asciistring_0224F4 ) ; {139020}
-    INC $042D             ; {139024}
-    COP [10] ( #$010A, #00, #$01D8, #$0040 ) ; {139027}
-    RTL                   ; {139036}
+    COP [01] ( &w3_shared_02249A.asciistring_0224C2 )
+    COP [1A] ( &lib_014F5B.asciistring_014F5B, #02, &code_021F1D )
+    LDA $L_choice_result
+    BEQ code_021F1D
+    COP [01] ( &w3_shared_02249A.asciistring_0224F4 )
+    INC $042D
+    COP [10] ( #$010A, #00, #$01D8, #$0040 )
+    RTL 
 }
 
 code_021F1D {
-    COP [01] ( &w3_shared_02249A.asciistring_022507 ) ; {139037}
-    RTL                   ; {139041}
+    COP [01] ( &w3_shared_02249A.asciistring_022507 )
+    RTL 
 }

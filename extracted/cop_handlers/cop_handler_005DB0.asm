@@ -8,10 +8,10 @@
 ---------------------------------------------
 
 Cop37_GetMissingHp {
-    TYX                   ; {23984}
-    LDA $player_max_hp    ; {23985}
-    SEC                   ; {23988}
-    SBC $player_hp        ; {23989}
-    STA $043B             ; {23992}
-    BRL cop_handler_006473.loc_0064BF ; {23995}
+    TYX 
+    LDA $player_max_hp
+    SEC 
+    SBC $player_hp
+    STA $043B
+    BRL cop_handler_006473.loc_0064BF
 }

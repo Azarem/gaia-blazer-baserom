@@ -6,50 +6,50 @@
 ---------------------------------------------
 
 code_0238A7 {
-    COP [14] ( #$013C, &code_0238AE ) ; {145575}
-    RTL                   ; {145581}
+    COP [14] ( #$013C, &code_0238AE )
+    RTL 
 }
 
 code_0238AE {
-    COP [85] ( @engine_0026F3.code_00299D ) ; {145582}
-    COP [17] ( &code_0238D3 ) ; {145587}
-    COP [15]              ; {145591}
+    COP [85] ( @engine_0026F3.code_00299D )
+    COP [17] ( &code_0238D3 )
+    COP [15]
 
   loc_0238B9:
-    COP [0C] ( #00, #04, &code_0238C6 ) ; {145593}
-    COP [80] ( #0C )      ; {145599}
-    COP [82]              ; {145602}
-    BRA loc_0238B9        ; {145604}
+    COP [0C] ( #00, #04, &code_0238C6 )
+    COP [80] ( #0C )
+    COP [82]
+    BRA loc_0238B9
 }
 
 code_0238C6 {
-    COP [80] ( #1E )      ; {145606}
-    COP [82]              ; {145609}
-    COP [0C] ( #00, #04, &code_0238C6 ) ; {145611}
-    BRA loc_0238B9        ; {145617}
+    COP [80] ( #1E )
+    COP [82]
+    COP [0C] ( #00, #04, &code_0238C6 )
+    BRA loc_0238B9
 }
 
 code_0238D3 {
-    COP [07] ( #$0605, &code_0238DF ) ; {145619}
-    COP [07] ( #$8606, &code_0238E4 ) ; {145625}
+    COP [07] ( #$0605, &code_0238DF )
+    COP [07] ( #$8606, &code_0238E4 )
 }
 
 code_0238DF {
-    COP [01] ( &asciistring_0238F8 ) ; {145631}
-    RTL                   ; {145635}
+    COP [01] ( &asciistring_0238F8 )
+    RTL 
 }
 
 code_0238E4 {
-    COP [18] ( #15, &code_0238EE ) ; {145636}
-    COP [01] ( &asciistring_023976 ) ; {145641}
-    RTL                   ; {145645}
+    COP [18] ( #15, &code_0238EE )
+    COP [01] ( &asciistring_023976 )
+    RTL 
 }
 
 code_0238EE {
-    COP [01] ( &asciistring_023921 ) ; {145646}
-    BRK #$5E              ; {145650}
-    COP [0A] ( #15 )      ; {145652}
-    RTL                   ; {145655}
+    COP [01] ( &asciistring_023921 )
+    BRK #$5E
+    COP [0A] ( #15 )
+    RTL 
 }
 
 asciistring_0238F8 |[10]We cannot walk [N]around outside because[N]of the cats- [JMP:&w4_shared_023F33.asciistring_023FA3]|

@@ -6,30 +6,30 @@
 ---------------------------------------------
 
 CopAB_SpawnAfterAbsolute {
-    TYX                   ; {25343}
-    JSR $&engine_0065A7.code_00663A ; {25344}
-    LDA [$38]             ; {25347}
-    INC $38               ; {25349}
-    INC $38               ; {25351}
-    STA $0018, Y          ; {25353}
-    TXA                   ; {25356}
-    LDA [$38]             ; {25357}
-    INC $38               ; {25359}
-    AND #$00FF            ; {25361}
-    SEP #$20              ; {25364}
-    STA $0036, Y          ; {25366}
-    REP #$20              ; {25369}
-    LDA [$38]             ; {25371}
-    INC $38               ; {25373}
-    INC $38               ; {25375}
-    STA $0000, Y          ; {25377}
-    LDA [$38]             ; {25380}
-    INC $38               ; {25382}
-    INC $38               ; {25384}
-    STA $0002, Y          ; {25386}
-    LDA [$38]             ; {25389}
-    INC $38               ; {25391}
-    INC $38               ; {25393}
-    STA $0016, Y          ; {25395}
-    BRL cop_handler_006473.loc_0064BF ; {25398}
+    TYX 
+    JSR $&engine_0065A7.code_00663A
+    LDA [$38]
+    INC $38
+    INC $38
+    STA $0018, Y
+    TXA 
+    LDA [$38]
+    INC $38
+    AND #$00FF
+    SEP #$20
+    STA $0036, Y
+    REP #$20
+    LDA [$38]
+    INC $38
+    INC $38
+    STA $0000, Y
+    LDA [$38]
+    INC $38
+    INC $38
+    STA $0002, Y
+    LDA [$38]
+    INC $38
+    INC $38
+    STA $0016, Y
+    BRL cop_handler_006473.loc_0064BF
 }

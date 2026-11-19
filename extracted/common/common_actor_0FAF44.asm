@@ -3,59 +3,59 @@
 ---------------------------------------------
 
 code_0FAF44 {
-    COP [A2] ( #30 )      ; {1027908}
-    COP [A3]              ; {1027911}
+    COP [A2] ( #30 )
+    COP [A3]
 
   code_0FAF49:
-    LDA $0016, X          ; {1027913}
-    BIT #$8000            ; {1027916}
-    BEQ loc_0FAF57        ; {1027919}
-    COP [1B] ( &code_0FAF49, #$0010 ) ; {1027921}
+    LDA $0016, X
+    BIT #$8000
+    BEQ loc_0FAF57
+    COP [1B] ( &code_0FAF49, #$0010 )
 
   loc_0FAF57:
-    COP [9C] ( &code_0FAF5D, &code_0FAF85 ) ; {1027927}
+    COP [9C] ( &code_0FAF5D, &code_0FAF85 )
 }
 
 code_0FAF5D {
-    COP [9A] ( #$0010, &code_0FAF67, &code_0FAF74, &code_0FAF74 ) ; {1027933}
+    COP [9A] ( #$0010, &code_0FAF67, &code_0FAF74, &code_0FAF74 )
 }
 
 code_0FAF67 {
-    COP [81] ( #1C, #02 ) ; {1027943}
-    COP [83]              ; {1027947}
-    COP [80] ( #1D )      ; {1027949}
-    COP [82]              ; {1027952}
-    BRA loc_0FAF57        ; {1027954}
+    COP [81] ( #1C, #02 )
+    COP [83]
+    COP [80] ( #1D )
+    COP [82]
+    BRA loc_0FAF57
 }
 
 code_0FAF74 {
-    COP [96]              ; {1027956}
-    COP [81] ( #1C, #02 ) ; {1027958}
-    COP [83]              ; {1027962}
-    COP [80] ( #1D )      ; {1027964}
-    COP [82]              ; {1027967}
-    COP [97]              ; {1027969}
-    BRA loc_0FAF57        ; {1027971}
+    COP [96]
+    COP [81] ( #1C, #02 )
+    COP [83]
+    COP [80] ( #1D )
+    COP [82]
+    COP [97]
+    BRA loc_0FAF57
 }
 
 code_0FAF85 {
-    COP [9B] ( #$0010, &code_0FAF8F, &code_0FAF9C, &code_0FAF9C ) ; {1027973}
+    COP [9B] ( #$0010, &code_0FAF8F, &code_0FAF9C, &code_0FAF9C )
 }
 
 code_0FAF8F {
-    COP [81] ( #1A, #02 ) ; {1027983}
-    COP [83]              ; {1027987}
-    COP [80] ( #1B )      ; {1027989}
-    COP [82]              ; {1027992}
-    BRA loc_0FAF57        ; {1027994}
+    COP [81] ( #1A, #02 )
+    COP [83]
+    COP [80] ( #1B )
+    COP [82]
+    BRA loc_0FAF57
 }
 
 code_0FAF9C {
-    COP [96]              ; {1027996}
-    COP [81] ( #18, #02 ) ; {1027998}
-    COP [83]              ; {1028002}
-    COP [80] ( #19 )      ; {1028004}
-    COP [82]              ; {1028007}
-    COP [97]              ; {1028009}
-    BRA loc_0FAF57        ; {1028011}
+    COP [96]
+    COP [81] ( #18, #02 )
+    COP [83]
+    COP [80] ( #19 )
+    COP [82]
+    COP [97]
+    BRA loc_0FAF57
 }

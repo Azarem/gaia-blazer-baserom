@@ -10,23 +10,23 @@
 ---------------------------------------------
 
 Cop10_SetNextScene {
-    TYX                   ; {22854}
-    LDA [$38]             ; {22855}
-    INC $38               ; {22857}
-    INC $38               ; {22859}
-    XBA                   ; {22861}
-    STA $scene_next       ; {22862}
-    LDA [$38]             ; {22865}
-    INC $38               ; {22867}
-    AND #$00FF            ; {22869}
-    STA $warp_dest_anim   ; {22872}
-    LDA [$38]             ; {22875}
-    INC $38               ; {22877}
-    INC $38               ; {22879}
-    STA $warp_dest_x      ; {22881}
-    LDA [$38]             ; {22884}
-    INC $38               ; {22886}
-    INC $38               ; {22888}
-    STA $warp_dest_y      ; {22890}
-    BRL cop_handler_006473.loc_0064BF ; {22893}
+    TYX 
+    LDA [$38]
+    INC $38
+    INC $38
+    XBA 
+    STA $scene_next
+    LDA [$38]
+    INC $38
+    AND #$00FF
+    STA $warp_dest_anim
+    LDA [$38]
+    INC $38
+    INC $38
+    STA $warp_dest_x
+    LDA [$38]
+    INC $38
+    INC $38
+    STA $warp_dest_y
+    BRL cop_handler_006473.loc_0064BF
 }

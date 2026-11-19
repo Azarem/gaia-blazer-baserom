@@ -9,55 +9,55 @@
 ---------------------------------------------
 
 code_0232B3 {
-    COP [14] ( #$014C, &code_0232BA ) ; {144051}
-    RTL                   ; {144057}
+    COP [14] ( #$014C, &code_0232BA )
+    RTL 
 }
 
 code_0232BA {
-    COP [85] ( @engine_0026F3.code_00299D ) ; {144058}
-    COP [17] ( &code_0232CD ) ; {144063}
-    COP [15]              ; {144067}
-    COP [91]              ; {144069}
-    COP [80] ( #07 )      ; {144071}
-    COP [82]              ; {144074}
-    RTL                   ; {144076}
+    COP [85] ( @engine_0026F3.code_00299D )
+    COP [17] ( &code_0232CD )
+    COP [15]
+    COP [91]
+    COP [80] ( #07 )
+    COP [82]
+    RTL 
 }
 
 code_0232CD {
-    COP [07] ( #$8807, &code_0232FF ) ; {144077}
-    COP [18] ( #38, &code_0232FA ) ; {144083}
-    COP [01] ( &asciistring_023317 ) ; {144088}
-    COP [1A] ( &lib_014F02.asciistring_014F02, #02, &code_0232F5 ) ; {144092}
-    LDA $L_choice_result  ; {144099}
-    BNE code_0232F5       ; {144103}
-    COP [01] ( &asciistring_0233D0 ) ; {144105}
-    COP [0B] ( #38 )      ; {144109}
-    COP [09] ( #$8807 )   ; {144112}
-    RTL                   ; {144116}
+    COP [07] ( #$8807, &code_0232FF )
+    COP [18] ( #38, &code_0232FA )
+    COP [01] ( &asciistring_023317 )
+    COP [1A] ( &lib_014F02.asciistring_014F02, #02, &code_0232F5 )
+    LDA $L_choice_result
+    BNE code_0232F5
+    COP [01] ( &asciistring_0233D0 )
+    COP [0B] ( #38 )
+    COP [09] ( #$8807 )
+    RTL 
 }
 
 code_0232F5 {
-    COP [01] ( &asciistring_0233B1 ) ; {144117}
-    RTL                   ; {144121}
+    COP [01] ( &asciistring_0233B1 )
+    RTL 
 }
 
 code_0232FA {
-    COP [01] ( &asciistring_023374 ) ; {144122}
-    RTL                   ; {144126}
+    COP [01] ( &asciistring_023374 )
+    RTL 
 }
 
 code_0232FF {
-    COP [18] ( #38, &code_023309 ) ; {144127}
-    COP [01] ( &asciistring_02342E ) ; {144132}
-    RTL                   ; {144136}
+    COP [18] ( #38, &code_023309 )
+    COP [01] ( &asciistring_02342E )
+    RTL 
 }
 
 code_023309 {
-    COP [01] ( &asciistring_023403 ) ; {144137}
-    BRK #$5E              ; {144141}
-    COP [0A] ( #38 )      ; {144143}
-    COP [09] ( #$0807 )   ; {144146}
-    RTL                   ; {144150}
+    COP [01] ( &asciistring_023403 )
+    BRK #$5E
+    COP [0A] ( #38 )
+    COP [09] ( #$0807 )
+    RTL 
 }
 
 asciistring_023317 |[10]If there s nothing in[N]a chest then the chest[N]is good for nothing- [FIN]Would you store your [N]Medical Herbs in my [N]drawer? [END]|

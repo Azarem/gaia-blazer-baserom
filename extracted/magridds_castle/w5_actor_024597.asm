@@ -8,73 +8,73 @@
 ---------------------------------------------
 
 code_024597 {
-    COP [14] ( #$0167, &code_02459E ) ; {148887}
-    RTL                   ; {148893}
+    COP [14] ( #$0167, &code_02459E )
+    RTL 
 }
 
 code_02459E {
-    COP [30] ( #$0167, &code_024615, #04 ) ; {148894}
-    COP [17] ( &code_0245CB ) ; {148901}
-    COP [15]              ; {148905}
-    COP [80] ( #1B )      ; {148907}
-    COP [82]              ; {148910}
-    COP [91]              ; {148912}
-    RTL                   ; {148914}
+    COP [30] ( #$0167, &code_024615, #04 )
+    COP [17] ( &code_0245CB )
+    COP [15]
+    COP [80] ( #1B )
+    COP [82]
+    COP [91]
+    RTL 
 }
 
 code_0245B3 {
-    COP [80] ( #1C )      ; {148915}
-    COP [82]              ; {148918}
-    COP [31] ( #12 )      ; {148920}
-    COP [03] ( #79 )      ; {148923}
-    COP [04]              ; {148926}
-    COP [09] ( #$8001 )   ; {148928}
+    COP [80] ( #1C )
+    COP [82]
+    COP [31] ( #12 )
+    COP [03] ( #79 )
+    COP [04]
+    COP [09] ( #$8001 )
 
   loc_0245C4:
-    COP [80] ( #1D )      ; {148932}
-    COP [82]              ; {148935}
-    BRA loc_0245C4        ; {148937}
+    COP [80] ( #1D )
+    COP [82]
+    BRA loc_0245C4
 }
 
 code_0245CB {
-    COP [07] ( #$8703, &code_0245FF ) ; {148939}
-    COP [19] ( #1A, &code_024610 ) ; {148945}
-    COP [01] ( &asciistring_02480A ) ; {148950}
-    COP [1A] ( &lib_014F02.asciistring_014F02, #02, &code_0245FA ) ; {148954}
-    LDA $L_choice_result  ; {148961}
-    BNE code_0245FA       ; {148965}
-    COP [09] ( #$8703 )   ; {148967}
-    COP [01] ( &asciistring_02484C ) ; {148971}
-    COP [0B] ( #1A )      ; {148975}
-    COP [17] ( &code_02460B ) ; {148978}
-    COP [27] ( &code_0245B3 ) ; {148982}
+    COP [07] ( #$8703, &code_0245FF )
+    COP [19] ( #1A, &code_024610 )
+    COP [01] ( &asciistring_02480A )
+    COP [1A] ( &lib_014F02.asciistring_014F02, #02, &code_0245FA )
+    LDA $L_choice_result
+    BNE code_0245FA
+    COP [09] ( #$8703 )
+    COP [01] ( &asciistring_02484C )
+    COP [0B] ( #1A )
+    COP [17] ( &code_02460B )
+    COP [27] ( &code_0245B3 )
 }
 
 code_0245FA {
-    COP [01] ( &asciistring_024871 ) ; {148986}
-    RTL                   ; {148990}
+    COP [01] ( &asciistring_024871 )
+    RTL 
 }
 
 code_0245FF {
-    COP [01] ( &asciistring_024676 ) ; {148991}
-    COP [17] ( &code_02460B ) ; {148995}
-    COP [27] ( &code_0245B3 ) ; {148999}
+    COP [01] ( &asciistring_024676 )
+    COP [17] ( &code_02460B )
+    COP [27] ( &code_0245B3 )
 }
 
 code_02460B {
-    COP [01] ( &asciistring_02479E ) ; {149003}
-    RTL                   ; {149007}
+    COP [01] ( &asciistring_02479E )
+    RTL 
 }
 
 code_024610 {
-    COP [01] ( &asciistring_0247DE ) ; {149008}
-    RTL                   ; {149012}
+    COP [01] ( &asciistring_0247DE )
+    RTL 
 }
 
 code_024615 {
-    COP [01] ( &asciistring_02461C ) ; {149013}
-    COP [86]              ; {149017}
-    RTL                   ; {149019}
+    COP [01] ( &asciistring_02461C )
+    COP [86]
+    RTL 
 }
 
 asciistring_02461C |[10][0E:3C]A sad sounding voice [N]is coming from the [N]theater- [FIN]Oh, what can I do? [N]I can t play a harp [N]without strings- [JMP:&w5_shared_02706C.asciistring_0270DF]|

@@ -20,35 +20,35 @@
 ---------------------------------------------
 
 code_013ADA {
-    SEP #$20              ; {80602}
-    LDA #$01              ; {80604}
-    STA $OBJSEL           ; {80606}
-    LDA #$09              ; {80609}
-    STA $BGMODE           ; {80611}
-    LDA #$63              ; {80614}
-    STA $BG1SC            ; {80616}
-    LDA #$73              ; {80619}
-    STA $BG2SC            ; {80621}
-    LDA #$58              ; {80624}
-    STA $BG3SC            ; {80626}
-    LDA #$00              ; {80629}
-    STA $BG12NBA          ; {80631}
-    LDA #$04              ; {80634}
-    STA $BG34NBA          ; {80636}
-    LDA #$33              ; {80639}
-    STA $W12SEL           ; {80641}
-    STA $W34SEL           ; {80644}
-    STA $WOBJSEL          ; {80647}
-    LDA #$00              ; {80650}
-    STA $WH0              ; {80652}
-    LDA #$FF              ; {80655}
-    STA $WH1              ; {80657}
-    LDA #$00              ; {80660}
-    STA $WH2              ; {80662}
-    STA $WH3              ; {80665}
-    LDA #$82              ; {80668}
-    STA $CGWSEL           ; {80670}
-    LDA #$07              ; {80673}
-    STA $TM               ; {80675}
-    RTL                   ; {80678}
+    SEP #$20
+    LDA #$01
+    STA $OBJSEL
+    LDA #$09
+    STA $BGMODE
+    LDA #$63
+    STA $BG1SC
+    LDA #$73
+    STA $BG2SC
+    LDA #$58
+    STA $BG3SC
+    LDA #$00
+    STA $BG12NBA
+    LDA #$04
+    STA $BG34NBA
+    LDA #$33
+    STA $W12SEL
+    STA $W34SEL
+    STA $WOBJSEL
+    LDA #$00
+    STA $WH0
+    LDA #$FF
+    STA $WH1
+    LDA #$00
+    STA $WH2
+    STA $WH3
+    LDA #$82
+    STA $CGWSEL
+    LDA #$07
+    STA $TM
+    RTL 
 }

@@ -6,60 +6,60 @@
 ---------------------------------------------
 
 code_02719F {
-    PHP                   ; {160159}
-    REP #$20              ; {160160}
-    LDA #$&graphics_054000+2 ; {160162}
-    STA $29               ; {160165}
-    SEP #$20              ; {160167}
-    LDA #$^graphics_054000 ; {160169}
-    STA $2B               ; {160171}
-    REP #$20              ; {160173}
-    LDA #$4000            ; {160175}
-    STA $23               ; {160178}
-    LDX #$8000            ; {160180}
-    STX $25               ; {160183}
-    JSL $@lib_0133A6_part3.code_013272 ; {160185}
-    PHB                   ; {160189}
-    LDX #$8000            ; {160190}
-    LDY #$3000            ; {160193}
-    LDA #$3FFF            ; {160196}
-    MVN #$7F, #$7E        ; {160199}
-    PLB                   ; {160202}
-    LDA #$&graphics_05C000+2 ; {160203}
-    STA $29               ; {160206}
-    SEP #$20              ; {160208}
-    LDA #$^graphics_05C000 ; {160210}
-    STA $2B               ; {160212}
-    REP #$20              ; {160214}
-    LDA #$2000            ; {160216}
-    STA $23               ; {160219}
-    LDX #$8000            ; {160221}
-    STX $25               ; {160224}
-    JSL $@lib_0133A6_part3.code_013272 ; {160226}
-    PHB                   ; {160230}
-    LDX #$8000            ; {160231}
-    LDY #$1000            ; {160234}
-    LDA #$1FFF            ; {160237}
-    MVN #$7F, #$7E        ; {160240}
-    PLB                   ; {160243}
-    LDA #$&graphics_04D000+2 ; {160244}
-    STA $29               ; {160247}
-    SEP #$20              ; {160249}
-    LDA #$^graphics_04D000 ; {160251}
-    STA $2B               ; {160253}
-    REP #$20              ; {160255}
-    LDA #$2000            ; {160257}
-    STA $23               ; {160260}
-    LDX #$8000            ; {160262}
-    STX $25               ; {160265}
-    JSL $@lib_0133A6_part3.code_013272 ; {160267}
-    PHB                   ; {160271}
-    LDX #$8000            ; {160272}
-    LDY #$C000            ; {160275}
-    LDA #$1FFF            ; {160278}
-    MVN #$7F, #$7E        ; {160281}
-    PLB                   ; {160284}
-    JSL $@lib_shared_027260.code_027260 ; {160285}
-    PLP                   ; {160289}
-    RTL                   ; {160290}
+    PHP 
+    REP #$20
+    LDA #$&graphics_054000+2
+    STA $29
+    SEP #$20
+    LDA #$^graphics_054000
+    STA $2B
+    REP #$20
+    LDA #$4000
+    STA $23
+    LDX #$8000
+    STX $25
+    JSL $@lib_0133A6_part3.code_013272
+    PHB 
+    LDX #$8000
+    LDY #$3000
+    LDA #$3FFF
+    MVN #$7F, #$7E
+    PLB 
+    LDA #$&graphics_05C000+2
+    STA $29
+    SEP #$20
+    LDA #$^graphics_05C000
+    STA $2B
+    REP #$20
+    LDA #$2000
+    STA $23
+    LDX #$8000
+    STX $25
+    JSL $@lib_0133A6_part3.code_013272
+    PHB 
+    LDX #$8000
+    LDY #$1000
+    LDA #$1FFF
+    MVN #$7F, #$7E
+    PLB 
+    LDA #$&graphics_04D000+2
+    STA $29
+    SEP #$20
+    LDA #$^graphics_04D000
+    STA $2B
+    REP #$20
+    LDA #$2000
+    STA $23
+    LDX #$8000
+    STX $25
+    JSL $@lib_0133A6_part3.code_013272
+    PHB 
+    LDX #$8000
+    LDY #$C000
+    LDA #$1FFF
+    MVN #$7F, #$7E
+    PLB 
+    JSL $@lib_shared_027260.code_027260
+    PLP 
+    RTL 
 }

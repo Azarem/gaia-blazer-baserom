@@ -9,67 +9,67 @@
 ---------------------------------------------
 
 code_01EEF3 {
-    PHX                   ; {126707}
-    LDX #$0000            ; {126708}
+    PHX 
+    LDX #$0000
 
   loc_01EEF7:
-    LDA #$00C0            ; {126711}
-    STA $7E7800, X        ; {126714}
-    LDA #$7900            ; {126718}
-    STA $7E7801, X        ; {126721}
-    INX                   ; {126725}
-    INX                   ; {126726}
-    INX                   ; {126727}
-    CPX #$000C            ; {126728}
-    BNE loc_01EEF7        ; {126731}
-    LDA #$0000            ; {126733}
-    STA $7E7800, X        ; {126736}
-    PLX                   ; {126740}
-    COP [91]              ; {126741}
-    LDA $scroll_bg1_x     ; {126743}
-    LSR                   ; {126746}
-    STA $16               ; {126747}
-    LDA $scroll_bg1_y     ; {126749}
-    LSR                   ; {126752}
-    STA $18               ; {126753}
-    PHX                   ; {126755}
-    LDA $frame_counter    ; {126756}
-    LSR                   ; {126759}
-    LSR                   ; {126760}
-    CLC                   ; {126761}
-    ADC $18               ; {126762}
-    AND #$003F            ; {126764}
-    ASL                   ; {126767}
-    TAX                   ; {126768}
-    LDY #$0000            ; {126769}
-    PHB                   ; {126772}
-    SEP #$20              ; {126773}
-    LDA #$7E              ; {126775}
-    PHA                   ; {126777}
-    PLB                   ; {126778}
-    REP #$20              ; {126779}
+    LDA #$00C0
+    STA $7E7800, X
+    LDA #$7900
+    STA $7E7801, X
+    INX 
+    INX 
+    INX 
+    CPX #$000C
+    BNE loc_01EEF7
+    LDA #$0000
+    STA $7E7800, X
+    PLX 
+    COP [91]
+    LDA $scroll_bg1_x
+    LSR 
+    STA $16
+    LDA $scroll_bg1_y
+    LSR 
+    STA $18
+    PHX 
+    LDA $frame_counter
+    LSR 
+    LSR 
+    CLC 
+    ADC $18
+    AND #$003F
+    ASL 
+    TAX 
+    LDY #$0000
+    PHB 
+    SEP #$20
+    LDA #$7E
+    PHA 
+    PLB 
+    REP #$20
 
   loc_01EF3D:
-    LDA $@word_01EF63, X  ; {126781}
-    CLC                   ; {126785}
-    ADC $16               ; {126786}
-    STA $7900, Y          ; {126788}
-    INX                   ; {126791}
-    INX                   ; {126792}
-    INY                   ; {126793}
-    INY                   ; {126794}
-    CPY #$0080            ; {126795}
-    BNE loc_01EF3D        ; {126798}
-    PLB                   ; {126800}
-    SEP #$20              ; {126801}
-    LDA #$0F              ; {126803}
-    XBA                   ; {126805}
-    LDA #$7E              ; {126806}
-    LDY #$7800            ; {126808}
-    JSL $@lib_01186E.code_01186E ; {126811}
-    REP #$20              ; {126815}
-    PLX                   ; {126817}
-    RTL                   ; {126818}
+    LDA $@word_01EF63, X
+    CLC 
+    ADC $16
+    STA $7900, Y
+    INX 
+    INX 
+    INY 
+    INY 
+    CPY #$0080
+    BNE loc_01EF3D
+    PLB 
+    SEP #$20
+    LDA #$0F
+    XBA 
+    LDA #$7E
+    LDY #$7800
+    JSL $@lib_01186E.code_01186E
+    REP #$20
+    PLX 
+    RTL 
 }
 ---------------------------------------------
 

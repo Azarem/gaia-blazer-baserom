@@ -3,77 +3,77 @@
 ---------------------------------------------
 
 code_0FB04F {
-    LDA $0016, X          ; {1028175}
-    BIT #$8000            ; {1028178}
-    BEQ loc_0FB05D        ; {1028181}
+    LDA $0016, X
+    BIT #$8000
+    BEQ loc_0FB05D
 
   loc_0FB057:
-    COP [1B] ( &code_0FB04F, #$0010 ) ; {1028183}
+    COP [1B] ( &code_0FB04F, #$0010 )
 
   loc_0FB05D:
-    COP [0C] ( #00, #05, &code_0FB065 ) ; {1028189}
-    BRA loc_0FB057        ; {1028195}
+    COP [0C] ( #00, #05, &code_0FB065 )
+    BRA loc_0FB057
 }
 
 code_0FB065 {
-    COP [80] ( #02 )      ; {1028197}
-    COP [82]              ; {1028200}
-    COP [81] ( #03, #02 ) ; {1028202}
-    COP [83]              ; {1028206}
-    COP [80] ( #01 )      ; {1028208}
-    COP [82]              ; {1028211}
+    COP [80] ( #02 )
+    COP [82]
+    COP [81] ( #03, #02 )
+    COP [83]
+    COP [80] ( #01 )
+    COP [82]
 
   loc_0FB075:
-    COP [0C] ( #00, #05, &code_0FB087 ) ; {1028213}
-    COP [80] ( #02 )      ; {1028219}
-    COP [82]              ; {1028222}
-    COP [80] ( #00 )      ; {1028224}
-    COP [82]              ; {1028227}
-    BRA loc_0FB057        ; {1028229}
+    COP [0C] ( #00, #05, &code_0FB087 )
+    COP [80] ( #02 )
+    COP [82]
+    COP [80] ( #00 )
+    COP [82]
+    BRA loc_0FB057
 }
 
 code_0FB087 {
-    COP [9A] ( #$0010, &code_0FB091, &code_0FB0AB, &code_0FB09E ) ; {1028231}
+    COP [9A] ( #$0010, &code_0FB091, &code_0FB0AB, &code_0FB09E )
 }
 
 code_0FB091 {
-    COP [23] ( &code_0FB0CF ) ; {1028241}
-    COP [97]              ; {1028245}
-    COP [80] ( #06 )      ; {1028247}
-    COP [82]              ; {1028250}
-    BRA code_0FB0AB       ; {1028252}
+    COP [23] ( &code_0FB0CF )
+    COP [97]
+    COP [80] ( #06 )
+    COP [82]
+    BRA code_0FB0AB
 }
 
 code_0FB09E {
-    COP [24] ( &code_0FB0CF ) ; {1028254}
-    COP [96]              ; {1028258}
-    COP [80] ( #06 )      ; {1028260}
-    COP [82]              ; {1028263}
-    BRA code_0FB0AB       ; {1028265}
+    COP [24] ( &code_0FB0CF )
+    COP [96]
+    COP [80] ( #06 )
+    COP [82]
+    BRA code_0FB0AB
 }
 
 code_0FB0AB {
-    COP [9B] ( #$0010, &code_0FB0B5, &code_0FB0CF, &code_0FB0C2 ) ; {1028267}
+    COP [9B] ( #$0010, &code_0FB0B5, &code_0FB0CF, &code_0FB0C2 )
 }
 
 code_0FB0B5 {
-    COP [21] ( &code_0FB0CF ) ; {1028277}
-    COP [97]              ; {1028281}
-    COP [80] ( #05 )      ; {1028283}
-    COP [82]              ; {1028286}
-    BRA code_0FB0CF       ; {1028288}
+    COP [21] ( &code_0FB0CF )
+    COP [97]
+    COP [80] ( #05 )
+    COP [82]
+    BRA code_0FB0CF
 }
 
 code_0FB0C2 {
-    COP [22] ( &code_0FB0CF ) ; {1028290}
-    COP [97]              ; {1028294}
-    COP [80] ( #04 )      ; {1028296}
-    COP [82]              ; {1028299}
-    BRA code_0FB0CF       ; {1028301}
+    COP [22] ( &code_0FB0CF )
+    COP [97]
+    COP [80] ( #04 )
+    COP [82]
+    BRA code_0FB0CF
 }
 
 code_0FB0CF {
-    COP [80] ( #01 )      ; {1028303}
-    COP [82]              ; {1028306}
-    BRA loc_0FB075        ; {1028308}
+    COP [80] ( #01 )
+    COP [82]
+    BRA loc_0FB075
 }

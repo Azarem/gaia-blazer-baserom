@@ -6,93 +6,93 @@
 ---------------------------------------------
 
 code_01CD6D {
-    COP [14] ( #$003D, &code_01CD74 ) ; {118125}
-    RTL                   ; {118131}
+    COP [14] ( #$003D, &code_01CD74 )
+    RTL 
 }
 
 code_01CD74 {
-    COP [85] ( @engine_0026F3.code_00299D ) ; {118132}
-    COP [17] ( &code_01CDE1 ) ; {118137}
-    COP [15]              ; {118141}
-    COP [91]              ; {118143}
-    RTL                   ; {118145}
+    COP [85] ( @engine_0026F3.code_00299D )
+    COP [17] ( &code_01CDE1 )
+    COP [15]
+    COP [91]
+    RTL 
 }
 
 code_01CD82 {
-    COP [17] ( &code_01CDE9 ) ; {118146}
-    COP [16]              ; {118150}
-    COP [80] ( #0F )      ; {118152}
-    COP [82]              ; {118155}
-    COP [9D] ( #0F )      ; {118157}
-    COP [9E] ( &code_01CD94 ) ; {118160}
+    COP [17] ( &code_01CDE9 )
+    COP [16]
+    COP [80] ( #0F )
+    COP [82]
+    COP [9D] ( #0F )
+    COP [9E] ( &code_01CD94 )
 }
 
 code_01CD94 {
-    COP [87]              ; {118164}
-    COP [81] ( #11, #08 ) ; {118166}
-    COP [83]              ; {118170}
-    COP [80] ( #0E )      ; {118172}
-    COP [82]              ; {118175}
-    COP [17] ( &code_01CDEE ) ; {118177}
-    COP [15]              ; {118181}
-    COP [91]              ; {118183}
-    RTL                   ; {118185}
+    COP [87]
+    COP [81] ( #11, #08 )
+    COP [83]
+    COP [80] ( #0E )
+    COP [82]
+    COP [17] ( &code_01CDEE )
+    COP [15]
+    COP [91]
+    RTL 
 }
 
 code_01CDAA {
-    COP [16]              ; {118186}
-    COP [17] ( &code_01CDF6 ) ; {118188}
-    COP [81] ( #10, #06 ) ; {118192}
-    COP [83]              ; {118196}
-    COP [81] ( #11, #02 ) ; {118198}
-    COP [83]              ; {118202}
-    COP [80] ( #10 )      ; {118204}
-    COP [82]              ; {118207}
-    COP [80] ( #0D )      ; {118209}
-    COP [82]              ; {118212}
-    COP [17] ( &code_01CDFB ) ; {118214}
-    COP [15]              ; {118218}
-    COP [91]              ; {118220}
-    COP [0D] ( #00, #1D, #09, &code_01CDD6 ) ; {118222}
-    RTL                   ; {118229}
+    COP [16]
+    COP [17] ( &code_01CDF6 )
+    COP [81] ( #10, #06 )
+    COP [83]
+    COP [81] ( #11, #02 )
+    COP [83]
+    COP [80] ( #10 )
+    COP [82]
+    COP [80] ( #0D )
+    COP [82]
+    COP [17] ( &code_01CDFB )
+    COP [15]
+    COP [91]
+    COP [0D] ( #00, #1D, #09, &code_01CDD6 )
+    RTL 
 }
 
 code_01CDD6 {
-    COP [01] ( &asciistring_01CED5 ) ; {118230}
-    COP [09] ( #$8001 )   ; {118234}
-    COP [91]              ; {118238}
-    RTL                   ; {118240}
+    COP [01] ( &asciistring_01CED5 )
+    COP [09] ( #$8001 )
+    COP [91]
+    RTL 
 }
 
 code_01CDE1 {
-    COP [01] ( &asciistring_01CE0B ) ; {118241}
-    COP [27] ( &code_01CD82 ) ; {118245}
+    COP [01] ( &asciistring_01CE0B )
+    COP [27] ( &code_01CD82 )
 }
 
 code_01CDE9 {
-    COP [01] ( &asciistring_01CE0B ) ; {118249}
-    RTL                   ; {118253}
+    COP [01] ( &asciistring_01CE0B )
+    RTL 
 }
 
 code_01CDEE {
-    COP [01] ( &asciistring_01CE48 ) ; {118254}
-    COP [27] ( &code_01CDAA ) ; {118258}
+    COP [01] ( &asciistring_01CE48 )
+    COP [27] ( &code_01CDAA )
 }
 
 code_01CDF6 {
-    COP [01] ( &asciistring_01CEA7 ) ; {118262}
-    RTL                   ; {118266}
+    COP [01] ( &asciistring_01CEA7 )
+    RTL 
 }
 
 code_01CDFB {
-    COP [07] ( #$8001, &code_01CE06 ) ; {118267}
-    COP [01] ( &asciistring_01CEAB ) ; {118273}
-    RTL                   ; {118277}
+    COP [07] ( #$8001, &code_01CE06 )
+    COP [01] ( &asciistring_01CEAB )
+    RTL 
 }
 
 code_01CE06 {
-    COP [01] ( &asciistring_01CEE6 ) ; {118278}
-    RTL                   ; {118282}
+    COP [01] ( &asciistring_01CEE6 )
+    RTL 
 }
 
 asciistring_01CE0B |[10]I can tell what [N]something is just by [N]it s smell- [FIN]Allright, let me start[N]doing my job- [JMP:&w1_shared_01EBC2.asciistring_01EC46]|

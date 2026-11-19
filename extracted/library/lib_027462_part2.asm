@@ -5,43 +5,43 @@
 ---------------------------------------------
 
 code_02731A {
-    PHP                   ; {160538}
-    SEP #$20              ; {160539}
-    TXA                   ; {160541}
-    AND #$0F              ; {160542}
-    CMP #$0F              ; {160544}
-    REP #$20              ; {160546}
-    BEQ loc_027329        ; {160548}
-    INX                   ; {160550}
-    PLP                   ; {160551}
-    RTL                   ; {160552}
+    PHP 
+    SEP #$20
+    TXA 
+    AND #$0F
+    CMP #$0F
+    REP #$20
+    BEQ loc_027329
+    INX 
+    PLP 
+    RTL 
 
   loc_027329:
-    TXA                   ; {160553}
-    CLC                   ; {160554}
-    ADC #$00F1            ; {160555}
-    TAX                   ; {160558}
-    PLP                   ; {160559}
-    RTL                   ; {160560}
+    TXA 
+    CLC 
+    ADC #$00F1
+    TAX 
+    PLP 
+    RTL 
 }
 
 code_027331 {
-    PHP                   ; {160561}
-    REP #$20              ; {160562}
-    TXA                   ; {160564}
-    SEP #$20              ; {160565}
-    CLC                   ; {160567}
-    ADC #$10              ; {160568}
-    REP #$20              ; {160570}
-    BCS loc_027341        ; {160572}
-    TAX                   ; {160574}
-    PLP                   ; {160575}
-    RTL                   ; {160576}
+    PHP 
+    REP #$20
+    TXA 
+    SEP #$20
+    CLC 
+    ADC #$10
+    REP #$20
+    BCS loc_027341
+    TAX 
+    PLP 
+    RTL 
 
   loc_027341:
-    CLC                   ; {160577}
-    ADC $map_width_px     ; {160578}
-    TAX                   ; {160581}
-    PLP                   ; {160582}
-    RTL                   ; {160583}
+    CLC 
+    ADC $map_width_px
+    TAX 
+    PLP 
+    RTL 
 }

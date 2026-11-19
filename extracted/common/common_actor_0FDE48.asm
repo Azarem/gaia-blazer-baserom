@@ -3,25 +3,25 @@
 ---------------------------------------------
 
 code_0FDE48 {
-    LDA $001A, X          ; {1039944}
-    ORA #$0200            ; {1039947}
-    STA $001A, X          ; {1039950}
-    COP [A5] ( &code_0FDE5B, &code_0FDE65, &code_0FDE5B, &code_0FDE65 ) ; {1039953}
+    LDA $001A, X
+    ORA #$0200
+    STA $001A, X
+    COP [A5] ( &code_0FDE5B, &code_0FDE65, &code_0FDE5B, &code_0FDE65 )
 }
 
 code_0FDE5B {
-    COP [80] ( #01 )      ; {1039963}
-    COP [82]              ; {1039966}
-    COP [AD] ( #10 )      ; {1039968}
-    BRA code_0FDE5B       ; {1039971}
+    COP [80] ( #01 )
+    COP [82]
+    COP [AD] ( #10 )
+    BRA code_0FDE5B
 }
 
 code_0FDE65 {
-    COP [96]              ; {1039973}
+    COP [96]
 
   loc_0FDE67:
-    COP [80] ( #00 )      ; {1039975}
-    COP [82]              ; {1039978}
-    COP [AD] ( #10 )      ; {1039980}
-    BRA loc_0FDE67        ; {1039983}
+    COP [80] ( #00 )
+    COP [82]
+    COP [AD] ( #10 )
+    BRA loc_0FDE67
 }

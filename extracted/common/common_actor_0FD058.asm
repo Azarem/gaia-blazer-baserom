@@ -3,104 +3,104 @@
 ---------------------------------------------
 
 code_0FD058 {
-    LDA $001A, X          ; {1036376}
-    ORA #$0100            ; {1036379}
-    STA $001A, X          ; {1036382}
+    LDA $001A, X
+    ORA #$0100
+    STA $001A, X
 
   loc_0FD061:
-    COP [AD] ( #08 )      ; {1036385}
-    LDA #$0008            ; {1036388}
-    STA $002C, X          ; {1036391}
+    COP [AD] ( #08 )
+    LDA #$0008
+    STA $002C, X
 
   loc_0FD06A:
-    COP [80] ( #1A )      ; {1036394}
-    COP [82]              ; {1036397}
-    LDA $0025, X          ; {1036399}
-    AND #$00FF            ; {1036402}
-    CMP #$0018            ; {1036405}
-    BNE loc_0FD086        ; {1036408}
-    DEC $002C, X          ; {1036410}
-    BNE loc_0FD06A        ; {1036413}
-    COP [80] ( #1B )      ; {1036415}
-    COP [82]              ; {1036418}
-    BRA loc_0FD061        ; {1036420}
+    COP [80] ( #1A )
+    COP [82]
+    LDA $0025, X
+    AND #$00FF
+    CMP #$0018
+    BNE loc_0FD086
+    DEC $002C, X
+    BNE loc_0FD06A
+    COP [80] ( #1B )
+    COP [82]
+    BRA loc_0FD061
 
   loc_0FD086:
-    LDA #$0200            ; {1036422}
-    STA $0016, X          ; {1036425}
-    COP [81] ( #1C, #14 ) ; {1036428}
-    COP [83]              ; {1036432}
-    BRK #$64              ; {1036434}
-    COP [85] ( @code_0FD0C4 ) ; {1036436}
-    COP [85] ( @code_0FD0C9 ) ; {1036441}
-    COP [85] ( @code_0FD0D0 ) ; {1036446}
-    COP [85] ( @code_0FD0D7 ) ; {1036451}
-    COP [85] ( @code_0FD0DE ) ; {1036456}
-    COP [85] ( @code_0FD0E3 ) ; {1036461}
-    COP [85] ( @code_0FD0E8 ) ; {1036466}
-    COP [85] ( @code_0FD0ED ) ; {1036471}
-    COP [80] ( #1D )      ; {1036476}
-    COP [82]              ; {1036479}
-    COP [86]              ; {1036481}
-    RTL                   ; {1036483}
+    LDA #$0200
+    STA $0016, X
+    COP [81] ( #1C, #14 )
+    COP [83]
+    BRK #$64
+    COP [85] ( @code_0FD0C4 )
+    COP [85] ( @code_0FD0C9 )
+    COP [85] ( @code_0FD0D0 )
+    COP [85] ( @code_0FD0D7 )
+    COP [85] ( @code_0FD0DE )
+    COP [85] ( @code_0FD0E3 )
+    COP [85] ( @code_0FD0E8 )
+    COP [85] ( @code_0FD0ED )
+    COP [80] ( #1D )
+    COP [82]
+    COP [86]
+    RTL 
 }
 
 code_0FD0C4 {
-    LDA #$001F            ; {1036484}
-    BRA loc_0FD0F2        ; {1036487}
+    LDA #$001F
+    BRA loc_0FD0F2
 }
 
 code_0FD0C9 {
-    COP [96]              ; {1036489}
-    LDA #$0022            ; {1036491}
-    BRA loc_0FD0F2        ; {1036494}
+    COP [96]
+    LDA #$0022
+    BRA loc_0FD0F2
 }
 
 code_0FD0D0 {
-    COP [96]              ; {1036496}
-    LDA #$0020            ; {1036498}
-    BRA loc_0FD0F2        ; {1036501}
+    COP [96]
+    LDA #$0020
+    BRA loc_0FD0F2
 }
 
 code_0FD0D7 {
-    COP [96]              ; {1036503}
-    LDA #$0021            ; {1036505}
-    BRA loc_0FD0F2        ; {1036508}
+    COP [96]
+    LDA #$0021
+    BRA loc_0FD0F2
 }
 
 code_0FD0DE {
-    LDA #$001E            ; {1036510}
-    BRA loc_0FD0F2        ; {1036513}
+    LDA #$001E
+    BRA loc_0FD0F2
 }
 
 code_0FD0E3 {
-    LDA #$0021            ; {1036515}
-    BRA loc_0FD0F2        ; {1036518}
+    LDA #$0021
+    BRA loc_0FD0F2
 }
 
 code_0FD0E8 {
-    LDA #$0020            ; {1036520}
-    BRA loc_0FD0F2        ; {1036523}
+    LDA #$0020
+    BRA loc_0FD0F2
 }
 
 code_0FD0ED {
-    LDA #$0022            ; {1036525}
-    BRA loc_0FD0F2        ; {1036528}
+    LDA #$0022
+    BRA loc_0FD0F2
 
   loc_0FD0F2:
-    STA $001E, X          ; {1036530}
-    STZ $0020, X          ; {1036533}
-    LDA #$0200            ; {1036536}
-    STA $0016, X          ; {1036539}
-    LDA #$0002            ; {1036542}
-    STA $002A, X          ; {1036545}
-    COP [A3]              ; {1036548}
-    COP [A2] ( #30 )      ; {1036550}
-    COP [A1] ( #$0008, #$FFF8 ) ; {1036553}
-    COP [91]              ; {1036559}
-    COP [83]              ; {1036561}
-    COP [80] ( #23 )      ; {1036563}
-    COP [82]              ; {1036566}
-    COP [86]              ; {1036568}
-    RTL                   ; {1036570}
+    STA $001E, X
+    STZ $0020, X
+    LDA #$0200
+    STA $0016, X
+    LDA #$0002
+    STA $002A, X
+    COP [A3]
+    COP [A2] ( #30 )
+    COP [A1] ( #$0008, #$FFF8 )
+    COP [91]
+    COP [83]
+    COP [80] ( #23 )
+    COP [82]
+    COP [86]
+    RTL 
 }

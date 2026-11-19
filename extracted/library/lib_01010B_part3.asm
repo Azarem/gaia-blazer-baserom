@@ -3,50 +3,50 @@
 ---------------------------------------------
 
 code_010466 {
-    PHX                   ; {66662}
-    PHY                   ; {66663}
-    LDA #$0010            ; {66664}
-    STA $0E               ; {66667}
+    PHX 
+    PHY 
+    LDA #$0010
+    STA $0E
 
   loc_01046D:
-    LDA $0000, Y          ; {66669}
-    AND #$00FF            ; {66672}
-    INY                   ; {66675}
-    PHY                   ; {66676}
-    ASL                   ; {66677}
-    ASL                   ; {66678}
-    ASL                   ; {66679}
-    TAY                   ; {66680}
-    LDA ($29), Y          ; {66681}
-    INY                   ; {66683}
-    INY                   ; {66684}
-    AND $0A               ; {66685}
-    ORA $06               ; {66687}
-    STA $0000, X          ; {66689}
-    LDA ($29), Y          ; {66692}
-    INY                   ; {66694}
-    INY                   ; {66695}
-    AND $0A               ; {66696}
-    ORA $06               ; {66698}
-    STA $0002, X          ; {66700}
-    LDA ($29), Y          ; {66703}
-    INY                   ; {66705}
-    INY                   ; {66706}
-    AND $0A               ; {66707}
-    ORA $06               ; {66709}
-    STA $0040, X          ; {66711}
-    LDA ($29), Y          ; {66714}
-    AND $0A               ; {66716}
-    ORA $06               ; {66718}
-    STA $0042, X          ; {66720}
-    INX                   ; {66723}
-    INX                   ; {66724}
-    INX                   ; {66725}
-    INX                   ; {66726}
-    PLY                   ; {66727}
-    DEC $0E               ; {66728}
-    BNE loc_01046D        ; {66730}
-    PLY                   ; {66732}
-    PLX                   ; {66733}
-    RTS                   ; {66734}
+    LDA $0000, Y
+    AND #$00FF
+    INY 
+    PHY 
+    ASL 
+    ASL 
+    ASL 
+    TAY 
+    LDA ($29), Y
+    INY 
+    INY 
+    AND $0A
+    ORA $06
+    STA $0000, X
+    LDA ($29), Y
+    INY 
+    INY 
+    AND $0A
+    ORA $06
+    STA $0002, X
+    LDA ($29), Y
+    INY 
+    INY 
+    AND $0A
+    ORA $06
+    STA $0040, X
+    LDA ($29), Y
+    AND $0A
+    ORA $06
+    STA $0042, X
+    INX 
+    INX 
+    INX 
+    INX 
+    PLY 
+    DEC $0E
+    BNE loc_01046D
+    PLY 
+    PLX 
+    RTS 
 }

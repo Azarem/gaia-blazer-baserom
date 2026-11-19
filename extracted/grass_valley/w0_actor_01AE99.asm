@@ -8,68 +8,68 @@
 ---------------------------------------------
 
 code_01AE99 {
-    COP [A0] ( #$0002 )   ; {110233}
+    COP [A0] ( #$0002 )
 
   loc_01AE9D:
-    COP [91]              ; {110237}
-    COP [07] ( #$8404, &code_01AEAD ) ; {110239}
-    COP [0D] ( #00, #47, #38, &code_01AEFA ) ; {110245}
-    RTL                   ; {110252}
+    COP [91]
+    COP [07] ( #$8404, &code_01AEAD )
+    COP [0D] ( #00, #47, #38, &code_01AEFA )
+    RTL 
 }
 
 code_01AEAD {
-    LDY $player_actor     ; {110253}
-    LDA $0000, Y          ; {110256}
-    CMP #$04B0            ; {110259}
-    BCC code_01AEC0       ; {110262}
-    COP [A0] ( #$FFB0 )   ; {110264}
-    COP [27] ( &code_01AEDD ) ; {110268}
+    LDY $player_actor
+    LDA $0000, Y
+    CMP #$04B0
+    BCC code_01AEC0
+    COP [A0] ( #$FFB0 )
+    COP [27] ( &code_01AEDD )
 
   code_01AEC0:
-    COP [91]              ; {110272}
-    COP [0D] ( #00, #47, #38, &code_01AECA ) ; {110274}
-    RTL                   ; {110281}
+    COP [91]
+    COP [0D] ( #00, #47, #38, &code_01AECA )
+    RTL 
 }
 
 code_01AECA {
-    LDA $joy_pressed      ; {110282}
-    AND #$0800            ; {110285}
-    BNE loc_01AED3        ; {110288}
-    RTL                   ; {110290}
+    LDA $joy_pressed
+    AND #$0800
+    BNE loc_01AED3
+    RTL 
 
   loc_01AED3:
-    COP [81] ( #2A, #14 ) ; {110291}
-    COP [83]              ; {110295}
-    COP [27] ( &code_01AEDD ) ; {110297}
+    COP [81] ( #2A, #14 )
+    COP [83]
+    COP [27] ( &code_01AEDD )
 }
 
 code_01AEDD {
-    COP [91]              ; {110301}
-    COP [0D] ( #00, #47, #33, &code_01AEE7 ) ; {110303}
-    RTL                   ; {110310}
+    COP [91]
+    COP [0D] ( #00, #47, #33, &code_01AEE7 )
+    RTL 
 }
 
 code_01AEE7 {
-    LDA $joy_pressed      ; {110311}
-    AND #$0400            ; {110314}
-    BNE loc_01AEF0        ; {110317}
-    RTL                   ; {110319}
+    LDA $joy_pressed
+    AND #$0400
+    BNE loc_01AEF0
+    RTL 
 
   loc_01AEF0:
-    COP [81] ( #2C, #14 ) ; {110320}
-    COP [83]              ; {110324}
-    COP [27] ( &code_01AEC0 ) ; {110326}
+    COP [81] ( #2C, #14 )
+    COP [83]
+    COP [27] ( &code_01AEC0 )
 }
 
 code_01AEFA {
-    COP [01] ( &asciistring_01AF0A ) ; {110330}
-    COP [91]              ; {110334}
-    COP [0D] ( #00, #47, #38, &code_01AF09 ) ; {110336}
-    BRA loc_01AE9D        ; {110343}
+    COP [01] ( &asciistring_01AF0A )
+    COP [91]
+    COP [0D] ( #00, #47, #38, &code_01AF09 )
+    BRA loc_01AE9D
 }
 
 code_01AF09 {
-    RTL                   ; {110345}
+    RTL 
 }
 
 asciistring_01AF0A |[10]I am an elevator [N]invented by Dr-Leo- [FIN]I cannot move unless [N]the water mill is [N]turning- [JMP:&w0_shared_01B988.asciistring_01B988]|

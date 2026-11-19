@@ -5,123 +5,123 @@
 ---------------------------------------------
 
 code_0FE76C {
-    LDA $0016, X          ; {1042284}
-    ORA #$2000            ; {1042287}
-    STA $0016, X          ; {1042290}
+    LDA $0016, X
+    ORA #$2000
+    STA $0016, X
 
   code_0FE775:
-    COP [28] ( &code_0FE77B ) ; {1042293}
-    BRA loc_0FE781        ; {1042297}
+    COP [28] ( &code_0FE77B )
+    BRA loc_0FE781
 }
 
 code_0FE77B {
-    COP [1B] ( &code_0FE775, #$0008 ) ; {1042299}
+    COP [1B] ( &code_0FE775, #$0008 )
 
   loc_0FE781:
-    LDA $0016, X          ; {1042305}
-    AND #$DFFF            ; {1042308}
-    STA $0016, X          ; {1042311}
+    LDA $0016, X
+    AND #$DFFF
+    STA $0016, X
 
   code_0FE78A:
-    COP [AD] ( #08 )      ; {1042314}
-    LDA $0016, X          ; {1042317}
-    ORA #$0200            ; {1042320}
-    STA $0016, X          ; {1042323}
-    COP [15]              ; {1042326}
-    COP [97]              ; {1042328}
-    COP [03] ( #32 )      ; {1042330}
-    COP [0C] ( #00, #01, &code_0FE7E1 ) ; {1042333}
-    COP [80] ( #25 )      ; {1042339}
-    COP [82]              ; {1042342}
-    COP [04]              ; {1042344}
-    COP [80] ( #29 )      ; {1042346}
-    COP [82]              ; {1042349}
-    COP [16]              ; {1042351}
-    LDA $0016, X          ; {1042353}
-    AND #$FDFF            ; {1042356}
-    STA $0016, X          ; {1042359}
-    COP [1F]              ; {1042362}
-    LDA $rng_state+1      ; {1042364}
-    AND #$0003            ; {1042367}
-    BEQ loc_0FE7CC        ; {1042370}
-    DEC                   ; {1042372}
-    BEQ loc_0FE7D3        ; {1042373}
-    DEC                   ; {1042375}
-    BEQ loc_0FE7DA        ; {1042376}
-    COP [96]              ; {1042378}
+    COP [AD] ( #08 )
+    LDA $0016, X
+    ORA #$0200
+    STA $0016, X
+    COP [15]
+    COP [97]
+    COP [03] ( #32 )
+    COP [0C] ( #00, #01, &code_0FE7E1 )
+    COP [80] ( #25 )
+    COP [82]
+    COP [04]
+    COP [80] ( #29 )
+    COP [82]
+    COP [16]
+    LDA $0016, X
+    AND #$FDFF
+    STA $0016, X
+    COP [1F]
+    LDA $rng_state+1
+    AND #$0003
+    BEQ loc_0FE7CC
+    DEC 
+    BEQ loc_0FE7D3
+    DEC 
+    BEQ loc_0FE7DA
+    COP [96]
 
   loc_0FE7CC:
-    COP [80] ( #28 )      ; {1042380}
-    COP [82]              ; {1042383}
-    BRA code_0FE78A       ; {1042385}
+    COP [80] ( #28 )
+    COP [82]
+    BRA code_0FE78A
 
   loc_0FE7D3:
-    COP [80] ( #27 )      ; {1042387}
-    COP [82]              ; {1042390}
-    BRA code_0FE78A       ; {1042392}
+    COP [80] ( #27 )
+    COP [82]
+    BRA code_0FE78A
 
   loc_0FE7DA:
-    COP [80] ( #26 )      ; {1042394}
-    COP [82]              ; {1042397}
-    BRA code_0FE78A       ; {1042399}
+    COP [80] ( #26 )
+    COP [82]
+    BRA code_0FE78A
 }
 
 code_0FE7E1 {
-    COP [81] ( #25, #0A ) ; {1042401}
-    COP [83]              ; {1042405}
-    COP [16]              ; {1042407}
-    LDA $0016, X          ; {1042409}
-    AND #$FDFF            ; {1042412}
-    STA $0016, X          ; {1042415}
+    COP [81] ( #25, #0A )
+    COP [83]
+    COP [16]
+    LDA $0016, X
+    AND #$FDFF
+    STA $0016, X
 
   code_0FE7F2:
-    COP [1B] ( &code_0FE7F8, #$0008 ) ; {1042418}
+    COP [1B] ( &code_0FE7F8, #$0008 )
 }
 
 code_0FE7F8 {
-    COP [9C] ( &code_0FE7FE, &code_0FE808 ) ; {1042424}
+    COP [9C] ( &code_0FE7FE, &code_0FE808 )
 }
 
 code_0FE7FE {
-    COP [9A] ( #$0008, &code_0FE828, &code_0FE808, &code_0FE833 ) ; {1042430}
+    COP [9A] ( #$0008, &code_0FE828, &code_0FE808, &code_0FE833 )
 }
 
 code_0FE808 {
-    COP [9B] ( #$0008, &code_0FE812, &code_0FE7F2, &code_0FE81D ) ; {1042440}
+    COP [9B] ( #$0008, &code_0FE812, &code_0FE7F2, &code_0FE81D )
 }
 
 code_0FE812 {
-    COP [97]              ; {1042450}
-    COP [9D] ( #2B )      ; {1042452}
-    COP [9E] ( &code_0FE78A ) ; {1042455}
+    COP [97]
+    COP [9D] ( #2B )
+    COP [9E] ( &code_0FE78A )
 
   loc_0FE81B:
-    BRA code_0FE7F2       ; {1042459}
+    BRA code_0FE7F2
 }
 
 code_0FE81D {
-    COP [97]              ; {1042461}
-    COP [9D] ( #2A )      ; {1042463}
-    COP [9E] ( &code_0FE78A ) ; {1042466}
+    COP [97]
+    COP [9D] ( #2A )
+    COP [9E] ( &code_0FE78A )
 
   loc_0FE826:
-    BRA code_0FE7F2       ; {1042470}
+    BRA code_0FE7F2
 }
 
 code_0FE828 {
-    COP [97]              ; {1042472}
-    COP [9D] ( #2C )      ; {1042474}
-    COP [9E] ( &code_0FE78A ) ; {1042477}
+    COP [97]
+    COP [9D] ( #2C )
+    COP [9E] ( &code_0FE78A )
 
   loc_0FE831:
-    BRA code_0FE7F2       ; {1042481}
+    BRA code_0FE7F2
 }
 
 code_0FE833 {
-    COP [96]              ; {1042483}
-    COP [9D] ( #2C )      ; {1042485}
-    COP [9E] ( &code_0FE78A ) ; {1042488}
+    COP [96]
+    COP [9D] ( #2C )
+    COP [9E] ( &code_0FE78A )
 
   loc_0FE83C:
-    BRA code_0FE7F2       ; {1042492}
+    BRA code_0FE7F2
 }

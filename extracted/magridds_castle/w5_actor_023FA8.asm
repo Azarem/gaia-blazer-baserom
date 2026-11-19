@@ -6,35 +6,35 @@
 ---------------------------------------------
 
 code_023FA8 {
-    COP [14] ( #$0159, &code_023FAF ) ; {147368}
-    RTL                   ; {147374}
+    COP [14] ( #$0159, &code_023FAF )
+    RTL 
 }
 
 code_023FAF {
-    COP [30] ( #$0159, &code_023FC9, #04 ) ; {147375}
-    COP [85] ( @engine_0026F3.code_00299D ) ; {147382}
-    COP [17] ( &code_023FC4 ) ; {147387}
-    COP [15]              ; {147391}
-    COP [91]              ; {147393}
-    RTL                   ; {147395}
+    COP [30] ( #$0159, &code_023FC9, #04 )
+    COP [85] ( @engine_0026F3.code_00299D )
+    COP [17] ( &code_023FC4 )
+    COP [15]
+    COP [91]
+    RTL 
 }
 
 code_023FC4 {
-    COP [01] ( &asciistring_023FDD ) ; {147396}
-    RTL                   ; {147400}
+    COP [01] ( &asciistring_023FDD )
+    RTL 
 }
 
 code_023FC9 {
-    COP [18] ( #06, &code_023FD1 ) ; {147401}
+    COP [18] ( #06, &code_023FD1 )
 
   loc_023FCE:
-    COP [86]              ; {147406}
-    RTL                   ; {147408}
+    COP [86]
+    RTL 
 }
 
 code_023FD1 {
-    COP [01] ( &asciistring_023FD7 ) ; {147409}
-    BRA loc_023FCE        ; {147413}
+    COP [01] ( &asciistring_023FD7 )
+    BRA loc_023FCE
 }
 
 asciistring_023FD7 |[10][0E:3C][JMP:&asciistring_023FDD+M]|

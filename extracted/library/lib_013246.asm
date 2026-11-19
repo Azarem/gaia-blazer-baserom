@@ -5,34 +5,34 @@
 ---------------------------------------------
 
 code_013246 {
-    PHX                   ; {78406}
-    PHY                   ; {78407}
-    PHP                   ; {78408}
-    SEP #$20              ; {78409}
-    REP #$10              ; {78411}
-    LDX #$000F            ; {78413}
-    LDA #$00              ; {78416}
-    XBA                   ; {78418}
-    CLC                   ; {78419}
+    PHX 
+    PHY 
+    PHP 
+    SEP #$20
+    REP #$10
+    LDX #$000F
+    LDA #$00
+    XBA 
+    CLC 
 
   loc_013254:
-    LDA $rng_state+1, X   ; {78420}
-    ADC $rng_state, X     ; {78423}
-    STA $rng_state, X     ; {78426}
-    DEX                   ; {78429}
-    BNE loc_013254        ; {78430}
-    LDX #$0010            ; {78432}
+    LDA $rng_state+1, X
+    ADC $rng_state, X
+    STA $rng_state, X
+    DEX 
+    BNE loc_013254
+    LDX #$0010
 
   loc_013263:
-    INC $rng_state, X     ; {78435}
-    BNE loc_01326B        ; {78438}
-    DEX                   ; {78440}
-    BNE loc_013263        ; {78441}
+    INC $rng_state, X
+    BNE loc_01326B
+    DEX 
+    BNE loc_013263
 
   loc_01326B:
-    LDA $rng_state+1      ; {78443}
-    PLP                   ; {78446}
-    PLY                   ; {78447}
-    PLX                   ; {78448}
-    RTL                   ; {78449}
+    LDA $rng_state+1
+    PLP 
+    PLY 
+    PLX 
+    RTL 
 }

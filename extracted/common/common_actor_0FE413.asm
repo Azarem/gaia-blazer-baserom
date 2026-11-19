@@ -3,130 +3,130 @@
 ---------------------------------------------
 
 code_0FE413 {
-    COP [AA] ( #00 )      ; {1041427}
+    COP [AA] ( #00 )
 
   loc_0FE416:
-    COP [AD] ( #08 )      ; {1041430}
-    COP [9B] ( #$0000, &code_0FE423, &code_0FE441, &code_0FE441 ) ; {1041433}
+    COP [AD] ( #08 )
+    COP [9B] ( #$0000, &code_0FE423, &code_0FE441, &code_0FE441 )
 }
 
 code_0FE423 {
-    COP [97]              ; {1041443}
-    COP [9B] ( #$0018, &code_0FE42F, &code_0FE4C0, &code_0FE42F ) ; {1041445}
+    COP [97]
+    COP [9B] ( #$0018, &code_0FE42F, &code_0FE4C0, &code_0FE42F )
 }
 
 code_0FE42F {
-    COP [21] ( &code_0FE43A ) ; {1041455}
-    COP [80] ( #08 )      ; {1041459}
-    COP [82]              ; {1041462}
-    BRA loc_0FE416        ; {1041464}
+    COP [21] ( &code_0FE43A )
+    COP [80] ( #08 )
+    COP [82]
+    BRA loc_0FE416
 }
 
 code_0FE43A {
-    COP [80] ( #02 )      ; {1041466}
-    COP [82]              ; {1041469}
-    BRA loc_0FE416        ; {1041471}
+    COP [80] ( #02 )
+    COP [82]
+    BRA loc_0FE416
 }
 
 code_0FE441 {
-    COP [97]              ; {1041473}
-    COP [9B] ( #$0018, &code_0FE44D, &code_0FE4A8, &code_0FE44D ) ; {1041475}
+    COP [97]
+    COP [9B] ( #$0018, &code_0FE44D, &code_0FE4A8, &code_0FE44D )
 }
 
 code_0FE44D {
-    COP [22] ( &code_0FE458 ) ; {1041485}
-    COP [80] ( #06 )      ; {1041489}
-    COP [82]              ; {1041492}
-    BRA loc_0FE416        ; {1041494}
+    COP [22] ( &code_0FE458 )
+    COP [80] ( #06 )
+    COP [82]
+    BRA loc_0FE416
 }
 
 code_0FE458 {
-    COP [80] ( #00 )      ; {1041496}
-    COP [82]              ; {1041499}
-    BRA loc_0FE416        ; {1041501}
+    COP [80] ( #00 )
+    COP [82]
+    BRA loc_0FE416
 
   loc_0FE45F:
-    COP [AD] ( #08 )      ; {1041503}
-    COP [9A] ( #$0000, &code_0FE46C, &code_0FE48A, &code_0FE48A ) ; {1041506}
+    COP [AD] ( #08 )
+    COP [9A] ( #$0000, &code_0FE46C, &code_0FE48A, &code_0FE48A )
 }
 
 code_0FE46C {
-    COP [9A] ( #$0018, &code_0FE476, &code_0FE4D9, &code_0FE476 ) ; {1041516}
+    COP [9A] ( #$0018, &code_0FE476, &code_0FE4D9, &code_0FE476 )
 }
 
 code_0FE476 {
-    COP [97]              ; {1041526}
-    COP [23] ( &code_0FE483 ) ; {1041528}
-    COP [80] ( #0A )      ; {1041532}
-    COP [82]              ; {1041535}
-    BRA loc_0FE45F        ; {1041537}
+    COP [97]
+    COP [23] ( &code_0FE483 )
+    COP [80] ( #0A )
+    COP [82]
+    BRA loc_0FE45F
 }
 
 code_0FE483 {
-    COP [80] ( #04 )      ; {1041539}
-    COP [82]              ; {1041542}
-    BRA loc_0FE45F        ; {1041544}
+    COP [80] ( #04 )
+    COP [82]
+    BRA loc_0FE45F
 }
 
 code_0FE48A {
-    COP [9A] ( #$0018, &code_0FE494, &code_0FE4D9, &code_0FE494 ) ; {1041546}
+    COP [9A] ( #$0018, &code_0FE494, &code_0FE4D9, &code_0FE494 )
 }
 
 code_0FE494 {
-    COP [96]              ; {1041556}
-    COP [24] ( &code_0FE4A1 ) ; {1041558}
-    COP [80] ( #0A )      ; {1041562}
-    COP [82]              ; {1041565}
-    BRA loc_0FE45F        ; {1041567}
+    COP [96]
+    COP [24] ( &code_0FE4A1 )
+    COP [80] ( #0A )
+    COP [82]
+    BRA loc_0FE45F
 }
 
 code_0FE4A1 {
-    COP [80] ( #04 )      ; {1041569}
-    COP [82]              ; {1041572}
-    BRA loc_0FE45F        ; {1041574}
+    COP [80] ( #04 )
+    COP [82]
+    BRA loc_0FE45F
 }
 
 code_0FE4A8 {
-    BRK #$41              ; {1041576}
-    COP [80] ( #0C )      ; {1041578}
-    COP [82]              ; {1041581}
-    COP [B0] ( @code_0FE4B8, #$0200 ) ; {1041583}
-    BRA loc_0FE45F        ; {1041590}
+    BRK #$41
+    COP [80] ( #0C )
+    COP [82]
+    COP [B0] ( @code_0FE4B8, #$0200 )
+    BRA loc_0FE45F
 }
 
 code_0FE4B8 {
-    COP [80] ( #19 )      ; {1041592}
-    COP [82]              ; {1041595}
-    COP [86]              ; {1041597}
-    RTL                   ; {1041599}
+    COP [80] ( #19 )
+    COP [82]
+    COP [86]
+    RTL 
 }
 
 code_0FE4C0 {
-    BRK #$41              ; {1041600}
-    COP [80] ( #0D )      ; {1041602}
-    COP [82]              ; {1041605}
-    COP [B0] ( @code_0FE4D1, #$0200 ) ; {1041607}
-    BRL loc_0FE45F        ; {1041614}
+    BRK #$41
+    COP [80] ( #0D )
+    COP [82]
+    COP [B0] ( @code_0FE4D1, #$0200 )
+    BRL loc_0FE45F
 }
 
 code_0FE4D1 {
-    COP [80] ( #1A )      ; {1041617}
-    COP [82]              ; {1041620}
-    COP [86]              ; {1041622}
-    RTL                   ; {1041624}
+    COP [80] ( #1A )
+    COP [82]
+    COP [86]
+    RTL 
 }
 
 code_0FE4D9 {
-    BRK #$41              ; {1041625}
-    COP [80] ( #0E )      ; {1041627}
-    COP [82]              ; {1041630}
-    COP [B0] ( @code_0FE4EA, #$0200 ) ; {1041632}
-    BRL loc_0FE416        ; {1041639}
+    BRK #$41
+    COP [80] ( #0E )
+    COP [82]
+    COP [B0] ( @code_0FE4EA, #$0200 )
+    BRL loc_0FE416
 }
 
 code_0FE4EA {
-    COP [80] ( #1B )      ; {1041642}
-    COP [82]              ; {1041645}
-    COP [86]              ; {1041647}
-    RTL                   ; {1041649}
+    COP [80] ( #1B )
+    COP [82]
+    COP [86]
+    RTL 
 }

@@ -6,90 +6,90 @@
 ---------------------------------------------
 
 code_01032F {
-    PHP                   ; {66351}
-    PHB                   ; {66352}
-    SEP #$20              ; {66353}
-    LDA $19               ; {66355}
-    XBA                   ; {66357}
-    LDA $05               ; {66358}
-    JSL $@lib_shared_0131D1.code_0131D1 ; {66360}
-    CLC                   ; {66364}
-    ADC $17               ; {66365}
-    CLC                   ; {66367}
-    ADC $03               ; {66368}
-    XBA                   ; {66370}
-    LDA $16               ; {66371}
-    LSR                   ; {66373}
-    LSR                   ; {66374}
-    LSR                   ; {66375}
-    LSR                   ; {66376}
-    TAY                   ; {66377}
-    LDA #$7E              ; {66378}
-    PHA                   ; {66380}
-    PLB                   ; {66381}
-    LDA $17               ; {66382}
-    AND #$01              ; {66384}
-    ASL                   ; {66386}
-    ASL                   ; {66387}
-    XBA                   ; {66388}
-    LDA $16               ; {66389}
-    LSR                   ; {66391}
-    LSR                   ; {66392}
-    LSR                   ; {66393}
-    AND #$1E              ; {66394}
-    REP #$20              ; {66396}
-    CLC                   ; {66398}
-    ADC $00               ; {66399}
-    STA $0000, X          ; {66401}
-    INX                   ; {66404}
-    INX                   ; {66405}
-    LDA $18               ; {66406}
-    AND #$0100            ; {66408}
-    BNE loc_01038B        ; {66411}
-    JSR $&lib_shared_010419.code_010419 ; {66413}
-    TYA                   ; {66416}
-    CLC                   ; {66417}
-    ADC $04               ; {66418}
-    CMP $08               ; {66420}
-    BCC loc_01037E        ; {66422}
-    SEC                   ; {66424}
-    SBC $08               ; {66425}
-    CLC                   ; {66427}
-    ADC $02               ; {66428}
+    PHP 
+    PHB 
+    SEP #$20
+    LDA $19
+    XBA 
+    LDA $05
+    JSL $@lib_shared_0131D1.code_0131D1
+    CLC 
+    ADC $17
+    CLC 
+    ADC $03
+    XBA 
+    LDA $16
+    LSR 
+    LSR 
+    LSR 
+    LSR 
+    TAY 
+    LDA #$7E
+    PHA 
+    PLB 
+    LDA $17
+    AND #$01
+    ASL 
+    ASL 
+    XBA 
+    LDA $16
+    LSR 
+    LSR 
+    LSR 
+    AND #$1E
+    REP #$20
+    CLC 
+    ADC $00
+    STA $0000, X
+    INX 
+    INX 
+    LDA $18
+    AND #$0100
+    BNE loc_01038B
+    JSR $&lib_shared_010419.code_010419
+    TYA 
+    CLC 
+    ADC $04
+    CMP $08
+    BCC loc_01037E
+    SEC 
+    SBC $08
+    CLC 
+    ADC $02
 
   loc_01037E:
-    TAY                   ; {66430}
-    TXA                   ; {66431}
-    CLC                   ; {66432}
-    ADC #$0080            ; {66433}
-    TAX                   ; {66436}
-    JSR $&lib_shared_010419.code_010419 ; {66437}
-    PLB                   ; {66440}
-    PLP                   ; {66441}
-    RTS                   ; {66442}
+    TAY 
+    TXA 
+    CLC 
+    ADC #$0080
+    TAX 
+    JSR $&lib_shared_010419.code_010419
+    PLB 
+    PLP 
+    RTS 
 
   loc_01038B:
-    PHX                   ; {66443}
-    TXA                   ; {66444}
-    CLC                   ; {66445}
-    ADC #$0080            ; {66446}
-    TAX                   ; {66449}
-    JSR $&lib_shared_010419.code_010419 ; {66450}
-    TYA                   ; {66453}
-    CLC                   ; {66454}
-    ADC $04               ; {66455}
-    CMP $08               ; {66457}
-    BCC loc_0103A3        ; {66459}
-    SEC                   ; {66461}
-    SBC $08               ; {66462}
-    CLC                   ; {66464}
-    ADC $02               ; {66465}
+    PHX 
+    TXA 
+    CLC 
+    ADC #$0080
+    TAX 
+    JSR $&lib_shared_010419.code_010419
+    TYA 
+    CLC 
+    ADC $04
+    CMP $08
+    BCC loc_0103A3
+    SEC 
+    SBC $08
+    CLC 
+    ADC $02
 
   loc_0103A3:
-    TAY                   ; {66467}
-    PLX                   ; {66468}
-    JSR $&lib_shared_010419.code_010419 ; {66469}
-    PLB                   ; {66472}
-    PLP                   ; {66473}
-    RTS                   ; {66474}
+    TAY 
+    PLX 
+    JSR $&lib_shared_010419.code_010419
+    PLB 
+    PLP 
+    RTS 
 }

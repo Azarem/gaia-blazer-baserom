@@ -7,20 +7,20 @@
 ---------------------------------------------
 
 code_011695 {
-    LDA $location_id      ; {71317}
-    SEC                   ; {71320}
-    SBC #$10              ; {71321}
-    CMP #$03              ; {71323}
-    BCS loc_0116A0        ; {71325}
-    RTL                   ; {71327}
+    LDA $location_id
+    SEC 
+    SBC #$10
+    CMP #$03
+    BCS loc_0116A0
+    RTL 
 
   loc_0116A0:
-    LDA #$12              ; {71328}
-    XBA                   ; {71330}
-    LDA #$^binary_0116AD  ; {71331}
-    LDY #$&binary_0116AD  ; {71333}
-    JSL $@lib_01186E.code_01188A ; {71336}
-    RTL                   ; {71340}
+    LDA #$12
+    XBA 
+    LDA #$^binary_0116AD
+    LDY #$&binary_0116AD
+    JSL $@lib_01186E.code_01188A
+    RTL 
 }
 ---------------------------------------------
 

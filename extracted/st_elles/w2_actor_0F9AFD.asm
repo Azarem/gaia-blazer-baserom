@@ -6,38 +6,38 @@
 ---------------------------------------------
 
 code_0F9AFD {
-    COP [14] ( #$00BB, &code_0F9B04 ) ; {1022717}
-    RTL                   ; {1022723}
+    COP [14] ( #$00BB, &code_0F9B04 )
+    RTL 
 }
 
 code_0F9B04 {
-    COP [85] ( @engine_0026F3.code_00299D ) ; {1022724}
-    COP [15]              ; {1022729}
-    COP [17] ( &code_0F9B17 ) ; {1022731}
+    COP [85] ( @engine_0026F3.code_00299D )
+    COP [15]
+    COP [17] ( &code_0F9B17 )
 
   loc_0F9B0F:
-    COP [80] ( #11 )      ; {1022735}
-    COP [82]              ; {1022738}
-    BRL loc_0F9B0F        ; {1022740}
+    COP [80] ( #11 )
+    COP [82]
+    BRL loc_0F9B0F
 }
 
 code_0F9B17 {
-    COP [07] ( #$8506, &code_0F9B38 ) ; {1022743}
-    COP [19] ( #1C, &code_0F9B33 ) ; {1022749}
-    COP [01] ( &asciistring_0F9B47 ) ; {1022754}
-    COP [3C] ( #04 )      ; {1022758}
-    COP [10] ( #$0407, #00, #$0050, #$0200 ) ; {1022761}
-    RTL                   ; {1022770}
+    COP [07] ( #$8506, &code_0F9B38 )
+    COP [19] ( #1C, &code_0F9B33 )
+    COP [01] ( &asciistring_0F9B47 )
+    COP [3C] ( #04 )
+    COP [10] ( #$0407, #00, #$0050, #$0200 )
+    RTL 
 }
 
 code_0F9B33 {
-    COP [01] ( &asciistring_0F9B3D ) ; {1022771}
-    RTL                   ; {1022775}
+    COP [01] ( &asciistring_0F9B3D )
+    RTL 
 }
 
 code_0F9B38 {
-    COP [01] ( &asciistring_0F9B69 ) ; {1022776}
-    RTL                   ; {1022780}
+    COP [01] ( &asciistring_0F9B69 )
+    RTL 
 }
 
 asciistring_0F9B3D |[10]Zzzzz [JMP:&w2_shared_0FA945.asciistring_0FAA44]|

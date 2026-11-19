@@ -9,34 +9,34 @@
 ---------------------------------------------
 
 code_027223 {
-    PHP                   ; {160291}
-    REP #$20              ; {160292}
-    LDA $location_id      ; {160294}
-    SEC                   ; {160297}
-    SBC #$000F            ; {160298}
-    CMP #$0004            ; {160301}
-    BCS loc_027235        ; {160304}
-    BRL loc_027256        ; {160306}
+    PHP 
+    REP #$20
+    LDA $location_id
+    SEC 
+    SBC #$000F
+    CMP #$0004
+    BCS loc_027235
+    BRL loc_027256
 
   loc_027235:
-    LDA $frame_counter    ; {160309}
-    AND #$001F            ; {160312}
-    XBA                   ; {160315}
-    LSR                   ; {160316}
-    CLC                   ; {160317}
-    ADC #$1000            ; {160318}
-    STA $vram_strip_src   ; {160321}
-    LDA $frame_counter    ; {160324}
-    AND #$0003            ; {160327}
-    ASL                   ; {160330}
-    TAX                   ; {160331}
-    LDA $@word_027258, X  ; {160332}
-    STA $vram_strip_dest  ; {160336}
-    INC $vram_strip_pending ; {160339}
+    LDA $frame_counter
+    AND #$001F
+    XBA 
+    LSR 
+    CLC 
+    ADC #$1000
+    STA $vram_strip_src
+    LDA $frame_counter
+    AND #$0003
+    ASL 
+    TAX 
+    LDA $@word_027258, X
+    STA $vram_strip_dest
+    INC $vram_strip_pending
 
   loc_027256:
-    PLP                   ; {160342}
-    RTL                   ; {160343}
+    PLP 
+    RTL 
 }
 ---------------------------------------------
 

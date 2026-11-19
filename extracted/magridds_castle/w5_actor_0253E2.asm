@@ -5,26 +5,26 @@
 ---------------------------------------------
 
 code_0253E2 {
-    COP [14] ( #$018D, &code_0253E9 ) ; {152546}
-    RTL                   ; {152552}
+    COP [14] ( #$018D, &code_0253E9 )
+    RTL 
 }
 
 code_0253E9 {
-    COP [17] ( &code_0253F2 ) ; {152553}
-    COP [15]              ; {152557}
-    COP [91]              ; {152559}
-    RTL                   ; {152561}
+    COP [17] ( &code_0253F2 )
+    COP [15]
+    COP [91]
+    RTL 
 }
 
 code_0253F2 {
-    COP [14] ( #$0195, &code_0253FD ) ; {152562}
-    COP [01] ( &asciistring_025402 ) ; {152568}
-    RTL                   ; {152572}
+    COP [14] ( #$0195, &code_0253FD )
+    COP [01] ( &asciistring_025402 )
+    RTL 
 }
 
 code_0253FD {
-    COP [01] ( &asciistring_025438 ) ; {152573}
-    RTL                   ; {152577}
+    COP [01] ( &asciistring_025438 )
+    RTL 
 }
 
 asciistring_025402 |[10]The key to the airship[N]has been stolen! [N]I don t know what is [N]going to happen- [JMP:&w5_shared_02706C.asciistring_0270DF]|

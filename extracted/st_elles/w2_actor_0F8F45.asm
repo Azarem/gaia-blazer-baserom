@@ -9,124 +9,124 @@
 ---------------------------------------------
 
 code_0F8F45 {
-    COP [14] ( #$00C1, &code_0F8F4C ) ; {1019717}
-    RTL                   ; {1019723}
+    COP [14] ( #$00C1, &code_0F8F4C )
+    RTL 
 }
 
 code_0F8F4C {
-    COP [85] ( @engine_0026F3.code_00299D ) ; {1019724}
+    COP [85] ( @engine_0026F3.code_00299D )
 
   loc_0F8F51:
-    COP [17] ( &code_0F9041 ) ; {1019729}
-    COP [15]              ; {1019733}
+    COP [17] ( &code_0F9041 )
+    COP [15]
 
   code_0F8F57:
-    COP [80] ( #10 )      ; {1019735}
-    COP [82]              ; {1019738}
-    COP [07] ( #$0000, &code_0F8F57 ) ; {1019740}
+    COP [80] ( #10 )
+    COP [82]
+    COP [07] ( #$0000, &code_0F8F57 )
 
   loc_0F8F62:
-    COP [0D] ( #00, #03, #31, &code_0F8F71 ) ; {1019746}
-    COP [80] ( #10 )      ; {1019753}
-    COP [82]              ; {1019756}
-    BRL loc_0F8F62        ; {1019758}
+    COP [0D] ( #00, #03, #31, &code_0F8F71 )
+    COP [80] ( #10 )
+    COP [82]
+    BRL loc_0F8F62
 }
 
 code_0F8F71 {
-    COP [16]              ; {1019761}
-    COP [17] ( #$0000 )   ; {1019763}
-    COP [85] ( @code_0F8FAB ) ; {1019767}
-    COP [81] ( #0D, #1B ) ; {1019772}
-    COP [83]              ; {1019776}
-    COP [17] ( &code_0F9041 ) ; {1019778}
-    COP [15]              ; {1019782}
+    COP [16]
+    COP [17] ( #$0000 )
+    COP [85] ( @code_0F8FAB )
+    COP [81] ( #0D, #1B )
+    COP [83]
+    COP [17] ( &code_0F9041 )
+    COP [15]
 
   loc_0F8F88:
-    COP [0D] ( #00, #03, #19, &code_0F8F97 ) ; {1019784}
-    COP [80] ( #0F )      ; {1019791}
-    COP [82]              ; {1019794}
-    BRL loc_0F8F88        ; {1019796}
+    COP [0D] ( #00, #03, #19, &code_0F8F97 )
+    COP [80] ( #0F )
+    COP [82]
+    BRL loc_0F8F88
 }
 
 code_0F8F97 {
-    COP [16]              ; {1019799}
-    COP [17] ( #$0000 )   ; {1019801}
-    COP [85] ( @code_0F8FF6 ) ; {1019805}
-    COP [81] ( #0C, #1B ) ; {1019810}
-    COP [83]              ; {1019814}
-    BRL loc_0F8F51        ; {1019816}
+    COP [16]
+    COP [17] ( #$0000 )
+    COP [85] ( @code_0F8FF6 )
+    COP [81] ( #0C, #1B )
+    COP [83]
+    BRL loc_0F8F51
 }
 
 code_0F8FAB {
-    LDA #$2F80            ; {1019819}
-    TSB $joy_block_mask   ; {1019822}
-    LDA #$01B0            ; {1019825}
-    STA $0025, X          ; {1019828}
-    LDY $player_actor     ; {1019831}
-    LDA $0016, Y          ; {1019834}
-    AND #$EFFF            ; {1019837}
-    STA $0016, Y          ; {1019840}
-    COP [91]              ; {1019843}
-    LDY $003C, X          ; {1019845}
-    LDA $0002, Y          ; {1019848}
-    SEC                   ; {1019851}
-    SBC #$0020            ; {1019852}
-    LDY $player_actor     ; {1019855}
-    STA $0002, Y          ; {1019858}
-    LDA #$FFFF            ; {1019861}
-    STA $0006, Y          ; {1019864}
-    DEC $0025, X          ; {1019867}
-    BEQ loc_0F8FE1        ; {1019870}
-    RTL                   ; {1019872}
+    LDA #$2F80
+    TSB $joy_block_mask
+    LDA #$01B0
+    STA $0025, X
+    LDY $player_actor
+    LDA $0016, Y
+    AND #$EFFF
+    STA $0016, Y
+    COP [91]
+    LDY $003C, X
+    LDA $0002, Y
+    SEC 
+    SBC #$0020
+    LDY $player_actor
+    STA $0002, Y
+    LDA #$FFFF
+    STA $0006, Y
+    DEC $0025, X
+    BEQ loc_0F8FE1
+    RTL 
 
   loc_0F8FE1:
-    LDY $player_actor     ; {1019873}
-    LDA $0016, Y          ; {1019876}
-    ORA #$1000            ; {1019879}
-    STA $0016, Y          ; {1019882}
-    LDA #$2F80            ; {1019885}
-    TRB $joy_block_mask   ; {1019888}
-    COP [86]              ; {1019891}
-    RTL                   ; {1019893}
+    LDY $player_actor
+    LDA $0016, Y
+    ORA #$1000
+    STA $0016, Y
+    LDA #$2F80
+    TRB $joy_block_mask
+    COP [86]
+    RTL 
 }
 
 code_0F8FF6 {
-    LDA #$2F80            ; {1019894}
-    TSB $joy_block_mask   ; {1019897}
-    LDA #$01B0            ; {1019900}
-    STA $0025, X          ; {1019903}
-    LDY $player_actor     ; {1019906}
-    LDA $0016, Y          ; {1019909}
-    AND #$EFFF            ; {1019912}
-    STA $0016, Y          ; {1019915}
-    COP [91]              ; {1019918}
-    LDY $003C, X          ; {1019920}
-    LDA $0002, Y          ; {1019923}
-    CLC                   ; {1019926}
-    ADC #$0010            ; {1019927}
-    LDY $player_actor     ; {1019930}
-    STA $0002, Y          ; {1019933}
-    LDA #$0001            ; {1019936}
-    STA $0006, Y          ; {1019939}
-    DEC $0025, X          ; {1019942}
-    BEQ loc_0F902C        ; {1019945}
-    RTL                   ; {1019947}
+    LDA #$2F80
+    TSB $joy_block_mask
+    LDA #$01B0
+    STA $0025, X
+    LDY $player_actor
+    LDA $0016, Y
+    AND #$EFFF
+    STA $0016, Y
+    COP [91]
+    LDY $003C, X
+    LDA $0002, Y
+    CLC 
+    ADC #$0010
+    LDY $player_actor
+    STA $0002, Y
+    LDA #$0001
+    STA $0006, Y
+    DEC $0025, X
+    BEQ loc_0F902C
+    RTL 
 
   loc_0F902C:
-    LDY $player_actor     ; {1019948}
-    LDA $0016, Y          ; {1019951}
-    ORA #$1000            ; {1019954}
-    STA $0016, Y          ; {1019957}
-    LDA #$2F80            ; {1019960}
-    TRB $joy_block_mask   ; {1019963}
-    COP [86]              ; {1019966}
-    RTL                   ; {1019968}
+    LDY $player_actor
+    LDA $0016, Y
+    ORA #$1000
+    STA $0016, Y
+    LDA #$2F80
+    TRB $joy_block_mask
+    COP [86]
+    RTL 
 }
 
 code_0F9041 {
-    COP [01] ( &asciistring_0F904A ) ; {1019969}
-    COP [09] ( #$8000 )   ; {1019973}
-    RTL                   ; {1019977}
+    COP [01] ( &asciistring_0F904A )
+    COP [09] ( #$8000 )
+    RTL 
 }
 
 asciistring_0F904A |[10]Stand on my nose- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|

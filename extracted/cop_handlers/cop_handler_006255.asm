@@ -5,9 +5,9 @@
 ---------------------------------------------
 
 CopA4_SetFlag1A2000 {
-    TYX                   ; {25173}
-    LDA $001A, X          ; {25174}
-    ORA #$2000            ; {25177}
-    STA $001A, X          ; {25180}
-    BRL cop_handler_006473.loc_0064BF ; {25183}
+    TYX 
+    LDA $001A, X
+    ORA #$2000
+    STA $001A, X
+    BRL cop_handler_006473.loc_0064BF
 }

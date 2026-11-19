@@ -10,105 +10,105 @@
 ---------------------------------------------
 
 code_0F98F5 {
-    COP [14] ( #$008A, &code_0F98FC ) ; {1022197}
-    RTL                   ; {1022203}
+    COP [14] ( #$008A, &code_0F98FC )
+    RTL 
 }
 
 code_0F98FC {
-    COP [18] ( #24, &code_0F9903 ) ; {1022204}
-    BRA code_0F997F       ; {1022209}
+    COP [18] ( #24, &code_0F9903 )
+    BRA code_0F997F
 }
 
 code_0F9903 {
-    COP [0D] ( #00, #0A, #27, &code_0F997F ) ; {1022211}
-    COP [85] ( @engine_0026F3.code_00299D ) ; {1022218}
-    COP [17] ( &code_0F99A2 ) ; {1022223}
-    COP [15]              ; {1022227}
+    COP [0D] ( #00, #0A, #27, &code_0F997F )
+    COP [85] ( @engine_0026F3.code_00299D )
+    COP [17] ( &code_0F99A2 )
+    COP [15]
 
   code_0F9915:
-    COP [80] ( #01 )      ; {1022229}
-    COP [82]              ; {1022232}
-    COP [07] ( #$0002, &code_0F9915 ) ; {1022234}
-    COP [16]              ; {1022240}
-    COP [9F] ( #$FFF8 )   ; {1022242}
-    COP [80] ( #05 )      ; {1022246}
-    COP [82]              ; {1022249}
-    COP [9F] ( #$0008 )   ; {1022251}
-    COP [81] ( #04, #02 ) ; {1022255}
-    COP [83]              ; {1022259}
-    COP [80] ( #00 )      ; {1022261}
-    COP [82]              ; {1022264}
-    COP [01] ( &asciistring_0F9A0F ) ; {1022266}
-    BRK #$4E              ; {1022270}
-    COP [85] ( @engine_0026F3.code_00299D ) ; {1022272}
-    COP [81] ( #19, #02 ) ; {1022277}
-    COP [83]              ; {1022281}
-    BRK #$4E              ; {1022283}
-    COP [85] ( @engine_0026F3.code_00299D ) ; {1022285}
-    COP [80] ( #18 )      ; {1022290}
-    COP [82]              ; {1022293}
-    COP [01] ( &asciistring_0F9A3F ) ; {1022295}
-    BRK #$4E              ; {1022299}
-    COP [85] ( @engine_0026F3.code_00299D ) ; {1022301}
-    COP [80] ( #00 )      ; {1022306}
-    COP [82]              ; {1022309}
-    COP [01] ( &asciistring_0F9A6F ) ; {1022311}
-    LDA #$2F80            ; {1022315}
-    TRB $joy_block_mask   ; {1022318}
-    COP [17] ( &code_0F99D1 ) ; {1022321}
-    COP [15]              ; {1022325}
-    COP [91]              ; {1022327}
-    COP [80] ( #00 )      ; {1022329}
-    COP [82]              ; {1022332}
-    RTL                   ; {1022334}
+    COP [80] ( #01 )
+    COP [82]
+    COP [07] ( #$0002, &code_0F9915 )
+    COP [16]
+    COP [9F] ( #$FFF8 )
+    COP [80] ( #05 )
+    COP [82]
+    COP [9F] ( #$0008 )
+    COP [81] ( #04, #02 )
+    COP [83]
+    COP [80] ( #00 )
+    COP [82]
+    COP [01] ( &asciistring_0F9A0F )
+    BRK #$4E
+    COP [85] ( @engine_0026F3.code_00299D )
+    COP [81] ( #19, #02 )
+    COP [83]
+    BRK #$4E
+    COP [85] ( @engine_0026F3.code_00299D )
+    COP [80] ( #18 )
+    COP [82]
+    COP [01] ( &asciistring_0F9A3F )
+    BRK #$4E
+    COP [85] ( @engine_0026F3.code_00299D )
+    COP [80] ( #00 )
+    COP [82]
+    COP [01] ( &asciistring_0F9A6F )
+    LDA #$2F80
+    TRB $joy_block_mask
+    COP [17] ( &code_0F99D1 )
+    COP [15]
+    COP [91]
+    COP [80] ( #00 )
+    COP [82]
+    RTL 
 }
 
 code_0F997F {
-    COP [16]              ; {1022335}
-    COP [17] ( &code_0F99D1 ) ; {1022337}
-    COP [9F] ( #$FFF8 )   ; {1022341}
-    COP [80] ( #05 )      ; {1022345}
-    COP [82]              ; {1022348}
-    COP [9F] ( #$0008 )   ; {1022350}
-    COP [81] ( #04, #02 ) ; {1022354}
-    COP [83]              ; {1022358}
-    COP [15]              ; {1022360}
-    COP [91]              ; {1022362}
-    COP [80] ( #00 )      ; {1022364}
-    COP [82]              ; {1022367}
-    RTL                   ; {1022369}
+    COP [16]
+    COP [17] ( &code_0F99D1 )
+    COP [9F] ( #$FFF8 )
+    COP [80] ( #05 )
+    COP [82]
+    COP [9F] ( #$0008 )
+    COP [81] ( #04, #02 )
+    COP [83]
+    COP [15]
+    COP [91]
+    COP [80] ( #00 )
+    COP [82]
+    RTL 
 }
 
 code_0F99A2 {
-    COP [01] ( &asciistring_0F99E0 ) ; {1022370}
-    COP [1A] ( &lib_014F02.asciistring_014F02, #02, &code_0F99B6 ) ; {1022374}
-    LDA $L_choice_result  ; {1022381}
-    BNE code_0F99B6       ; {1022385}
-    BRL loc_0F99C9        ; {1022387}
+    COP [01] ( &asciistring_0F99E0 )
+    COP [1A] ( &lib_014F02.asciistring_014F02, #02, &code_0F99B6 )
+    LDA $L_choice_result
+    BNE code_0F99B6
+    BRL loc_0F99C9
 }
 
 code_0F99B6 {
-    COP [01] ( &asciistring_0F9A00 ) ; {1022390}
-    COP [17] ( #$0000 )   ; {1022394}
-    COP [09] ( #$8002 )   ; {1022398}
-    LDA #$2F80            ; {1022402}
-    TSB $joy_block_mask   ; {1022405}
-    RTL                   ; {1022408}
+    COP [01] ( &asciistring_0F9A00 )
+    COP [17] ( #$0000 )
+    COP [09] ( #$8002 )
+    LDA #$2F80
+    TSB $joy_block_mask
+    RTL 
 
   loc_0F99C9:
-    COP [01] ( &asciistring_0F9AA7 ) ; {1022409}
-    COP [27] ( &code_0F997F ) ; {1022413}
+    COP [01] ( &asciistring_0F9AA7 )
+    COP [27] ( &code_0F997F )
 }
 
 code_0F99D1 {
-    COP [18] ( #24, &code_0F99DB ) ; {1022417}
-    COP [01] ( &asciistring_0F9AAB ) ; {1022422}
-    RTL                   ; {1022426}
+    COP [18] ( #24, &code_0F99DB )
+    COP [01] ( &asciistring_0F9AAB )
+    RTL 
 }
 
 code_0F99DB {
-    COP [01] ( &asciistring_0F9AA7 ) ; {1022427}
-    RTL                   ; {1022431}
+    COP [01] ( &asciistring_0F9AA7 )
+    RTL 
 }
 
 asciistring_0F99E0 |[10]Have you seen the [N]Queen of the Mermaids?[END]|

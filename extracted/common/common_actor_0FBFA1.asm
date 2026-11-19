@@ -7,70 +7,70 @@
 ---------------------------------------------
 
 code_0FBFA1 {
-    LDA #$&code_0FBFB7    ; {1032097}
-    STA $0018, X          ; {1032100}
+    LDA #$&code_0FBFB7
+    STA $0018, X
 
   loc_0FBFA7:
-    COP [1F]              ; {1032103}
-    LDA $rng_state+1      ; {1032105}
-    AND #$007F            ; {1032108}
-    CLC                   ; {1032111}
-    ADC #$007F            ; {1032112}
-    STA $0014, X          ; {1032115}
-    RTL                   ; {1032118}
+    COP [1F]
+    LDA $rng_state+1
+    AND #$007F
+    CLC 
+    ADC #$007F
+    STA $0014, X
+    RTL 
 }
 ---------------------------------------------
 
 code_0FBFB7 {
-    COP [07] ( #$8503, &code_0FBFC4 ) ; {1032119}
-    COP [85] ( @code_0FBFC7 ) ; {1032125}
-    BRA loc_0FBFA7        ; {1032130}
+    COP [07] ( #$8503, &code_0FBFC4 )
+    COP [85] ( @code_0FBFC7 )
+    BRA loc_0FBFA7
 }
 
 code_0FBFC4 {
-    COP [86]              ; {1032132}
-    RTL                   ; {1032134}
+    COP [86]
+    RTL 
 }
 
 code_0FBFC7 {
-    LDA #$0301            ; {1032135}
-    STA $0016, X          ; {1032138}
-    COP [A3]              ; {1032141}
-    BRK #$50              ; {1032143}
+    LDA #$0301
+    STA $0016, X
+    COP [A3]
+    BRK #$50
 
   loc_0FBFD1:
-    COP [80] ( #03 )      ; {1032145}
-    COP [82]              ; {1032148}
-    COP [1C] ( #$8000, &code_0FBFDE ) ; {1032150}
-    BRA loc_0FBFD1        ; {1032156}
+    COP [80] ( #03 )
+    COP [82]
+    COP [1C] ( #$8000, &code_0FBFDE )
+    BRA loc_0FBFD1
 }
 
 code_0FBFDE {
-    COP [1F]              ; {1032158}
-    LDA $rng_state+1      ; {1032160}
-    AND #$007F            ; {1032163}
-    SEC                   ; {1032166}
-    SBC #$0040            ; {1032167}
-    CLC                   ; {1032170}
-    ADC $player_x         ; {1032171}
-    STA $0000, X          ; {1032174}
-    COP [1F]              ; {1032177}
-    LDA $rng_state+1      ; {1032179}
-    AND #$007F            ; {1032182}
-    SEC                   ; {1032185}
-    SBC #$0040            ; {1032186}
-    CLC                   ; {1032189}
-    ADC $player_y         ; {1032190}
-    SEC                   ; {1032193}
-    SBC #$00E0            ; {1032194}
-    STA $0002, X          ; {1032197}
-    COP [81] ( #04, #07 ) ; {1032200}
-    COP [83]              ; {1032204}
-    LDA #$0200            ; {1032206}
-    STA $0016, X          ; {1032209}
-    COP [A6]              ; {1032212}
-    COP [80] ( #05 )      ; {1032214}
-    COP [82]              ; {1032217}
-    COP [86]              ; {1032219}
-    RTL                   ; {1032221}
+    COP [1F]
+    LDA $rng_state+1
+    AND #$007F
+    SEC 
+    SBC #$0040
+    CLC 
+    ADC $player_x
+    STA $0000, X
+    COP [1F]
+    LDA $rng_state+1
+    AND #$007F
+    SEC 
+    SBC #$0040
+    CLC 
+    ADC $player_y
+    SEC 
+    SBC #$00E0
+    STA $0002, X
+    COP [81] ( #04, #07 )
+    COP [83]
+    LDA #$0200
+    STA $0016, X
+    COP [A6]
+    COP [80] ( #05 )
+    COP [82]
+    COP [86]
+    RTL 
 }

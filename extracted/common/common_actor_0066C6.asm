@@ -12,25 +12,25 @@
 ---------------------------------------------
 
 code_0066C6 {
-    LDA #$3080            ; {26310}
-    TSB $joy_block_mask   ; {26313}
-    STX $player_actor     ; {26316}
-    PHX                   ; {26319}
-    LDY #$&lib_014176.asciistring_014176 ; {26320}
-    JSL $@lib_shared_012769.code_012769 ; {26323}
-    PLX                   ; {26327}
-    COP [1B] ( &code_0066DE, #$0001 ) ; {26328}
+    LDA #$3080
+    TSB $joy_block_mask
+    STX $player_actor
+    PHX 
+    LDY #$&lib_014176.asciistring_014176
+    JSL $@lib_shared_012769.code_012769
+    PLX 
+    COP [1B] ( &code_0066DE, #$0001 )
 }
 
 code_0066DE {
-    SEP #$20              ; {26334}
-    PHX                   ; {26336}
-    JSL $@common_shared_0FEEA6.code_0FEFBC ; {26337}
-    JSL $@lib_0118FC_part5.code_012463 ; {26341}
-    JSL $@lib_02719F.code_02719F ; {26345}
-    PLX                   ; {26349}
-    REP #$20              ; {26350}
-    COP [10] ( #$0A00, #01, #$0000, #$0000 ) ; {26352}
-    COP [91]              ; {26361}
-    RTL                   ; {26363}
+    SEP #$20
+    PHX 
+    JSL $@common_shared_0FEEA6.code_0FEFBC
+    JSL $@lib_0118FC_part5.code_012463
+    JSL $@lib_02719F.code_02719F
+    PLX 
+    REP #$20
+    COP [10] ( #$0A00, #01, #$0000, #$0000 )
+    COP [91]
+    RTL 
 }

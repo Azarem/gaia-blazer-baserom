@@ -7,14 +7,14 @@
 ---------------------------------------------
 
 code_0114D0 {
-    REP #$20              ; {70864}
-    LDA $location_id      ; {70866}
-    ASL                   ; {70869}
-    TAX                   ; {70870}
-    LDA $&table_00AC96, X ; {70871}
-    SEC                   ; {70874}
-    SBC #$&table_00AC96   ; {70875}
-    STA $03B2             ; {70878}
-    SEP #$20              ; {70881}
-    RTL                   ; {70883}
+    REP #$20
+    LDA $location_id
+    ASL 
+    TAX 
+    LDA $&table_00AC96, X
+    SEC 
+    SBC #$&table_00AC96
+    STA $03B2
+    SEP #$20
+    RTL 
 }

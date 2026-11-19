@@ -8,15 +8,15 @@
 ---------------------------------------------
 
 code_0131D1 {
-    STA $L_WRMPYA         ; {78289}
-    XBA                   ; {78293}
-    STA $L_WRMPYB         ; {78294}
-    NOP                   ; {78298}
-    NOP                   ; {78299}
-    NOP                   ; {78300}
-    NOP                   ; {78301}
-    LDA $L_RDMPYH         ; {78302}
-    XBA                   ; {78306}
-    LDA $L_RDMPYL         ; {78307}
-    RTL                   ; {78311}
+    STA $L_WRMPYA
+    XBA 
+    STA $L_WRMPYB
+    NOP 
+    NOP 
+    NOP 
+    NOP 
+    LDA $L_RDMPYH
+    XBA 
+    LDA $L_RDMPYL
+    RTL 
 }

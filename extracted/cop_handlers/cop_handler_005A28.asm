@@ -6,18 +6,18 @@
 ---------------------------------------------
 
 Cop19_JumpUnlessInventoryBit7 {
-    TYX                   ; {23080}
-    LDA [$38]             ; {23081}
-    INC $38               ; {23083}
-    AND #$00FF            ; {23085}
-    JSR $&engine_0064F8.code_00651E ; {23088}
-    BCS loc_005A3A        ; {23091}
-    BPL loc_005A3A        ; {23093}
-    BRL cop_handler_006473.loc_0064BB ; {23095}
+    TYX 
+    LDA [$38]
+    INC $38
+    AND #$00FF
+    JSR $&engine_0064F8.code_00651E
+    BCS loc_005A3A
+    BPL loc_005A3A
+    BRL cop_handler_006473.loc_0064BB
 
   loc_005A3A:
-    LDA [$38]             ; {23098}
-    INC $38               ; {23100}
-    INC $38               ; {23102}
-    BRL cop_handler_006473.loc_0064C1 ; {23104}
+    LDA [$38]
+    INC $38
+    INC $38
+    BRL cop_handler_006473.loc_0064C1
 }

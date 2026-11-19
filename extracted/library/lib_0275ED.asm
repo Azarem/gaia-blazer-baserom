@@ -7,26 +7,26 @@
 ---------------------------------------------
 
 code_0275ED {
-    LDA $043B             ; {161261}
-    BEQ loc_027613        ; {161264}
-    LDA $frame_counter    ; {161266}
-    AND #$03              ; {161269}
-    BNE loc_027613        ; {161271}
-    DEC $043B             ; {161273}
-    LDA $player_hp        ; {161276}
-    CMP $player_max_hp    ; {161279}
-    BCS loc_02760B        ; {161282}
-    INC $player_hp        ; {161284}
-    BRK #$48              ; {161287}
-    BRA loc_02760E        ; {161289}
+    LDA $043B
+    BEQ loc_027613
+    LDA $frame_counter
+    AND #$03
+    BNE loc_027613
+    DEC $043B
+    LDA $player_hp
+    CMP $player_max_hp
+    BCS loc_02760B
+    INC $player_hp
+    BRK #$48
+    BRA loc_02760E
 
   loc_02760B:
-    STZ $043B             ; {161291}
+    STZ $043B
 
   loc_02760E:
-    LDA #$04              ; {161294}
-    TSB $0332             ; {161296}
+    LDA #$04
+    TSB $0332
 
   loc_027613:
-    RTL                   ; {161299}
+    RTL 
 }

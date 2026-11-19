@@ -5,65 +5,65 @@
 ---------------------------------------------
 
 code_01065B {
-    PHP                   ; {67163}
-    PHB                   ; {67164}
-    SEP #$20              ; {67165}
-    LDA $0024, X          ; {67167}
-    PHA                   ; {67170}
-    PLB                   ; {67171}
-    REP #$20              ; {67172}
-    LDA $001E, X          ; {67174}
-    ASL                   ; {67177}
-    TAY                   ; {67178}
-    LDA $&meta_tables_008000, Y ; {67179}
-    PHA                   ; {67182}
-    LDA $0020, X          ; {67183}
-    ASL                   ; {67186}
-    CLC                   ; {67187}
-    ADC $0020, X          ; {67188}
-    ASL                   ; {67191}
-    CLC                   ; {67192}
-    ADC $01, S            ; {67193}
-    PLY                   ; {67195}
-    TAY                   ; {67196}
-    LDA $0000, Y          ; {67197}
-    AND #$00FF            ; {67200}
-    BEQ loc_0106C6        ; {67203}
-    DEC                   ; {67205}
-    STA $0026, X          ; {67206}
-    LDA $0001, Y          ; {67209}
-    STA $0008, X          ; {67212}
-    LDA $0003, Y          ; {67215}
-    AND #$00FF            ; {67218}
-    ASL                   ; {67221}
-    CLC                   ; {67222}
-    ADC #$0000            ; {67223}
-    STA $000A, X          ; {67226}
-    LDA $0004, Y          ; {67229}
-    AND #$00FF            ; {67232}
-    STA $000C, X          ; {67235}
-    PHA                   ; {67238}
-    LDA $0005, Y          ; {67239}
-    AND #$00FF            ; {67242}
-    STA $0014, X          ; {67245}
-    STA $000E, X          ; {67248}
-    INC $0020, X          ; {67251}
-    PLA                   ; {67254}
-    CMP #$0002            ; {67255}
-    BNE loc_0106C2        ; {67258}
-    INC $000B, X          ; {67260}
-    INC $000B, X          ; {67263}
+    PHP 
+    PHB 
+    SEP #$20
+    LDA $0024, X
+    PHA 
+    PLB 
+    REP #$20
+    LDA $001E, X
+    ASL 
+    TAY 
+    LDA $&meta_tables_008000, Y
+    PHA 
+    LDA $0020, X
+    ASL 
+    CLC 
+    ADC $0020, X
+    ASL 
+    CLC 
+    ADC $01, S
+    PLY 
+    TAY 
+    LDA $0000, Y
+    AND #$00FF
+    BEQ loc_0106C6
+    DEC 
+    STA $0026, X
+    LDA $0001, Y
+    STA $0008, X
+    LDA $0003, Y
+    AND #$00FF
+    ASL 
+    CLC 
+    ADC #$0000
+    STA $000A, X
+    LDA $0004, Y
+    AND #$00FF
+    STA $000C, X
+    PHA 
+    LDA $0005, Y
+    AND #$00FF
+    STA $0014, X
+    STA $000E, X
+    INC $0020, X
+    PLA 
+    CMP #$0002
+    BNE loc_0106C2
+    INC $000B, X
+    INC $000B, X
 
   loc_0106C2:
-    PLB                   ; {67266}
-    PLP                   ; {67267}
-    CLC                   ; {67268}
-    RTL                   ; {67269}
+    PLB 
+    PLP 
+    CLC 
+    RTL 
 
   loc_0106C6:
-    STZ $0020, X          ; {67270}
-    PLB                   ; {67273}
-    PLP                   ; {67274}
-    SEC                   ; {67275}
-    RTL                   ; {67276}
+    STZ $0020, X
+    PLB 
+    PLP 
+    SEC 
+    RTL 
 }

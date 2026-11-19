@@ -10,105 +10,105 @@
 ---------------------------------------------
 
 code_01B98D {
-    COP [14] ( #$0056, &code_01B994 ) ; {113037}
-    RTL                   ; {113043}
+    COP [14] ( #$0056, &code_01B994 )
+    RTL 
 }
 
 code_01B994 {
-    COP [85] ( @engine_0026F3.code_00299D ) ; {113044}
-    COP [17] ( &code_01BA28 ) ; {113049}
+    COP [85] ( @engine_0026F3.code_00299D )
+    COP [17] ( &code_01BA28 )
 
   loc_01B99D:
-    COP [80] ( #0E )      ; {113053}
-    COP [82]              ; {113056}
-    COP [15]              ; {113058}
-    COP [1B] ( &code_01B9AA, #$0078 ) ; {113060}
+    COP [80] ( #0E )
+    COP [82]
+    COP [15]
+    COP [1B] ( &code_01B9AA, #$0078 )
 }
 
 code_01B9AA {
-    COP [16]              ; {113066}
-    COP [9F] ( #$0008 )   ; {113068}
-    COP [1E] ( #$EFFF )   ; {113072}
-    COP [81] ( #0F, #04 ) ; {113076}
-    COP [83]              ; {113080}
-    COP [1D] ( #$1000 )   ; {113082}
-    COP [9F] ( #$FFF8 )   ; {113086}
-    COP [81] ( #11, #03 ) ; {113090}
-    COP [83]              ; {113094}
-    COP [9D] ( #11 )      ; {113096}
-    COP [9E] ( &code_01B9CF ) ; {113099}
+    COP [16]
+    COP [9F] ( #$0008 )
+    COP [1E] ( #$EFFF )
+    COP [81] ( #0F, #04 )
+    COP [83]
+    COP [1D] ( #$1000 )
+    COP [9F] ( #$FFF8 )
+    COP [81] ( #11, #03 )
+    COP [83]
+    COP [9D] ( #11 )
+    COP [9E] ( &code_01B9CF )
 }
 
 code_01B9CF {
-    COP [15]              ; {113103}
-    COP [1B] ( &code_01B9D7, #$0078 ) ; {113105}
+    COP [15]
+    COP [1B] ( &code_01B9D7, #$0078 )
 }
 
 code_01B9D7 {
-    COP [16]              ; {113111}
-    COP [9F] ( #$0008 )   ; {113113}
-    COP [81] ( #10, #02 ) ; {113117}
-    COP [83]              ; {113121}
-    COP [9F] ( #$FFF8 )   ; {113123}
-    COP [80] ( #0E )      ; {113127}
-    COP [82]              ; {113130}
-    COP [15]              ; {113132}
-    COP [1B] ( &code_01B9F4, #$0078 ) ; {113134}
+    COP [16]
+    COP [9F] ( #$0008 )
+    COP [81] ( #10, #02 )
+    COP [83]
+    COP [9F] ( #$FFF8 )
+    COP [80] ( #0E )
+    COP [82]
+    COP [15]
+    COP [1B] ( &code_01B9F4, #$0078 )
 }
 
 code_01B9F4 {
-    COP [16]              ; {113140}
-    COP [9F] ( #$0008 )   ; {113142}
-    COP [81] ( #10, #03 ) ; {113146}
-    COP [83]              ; {113150}
-    COP [87]              ; {113152}
-    COP [9F] ( #$FFF8 )   ; {113154}
-    COP [81] ( #11, #03 ) ; {113158}
-    COP [83]              ; {113162}
-    COP [9D] ( #11 )      ; {113164}
-    COP [9E] ( &code_01BA13 ) ; {113167}
+    COP [16]
+    COP [9F] ( #$0008 )
+    COP [81] ( #10, #03 )
+    COP [83]
+    COP [87]
+    COP [9F] ( #$FFF8 )
+    COP [81] ( #11, #03 )
+    COP [83]
+    COP [9D] ( #11 )
+    COP [9E] ( &code_01BA13 )
 }
 
 code_01BA13 {
-    COP [87]              ; {113171}
-    COP [9F] ( #$0008 )   ; {113173}
-    COP [80] ( #0F )      ; {113177}
-    COP [82]              ; {113180}
-    COP [9F] ( #$FFF8 )   ; {113182}
-    BRL loc_01B99D        ; {113186}
+    COP [87]
+    COP [9F] ( #$0008 )
+    COP [80] ( #0F )
+    COP [82]
+    COP [9F] ( #$FFF8 )
+    BRL loc_01B99D
 
   loc_01BA25:
-    COP [91]              ; {113189}
-    RTL                   ; {113191}
+    COP [91]
+    RTL 
 }
 
 code_01BA28 {
-    COP [01] ( &asciistring_01BA6B ) ; {113192}
+    COP [01] ( &asciistring_01BA6B )
 
   loc_01BA2C:
-    COP [1A] ( &lib_014F02.asciistring_014F02, #02, &code_01BA64 ) ; {113196}
-    LDA $L_choice_result  ; {113203}
-    BNE code_01BA64       ; {113207}
-    COP [01] ( &asciistring_01BAAA ) ; {113209}
-    LDA #$0000            ; {113213}
-    STA $APUIO0           ; {113216}
-    LDA $1B84             ; {113219}
-    PHA                   ; {113222}
-    LDA #$0005            ; {113223}
-    STA $1B84             ; {113226}
-    COP [01] ( &asciistring_01BAD8 ) ; {113229}
-    PLA                   ; {113233}
-    STA $1B84             ; {113234}
-    COP [01] ( &asciistring_01BAE1 ) ; {113237}
-    LDA #$0001            ; {113241}
-    STA $APUIO0           ; {113244}
-    COP [01] ( &asciistring_01BB03 ) ; {113247}
-    RTL                   ; {113251}
+    COP [1A] ( &lib_014F02.asciistring_014F02, #02, &code_01BA64 )
+    LDA $L_choice_result
+    BNE code_01BA64
+    COP [01] ( &asciistring_01BAAA )
+    LDA #$0000
+    STA $APUIO0
+    LDA $1B84
+    PHA 
+    LDA #$0005
+    STA $1B84
+    COP [01] ( &asciistring_01BAD8 )
+    PLA 
+    STA $1B84
+    COP [01] ( &asciistring_01BAE1 )
+    LDA #$0001
+    STA $APUIO0
+    COP [01] ( &asciistring_01BB03 )
+    RTL 
 }
 
 code_01BA64 {
-    COP [01] ( &asciistring_01BA8F ) ; {113252}
-    BRL loc_01BA2C        ; {113256}
+    COP [01] ( &asciistring_01BA8F )
+    BRL loc_01BA2C
 }
 
 asciistring_01BA6B |[10]This is a restaurant- [N][::]Would you like to see [N]the menu? [END]|

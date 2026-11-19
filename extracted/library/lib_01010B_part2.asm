@@ -6,74 +6,74 @@
 ---------------------------------------------
 
 code_0103AB {
-    PHP                   ; {66475}
-    PHB                   ; {66476}
-    SEP #$20              ; {66477}
-    LDA $19               ; {66479}
-    XBA                   ; {66481}
-    LDA $05               ; {66482}
-    JSL $@lib_shared_0131D1.code_0131D1 ; {66484}
-    CLC                   ; {66488}
-    ADC $17               ; {66489}
-    CLC                   ; {66491}
-    ADC $03               ; {66492}
-    XBA                   ; {66494}
-    LDA $18               ; {66495}
-    AND #$F0              ; {66497}
-    TAY                   ; {66499}
-    LDA #$7E              ; {66500}
-    PHA                   ; {66502}
-    PLB                   ; {66503}
-    REP #$20              ; {66504}
-    LDA $18               ; {66506}
-    AND #$00F0            ; {66508}
-    ASL                   ; {66511}
-    ASL                   ; {66512}
-    PHA                   ; {66513}
-    LDA $18               ; {66514}
-    AND #$0100            ; {66516}
-    ASL                   ; {66519}
-    ASL                   ; {66520}
-    ASL                   ; {66521}
-    CLC                   ; {66522}
-    ADC $01, S            ; {66523}
-    CLC                   ; {66525}
-    ADC $00               ; {66526}
-    STA $0000, X          ; {66528}
-    PLA                   ; {66531}
-    INX                   ; {66532}
-    INX                   ; {66533}
-    LDA $16               ; {66534}
-    AND #$0100            ; {66536}
-    BNE loc_010402        ; {66539}
-    JSR $&lib_01010B_part3.code_010466 ; {66541}
-    TYA                   ; {66544}
-    CLC                   ; {66545}
-    ADC #$0100            ; {66546}
-    TAY                   ; {66549}
-    TXA                   ; {66550}
-    CLC                   ; {66551}
-    ADC #$0080            ; {66552}
-    TAX                   ; {66555}
-    JSR $&lib_01010B_part3.code_010466 ; {66556}
-    PLB                   ; {66559}
-    PLP                   ; {66560}
-    RTS                   ; {66561}
+    PHP 
+    PHB 
+    SEP #$20
+    LDA $19
+    XBA 
+    LDA $05
+    JSL $@lib_shared_0131D1.code_0131D1
+    CLC 
+    ADC $17
+    CLC 
+    ADC $03
+    XBA 
+    LDA $18
+    AND #$F0
+    TAY 
+    LDA #$7E
+    PHA 
+    PLB 
+    REP #$20
+    LDA $18
+    AND #$00F0
+    ASL 
+    ASL 
+    PHA 
+    LDA $18
+    AND #$0100
+    ASL 
+    ASL 
+    ASL 
+    CLC 
+    ADC $01, S
+    CLC 
+    ADC $00
+    STA $0000, X
+    PLA 
+    INX 
+    INX 
+    LDA $16
+    AND #$0100
+    BNE loc_010402
+    JSR $&lib_01010B_part3.code_010466
+    TYA 
+    CLC 
+    ADC #$0100
+    TAY 
+    TXA 
+    CLC 
+    ADC #$0080
+    TAX 
+    JSR $&lib_01010B_part3.code_010466
+    PLB 
+    PLP 
+    RTS 
 
   loc_010402:
-    PHX                   ; {66562}
-    TXA                   ; {66563}
-    CLC                   ; {66564}
-    ADC #$0080            ; {66565}
-    TAX                   ; {66568}
-    JSR $&lib_01010B_part3.code_010466 ; {66569}
-    TYA                   ; {66572}
-    CLC                   ; {66573}
-    ADC #$0100            ; {66574}
-    TAY                   ; {66577}
-    PLX                   ; {66578}
-    JSR $&lib_01010B_part3.code_010466 ; {66579}
-    PLB                   ; {66582}
-    PLP                   ; {66583}
-    RTS                   ; {66584}
+    PHX 
+    TXA 
+    CLC 
+    ADC #$0080
+    TAX 
+    JSR $&lib_01010B_part3.code_010466
+    TYA 
+    CLC 
+    ADC #$0100
+    TAY 
+    PLX 
+    JSR $&lib_01010B_part3.code_010466
+    PLB 
+    PLP 
+    RTS 
 }

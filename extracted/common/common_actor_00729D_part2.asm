@@ -9,203 +9,203 @@
 ---------------------------------------------
 
 code_0074D3 {
-    INC $046A             ; {29907}
-    LDA $046A             ; {29910}
-    STA $scroll_bg1_x     ; {29913}
-    CMP #$0100            ; {29916}
-    BEQ loc_0074E2        ; {29919}
-    RTL                   ; {29921}
+    INC $046A
+    LDA $046A
+    STA $scroll_bg1_x
+    CMP #$0100
+    BEQ loc_0074E2
+    RTL 
 
   loc_0074E2:
-    INC $0482             ; {29922}
-    COP [91]              ; {29925}
-    RTL                   ; {29927}
+    INC $0482
+    COP [91]
+    RTL 
 }
 
 code_0074E8 {
-    LDA $0016, X          ; {29928}
-    ORA #$0010            ; {29931}
-    STA $0016, X          ; {29934}
-    STZ $0030, X          ; {29937}
-    PHX                   ; {29940}
-    LDX #$0000            ; {29941}
-    LDA #$0070            ; {29944}
-    STA $7E7800, X        ; {29947}
-    LDA #$0030            ; {29951}
-    STA $7E7803, X        ; {29954}
-    LDA #$0010            ; {29958}
-    STA $7E7806, X        ; {29961}
-    LDA #$0010            ; {29965}
-    STA $7E7809, X        ; {29968}
-    LDA #$0010            ; {29972}
-    STA $7E780C, X        ; {29975}
-    LDA #$0008            ; {29979}
-    STA $7E780F, X        ; {29982}
-    LDA #$0001            ; {29986}
-    STA $7E7812, X        ; {29989}
-    LDA #$0000            ; {29993}
-    STA $7E7815, X        ; {29996}
-    STA $7E7801, X        ; {30000}
-    PLX                   ; {30004}
-    COP [91]              ; {30005}
-    PHX                   ; {30007}
-    TXY                   ; {30008}
-    LDX #$0000            ; {30009}
-    LDA $046A             ; {30012}
-    LSR                   ; {30015}
-    STA $16               ; {30016}
-    STA $7E780A, X        ; {30018}
-    LDA $0030, Y          ; {30022}
-    LSR                   ; {30025}
-    PHA                   ; {30026}
-    LSR                   ; {30027}
-    CLC                   ; {30028}
-    ADC $01, S            ; {30029}
-    LSR                   ; {30031}
-    CLC                   ; {30032}
-    ADC $16               ; {30033}
-    STA $7E7810, X        ; {30035}
-    PLA                   ; {30039}
-    LDA $0030, Y          ; {30040}
-    LSR                   ; {30043}
-    CLC                   ; {30044}
-    ADC $16               ; {30045}
-    STA $7E7804, X        ; {30047}
-    STA $7E7813, X        ; {30051}
-    LDA $0030, Y          ; {30055}
-    LSR                   ; {30058}
-    LSR                   ; {30059}
-    CLC                   ; {30060}
-    ADC $16               ; {30061}
-    STA $7E7807, X        ; {30063}
-    STA $7E780D, X        ; {30067}
-    SEP #$20              ; {30071}
-    LDA #$0F              ; {30073}
-    XBA                   ; {30075}
-    LDA #$7E              ; {30076}
-    LDY #$7800            ; {30078}
-    JSL $@lib_01186E.code_01188A ; {30081}
-    REP #$20              ; {30085}
-    PLX                   ; {30087}
-    INC $0030, X          ; {30088}
-    RTL                   ; {30091}
+    LDA $0016, X
+    ORA #$0010
+    STA $0016, X
+    STZ $0030, X
+    PHX 
+    LDX #$0000
+    LDA #$0070
+    STA $7E7800, X
+    LDA #$0030
+    STA $7E7803, X
+    LDA #$0010
+    STA $7E7806, X
+    LDA #$0010
+    STA $7E7809, X
+    LDA #$0010
+    STA $7E780C, X
+    LDA #$0008
+    STA $7E780F, X
+    LDA #$0001
+    STA $7E7812, X
+    LDA #$0000
+    STA $7E7815, X
+    STA $7E7801, X
+    PLX 
+    COP [91]
+    PHX 
+    TXY 
+    LDX #$0000
+    LDA $046A
+    LSR 
+    STA $16
+    STA $7E780A, X
+    LDA $0030, Y
+    LSR 
+    PHA 
+    LSR 
+    CLC 
+    ADC $01, S
+    LSR 
+    CLC 
+    ADC $16
+    STA $7E7810, X
+    PLA 
+    LDA $0030, Y
+    LSR 
+    CLC 
+    ADC $16
+    STA $7E7804, X
+    STA $7E7813, X
+    LDA $0030, Y
+    LSR 
+    LSR 
+    CLC 
+    ADC $16
+    STA $7E7807, X
+    STA $7E780D, X
+    SEP #$20
+    LDA #$0F
+    XBA 
+    LDA #$7E
+    LDY #$7800
+    JSL $@lib_01186E.code_01188A
+    REP #$20
+    PLX 
+    INC $0030, X
+    RTL 
 }
 
 code_00758C {
-    LDA $0016, X          ; {30092}
-    ORA #$0010            ; {30095}
-    STA $0016, X          ; {30098}
+    LDA $0016, X
+    ORA #$0010
+    STA $0016, X
 
   loc_007595:
-    COP [91]              ; {30101}
-    LDA $0466             ; {30103}
-    BMI loc_0075DE        ; {30106}
-    BNE loc_0075A2        ; {30108}
-    JSR $&code_0075E7     ; {30110}
-    RTL                   ; {30113}
+    COP [91]
+    LDA $0466
+    BMI loc_0075DE
+    BNE loc_0075A2
+    JSR $&code_0075E7
+    RTL 
 
   loc_0075A2:
-    STZ $0030, X          ; {30114}
-    COP [03] ( #E0 )      ; {30117}
-    LDA $0030, X          ; {30120}
-    JSR $&code_0075E7     ; {30123}
-    COP [27] ( &code_0075B2 ) ; {30126}
+    STZ $0030, X
+    COP [03] ( #E0 )
+    LDA $0030, X
+    JSR $&code_0075E7
+    COP [27] ( &code_0075B2 )
 }
 
 code_0075B2 {
-    LDA $0030, X          ; {30130}
-    JSR $&code_0075E7     ; {30133}
-    INC $0030, X          ; {30136}
-    COP [04]              ; {30139}
-    COP [91]              ; {30141}
-    LDA $0466             ; {30143}
-    BEQ loc_0075CB        ; {30146}
-    LDA #$00E0            ; {30148}
-    JSR $&code_0075E7     ; {30151}
-    RTL                   ; {30154}
+    LDA $0030, X
+    JSR $&code_0075E7
+    INC $0030, X
+    COP [04]
+    COP [91]
+    LDA $0466
+    BEQ loc_0075CB
+    LDA #$00E0
+    JSR $&code_0075E7
+    RTL 
 
   loc_0075CB:
-    COP [03] ( #70 )      ; {30155}
-    LDA $0030, X          ; {30158}
-    JSR $&code_0075E7     ; {30161}
-    DEC $0030, X          ; {30164}
-    DEC $0030, X          ; {30167}
-    COP [04]              ; {30170}
-    BRA loc_007595        ; {30172}
+    COP [03] ( #70 )
+    LDA $0030, X
+    JSR $&code_0075E7
+    DEC $0030, X
+    DEC $0030, X
+    COP [04]
+    BRA loc_007595
 
   loc_0075DE:
-    COP [91]              ; {30174}
-    LDA #$00E0            ; {30176}
-    JSR $&code_0075E7     ; {30179}
-    RTL                   ; {30182}
+    COP [91]
+    LDA #$00E0
+    JSR $&code_0075E7
+    RTL 
 }
 
 code_0075E7 {
-    PHX                   ; {30183}
-    SEP #$20              ; {30184}
-    LDX #$0000            ; {30186}
-    CMP #$00              ; {30189}
-    BEQ loc_007614        ; {30191}
-    CMP #$80              ; {30193}
-    BCC loc_007608        ; {30195}
-    SEC                   ; {30197}
-    SBC #$7F              ; {30198}
-    PHA                   ; {30200}
-    LDA #$7F              ; {30201}
-    STA $7E7000, X        ; {30203}
-    LDA #$17              ; {30207}
-    STA $7E7001, X        ; {30209}
-    INX                   ; {30213}
-    INX                   ; {30214}
-    PLA                   ; {30215}
+    PHX 
+    SEP #$20
+    LDX #$0000
+    CMP #$00
+    BEQ loc_007614
+    CMP #$80
+    BCC loc_007608
+    SEC 
+    SBC #$7F
+    PHA 
+    LDA #$7F
+    STA $7E7000, X
+    LDA #$17
+    STA $7E7001, X
+    INX 
+    INX 
+    PLA 
 
   loc_007608:
-    STA $7E7000, X        ; {30216}
-    LDA #$17              ; {30220}
-    STA $7E7001, X        ; {30222}
-    INX                   ; {30226}
-    INX                   ; {30227}
+    STA $7E7000, X
+    LDA #$17
+    STA $7E7001, X
+    INX 
+    INX 
 
   loc_007614:
-    LDA #$01              ; {30228}
-    STA $7E7000, X        ; {30230}
-    LDA #$13              ; {30234}
-    STA $7E7001, X        ; {30236}
-    INX                   ; {30240}
-    INX                   ; {30241}
-    LDA #$00              ; {30242}
-    STA $7E7000, X        ; {30244}
-    LDA #$2C              ; {30248}
-    XBA                   ; {30250}
-    LDA #$7E              ; {30251}
-    LDY #$7000            ; {30253}
-    JSL $@lib_01186E.code_01188A ; {30256}
-    REP #$20              ; {30260}
-    PLX                   ; {30262}
-    RTS                   ; {30263}
+    LDA #$01
+    STA $7E7000, X
+    LDA #$13
+    STA $7E7001, X
+    INX 
+    INX 
+    LDA #$00
+    STA $7E7000, X
+    LDA #$2C
+    XBA 
+    LDA #$7E
+    LDY #$7000
+    JSL $@lib_01186E.code_01188A
+    REP #$20
+    PLX 
+    RTS 
 }
 
 code_007638 {
-    PHX                   ; {30264}
-    LDY #$&lib_016264.asciistring_016264 ; {30265}
-    JSL $@lib_0126CF.code_0126CF ; {30268}
-    PLX                   ; {30272}
-    COP [1B] ( &code_007647, #$00F0 ) ; {30273}
+    PHX 
+    LDY #$&lib_016264.asciistring_016264
+    JSL $@lib_0126CF.code_0126CF
+    PLX 
+    COP [1B] ( &code_007647, #$00F0 )
 }
 
 code_007647 {
-    COP [31] ( #00 )      ; {30279}
-    COP [1B] ( &code_007650, #$00F0 ) ; {30282}
+    COP [31] ( #00 )
+    COP [1B] ( &code_007650, #$00F0 )
 }
 
 code_007650 {
-    COP [10] ( #$0D00, #02, #$0000, #$0000 ) ; {30288}
-    SEP #$20              ; {30297}
-    STZ $1B82             ; {30299}
-    REP #$20              ; {30302}
-    LDA #$0020            ; {30304}
-    STA $03B4             ; {30307}
-    INC $0454             ; {30310}
-    COP [91]              ; {30313}
-    RTL                   ; {30315}
+    COP [10] ( #$0D00, #02, #$0000, #$0000 )
+    SEP #$20
+    STZ $1B82
+    REP #$20
+    LDA #$0020
+    STA $03B4
+    INC $0454
+    COP [91]
+    RTL 
 }

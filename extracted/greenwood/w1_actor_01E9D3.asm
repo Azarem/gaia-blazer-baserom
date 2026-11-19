@@ -9,86 +9,86 @@
 ---------------------------------------------
 
 code_01E9D3 {
-    PHX                   ; {125395}
-    LDX #$0000            ; {125396}
+    PHX 
+    LDX #$0000
 
   loc_01E9D7:
-    LDA #$00A0            ; {125399}
-    STA $7E7000, X        ; {125402}
-    STA $7E7800, X        ; {125406}
-    LDA #$7100            ; {125410}
-    STA $7E7001, X        ; {125413}
-    LDA #$7900            ; {125417}
-    STA $7E7801, X        ; {125420}
-    INX                   ; {125424}
-    INX                   ; {125425}
-    INX                   ; {125426}
-    CPX #$0015            ; {125427}
-    BNE loc_01E9D7        ; {125430}
-    LDA #$0000            ; {125432}
-    STA $7E7000, X        ; {125435}
-    STA $7E7800, X        ; {125439}
-    PLX                   ; {125443}
-    COP [91]              ; {125444}
-    LDA $0000, X          ; {125446}
-    INC                   ; {125449}
-    CLC                   ; {125450}
-    ADC $0382             ; {125451}
-    STA $0000, X          ; {125454}
-    STA $scroll_bg2_x     ; {125457}
-    LDA $0002, X          ; {125460}
-    INC                   ; {125463}
-    CLC                   ; {125464}
-    ADC $0384             ; {125465}
-    STA $0002, X          ; {125468}
-    STA $scroll_bg2_y     ; {125471}
-    PHX                   ; {125474}
-    LDA $frame_counter    ; {125475}
-    LSR                   ; {125478}
-    LSR                   ; {125479}
-    CLC                   ; {125480}
-    ADC $scroll_bg2_y     ; {125481}
-    AND #$001F            ; {125484}
-    ASL                   ; {125487}
-    TAX                   ; {125488}
-    LDY #$0000            ; {125489}
-    PHB                   ; {125492}
-    SEP #$20              ; {125493}
-    LDA #$7E              ; {125495}
-    PHA                   ; {125497}
-    PLB                   ; {125498}
-    REP #$20              ; {125499}
+    LDA #$00A0
+    STA $7E7000, X
+    STA $7E7800, X
+    LDA #$7100
+    STA $7E7001, X
+    LDA #$7900
+    STA $7E7801, X
+    INX 
+    INX 
+    INX 
+    CPX #$0015
+    BNE loc_01E9D7
+    LDA #$0000
+    STA $7E7000, X
+    STA $7E7800, X
+    PLX 
+    COP [91]
+    LDA $0000, X
+    INC 
+    CLC 
+    ADC $0382
+    STA $0000, X
+    STA $scroll_bg2_x
+    LDA $0002, X
+    INC 
+    CLC 
+    ADC $0384
+    STA $0002, X
+    STA $scroll_bg2_y
+    PHX 
+    LDA $frame_counter
+    LSR 
+    LSR 
+    CLC 
+    ADC $scroll_bg2_y
+    AND #$001F
+    ASL 
+    TAX 
+    LDY #$0000
+    PHB 
+    SEP #$20
+    LDA #$7E
+    PHA 
+    PLB 
+    REP #$20
 
   loc_01EA3D:
-    LDA $@word_01EA7B, X  ; {125501}
-    CLC                   ; {125505}
-    ADC $033E             ; {125506}
-    STA $7100, Y          ; {125509}
-    LDA $@word_01EA7B, X  ; {125512}
-    CLC                   ; {125516}
-    ADC $0340             ; {125517}
-    STA $7900, Y          ; {125520}
-    INX                   ; {125523}
-    INX                   ; {125524}
-    INY                   ; {125525}
-    INY                   ; {125526}
-    CPY #$0040            ; {125527}
-    BNE loc_01EA3D        ; {125530}
-    PLB                   ; {125532}
-    SEP #$20              ; {125533}
-    LDA #$0D              ; {125535}
-    XBA                   ; {125537}
-    LDA #$7E              ; {125538}
-    LDY #$7000            ; {125540}
-    JSL $@lib_01186E.code_01186E ; {125543}
-    LDA #$0E              ; {125547}
-    XBA                   ; {125549}
-    LDA #$7E              ; {125550}
-    LDY #$7800            ; {125552}
-    JSL $@lib_01186E.code_01186E ; {125555}
-    REP #$20              ; {125559}
-    PLX                   ; {125561}
-    RTL                   ; {125562}
+    LDA $@word_01EA7B, X
+    CLC 
+    ADC $033E
+    STA $7100, Y
+    LDA $@word_01EA7B, X
+    CLC 
+    ADC $0340
+    STA $7900, Y
+    INX 
+    INX 
+    INY 
+    INY 
+    CPY #$0040
+    BNE loc_01EA3D
+    PLB 
+    SEP #$20
+    LDA #$0D
+    XBA 
+    LDA #$7E
+    LDY #$7000
+    JSL $@lib_01186E.code_01186E
+    LDA #$0E
+    XBA 
+    LDA #$7E
+    LDY #$7800
+    JSL $@lib_01186E.code_01186E
+    REP #$20
+    PLX 
+    RTL 
 }
 ---------------------------------------------
 

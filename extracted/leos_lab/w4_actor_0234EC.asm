@@ -8,58 +8,58 @@
 ---------------------------------------------
 
 code_0234EC {
-    COP [14] ( #$012F, &code_0234F3 ) ; {144620}
-    RTL                   ; {144626}
+    COP [14] ( #$012F, &code_0234F3 )
+    RTL 
 }
 
 code_0234F3 {
-    COP [30] ( #$012F, &code_023558, #04 ) ; {144627}
-    COP [07] ( #$9F02, &code_023513 ) ; {144634}
-    COP [85] ( @engine_0026F3.code_00299D ) ; {144640}
-    COP [17] ( &code_02353F ) ; {144645}
-    COP [15]              ; {144649}
-    COP [91]              ; {144651}
-    COP [80] ( #18 )      ; {144653}
-    COP [82]              ; {144656}
-    RTL                   ; {144658}
+    COP [30] ( #$012F, &code_023558, #04 )
+    COP [07] ( #$9F02, &code_023513 )
+    COP [85] ( @engine_0026F3.code_00299D )
+    COP [17] ( &code_02353F )
+    COP [15]
+    COP [91]
+    COP [80] ( #18 )
+    COP [82]
+    RTL 
 }
 
 code_023513 {
-    LDA #$BFC0            ; {144659}
-    TSB $joy_block_mask   ; {144662}
-    COP [03] ( #29 )      ; {144665}
-    COP [04]              ; {144668}
-    COP [01] ( &asciistring_023675 ) ; {144670}
-    COP [03] ( #5B )      ; {144674}
-    COP [04]              ; {144677}
-    LDA #$0020            ; {144679}
-    STA $03B4             ; {144682}
-    COP [10] ( #$010A, #01, #$0100, #$0380 ) ; {144685}
-    LDA #$BFC0            ; {144694}
-    TRB $joy_block_mask   ; {144697}
-    COP [91]              ; {144700}
-    RTL                   ; {144702}
+    LDA #$BFC0
+    TSB $joy_block_mask
+    COP [03] ( #29 )
+    COP [04]
+    COP [01] ( &asciistring_023675 )
+    COP [03] ( #5B )
+    COP [04]
+    LDA #$0020
+    STA $03B4
+    COP [10] ( #$010A, #01, #$0100, #$0380 )
+    LDA #$BFC0
+    TRB $joy_block_mask
+    COP [91]
+    RTL 
 }
 
 code_02353F {
-    COP [07] ( #$9B04, &code_023553 ) ; {144703}
-    COP [01] ( &asciistring_0235AC ) ; {144709}
-    BRK #$5E              ; {144713}
-    COP [0A] ( #3E )      ; {144715}
-    COP [09] ( #$9B04 )   ; {144718}
-    RTL                   ; {144722}
+    COP [07] ( #$9B04, &code_023553 )
+    COP [01] ( &asciistring_0235AC )
+    BRK #$5E
+    COP [0A] ( #3E )
+    COP [09] ( #$9B04 )
+    RTL 
 }
 
 code_023553 {
-    COP [01] ( &asciistring_023644 ) ; {144723}
-    RTL                   ; {144727}
+    COP [01] ( &asciistring_023644 )
+    RTL 
 }
 
 code_023558 {
-    COP [01] ( &asciistring_023561 ) ; {144728}
-    COP [37]              ; {144732}
-    COP [86]              ; {144734}
-    RTL                   ; {144736}
+    COP [01] ( &asciistring_023561 )
+    COP [37]
+    COP [86]
+    RTL 
 }
 
 asciistring_023561 |[10][0E:3C]I am Marie, the doll- [N]I have [03:24]a Purple Stone [N][03:20]in my pocket- [FIN]Take this with you and[N]save Dr-Leo- [JMP:&w4_shared_023F33.asciistring_023FA3]|

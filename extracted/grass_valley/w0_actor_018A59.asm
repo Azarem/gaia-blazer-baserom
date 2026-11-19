@@ -7,175 +7,175 @@
 ---------------------------------------------
 
 code_018A59 {
-    COP [14] ( #$0010, &code_018A60 ) ; {100953}
-    RTL                   ; {100959}
+    COP [14] ( #$0010, &code_018A60 )
+    RTL 
 }
 
 code_018A60 {
-    COP [30] ( #$0010, &code_018BC3, #03 ) ; {100960}
-    COP [07] ( #$9F02, &code_018B28 ) ; {100967}
-    COP [18] ( #29, &code_018A75 ) ; {100973}
-    COP [86]              ; {100978}
-    RTL                   ; {100980}
+    COP [30] ( #$0010, &code_018BC3, #03 )
+    COP [07] ( #$9F02, &code_018B28 )
+    COP [18] ( #29, &code_018A75 )
+    COP [86]
+    RTL 
 }
 
 code_018A75 {
-    COP [A0] ( #$FFF8 )   ; {100981}
-    COP [14] ( #$0009, &code_018B1C ) ; {100985}
-    COP [17] ( &code_018B7C ) ; {100991}
+    COP [A0] ( #$FFF8 )
+    COP [14] ( #$0009, &code_018B1C )
+    COP [17] ( &code_018B7C )
 
   code_018A83:
-    COP [07] ( #$8302, &code_018B0F ) ; {100995}
-    COP [07] ( #$8301, &code_018AF5 ) ; {101001}
-    COP [07] ( #$8207, &code_018AE8 ) ; {101007}
-    COP [07] ( #$8105, &code_018AE8 ) ; {101013}
-    COP [07] ( #$8104, &code_018AA9 ) ; {101019}
-    COP [80] ( #12 )      ; {101025}
-    COP [82]              ; {101028}
-    BRL code_018A83       ; {101030}
+    COP [07] ( #$8302, &code_018B0F )
+    COP [07] ( #$8301, &code_018AF5 )
+    COP [07] ( #$8207, &code_018AE8 )
+    COP [07] ( #$8105, &code_018AE8 )
+    COP [07] ( #$8104, &code_018AA9 )
+    COP [80] ( #12 )
+    COP [82]
+    BRL code_018A83
 }
 
 code_018AA9 {
-    LDA #$AF80            ; {101033}
-    TSB $joy_block_mask   ; {101036}
-    COP [80] ( #13 )      ; {101039}
-    COP [82]              ; {101042}
-    COP [80] ( #14 )      ; {101044}
-    COP [82]              ; {101047}
-    LDA #$AF80            ; {101049}
-    TRB $joy_block_mask   ; {101052}
-    COP [01] ( &asciistring_018C34 ) ; {101055}
-    COP [09] ( #$8105 )   ; {101059}
-    COP [91]              ; {101063}
-    COP [0D] ( #00, #37, #1F, &code_018AD8 ) ; {101065}
-    COP [0D] ( #00, #3A, #20, &code_018AD8 ) ; {101072}
-    RTL                   ; {101079}
+    LDA #$AF80
+    TSB $joy_block_mask
+    COP [80] ( #13 )
+    COP [82]
+    COP [80] ( #14 )
+    COP [82]
+    LDA #$AF80
+    TRB $joy_block_mask
+    COP [01] ( &asciistring_018C34 )
+    COP [09] ( #$8105 )
+    COP [91]
+    COP [0D] ( #00, #37, #1F, &code_018AD8 )
+    COP [0D] ( #00, #3A, #20, &code_018AD8 )
+    RTL 
 }
 
 code_018AD8 {
-    COP [01] ( &asciistring_018C5C ) ; {101080}
-    COP [09] ( #$8207 )   ; {101084}
-    COP [17] ( &code_018BA2 ) ; {101088}
-    COP [27] ( &code_018A83 ) ; {101092}
+    COP [01] ( &asciistring_018C5C )
+    COP [09] ( #$8207 )
+    COP [17] ( &code_018BA2 )
+    COP [27] ( &code_018A83 )
 }
 
 code_018AE8 {
-    COP [80] ( #14 )      ; {101096}
-    COP [82]              ; {101099}
-    COP [17] ( &code_018BA2 ) ; {101101}
-    COP [27] ( &code_018A83 ) ; {101105}
+    COP [80] ( #14 )
+    COP [82]
+    COP [17] ( &code_018BA2 )
+    COP [27] ( &code_018A83 )
 }
 
 code_018AF5 {
-    COP [80] ( #14 )      ; {101109}
-    COP [82]              ; {101112}
-    COP [18] ( #1D, &code_018B07 ) ; {101114}
-    COP [17] ( &code_018BB0 ) ; {101119}
-    COP [27] ( &code_018A83 ) ; {101123}
+    COP [80] ( #14 )
+    COP [82]
+    COP [18] ( #1D, &code_018B07 )
+    COP [17] ( &code_018BB0 )
+    COP [27] ( &code_018A83 )
 }
 
 code_018B07 {
-    COP [17] ( &code_018BAB ) ; {101127}
-    COP [27] ( &code_018A83 ) ; {101131}
+    COP [17] ( &code_018BAB )
+    COP [27] ( &code_018A83 )
 }
 
 code_018B0F {
-    COP [80] ( #14 )      ; {101135}
-    COP [82]              ; {101138}
-    COP [17] ( &code_018BB9 ) ; {101140}
-    COP [27] ( &code_018A83 ) ; {101144}
+    COP [80] ( #14 )
+    COP [82]
+    COP [17] ( &code_018BB9 )
+    COP [27] ( &code_018A83 )
 }
 
 code_018B1C {
-    COP [80] ( #14 )      ; {101148}
-    COP [82]              ; {101151}
-    COP [17] ( &code_018BBE ) ; {101153}
-    COP [91]              ; {101157}
-    RTL                   ; {101159}
+    COP [80] ( #14 )
+    COP [82]
+    COP [17] ( &code_018BBE )
+    COP [91]
+    RTL 
 }
 
 code_018B28 {
-    LDA #$BFC0            ; {101160}
-    TSB $joy_block_mask   ; {101163}
-    COP [A0] ( #$FFF8 )   ; {101166}
-    COP [07] ( #$9F01, &code_018B5B ) ; {101170}
-    COP [03] ( #29 )      ; {101176}
-    COP [04]              ; {101179}
-    COP [01] ( &asciistring_018F85 ) ; {101181}
-    COP [03] ( #79 )      ; {101185}
-    COP [04]              ; {101188}
-    COP [3C] ( #04 )      ; {101190}
-    COP [10] ( #$0302, #01, #$0108, #$0348 ) ; {101193}
-    LDA #$BFC0            ; {101202}
-    TRB $joy_block_mask   ; {101205}
-    COP [91]              ; {101208}
-    RTL                   ; {101210}
+    LDA #$BFC0
+    TSB $joy_block_mask
+    COP [A0] ( #$FFF8 )
+    COP [07] ( #$9F01, &code_018B5B )
+    COP [03] ( #29 )
+    COP [04]
+    COP [01] ( &asciistring_018F85 )
+    COP [03] ( #79 )
+    COP [04]
+    COP [3C] ( #04 )
+    COP [10] ( #$0302, #01, #$0108, #$0348 )
+    LDA #$BFC0
+    TRB $joy_block_mask
+    COP [91]
+    RTL 
 }
 
 code_018B5B {
-    COP [34]              ; {101211}
-    COP [80] ( #13 )      ; {101213}
-    COP [82]              ; {101216}
-    COP [03] ( #5B )      ; {101218}
-    COP [04]              ; {101221}
-    COP [01] ( &asciistring_018FCD ) ; {101223}
-    COP [03] ( #F1 )      ; {101227}
-    COP [04]              ; {101230}
-    COP [10] ( #$0B00, #01, #$0000, #$0000 ) ; {101232}
-    COP [91]              ; {101241}
-    RTL                   ; {101243}
+    COP [34]
+    COP [80] ( #13 )
+    COP [82]
+    COP [03] ( #5B )
+    COP [04]
+    COP [01] ( &asciistring_018FCD )
+    COP [03] ( #F1 )
+    COP [04]
+    COP [10] ( #$0B00, #01, #$0000, #$0000 )
+    COP [91]
+    RTL 
 }
 
 code_018B7C {
-    COP [07] ( #$8104, &code_018B9D ) ; {101244}
-    COP [19] ( #1C, &code_018B98 ) ; {101250}
-    COP [01] ( &asciistring_018C02 ) ; {101255}
-    COP [3C] ( #04 )      ; {101259}
-    COP [10] ( #$0302, #02, #$0120, #$0320 ) ; {101262}
-    RTL                   ; {101271}
+    COP [07] ( #$8104, &code_018B9D )
+    COP [19] ( #1C, &code_018B98 )
+    COP [01] ( &asciistring_018C02 )
+    COP [3C] ( #04 )
+    COP [10] ( #$0302, #02, #$0120, #$0320 )
+    RTL 
 }
 
 code_018B98 {
-    COP [01] ( &asciistring_018C26 ) ; {101272}
-    RTL                   ; {101276}
+    COP [01] ( &asciistring_018C26 )
+    RTL 
 }
 
 code_018B9D {
-    COP [01] ( &asciistring_018C34 ) ; {101277}
-    RTL                   ; {101281}
+    COP [01] ( &asciistring_018C34 )
+    RTL 
 }
 
 code_018BA2 {
-    COP [01] ( &asciistring_018C98 ) ; {101282}
-    COP [09] ( #$8301 )   ; {101286}
-    RTL                   ; {101290}
+    COP [01] ( &asciistring_018C98 )
+    COP [09] ( #$8301 )
+    RTL 
 }
 
 code_018BAB {
-    COP [01] ( &asciistring_018D5D ) ; {101291}
-    RTL                   ; {101295}
+    COP [01] ( &asciistring_018D5D )
+    RTL 
 }
 
 code_018BB0 {
-    COP [01] ( &asciistring_018D61 ) ; {101296}
-    COP [09] ( #$8302 )   ; {101300}
-    RTL                   ; {101304}
+    COP [01] ( &asciistring_018D61 )
+    COP [09] ( #$8302 )
+    RTL 
 }
 
 code_018BB9 {
-    COP [01] ( &asciistring_018F15 ) ; {101305}
-    RTL                   ; {101309}
+    COP [01] ( &asciistring_018F15 )
+    RTL 
 }
 
 code_018BBE {
-    COP [01] ( &asciistring_018F19 ) ; {101310}
-    RTL                   ; {101314}
+    COP [01] ( &asciistring_018F19 )
+    RTL 
 }
 
 code_018BC3 {
-    COP [01] ( &asciistring_018BCA ) ; {101315}
-    COP [86]              ; {101319}
-    RTL                   ; {101321}
+    COP [01] ( &asciistring_018BCA )
+    COP [86]
+    RTL 
 }
 
 asciistring_018BCA |[10][0E:3C]You hear some light [N]snoring coming from [N]inside the house- [JMP:&w0_shared_01B988.asciistring_01B988]|

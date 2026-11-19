@@ -3,45 +3,45 @@
 ---------------------------------------------
 
 code_0070B3 {
-    COP [07] ( #$9F05, &code_0070BF ) ; {28851}
-    COP [07] ( #$9F04, &code_0070C2 ) ; {28857}
+    COP [07] ( #$9F05, &code_0070BF )
+    COP [07] ( #$9F04, &code_0070C2 )
 }
 
 code_0070BF {
-    COP [91]              ; {28863}
-    RTL                   ; {28865}
+    COP [91]
+    RTL 
 }
 
 code_0070C2 {
-    COP [86]              ; {28866}
-    RTL                   ; {28868}
+    COP [86]
+    RTL 
 }
 
 code_0070C5 {
-    RTL                   ; {28869}
+    RTL 
 }
 
 code_0070C6 {
-    COP [A3]              ; {28870}
-    RTL                   ; {28872}
+    COP [A3]
+    RTL 
 }
 
 code_0070C9 {
-    BRA code_0070B3       ; {28873}
+    BRA code_0070B3
 
   code_0070CB:
-    RTL                   ; {28875}
+    RTL 
 }
 
 code_0070CC {
-    RTL                   ; {28876}
+    RTL 
 }
 
 code_0070CD {
-    BRA code_0070B3       ; {28877}
+    BRA code_0070B3
 
   code_0070CF:
-    COP [80] ( #04 )      ; {28879}
-    COP [82]              ; {28882}
-    RTL                   ; {28884}
+    COP [80] ( #04 )
+    COP [82]
+    RTL 
 }

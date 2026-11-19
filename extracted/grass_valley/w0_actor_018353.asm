@@ -5,59 +5,59 @@
 ---------------------------------------------
 
 code_018353 {
-    COP [14] ( #$0006, &code_01835A ) ; {99155}
-    RTL                   ; {99161}
+    COP [14] ( #$0006, &code_01835A )
+    RTL 
 }
 
 code_01835A {
-    COP [17] ( &code_018399 ) ; {99162}
+    COP [17] ( &code_018399 )
 
   code_01835E:
-    COP [91]              ; {99166}
-    COP [20] ( &code_018395 ) ; {99168}
-    COP [9A] ( #$0000, &code_01836E, &code_018395, &code_018383 ) ; {99172}
+    COP [91]
+    COP [20] ( &code_018395 )
+    COP [9A] ( #$0000, &code_01836E, &code_018395, &code_018383 )
 }
 
 code_01836E {
-    COP [23] ( &code_01837B ) ; {99182}
-    COP [97]              ; {99186}
-    COP [9D] ( #0B )      ; {99188}
-    COP [9E] ( &code_01837B ) ; {99191}
+    COP [23] ( &code_01837B )
+    COP [97]
+    COP [9D] ( #0B )
+    COP [9E] ( &code_01837B )
 }
 
 code_01837B {
-    COP [80] ( #06 )      ; {99195}
-    COP [82]              ; {99198}
-    BRL code_018395       ; {99200}
+    COP [80] ( #06 )
+    COP [82]
+    BRL code_018395
 }
 
 code_018383 {
-    COP [24] ( &code_018390 ) ; {99203}
-    COP [96]              ; {99207}
-    COP [9D] ( #0B )      ; {99209}
-    COP [9E] ( &code_018390 ) ; {99212}
+    COP [24] ( &code_018390 )
+    COP [96]
+    COP [9D] ( #0B )
+    COP [9E] ( &code_018390 )
 }
 
 code_018390 {
-    COP [80] ( #06 )      ; {99216}
-    COP [82]              ; {99219}
+    COP [80] ( #06 )
+    COP [82]
 }
 
 code_018395 {
-    COP [27] ( &code_01835E ) ; {99221}
+    COP [27] ( &code_01835E )
 }
 
 code_018399 {
-    COP [18] ( #38, &code_0183A3 ) ; {99225}
-    COP [01] ( &asciistring_018428 ) ; {99230}
-    RTL                   ; {99234}
+    COP [18] ( #38, &code_0183A3 )
+    COP [01] ( &asciistring_018428 )
+    RTL 
 }
 
 code_0183A3 {
-    COP [01] ( &asciistring_0183AD ) ; {99235}
-    BRK #$5E              ; {99239}
-    COP [0A] ( #38 )      ; {99241}
-    RTL                   ; {99244}
+    COP [01] ( &asciistring_0183AD )
+    BRK #$5E
+    COP [0A] ( #38 )
+    RTL 
 }
 
 asciistring_0183AD |[10]Hello, may I help you?[FIN]Oh, you are the one [N]who released me! [N]Take whatever you need[N]from my store- [FIN]I only have Medical [N]Herbs though- [FIN][02:2] received [N][03:24]a Medical Herb- [03:20][JMP:&w0_shared_01B988.asciistring_01B988]|

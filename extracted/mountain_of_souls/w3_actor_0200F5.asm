@@ -6,28 +6,28 @@
 ---------------------------------------------
 
 code_0200F5 {
-    COP [14] ( #$00D3, &code_0200FC ) ; {131317}
-    RTL                   ; {131323}
+    COP [14] ( #$00D3, &code_0200FC )
+    RTL 
 }
 
 code_0200FC {
-    COP [17] ( &code_020119 ) ; {131324}
-    COP [14] ( #$00EA, &code_02010F ) ; {131328}
-    LDA $0016, X          ; {131334}
-    AND #$FFF7            ; {131337}
-    STA $0016, X          ; {131340}
+    COP [17] ( &code_020119 )
+    COP [14] ( #$00EA, &code_02010F )
+    LDA $0016, X
+    AND #$FFF7
+    STA $0016, X
 }
 
 code_02010F {
-    COP [85] ( @engine_0026F3.code_00299D ) ; {131343}
-    COP [15]              ; {131348}
-    COP [91]              ; {131350}
-    RTL                   ; {131352}
+    COP [85] ( @engine_0026F3.code_00299D )
+    COP [15]
+    COP [91]
+    RTL 
 }
 
 code_020119 {
-    COP [01] ( &asciistring_02011E ) ; {131353}
-    RTL                   ; {131357}
+    COP [01] ( &asciistring_02011E )
+    RTL 
 }
 
 asciistring_02011E |[10]My wife was able to [N]use magic at one time- [JMP:&w3_shared_02249A.asciistring_02251E]|

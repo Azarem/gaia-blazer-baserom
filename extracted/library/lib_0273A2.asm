@@ -5,41 +5,41 @@
 ---------------------------------------------
 
 code_0273A2 {
-    PHP                   ; {160674}
-    REP #$20              ; {160675}
-    PHA                   ; {160677}
-    PHX                   ; {160678}
-    PHY                   ; {160679}
-    PHA                   ; {160680}
-    PHY                   ; {160681}
-    AND #$03F8            ; {160682}
-    LSR                   ; {160685}
-    LSR                   ; {160686}
-    LSR                   ; {160687}
-    CLC                   ; {160688}
-    ADC $01, S            ; {160689}
-    STA $01, S            ; {160691}
-    PLY                   ; {160693}
-    PLA                   ; {160694}
-    AND #$0007            ; {160695}
-    TAX                   ; {160698}
-    SEP #$20              ; {160699}
-    LDA $@data_00F9F7.binary_00FA77, X ; {160701}
-    AND $0000, Y          ; {160705}
-    REP #$20              ; {160708}
-    BNE loc_0273CE        ; {160710}
-    PLY                   ; {160712}
-    PLX                   ; {160713}
-    PLA                   ; {160714}
-    PLP                   ; {160715}
-    CLC                   ; {160716}
-    RTL                   ; {160717}
+    PHP 
+    REP #$20
+    PHA 
+    PHX 
+    PHY 
+    PHA 
+    PHY 
+    AND #$03F8
+    LSR 
+    LSR 
+    LSR 
+    CLC 
+    ADC $01, S
+    STA $01, S
+    PLY 
+    PLA 
+    AND #$0007
+    TAX 
+    SEP #$20
+    LDA $@data_00F9F7.binary_00FA77, X
+    AND $0000, Y
+    REP #$20
+    BNE loc_0273CE
+    PLY 
+    PLX 
+    PLA 
+    PLP 
+    CLC 
+    RTL 
 
   loc_0273CE:
-    PLY                   ; {160718}
-    PLX                   ; {160719}
-    PLA                   ; {160720}
-    PLP                   ; {160721}
-    SEC                   ; {160722}
-    RTL                   ; {160723}
+    PLY 
+    PLX 
+    PLA 
+    PLP 
+    SEC 
+    RTL 
 }

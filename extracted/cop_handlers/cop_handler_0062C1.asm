@@ -5,22 +5,22 @@
 ---------------------------------------------
 
 CopA9_SetFields34And2C {
-    TYX                   ; {25281}
-    LDA [$38]             ; {25282}
-    INC $38               ; {25284}
-    INC $38               ; {25286}
-    STA $0034, X          ; {25288}
-    SEP #$20              ; {25291}
-    LDA [$38]             ; {25293}
-    INC $38               ; {25295}
-    BNE loc_0062D5        ; {25297}
-    INC $39               ; {25299}
+    TYX 
+    LDA [$38]
+    INC $38
+    INC $38
+    STA $0034, X
+    SEP #$20
+    LDA [$38]
+    INC $38
+    BNE loc_0062D5
+    INC $39
 
   loc_0062D5:
-    STA $002C, X          ; {25301}
-    REP #$20              ; {25304}
-    LDA $001A, X          ; {25306}
-    ORA #$8000            ; {25309}
-    STA $001A, X          ; {25312}
-    BRL cop_handler_006473.loc_0064BF ; {25315}
+    STA $002C, X
+    REP #$20
+    LDA $001A, X
+    ORA #$8000
+    STA $001A, X
+    BRL cop_handler_006473.loc_0064BF
 }

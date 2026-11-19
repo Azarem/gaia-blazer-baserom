@@ -7,26 +7,26 @@
 ---------------------------------------------
 
 Cop8B_JumpIfPlayerBeyondX {
-    TYX                   ; {24491}
-    LDA $player_x         ; {24492}
-    SEC                   ; {24495}
-    SBC $0000, X          ; {24496}
-    BPL loc_005FB9        ; {24499}
-    EOR #$FFFF            ; {24501}
-    INC                   ; {24504}
+    TYX 
+    LDA $player_x
+    SEC 
+    SBC $0000, X
+    BPL loc_005FB9
+    EOR #$FFFF
+    INC 
 
   loc_005FB9:
-    STA $00               ; {24505}
-    LDA [$38]             ; {24507}
-    INC $38               ; {24509}
-    INC $38               ; {24511}
-    CMP $00               ; {24513}
-    BCC loc_005FC8        ; {24515}
-    BRL cop_handler_006473.loc_0064BB ; {24517}
+    STA $00
+    LDA [$38]
+    INC $38
+    INC $38
+    CMP $00
+    BCC loc_005FC8
+    BRL cop_handler_006473.loc_0064BB
 
   loc_005FC8:
-    LDA [$38]             ; {24520}
-    INC $38               ; {24522}
-    INC $38               ; {24524}
-    BRL cop_handler_006473.loc_0064C1 ; {24526}
+    LDA [$38]
+    INC $38
+    INC $38
+    BRL cop_handler_006473.loc_0064C1
 }

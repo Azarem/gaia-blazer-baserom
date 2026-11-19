@@ -6,111 +6,111 @@
 ---------------------------------------------
 
 code_019A2C {
-    COP [14] ( #$001D, &code_019A33 ) ; {105004}
-    RTL                   ; {105010}
+    COP [14] ( #$001D, &code_019A33 )
+    RTL 
 }
 
 code_019A33 {
-    COP [85] ( @engine_0026F3.code_00299D ) ; {105011}
-    COP [07] ( #$0102, &code_019A46 ) ; {105016}
-    COP [11] ( #15, #32, #2A ) ; {105022}
-    BRL loc_019AD6        ; {105027}
+    COP [85] ( @engine_0026F3.code_00299D )
+    COP [07] ( #$0102, &code_019A46 )
+    COP [11] ( #15, #32, #2A )
+    BRL loc_019AD6
 }
 
 code_019A46 {
-    COP [17] ( &code_019AE4 ) ; {105030}
-    COP [15]              ; {105034}
-    COP [91]              ; {105036}
-    RTL                   ; {105038}
+    COP [17] ( &code_019AE4 )
+    COP [15]
+    COP [91]
+    RTL 
 }
 
 code_019A4F {
-    COP [16]              ; {105039}
-    COP [17] ( &code_019B05 ) ; {105041}
-    COP [81] ( #1B, #02 ) ; {105045}
-    COP [83]              ; {105049}
-    COP [9F] ( #$0008 )   ; {105051}
-    COP [81] ( #1A, #03 ) ; {105055}
-    COP [83]              ; {105059}
-    COP [9F] ( #$FFF8 )   ; {105061}
-    COP [81] ( #1B, #02 ) ; {105065}
-    COP [83]              ; {105069}
-    COP [9F] ( #$0008 )   ; {105071}
-    COP [81] ( #1A, #02 ) ; {105075}
-    COP [83]              ; {105079}
-    COP [87]              ; {105081}
-    COP [9F] ( #$FFF8 )   ; {105083}
-    COP [80] ( #18 )      ; {105087}
-    COP [82]              ; {105090}
-    COP [17] ( &code_019AEC ) ; {105092}
-    COP [15]              ; {105096}
-    COP [91]              ; {105098}
-    RTL                   ; {105100}
+    COP [16]
+    COP [17] ( &code_019B05 )
+    COP [81] ( #1B, #02 )
+    COP [83]
+    COP [9F] ( #$0008 )
+    COP [81] ( #1A, #03 )
+    COP [83]
+    COP [9F] ( #$FFF8 )
+    COP [81] ( #1B, #02 )
+    COP [83]
+    COP [9F] ( #$0008 )
+    COP [81] ( #1A, #02 )
+    COP [83]
+    COP [87]
+    COP [9F] ( #$FFF8 )
+    COP [80] ( #18 )
+    COP [82]
+    COP [17] ( &code_019AEC )
+    COP [15]
+    COP [91]
+    RTL 
 }
 
 code_019A8D {
-    COP [16]              ; {105101}
-    COP [17] ( &code_019B05 ) ; {105103}
-    COP [81] ( #1A, #04 ) ; {105107}
-    COP [83]              ; {105111}
-    COP [9F] ( #$FFF8 )   ; {105113}
-    COP [81] ( #1B, #03 ) ; {105117}
-    COP [83]              ; {105121}
-    COP [9F] ( #$0008 )   ; {105123}
-    COP [80] ( #1A )      ; {105127}
-    COP [82]              ; {105130}
-    COP [17] ( &code_019AF4 ) ; {105132}
-    COP [15]              ; {105136}
-    COP [91]              ; {105138}
-    RTL                   ; {105140}
+    COP [16]
+    COP [17] ( &code_019B05 )
+    COP [81] ( #1A, #04 )
+    COP [83]
+    COP [9F] ( #$FFF8 )
+    COP [81] ( #1B, #03 )
+    COP [83]
+    COP [9F] ( #$0008 )
+    COP [80] ( #1A )
+    COP [82]
+    COP [17] ( &code_019AF4 )
+    COP [15]
+    COP [91]
+    RTL 
 }
 
 code_019AB5 {
-    COP [16]              ; {105141}
-    COP [17] ( &code_019B05 ) ; {105143}
-    COP [87]              ; {105147}
-    COP [9F] ( #$0008 )   ; {105149}
-    COP [81] ( #1B, #04 ) ; {105153}
-    COP [83]              ; {105157}
-    COP [9F] ( #$0008 )   ; {105159}
-    COP [81] ( #19, #0A ) ; {105163}
-    COP [83]              ; {105167}
-    COP [80] ( #18 )      ; {105169}
-    COP [82]              ; {105172}
+    COP [16]
+    COP [17] ( &code_019B05 )
+    COP [87]
+    COP [9F] ( #$0008 )
+    COP [81] ( #1B, #04 )
+    COP [83]
+    COP [9F] ( #$0008 )
+    COP [81] ( #19, #0A )
+    COP [83]
+    COP [80] ( #18 )
+    COP [82]
 
   loc_019AD6:
-    COP [15]              ; {105174}
-    COP [17] ( &code_019AFC ) ; {105176}
-    COP [91]              ; {105180}
-    COP [80] ( #24 )      ; {105182}
-    COP [82]              ; {105185}
-    RTL                   ; {105187}
+    COP [15]
+    COP [17] ( &code_019AFC )
+    COP [91]
+    COP [80] ( #24 )
+    COP [82]
+    RTL 
 }
 
 code_019AE4 {
-    COP [01] ( &asciistring_019B0A ) ; {105188}
-    COP [27] ( &code_019A4F ) ; {105192}
+    COP [01] ( &asciistring_019B0A )
+    COP [27] ( &code_019A4F )
 }
 
 code_019AEC {
-    COP [01] ( &asciistring_019B52 ) ; {105196}
-    COP [27] ( &code_019A8D ) ; {105200}
+    COP [01] ( &asciistring_019B52 )
+    COP [27] ( &code_019A8D )
 }
 
 code_019AF4 {
-    COP [01] ( &asciistring_019BF2 ) ; {105204}
-    COP [27] ( &code_019AB5 ) ; {105208}
+    COP [01] ( &asciistring_019BF2 )
+    COP [27] ( &code_019AB5 )
 }
 
 code_019AFC {
-    COP [01] ( &asciistring_019C56 ) ; {105212}
-    COP [09] ( #$8102 )   ; {105216}
-    RTL                   ; {105220}
+    COP [01] ( &asciistring_019C56 )
+    COP [09] ( #$8102 )
+    RTL 
 }
 
 code_019B05 {
-    COP [01] ( &asciistring_019CC1 ) ; {105221}
-    RTL                   ; {105225}
+    COP [01] ( &asciistring_019CC1 )
+    RTL 
 }
 
 asciistring_019B0A |[10]You are the one who [N]set me free, right? [FIN]Come, I shall show you[N]around- Please follow [N]me- [JMP:&w0_shared_01B988.asciistring_01B988]|

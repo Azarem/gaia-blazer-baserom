@@ -6,74 +6,74 @@
 ---------------------------------------------
 
 code_025B1A {
-    COP [14] ( #$016E, &code_025B21 ) ; {154394}
-    RTL                   ; {154400}
+    COP [14] ( #$016E, &code_025B21 )
+    RTL 
 }
 
 code_025B21 {
-    COP [30] ( #$016E, &code_025B98, #04 ) ; {154401}
-    COP [07] ( #$8805, &code_025B81 ) ; {154408}
-    COP [85] ( @engine_0026F3.code_00299D ) ; {154414}
-    COP [15]              ; {154419}
-    COP [17] ( &code_025B93 ) ; {154421}
-    COP [05] ( #$0000 )   ; {154425}
-    COP [09] ( #$0000 )   ; {154429}
-    COP [16]              ; {154433}
-    COP [97]              ; {154435}
-    COP [81] ( #17, #02 ) ; {154437}
-    COP [83]              ; {154441}
-    COP [01] ( &asciistring_025C7E ) ; {154443}
-    COP [32] ( #00 )      ; {154447}
-    COP [B2] ( @code_025B84, #$0080, #$0000, #$0200 ) ; {154450}
-    BRK #$5B              ; {154461}
-    COP [05] ( #$0001 )   ; {154463}
-    BRK #$04              ; {154467}
-    LDA $0016, X          ; {154469}
-    ORA #$0010            ; {154472}
-    STA $0016, X          ; {154475}
-    COP [97]              ; {154478}
-    COP [80] ( #27 )      ; {154480}
-    COP [82]              ; {154483}
-    COP [81] ( #28, #08 ) ; {154485}
-    COP [83]              ; {154489}
-    COP [81] ( #29, #08 ) ; {154491}
-    COP [83]              ; {154495}
+    COP [30] ( #$016E, &code_025B98, #04 )
+    COP [07] ( #$8805, &code_025B81 )
+    COP [85] ( @engine_0026F3.code_00299D )
+    COP [15]
+    COP [17] ( &code_025B93 )
+    COP [05] ( #$0000 )
+    COP [09] ( #$0000 )
+    COP [16]
+    COP [97]
+    COP [81] ( #17, #02 )
+    COP [83]
+    COP [01] ( &asciistring_025C7E )
+    COP [32] ( #00 )
+    COP [B2] ( @code_025B84, #$0080, #$0000, #$0200 )
+    BRK #$5B
+    COP [05] ( #$0001 )
+    BRK #$04
+    LDA $0016, X
+    ORA #$0010
+    STA $0016, X
+    COP [97]
+    COP [80] ( #27 )
+    COP [82]
+    COP [81] ( #28, #08 )
+    COP [83]
+    COP [81] ( #29, #08 )
+    COP [83]
 }
 
 code_025B81 {
-    COP [86]              ; {154497}
-    RTL                   ; {154499}
+    COP [86]
+    RTL 
 }
 
 code_025B84 {
-    COP [97]              ; {154500}
-    COP [81] ( #25, #10 ) ; {154502}
-    COP [83]              ; {154506}
-    COP [09] ( #$8001 )   ; {154508}
-    COP [86]              ; {154512}
-    RTL                   ; {154514}
+    COP [97]
+    COP [81] ( #25, #10 )
+    COP [83]
+    COP [09] ( #$8001 )
+    COP [86]
+    RTL 
 }
 
 code_025B93 {
-    COP [01] ( &asciistring_025C65 ) ; {154515}
-    RTL                   ; {154519}
+    COP [01] ( &asciistring_025C65 )
+    RTL 
 }
 
 code_025B98 {
-    COP [14] ( #$0183, &code_025BA3 ) ; {154520}
-    COP [01] ( &asciistring_025BB3 ) ; {154526}
-    RTL                   ; {154530}
+    COP [14] ( #$0183, &code_025BA3 )
+    COP [01] ( &asciistring_025BB3 )
+    RTL 
 }
 
 code_025BA3 {
-    COP [14] ( #$0181, &code_025BAE ) ; {154531}
-    COP [01] ( &asciistring_025BEB ) ; {154537}
-    RTL                   ; {154541}
+    COP [14] ( #$0181, &code_025BAE )
+    COP [01] ( &asciistring_025BEB )
+    RTL 
 }
 
 code_025BAE {
-    COP [01] ( &asciistring_025C22 ) ; {154542}
-    RTL                   ; {154546}
+    COP [01] ( &asciistring_025C22 )
+    RTL 
 }
 
 asciistring_025BB3 |[10][0E:3C]Please save Dr-Leo- [N]He must be in the [N]prison of the left [N]tower!! [JMP:&w5_shared_02706C.asciistring_0270DF]|

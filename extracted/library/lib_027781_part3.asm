@@ -40,103 +40,103 @@
 ---------------------------------------------
 
 code_0279B5 {
-    LDX #$0000            ; {162229}
-    STX $player_x         ; {162232}
-    STX $player_y         ; {162235}
-    STX $0382             ; {162238}
-    STX $0384             ; {162241}
-    STX $joy_pressed      ; {162244}
-    STX $03D4             ; {162247}
-    STX $03D6             ; {162250}
-    STX $03D8             ; {162253}
-    STX $038A             ; {162256}
-    STX $038C             ; {162259}
-    STX $joy_block_mask   ; {162262}
-    STX $0433             ; {162265}
-    STX $0433             ; {162268}
-    STX $0458             ; {162271}
-    STX $0464             ; {162274}
-    STX $0468             ; {162277}
-    LDX #$06AA            ; {162280}
-    STX $039E             ; {162283}
-    STX $03A0             ; {162286}
-    STX $039A             ; {162289}
-    STZ $event_flags      ; {162292}
-    STZ $042D             ; {162295}
-    STZ $0439             ; {162298}
-    STZ $BG12NBA          ; {162301}
-    STZ $vram_upload_flags ; {162304}
-    STZ $W12SEL           ; {162307}
-    STZ $03C3             ; {162310}
-    STZ $W34SEL           ; {162313}
-    STZ $WOBJSEL          ; {162316}
-    STZ $MOSAIC           ; {162319}
-    LDA #$E0              ; {162322}
-    STA $COLDATA          ; {162324}
-    LDA #$00              ; {162327}
-    STA $coldata_buffer   ; {162329}
-    STA $7F0201           ; {162333}
-    STA $7F0202           ; {162337}
-    STA $cgram_buffer     ; {162341}
-    STA $7F0001           ; {162345}
-    JSL $@lib_0133A6_part3.code_0133A6 ; {162349}
-    LDA $0454             ; {162353}
-    BEQ loc_027A41        ; {162356}
-    STZ $0454             ; {162358}
-    JSL $@lib_0118FC_part5.code_012463 ; {162361}
-    JSL $@lib_0118FC_part5.code_01249C ; {162365}
+    LDX #$0000
+    STX $player_x
+    STX $player_y
+    STX $0382
+    STX $0384
+    STX $joy_pressed
+    STX $03D4
+    STX $03D6
+    STX $03D8
+    STX $038A
+    STX $038C
+    STX $joy_block_mask
+    STX $0433
+    STX $0433
+    STX $0458
+    STX $0464
+    STX $0468
+    LDX #$06AA
+    STX $039E
+    STX $03A0
+    STX $039A
+    STZ $event_flags
+    STZ $042D
+    STZ $0439
+    STZ $BG12NBA
+    STZ $vram_upload_flags
+    STZ $W12SEL
+    STZ $03C3
+    STZ $W34SEL
+    STZ $WOBJSEL
+    STZ $MOSAIC
+    LDA #$E0
+    STA $COLDATA
+    LDA #$00
+    STA $coldata_buffer
+    STA $7F0201
+    STA $7F0202
+    STA $cgram_buffer
+    STA $7F0001
+    JSL $@lib_0133A6_part3.code_0133A6
+    LDA $0454
+    BEQ loc_027A41
+    STZ $0454
+    JSL $@lib_0118FC_part5.code_012463
+    JSL $@lib_0118FC_part5.code_01249C
 
   loc_027A41:
-    JSL $@lib_027781_part2.code_027723 ; {162369}
-    REP #$20              ; {162373}
-    LDA $location_id      ; {162375}
-    ASL                   ; {162378}
-    TAX                   ; {162379}
-    SEP #$20              ; {162380}
-    LDA $@lib_017504.unk14_017504+28, X ; {162382}
-    STA $map_width_pages  ; {162386}
-    LDA $@lib_017504.unk14_017504+29, X ; {162389}
-    STA $map_height_pages ; {162393}
-    JSL $@engine_000000.code_0012AF ; {162396}
-    JSL $@engine_000000.code_0012DE ; {162400}
-    JSL $@lib_011395.code_011395 ; {162404}
-    JSL $@lib_0112F5.code_0112F5 ; {162408}
-    JSL $@lib_0133A6_part1.code_01157E ; {162412}
-    JSL $@lib_011395.code_011445 ; {162416}
-    JSL $@lib_0114D0.code_0114D0 ; {162420}
-    JSL $@lib_0114E4.code_0114E4 ; {162424}
-    JSL $@lib_0133A6_part1.code_0115F1 ; {162428}
-    JSL $@lib_027781_part2.code_0276EE ; {162432}
-    JSL $@lib_027781_part2.code_027706 ; {162436}
-    JSL $@engine_000000.code_0005A6 ; {162440}
-    JSL $@engine_000000.code_0005A6 ; {162444}
-    JSL $@lib_027781_part1.code_0273F9 ; {162448}
-    LDA $location_id      ; {162452}
-    CMP #$10              ; {162455}
-    BEQ loc_027A9F        ; {162457}
-    JSL $@lib_01020E.code_01020E ; {162459}
+    JSL $@lib_027781_part2.code_027723
+    REP #$20
+    LDA $location_id
+    ASL 
+    TAX 
+    SEP #$20
+    LDA $@lib_017504.unk14_017504+28, X
+    STA $map_width_pages
+    LDA $@lib_017504.unk14_017504+29, X
+    STA $map_height_pages
+    JSL $@engine_000000.code_0012AF
+    JSL $@engine_000000.code_0012DE
+    JSL $@lib_011395.code_011395
+    JSL $@lib_0112F5.code_0112F5
+    JSL $@lib_0133A6_part1.code_01157E
+    JSL $@lib_011395.code_011445
+    JSL $@lib_0114D0.code_0114D0
+    JSL $@lib_0114E4.code_0114E4
+    JSL $@lib_0133A6_part1.code_0115F1
+    JSL $@lib_027781_part2.code_0276EE
+    JSL $@lib_027781_part2.code_027706
+    JSL $@engine_000000.code_0005A6
+    JSL $@engine_000000.code_0005A6
+    JSL $@lib_027781_part1.code_0273F9
+    LDA $location_id
+    CMP #$10
+    BEQ loc_027A9F
+    JSL $@lib_01020E.code_01020E
 
   loc_027A9F:
-    LDA #$01              ; {162463}
-    TSB $vram_upload_flags ; {162465}
-    STZ $031E             ; {162468}
-    STZ $03B4             ; {162471}
-    LDX $frame_counter    ; {162474}
-    STX $rng_state+1      ; {162477}
-    LDX #$FFFF            ; {162480}
-    STX $joy_release_latch ; {162483}
-    STX $frame_counter    ; {162486}
-    LDA #$00              ; {162489}
-    STA $WH0              ; {162491}
-    DEC                   ; {162494}
-    STA $WH1              ; {162495}
-    JSL $@lib_shared_027260.code_027260 ; {162498}
-    LDA $1A7D             ; {162502}
-    BIT #$04              ; {162505}
-    BNE loc_027AD2        ; {162507}
-    LDA #$1F              ; {162509}
-    STA $0332             ; {162511}
+    LDA #$01
+    TSB $vram_upload_flags
+    STZ $031E
+    STZ $03B4
+    LDX $frame_counter
+    STX $rng_state+1
+    LDX #$FFFF
+    STX $joy_release_latch
+    STX $frame_counter
+    LDA #$00
+    STA $WH0
+    DEC 
+    STA $WH1
+    JSL $@lib_shared_027260.code_027260
+    LDA $1A7D
+    BIT #$04
+    BNE loc_027AD2
+    LDA #$1F
+    STA $0332
 
   loc_027AD2:
-    RTL                   ; {162514}
+    RTL 
 }

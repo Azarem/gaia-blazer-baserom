@@ -9,67 +9,67 @@
 ---------------------------------------------
 
 code_0FA7C4 {
-    PHX                   ; {1025988}
-    LDX #$0000            ; {1025989}
+    PHX 
+    LDX #$0000
 
   loc_0FA7C8:
-    LDA #$0090            ; {1025992}
-    STA $7E7000, X        ; {1025995}
-    LDA #$7100            ; {1025999}
-    STA $7E7001, X        ; {1026002}
-    INX                   ; {1026006}
-    INX                   ; {1026007}
-    INX                   ; {1026008}
-    CPX #$002A            ; {1026009}
-    BNE loc_0FA7C8        ; {1026012}
-    LDA #$0000            ; {1026014}
-    STA $7E7000, X        ; {1026017}
-    PLX                   ; {1026021}
-    COP [91]              ; {1026022}
-    PHX                   ; {1026024}
-    LDA $scroll_bg1_x     ; {1026025}
-    LSR                   ; {1026028}
-    STA $00               ; {1026029}
-    LDA $scroll_bg1_y     ; {1026031}
-    LSR                   ; {1026034}
-    STA $02               ; {1026035}
-    LDA $frame_counter    ; {1026037}
-    LSR                   ; {1026040}
-    LSR                   ; {1026041}
-    CLC                   ; {1026042}
-    ADC $02               ; {1026043}
-    AND #$000F            ; {1026045}
-    ASL                   ; {1026048}
-    TAX                   ; {1026049}
-    LDY #$0000            ; {1026050}
-    SEP #$20              ; {1026053}
-    PHB                   ; {1026055}
-    LDA #$7E              ; {1026056}
-    PHA                   ; {1026058}
-    PLB                   ; {1026059}
-    REP #$20              ; {1026060}
+    LDA #$0090
+    STA $7E7000, X
+    LDA #$7100
+    STA $7E7001, X
+    INX 
+    INX 
+    INX 
+    CPX #$002A
+    BNE loc_0FA7C8
+    LDA #$0000
+    STA $7E7000, X
+    PLX 
+    COP [91]
+    PHX 
+    LDA $scroll_bg1_x
+    LSR 
+    STA $00
+    LDA $scroll_bg1_y
+    LSR 
+    STA $02
+    LDA $frame_counter
+    LSR 
+    LSR 
+    CLC 
+    ADC $02
+    AND #$000F
+    ASL 
+    TAX 
+    LDY #$0000
+    SEP #$20
+    PHB 
+    LDA #$7E
+    PHA 
+    PLB 
+    REP #$20
 
   loc_0FA80E:
-    LDA $@word_0FA834, X  ; {1026062}
-    CLC                   ; {1026066}
-    ADC $00               ; {1026067}
-    STA $7100, Y          ; {1026069}
-    INX                   ; {1026072}
-    INX                   ; {1026073}
-    INY                   ; {1026074}
-    INY                   ; {1026075}
-    CPY #$0020            ; {1026076}
-    BNE loc_0FA80E        ; {1026079}
-    PLB                   ; {1026081}
-    SEP #$20              ; {1026082}
-    LDA #$0F              ; {1026084}
-    XBA                   ; {1026086}
-    LDA #$7E              ; {1026087}
-    LDY #$7000            ; {1026089}
-    JSL $@lib_01186E.code_01186E ; {1026092}
-    REP #$20              ; {1026096}
-    PLX                   ; {1026098}
-    RTL                   ; {1026099}
+    LDA $@word_0FA834, X
+    CLC 
+    ADC $00
+    STA $7100, Y
+    INX 
+    INX 
+    INY 
+    INY 
+    CPY #$0020
+    BNE loc_0FA80E
+    PLB 
+    SEP #$20
+    LDA #$0F
+    XBA 
+    LDA #$7E
+    LDY #$7000
+    JSL $@lib_01186E.code_01186E
+    REP #$20
+    PLX 
+    RTL 
 }
 ---------------------------------------------
 

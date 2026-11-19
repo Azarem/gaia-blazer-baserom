@@ -34,66 +34,66 @@ asciistring_026551 |[10][02:2], I think [N]I was born in the [N]wrong generation
 asciistring_0266DB |[10]-------- [JMP:&w5_shared_02706C.asciistring_0270DF]|
 
 code_0266E8 {
-    COP [81] ( #09, #03 ) ; {157416}
-    COP [83]              ; {157420}
-    COP [80] ( #03 )      ; {157422}
-    COP [82]              ; {157425}
-    COP [05] ( #$0006 )   ; {157427}
-    COP [80] ( #09 )      ; {157431}
-    COP [82]              ; {157434}
+    COP [81] ( #09, #03 )
+    COP [83]
+    COP [80] ( #03 )
+    COP [82]
+    COP [05] ( #$0006 )
+    COP [80] ( #09 )
+    COP [82]
 }
 
 code_0266FC {
-    COP [80] ( #03 )      ; {157436}
-    COP [82]              ; {157439}
-    COP [15]              ; {157441}
-    COP [17] ( &code_026736 ) ; {157443}
-    COP [91]              ; {157447}
-    RTL                   ; {157449}
+    COP [80] ( #03 )
+    COP [82]
+    COP [15]
+    COP [17] ( &code_026736 )
+    COP [91]
+    RTL 
 }
 
 code_02670A {
-    COP [07] ( #$8902, &code_026723 ) ; {157450}
-    COP [97]              ; {157456}
-    COP [80] ( #08 )      ; {157458}
-    COP [82]              ; {157461}
-    COP [15]              ; {157463}
-    COP [17] ( &code_02673B ) ; {157465}
-    COP [05] ( #$0902 )   ; {157469}
-    COP [16]              ; {157473}
+    COP [07] ( #$8902, &code_026723 )
+    COP [97]
+    COP [80] ( #08 )
+    COP [82]
+    COP [15]
+    COP [17] ( &code_02673B )
+    COP [05] ( #$0902 )
+    COP [16]
 }
 
 code_026723 {
-    COP [17] ( &code_026753 ) ; {157475}
-    COP [80] ( #09 )      ; {157479}
-    COP [82]              ; {157482}
-    COP [80] ( #06 )      ; {157484}
-    COP [82]              ; {157487}
-    COP [15]              ; {157489}
-    COP [91]              ; {157491}
-    RTL                   ; {157493}
+    COP [17] ( &code_026753 )
+    COP [80] ( #09 )
+    COP [82]
+    COP [80] ( #06 )
+    COP [82]
+    COP [15]
+    COP [91]
+    RTL 
 }
 
 code_026736 {
-    COP [01] ( &asciistring_026758 ) ; {157494}
-    RTL                   ; {157498}
+    COP [01] ( &asciistring_026758 )
+    RTL 
 }
 
 code_02673B {
-    COP [01] ( &asciistring_026772 ) ; {157499}
-    COP [1A] ( &lib_014F02.asciistring_014F02, #02, &code_026746 ) ; {157503}
+    COP [01] ( &asciistring_026772 )
+    COP [1A] ( &lib_014F02.asciistring_014F02, #02, &code_026746 )
 }
 
 code_026746 {
-    COP [01] ( &asciistring_026874 ) ; {157510}
-    COP [17] ( &code_026753 ) ; {157514}
-    COP [09] ( #$8902 )   ; {157518}
-    RTL                   ; {157522}
+    COP [01] ( &asciistring_026874 )
+    COP [17] ( &code_026753 )
+    COP [09] ( #$8902 )
+    RTL 
 }
 
 code_026753 {
-    COP [01] ( &asciistring_026921 ) ; {157523}
-    RTL                   ; {157527}
+    COP [01] ( &asciistring_026921 )
+    RTL 
 }
 
 asciistring_026758 |[10][0F]Lisa just keeps [N]crying- [JMP:&w5_shared_02706C.asciistring_0270DF]|
@@ -105,71 +105,71 @@ asciistring_026874 |I see --------- [FIN]I feel like you are [N]far away even th
 asciistring_026921 |[10][::]I would say goodbye, [N]but I know I am going [N]to cry- [FIN]Please leave while my [N]back is turned- [JMP:&w5_shared_02706C.asciistring_0270DF]|
 
 code_026961 {
-    COP [81] ( #15, #03 ) ; {158049}
-    COP [83]              ; {158053}
-    COP [80] ( #12 )      ; {158055}
-    COP [82]              ; {158058}
-    COP [09] ( #$8007 )   ; {158060}
-    COP [05] ( #$8007 )   ; {158064}
-    LDA $0016, X          ; {158068}
-    ORA #$1000            ; {158071}
-    STA $0016, X          ; {158074}
-    COP [96]              ; {158077}
-    COP [80] ( #17 )      ; {158079}
-    COP [82]              ; {158082}
-    COP [81] ( #15, #03 ) ; {158084}
-    COP [83]              ; {158088}
-    COP [97]              ; {158090}
-    COP [80] ( #17 )      ; {158092}
-    COP [82]              ; {158095}
-    COP [09] ( #$8007 )   ; {158097}
-    COP [05] ( #$0006 )   ; {158101}
-    COP [86]              ; {158105}
-    RTL                   ; {158107}
+    COP [81] ( #15, #03 )
+    COP [83]
+    COP [80] ( #12 )
+    COP [82]
+    COP [09] ( #$8007 )
+    COP [05] ( #$8007 )
+    LDA $0016, X
+    ORA #$1000
+    STA $0016, X
+    COP [96]
+    COP [80] ( #17 )
+    COP [82]
+    COP [81] ( #15, #03 )
+    COP [83]
+    COP [97]
+    COP [80] ( #17 )
+    COP [82]
+    COP [09] ( #$8007 )
+    COP [05] ( #$0006 )
+    COP [86]
+    RTL 
 }
 
 code_02699C {
-    COP [03] ( #40 )      ; {158108}
-    COP [B0] ( @code_0269B5, #$0300 ) ; {158111}
-    COP [1B] ( &code_0269AC, #$0002 ) ; {158118}
+    COP [03] ( #40 )
+    COP [B0] ( @code_0269B5, #$0300 )
+    COP [1B] ( &code_0269AC, #$0002 )
 }
 
 code_0269AC {
-    COP [04]              ; {158124}
-    COP [09] ( #$8006 )   ; {158126}
-    COP [86]              ; {158130}
-    RTL                   ; {158132}
+    COP [04]
+    COP [09] ( #$8006 )
+    COP [86]
+    RTL 
 }
 
 code_0269B5 {
-    COP [A8] ( #$8000, #0E ) ; {158133}
-    COP [A3]              ; {158138}
-    LDA $0372             ; {158140}
-    STA $001C, X          ; {158143}
-    JSR $&code_0269CF     ; {158146}
-    BRK #$85              ; {158149}
-    COP [80] ( #00 )      ; {158151}
-    COP [82]              ; {158154}
-    COP [86]              ; {158156}
-    RTL                   ; {158158}
+    COP [A8] ( #$8000, #0E )
+    COP [A3]
+    LDA $0372
+    STA $001C, X
+    JSR $&code_0269CF
+    BRK #$85
+    COP [80] ( #00 )
+    COP [82]
+    COP [86]
+    RTL 
 }
 
 code_0269CF {
-    COP [1F]              ; {158159}
-    COP [35] ( #40 )      ; {158161}
-    LDA $random_mod_result ; {158164}
-    SEC                   ; {158167}
-    SBC #$0020            ; {158168}
-    CLC                   ; {158171}
-    ADC $0000, X          ; {158172}
-    STA $0000, X          ; {158175}
-    COP [1F]              ; {158178}
-    COP [35] ( #40 )      ; {158180}
-    LDA $random_mod_result ; {158183}
-    SEC                   ; {158186}
-    SBC #$0020            ; {158187}
-    CLC                   ; {158190}
-    ADC $0002, X          ; {158191}
-    STA $0002, X          ; {158194}
-    RTS                   ; {158197}
+    COP [1F]
+    COP [35] ( #40 )
+    LDA $random_mod_result
+    SEC 
+    SBC #$0020
+    CLC 
+    ADC $0000, X
+    STA $0000, X
+    COP [1F]
+    COP [35] ( #40 )
+    LDA $random_mod_result
+    SEC 
+    SBC #$0020
+    CLC 
+    ADC $0002, X
+    STA $0002, X
+    RTS 
 }

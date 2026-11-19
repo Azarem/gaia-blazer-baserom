@@ -5,13 +5,13 @@
 ---------------------------------------------
 
 Cop97_ClearFlipX {
-    TYX                   ; {24832}
-    LDA $001C, X          ; {24833}
-    BIT #$4000            ; {24836}
-    BEQ loc_00610F        ; {24839}
-    AND #$BFFF            ; {24841}
-    STA $001C, X          ; {24844}
+    TYX 
+    LDA $001C, X
+    BIT #$4000
+    BEQ loc_00610F
+    AND #$BFFF
+    STA $001C, X
 
   loc_00610F:
-    BRL cop_handler_006473.loc_0064BF ; {24847}
+    BRL cop_handler_006473.loc_0064BF
 }

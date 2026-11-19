@@ -8,76 +8,76 @@
 ---------------------------------------------
 
 code_024BC8 {
-    COP [3B] ( #$0170, &code_024BDE ) ; {150472}
-    COP [17] ( &w3_shared_022289.code_02229E ) ; {150478}
-    SEP #$20              ; {150482}
-    LDA #$^engine_003005.code_00305F ; {150484}
-    PHA                   ; {150486}
-    REP #$20              ; {150487}
-    LDA #$&engine_003005.code_00305F-1 ; {150489}
-    PHA                   ; {150492}
-    RTL                   ; {150493}
+    COP [3B] ( #$0170, &code_024BDE )
+    COP [17] ( &w3_shared_022289.code_02229E )
+    SEP #$20
+    LDA #$^engine_003005.code_00305F
+    PHA 
+    REP #$20
+    LDA #$&engine_003005.code_00305F-1
+    PHA 
+    RTL 
 }
 
 code_024BDE {
-    COP [85] ( @engine_0026F3.code_00299D ) ; {150494}
-    COP [07] ( #$8805, &code_024C20 ) ; {150499}
-    COP [17] ( &code_024C23 ) ; {150505}
-    COP [18] ( #28, &code_024BF8 ) ; {150509}
-    COP [17] ( &code_024C2D ) ; {150514}
-    BRA loc_024BFF        ; {150518}
+    COP [85] ( @engine_0026F3.code_00299D )
+    COP [07] ( #$8805, &code_024C20 )
+    COP [17] ( &code_024C23 )
+    COP [18] ( #28, &code_024BF8 )
+    COP [17] ( &code_024C2D )
+    BRA loc_024BFF
 }
 
 code_024BF8 {
-    COP [B0] ( @code_024C32, #$2000 ) ; {150520}
+    COP [B0] ( @code_024C32, #$2000 )
 
   loc_024BFF:
-    COP [15]              ; {150527}
-    COP [05] ( #$0001 )   ; {150529}
-    COP [16]              ; {150533}
-    COP [17] ( #$0000 )   ; {150535}
-    COP [81] ( #17, #02 ) ; {150539}
-    COP [83]              ; {150543}
-    COP [81] ( #16, #03 ) ; {150545}
-    COP [83]              ; {150549}
-    COP [17] ( &code_024C28 ) ; {150551}
-    COP [15]              ; {150555}
-    COP [91]              ; {150557}
-    RTL                   ; {150559}
+    COP [15]
+    COP [05] ( #$0001 )
+    COP [16]
+    COP [17] ( #$0000 )
+    COP [81] ( #17, #02 )
+    COP [83]
+    COP [81] ( #16, #03 )
+    COP [83]
+    COP [17] ( &code_024C28 )
+    COP [15]
+    COP [91]
+    RTL 
 }
 
 code_024C20 {
-    COP [86]              ; {150560}
-    RTL                   ; {150562}
+    COP [86]
+    RTL 
 }
 
 code_024C23 {
-    COP [01] ( &asciistring_024C48 ) ; {150563}
-    RTL                   ; {150567}
+    COP [01] ( &asciistring_024C48 )
+    RTL 
 }
 
 code_024C28 {
-    COP [01] ( &asciistring_024CDF ) ; {150568}
-    RTL                   ; {150572}
+    COP [01] ( &asciistring_024CDF )
+    RTL 
 }
 
 code_024C2D {
-    COP [01] ( &asciistring_024D1B ) ; {150573}
-    RTL                   ; {150577}
+    COP [01] ( &asciistring_024D1B )
+    RTL 
 }
 
 code_024C32 {
-    COP [91]              ; {150578}
-    COP [0D] ( #00, #0B, #30, &code_024C3C ) ; {150580}
-    RTL                   ; {150587}
+    COP [91]
+    COP [0D] ( #00, #0B, #30, &code_024C3C )
+    RTL 
 }
 
 code_024C3C {
-    COP [01] ( &asciistring_024D45 ) ; {150588}
-    BRK #$5E              ; {150592}
-    COP [0A] ( #28 )      ; {150594}
-    COP [86]              ; {150597}
-    RTL                   ; {150599}
+    COP [01] ( &asciistring_024D45 )
+    BRK #$5E
+    COP [0A] ( #28 )
+    COP [86]
+    RTL 
 }
 
 asciistring_024C48 |[10]I am a guard- [N]But I am tired of my [N]job- [N]I came here to relax- [FIN][0F]While listening to the[N]guard, [02:2] sees a[N]card under the guard s[N]feet- [FIN]But [02:2] can t [N]get it because the [N]guard is standing on [N]it- [0F][JMP:&w5_shared_02706C.asciistring_0270DF]|

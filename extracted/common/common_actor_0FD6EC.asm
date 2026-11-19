@@ -3,57 +3,57 @@
 ---------------------------------------------
 
 code_0FD6EC {
-    COP [A5] ( &code_0FD6F6, &code_0FD6FC, &code_0FD724, &code_0FD72A ) ; {1038060}
+    COP [A5] ( &code_0FD6F6, &code_0FD6FC, &code_0FD724, &code_0FD72A )
 }
 
 code_0FD6F6 {
-    COP [9F] ( #$FFF0 )   ; {1038070}
-    BRA loc_0FD711        ; {1038074}
+    COP [9F] ( #$FFF0 )
+    BRA loc_0FD711
 }
 
 code_0FD6FC {
-    COP [9F] ( #$0010 )   ; {1038076}
+    COP [9F] ( #$0010 )
 
   loc_0FD700:
-    LDA $0016, X          ; {1038080}
-    ORA #$0100            ; {1038083}
-    STA $0016, X          ; {1038086}
-    COP [A2] ( #20 )      ; {1038089}
-    COP [80] ( #25 )      ; {1038092}
-    COP [82]              ; {1038095}
+    LDA $0016, X
+    ORA #$0100
+    STA $0016, X
+    COP [A2] ( #20 )
+    COP [80] ( #25 )
+    COP [82]
 
   loc_0FD711:
-    LDA $0016, X          ; {1038097}
-    AND #$FEFF            ; {1038100}
-    STA $0016, X          ; {1038103}
-    COP [A2] ( #30 )      ; {1038106}
-    COP [80] ( #24 )      ; {1038109}
-    COP [82]              ; {1038112}
-    BRA loc_0FD700        ; {1038114}
+    LDA $0016, X
+    AND #$FEFF
+    STA $0016, X
+    COP [A2] ( #30 )
+    COP [80] ( #24 )
+    COP [82]
+    BRA loc_0FD700
 }
 
 code_0FD724 {
-    COP [A0] ( #$FFF8 )   ; {1038116}
-    BRA loc_0FD73F        ; {1038120}
+    COP [A0] ( #$FFF8 )
+    BRA loc_0FD73F
 }
 
 code_0FD72A {
-    COP [A0] ( #$0018 )   ; {1038122}
+    COP [A0] ( #$0018 )
 
   loc_0FD72E:
-    LDA $0016, X          ; {1038126}
-    ORA #$0100            ; {1038129}
-    STA $0016, X          ; {1038132}
-    COP [A2] ( #20 )      ; {1038135}
-    COP [80] ( #27 )      ; {1038138}
-    COP [82]              ; {1038141}
+    LDA $0016, X
+    ORA #$0100
+    STA $0016, X
+    COP [A2] ( #20 )
+    COP [80] ( #27 )
+    COP [82]
 
   loc_0FD73F:
-    LDA $0016, X          ; {1038143}
-    AND #$FEFF            ; {1038146}
-    STA $0016, X          ; {1038149}
-    COP [A2] ( #30 )      ; {1038152}
-    COP [80] ( #26 )      ; {1038155}
-    COP [82]              ; {1038158}
-    BRA loc_0FD72E        ; {1038160}
+    LDA $0016, X
+    AND #$FEFF
+    STA $0016, X
+    COP [A2] ( #30 )
+    COP [80] ( #26 )
+    COP [82]
+    BRA loc_0FD72E
 }

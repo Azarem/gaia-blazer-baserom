@@ -7,31 +7,31 @@
 ---------------------------------------------
 
 code_0272B8 {
-    LDA $18               ; {160440}
-    PHA                   ; {160442}
-    SEP #$20              ; {160443}
-    LDA $map_width_pages  ; {160445}
-    JSL $@lib_shared_0131D1.code_0131D1 ; {160448}
-    STA $02, S            ; {160452}
-    LDA $16               ; {160454}
-    LSR                   ; {160456}
-    LSR                   ; {160457}
-    LSR                   ; {160458}
-    LSR                   ; {160459}
-    AND #$0F              ; {160460}
-    CLC                   ; {160462}
-    ADC $01, S            ; {160463}
-    STA $01, S            ; {160465}
-    LDA $17               ; {160467}
-    CLC                   ; {160469}
-    ADC $02, S            ; {160470}
-    STA $02, S            ; {160472}
-    REP #$20              ; {160474}
-    PLX                   ; {160476}
-    CPX #$4000            ; {160477}
-    BCC loc_0272E5        ; {160480}
-    LDX #$0000            ; {160482}
+    LDA $18
+    PHA 
+    SEP #$20
+    LDA $map_width_pages
+    JSL $@lib_shared_0131D1.code_0131D1
+    STA $02, S
+    LDA $16
+    LSR 
+    LSR 
+    LSR 
+    LSR 
+    AND #$0F
+    CLC 
+    ADC $01, S
+    STA $01, S
+    LDA $17
+    CLC 
+    ADC $02, S
+    STA $02, S
+    REP #$20
+    PLX 
+    CPX #$4000
+    BCC loc_0272E5
+    LDX #$0000
 
   loc_0272E5:
-    RTL                   ; {160485}
+    RTL 
 }

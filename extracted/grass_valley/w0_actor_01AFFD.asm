@@ -5,40 +5,40 @@
 ---------------------------------------------
 
 code_01AFFD {
-    SEP #$20              ; {110589}
-    LDA $location_id      ; {110591}
-    LDY #$&unk16_01B042   ; {110594}
-    CMP #$05              ; {110597}
-    BEQ loc_01B035        ; {110599}
-    LDY #$&unk16_01B063   ; {110601}
-    CMP #$06              ; {110604}
-    BEQ loc_01B035        ; {110606}
-    LDY #$&unk16_01B0A4   ; {110608}
-    CMP #$07              ; {110611}
-    BEQ loc_01B035        ; {110613}
-    LDY #$&unk16_01B0B5   ; {110615}
-    CMP #$08              ; {110618}
-    BEQ loc_01B035        ; {110620}
-    LDY #$&unk16_01B106   ; {110622}
-    CMP #$09              ; {110625}
-    BEQ loc_01B035        ; {110627}
-    LDY #$&unk16_01B13F   ; {110629}
-    CMP #$0B              ; {110632}
-    BEQ loc_01B035        ; {110634}
-    LDY #$&unk16_01B148   ; {110636}
-    CMP #$0C              ; {110639}
-    BEQ loc_01B035        ; {110641}
-    BRA loc_01B03D        ; {110643}
+    SEP #$20
+    LDA $location_id
+    LDY #$&unk16_01B042
+    CMP #$05
+    BEQ loc_01B035
+    LDY #$&unk16_01B063
+    CMP #$06
+    BEQ loc_01B035
+    LDY #$&unk16_01B0A4
+    CMP #$07
+    BEQ loc_01B035
+    LDY #$&unk16_01B0B5
+    CMP #$08
+    BEQ loc_01B035
+    LDY #$&unk16_01B106
+    CMP #$09
+    BEQ loc_01B035
+    LDY #$&unk16_01B13F
+    CMP #$0B
+    BEQ loc_01B035
+    LDY #$&unk16_01B148
+    CMP #$0C
+    BEQ loc_01B035
+    BRA loc_01B03D
 
   loc_01B035:
-    STY $03D8             ; {110645}
-    LDA #$^unk16_01B042   ; {110648}
-    STA $03DA             ; {110650}
+    STY $03D8
+    LDA #$^unk16_01B042
+    STA $03DA
 
   loc_01B03D:
-    REP #$20              ; {110653}
-    COP [86]              ; {110655}
-    RTL                   ; {110657}
+    REP #$20
+    COP [86]
+    RTL 
 }
 ---------------------------------------------
 

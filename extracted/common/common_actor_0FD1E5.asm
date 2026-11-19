@@ -5,78 +5,78 @@
 ---------------------------------------------
 
 code_0FD1E5 {
-    COP [AD] ( #08 )      ; {1036773}
-    COP [0C] ( #00, #05, &code_0FD1F5 ) ; {1036776}
-    COP [80] ( #2B )      ; {1036782}
-    COP [82]              ; {1036785}
-    BRA code_0FD1E5       ; {1036787}
+    COP [AD] ( #08 )
+    COP [0C] ( #00, #05, &code_0FD1F5 )
+    COP [80] ( #2B )
+    COP [82]
+    BRA code_0FD1E5
 }
 
 code_0FD1F5 {
-    COP [1F]              ; {1036789}
-    LDA $rng_state+1      ; {1036791}
-    BPL loc_0FD21A        ; {1036794}
-    COP [9A] ( #$0000, &code_0FD206, &code_0FD210, &code_0FD210 ) ; {1036796}
+    COP [1F]
+    LDA $rng_state+1
+    BPL loc_0FD21A
+    COP [9A] ( #$0000, &code_0FD206, &code_0FD210, &code_0FD210 )
 }
 
 code_0FD206 {
-    COP [9B] ( #$0000, &code_0FD261, &code_0FD24E, &code_0FD24E ) ; {1036806}
+    COP [9B] ( #$0000, &code_0FD261, &code_0FD24E, &code_0FD24E )
 }
 
 code_0FD210 {
-    COP [9B] ( #$0000, &code_0FD228, &code_0FD23B, &code_0FD23B ) ; {1036816}
+    COP [9B] ( #$0000, &code_0FD228, &code_0FD23B, &code_0FD23B )
 
   loc_0FD21A:
-    AND #$0003            ; {1036826}
-    BEQ code_0FD228       ; {1036829}
-    DEC                   ; {1036831}
-    BEQ code_0FD23B       ; {1036832}
-    DEC                   ; {1036834}
-    BEQ code_0FD24E       ; {1036835}
-    DEC                   ; {1036837}
-    BEQ code_0FD261       ; {1036838}
+    AND #$0003
+    BEQ code_0FD228
+    DEC 
+    BEQ code_0FD23B
+    DEC 
+    BEQ code_0FD24E
+    DEC 
+    BEQ code_0FD261
 }
 
 code_0FD228 {
-    COP [96]              ; {1036840}
-    COP [80] ( #2C )      ; {1036842}
-    COP [82]              ; {1036845}
-    COP [80] ( #2E )      ; {1036847}
-    COP [82]              ; {1036850}
-    COP [80] ( #2C )      ; {1036852}
-    COP [82]              ; {1036855}
-    BRA code_0FD1E5       ; {1036857}
+    COP [96]
+    COP [80] ( #2C )
+    COP [82]
+    COP [80] ( #2E )
+    COP [82]
+    COP [80] ( #2C )
+    COP [82]
+    BRA code_0FD1E5
 }
 
 code_0FD23B {
-    COP [96]              ; {1036859}
-    COP [80] ( #2C )      ; {1036861}
-    COP [82]              ; {1036864}
-    COP [80] ( #2D )      ; {1036866}
-    COP [82]              ; {1036869}
-    COP [80] ( #2C )      ; {1036871}
-    COP [82]              ; {1036874}
-    BRA code_0FD1E5       ; {1036876}
+    COP [96]
+    COP [80] ( #2C )
+    COP [82]
+    COP [80] ( #2D )
+    COP [82]
+    COP [80] ( #2C )
+    COP [82]
+    BRA code_0FD1E5
 }
 
 code_0FD24E {
-    COP [97]              ; {1036878}
-    COP [80] ( #2C )      ; {1036880}
-    COP [82]              ; {1036883}
-    COP [80] ( #2D )      ; {1036885}
-    COP [82]              ; {1036888}
-    COP [80] ( #2C )      ; {1036890}
-    COP [82]              ; {1036893}
-    BRA code_0FD1E5       ; {1036895}
+    COP [97]
+    COP [80] ( #2C )
+    COP [82]
+    COP [80] ( #2D )
+    COP [82]
+    COP [80] ( #2C )
+    COP [82]
+    BRA code_0FD1E5
 }
 
 code_0FD261 {
-    COP [97]              ; {1036897}
-    COP [80] ( #2C )      ; {1036899}
-    COP [82]              ; {1036902}
-    COP [80] ( #2E )      ; {1036904}
-    COP [82]              ; {1036907}
-    COP [80] ( #2C )      ; {1036909}
-    COP [82]              ; {1036912}
-    BRL code_0FD1E5       ; {1036914}
+    COP [97]
+    COP [80] ( #2C )
+    COP [82]
+    COP [80] ( #2E )
+    COP [82]
+    COP [80] ( #2C )
+    COP [82]
+    BRL code_0FD1E5
 }

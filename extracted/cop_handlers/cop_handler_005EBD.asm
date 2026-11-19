@@ -6,15 +6,15 @@
 ---------------------------------------------
 
 Cop83_AnimStepRepeat {
-    TYX                   ; {24253}
+    TYX 
 
   loc_005EBE:
-    JSL $@engine_000000.code_0008F3 ; {24254}
-    BCC loc_005ECC        ; {24258}
-    DEC $002A, X          ; {24260}
-    BNE loc_005EBE        ; {24263}
-    BRL cop_handler_006473.loc_0064BF ; {24265}
+    JSL $@engine_000000.code_0008F3
+    BCC loc_005ECC
+    DEC $002A, X
+    BNE loc_005EBE
+    BRL cop_handler_006473.loc_0064BF
 
   loc_005ECC:
-    BRL cop_handler_006473.loc_0064C9 ; {24268}
+    BRL cop_handler_006473.loc_0064C9
 }

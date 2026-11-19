@@ -7,20 +7,20 @@
 ---------------------------------------------
 
 code_026E9D {
-    COP [14] ( #$0163, &code_026EA4 ) ; {159389}
-    RTL                   ; {159395}
+    COP [14] ( #$0163, &code_026EA4 )
+    RTL 
 }
 
 code_026EA4 {
-    JSL $@w0_shared_01B161.code_01B161 ; {159396}
-    COP [17] ( &code_026F29 ) ; {159400}
-    SEP #$20              ; {159404}
-    LDA #$^w3_shared_022289.code_022289 ; {159406}
-    PHA                   ; {159408}
-    REP #$20              ; {159409}
-    LDA #$&w3_shared_022289.code_022289-1 ; {159411}
-    PHA                   ; {159414}
-    RTL                   ; {159415}
+    JSL $@w0_shared_01B161.code_01B161
+    COP [17] ( &code_026F29 )
+    SEP #$20
+    LDA #$^w3_shared_022289.code_022289
+    PHA 
+    REP #$20
+    LDA #$&w3_shared_022289.code_022289-1
+    PHA 
+    RTL 
 }
 ---------------------------------------------
 
@@ -28,6 +28,6 @@ asciistring_026EB8 |[10]The Zantetsu Sword is [N]found in Leo s [N]laboratory- [
 ---------------------------------------------
 
 code_026F29 {
-    COP [01] ( &asciistring_026EB8 ) ; {159529}
-    BRL w5_shared_026DF2.code_026E79 ; {159533}
+    COP [01] ( &asciistring_026EB8 )
+    BRL w5_shared_026DF2.code_026E79
 }

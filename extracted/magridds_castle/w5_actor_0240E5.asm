@@ -6,34 +6,34 @@
 ---------------------------------------------
 
 code_0240E5 {
-    COP [14] ( #$015F, &code_0240EC ) ; {147685}
-    RTL                   ; {147691}
+    COP [14] ( #$015F, &code_0240EC )
+    RTL 
 }
 
 code_0240EC {
-    COP [30] ( #$015F, &code_024111, #04 ) ; {147692}
-    COP [85] ( @engine_0026F3.code_00299D ) ; {147699}
-    COP [17] ( &code_024101 ) ; {147704}
-    COP [15]              ; {147708}
-    COP [91]              ; {147710}
-    RTL                   ; {147712}
+    COP [30] ( #$015F, &code_024111, #04 )
+    COP [85] ( @engine_0026F3.code_00299D )
+    COP [17] ( &code_024101 )
+    COP [15]
+    COP [91]
+    RTL 
 }
 
 code_024101 {
-    COP [14] ( #$0195, &code_02410C ) ; {147713}
-    COP [01] ( &asciistring_024194 ) ; {147719}
-    RTL                   ; {147723}
+    COP [14] ( #$0195, &code_02410C )
+    COP [01] ( &asciistring_024194 )
+    RTL 
 }
 
 code_02410C {
-    COP [01] ( &asciistring_0241F2 ) ; {147724}
-    RTL                   ; {147728}
+    COP [01] ( &asciistring_0241F2 )
+    RTL 
 }
 
 code_024111 {
-    COP [01] ( &asciistring_024118 ) ; {147729}
-    COP [86]              ; {147733}
-    RTL                   ; {147735}
+    COP [01] ( &asciistring_024118 )
+    COP [86]
+    RTL 
 }
 
 asciistring_024118 |[10][0E:3C]Thank you very much- [FIN]There are many thorns [N]in the basement- [FIN]If you free the [N]soldier right in front[N]of where I have been [N]captured, [FIN]you will receive [N]the Elemental Mail- [JMP:&w5_shared_02706C.asciistring_0270DF]|

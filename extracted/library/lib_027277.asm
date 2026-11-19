@@ -9,38 +9,38 @@
 ---------------------------------------------
 
 code_027277 {
-    PHP                   ; {160375}
-    PHX                   ; {160376}
-    SEP #$20              ; {160377}
-    LDA $03CD             ; {160379}
-    BEQ loc_0272B5        ; {160382}
-    STZ $03CD             ; {160384}
-    LDX #$0000            ; {160387}
-    TXY                   ; {160390}
-    LDA $03CC             ; {160391}
-    STA $M7A              ; {160394}
-    STZ $M7A              ; {160397}
+    PHP 
+    PHX 
+    SEP #$20
+    LDA $03CD
+    BEQ loc_0272B5
+    STZ $03CD
+    LDX #$0000
+    TXY 
+    LDA $03CC
+    STA $M7A
+    STZ $M7A
 
   loc_027290:
-    LDA $&data_00F9F7.binary_00FC84, Y ; {160400}
-    STA $M7B              ; {160403}
-    STA $M7B              ; {160406}
-    REP #$20              ; {160409}
-    LDA $MPYM             ; {160411}
-    STA $7E7900, X        ; {160414}
-    STA $7E7B00, X        ; {160418}
-    TYA                   ; {160422}
-    SEP #$20              ; {160423}
-    CLC                   ; {160425}
-    ADC $03CE             ; {160426}
-    TAY                   ; {160429}
-    INX                   ; {160430}
-    INX                   ; {160431}
-    CPX #$0200            ; {160432}
-    BNE loc_027290        ; {160435}
+    LDA $&data_00F9F7.binary_00FC84, Y
+    STA $M7B
+    STA $M7B
+    REP #$20
+    LDA $MPYM
+    STA $7E7900, X
+    STA $7E7B00, X
+    TYA 
+    SEP #$20
+    CLC 
+    ADC $03CE
+    TAY 
+    INX 
+    INX 
+    CPX #$0200
+    BNE loc_027290
 
   loc_0272B5:
-    PLX                   ; {160437}
-    PLP                   ; {160438}
-    RTL                   ; {160439}
+    PLX 
+    PLP 
+    RTL 
 }

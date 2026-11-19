@@ -14,305 +14,305 @@
 ---------------------------------------------
 
 code_006E28 {
-    COP [07] ( #$9F05, &code_006E34 ) ; {28200}
-    COP [07] ( #$9F04, &common_actor_006E28_part2.code_007264 ) ; {28206}
+    COP [07] ( #$9F05, &code_006E34 )
+    COP [07] ( #$9F04, &common_actor_006E28_part2.code_007264 )
 }
 
 code_006E34 {
-    INC $0454             ; {28212}
-    COP [85] ( @common_actor_006E28_part2.code_007141 ) ; {28215}
-    LDA #$3080            ; {28220}
-    TSB $joy_block_mask   ; {28223}
-    COP [A3]              ; {28226}
-    STX $player_actor     ; {28228}
-    STZ $040D             ; {28231}
-    STZ $0410             ; {28234}
-    COP [85] ( @code_00708E ) ; {28237}
-    LDA $0000, X          ; {28242}
-    CMP #$0070            ; {28245}
-    BEQ code_006EA0       ; {28248}
-    CMP #$0030            ; {28250}
-    BNE loc_006E62        ; {28253}
-    BRL code_006EDE       ; {28255}
+    INC $0454
+    COP [85] ( @common_actor_006E28_part2.code_007141 )
+    LDA #$3080
+    TSB $joy_block_mask
+    COP [A3]
+    STX $player_actor
+    STZ $040D
+    STZ $0410
+    COP [85] ( @code_00708E )
+    LDA $0000, X
+    CMP #$0070
+    BEQ code_006EA0
+    CMP #$0030
+    BNE loc_006E62
+    BRL code_006EDE
 
   loc_006E62:
-    CMP #$01B0            ; {28258}
-    BNE loc_006E6A        ; {28261}
-    BRL code_006FD4       ; {28263}
+    CMP #$01B0
+    BNE loc_006E6A
+    BRL code_006FD4
 
   loc_006E6A:
-    CMP #$0170            ; {28266}
-    BNE loc_006E72        ; {28269}
-    BRL code_007026       ; {28271}
+    CMP #$0170
+    BNE loc_006E72
+    BRL code_007026
 
   loc_006E72:
-    LDA $0002, X          ; {28274}
-    CMP #$0170            ; {28277}
-    BNE loc_006E7D        ; {28280}
-    BRL code_006F30       ; {28282}
+    LDA $0002, X
+    CMP #$0170
+    BNE loc_006E7D
+    BRL code_006F30
 
   loc_006E7D:
-    CMP #$0070            ; {28285}
-    BNE loc_006E85        ; {28288}
-    BRL code_006F82       ; {28290}
+    CMP #$0070
+    BNE loc_006E85
+    BRL code_006F82
 
   loc_006E85:
-    BRL loc_007073        ; {28293}
+    BRL loc_007073
 
   loc_006E88:
-    LDA $joy_pressed      ; {28296}
-    BIT #$0400            ; {28299}
-    BNE loc_006EA7        ; {28302}
-    BIT #$8000            ; {28304}
-    BEQ code_006EA0       ; {28307}
-    BRK #$98              ; {28309}
-    COP [10] ( #$0100, #00, #$0070, #$0050 ) ; {28311}
+    LDA $joy_pressed
+    BIT #$0400
+    BNE loc_006EA7
+    BIT #$8000
+    BEQ code_006EA0
+    BRK #$98
+    COP [10] ( #$0100, #00, #$0070, #$0050 )
 
   code_006EA0:
-    COP [80] ( #10 )      ; {28320}
-    COP [82]              ; {28323}
-    BRA loc_006E88        ; {28325}
+    COP [80] ( #10 )
+    COP [82]
+    BRA loc_006E88
 
   loc_006EA7:
-    COP [08] ( #$9B00, &code_006EA0 ) ; {28327}
-    COP [80] ( #01 )      ; {28333}
-    COP [82]              ; {28336}
-    BRK #$96              ; {28338}
-    COP [80] ( #24 )      ; {28340}
-    COP [82]              ; {28343}
-    COP [80] ( #2F )      ; {28345}
-    COP [82]              ; {28348}
-    BRL code_006EDE       ; {28350}
+    COP [08] ( #$9B00, &code_006EA0 )
+    COP [80] ( #01 )
+    COP [82]
+    BRK #$96
+    COP [80] ( #24 )
+    COP [82]
+    COP [80] ( #2F )
+    COP [82]
+    BRL code_006EDE
 
   loc_006EC1:
-    LDA $joy_pressed      ; {28353}
-    BIT #$0800            ; {28356}
-    BNE loc_006EE5        ; {28359}
-    BIT #$0100            ; {28361}
-    BNE loc_006EF9        ; {28364}
-    BIT #$8000            ; {28366}
-    BEQ code_006EDE       ; {28369}
-    BRK #$98              ; {28371}
-    COP [10] ( #$0200, #00, #$0070, #$0050 ) ; {28373}
+    LDA $joy_pressed
+    BIT #$0800
+    BNE loc_006EE5
+    BIT #$0100
+    BNE loc_006EF9
+    BIT #$8000
+    BEQ code_006EDE
+    BRK #$98
+    COP [10] ( #$0200, #00, #$0070, #$0050 )
 
   code_006EDE:
-    COP [80] ( #02 )      ; {28382}
-    COP [82]              ; {28385}
-    BRA loc_006EC1        ; {28387}
+    COP [80] ( #02 )
+    COP [82]
+    BRA loc_006EC1
 
   loc_006EE5:
-    COP [80] ( #03 )      ; {28389}
-    COP [82]              ; {28392}
-    BRK #$96              ; {28394}
-    COP [80] ( #25 )      ; {28396}
-    COP [82]              ; {28399}
-    COP [80] ( #2E )      ; {28401}
-    COP [82]              ; {28404}
-    BRL code_006EA0       ; {28406}
+    COP [80] ( #03 )
+    COP [82]
+    BRK #$96
+    COP [80] ( #25 )
+    COP [82]
+    COP [80] ( #2E )
+    COP [82]
+    BRL code_006EA0
 
   loc_006EF9:
-    COP [08] ( #$9B01, &code_006EDE ) ; {28409}
-    COP [80] ( #03 )      ; {28415}
-    COP [82]              ; {28418}
-    BRK #$96              ; {28420}
-    COP [80] ( #26 )      ; {28422}
-    COP [82]              ; {28425}
-    COP [80] ( #2F )      ; {28427}
-    COP [82]              ; {28430}
-    BRL code_006F30       ; {28432}
+    COP [08] ( #$9B01, &code_006EDE )
+    COP [80] ( #03 )
+    COP [82]
+    BRK #$96
+    COP [80] ( #26 )
+    COP [82]
+    COP [80] ( #2F )
+    COP [82]
+    BRL code_006F30
 
   loc_006F13:
-    LDA $joy_pressed      ; {28435}
-    BIT #$0200            ; {28438}
-    BNE loc_006F37        ; {28441}
-    BIT #$0800            ; {28443}
-    BNE loc_006F4B        ; {28446}
-    BIT #$8000            ; {28448}
-    BEQ code_006F30       ; {28451}
-    BRK #$98              ; {28453}
-    COP [10] ( #$0300, #00, #$0070, #$0050 ) ; {28455}
+    LDA $joy_pressed
+    BIT #$0200
+    BNE loc_006F37
+    BIT #$0800
+    BNE loc_006F4B
+    BIT #$8000
+    BEQ code_006F30
+    BRK #$98
+    COP [10] ( #$0300, #00, #$0070, #$0050 )
 
   code_006F30:
-    COP [80] ( #02 )      ; {28464}
-    COP [82]              ; {28467}
-    BRA loc_006F13        ; {28469}
+    COP [80] ( #02 )
+    COP [82]
+    BRA loc_006F13
 
   loc_006F37:
-    COP [80] ( #03 )      ; {28471}
-    COP [82]              ; {28474}
-    BRK #$96              ; {28476}
-    COP [80] ( #27 )      ; {28478}
-    COP [82]              ; {28481}
-    COP [80] ( #2F )      ; {28483}
-    COP [82]              ; {28486}
-    BRL loc_006EC1        ; {28488}
+    COP [80] ( #03 )
+    COP [82]
+    BRK #$96
+    COP [80] ( #27 )
+    COP [82]
+    COP [80] ( #2F )
+    COP [82]
+    BRL loc_006EC1
 
   loc_006F4B:
-    COP [08] ( #$9B02, &code_006F30 ) ; {28491}
-    COP [80] ( #03 )      ; {28497}
-    COP [82]              ; {28500}
-    BRK #$96              ; {28502}
-    COP [80] ( #29 )      ; {28504}
-    COP [82]              ; {28507}
-    COP [80] ( #2E )      ; {28509}
-    COP [82]              ; {28512}
-    BRL loc_006F65        ; {28514}
+    COP [08] ( #$9B02, &code_006F30 )
+    COP [80] ( #03 )
+    COP [82]
+    BRK #$96
+    COP [80] ( #29 )
+    COP [82]
+    COP [80] ( #2E )
+    COP [82]
+    BRL loc_006F65
 
   loc_006F65:
-    LDA $joy_pressed      ; {28517}
-    BIT #$0400            ; {28520}
-    BNE loc_006F89        ; {28523}
-    BIT #$0100            ; {28525}
-    BNE loc_006F9D        ; {28528}
-    BIT #$8000            ; {28530}
-    BEQ code_006F82       ; {28533}
-    BRK #$98              ; {28535}
-    COP [10] ( #$0400, #00, #$0070, #$0050 ) ; {28537}
+    LDA $joy_pressed
+    BIT #$0400
+    BNE loc_006F89
+    BIT #$0100
+    BNE loc_006F9D
+    BIT #$8000
+    BEQ code_006F82
+    BRK #$98
+    COP [10] ( #$0400, #00, #$0070, #$0050 )
 
   code_006F82:
-    COP [80] ( #10 )      ; {28546}
-    COP [82]              ; {28549}
-    BRA loc_006F65        ; {28551}
+    COP [80] ( #10 )
+    COP [82]
+    BRA loc_006F65
 
   loc_006F89:
-    COP [80] ( #01 )      ; {28553}
-    COP [82]              ; {28556}
-    BRK #$96              ; {28558}
-    COP [80] ( #28 )      ; {28560}
-    COP [82]              ; {28563}
-    COP [80] ( #2F )      ; {28565}
-    COP [82]              ; {28568}
-    BRL loc_006F13        ; {28570}
+    COP [80] ( #01 )
+    COP [82]
+    BRK #$96
+    COP [80] ( #28 )
+    COP [82]
+    COP [80] ( #2F )
+    COP [82]
+    BRL loc_006F13
 
   loc_006F9D:
-    COP [08] ( #$9B03, &code_006F82 ) ; {28573}
-    COP [80] ( #01 )      ; {28579}
-    COP [82]              ; {28582}
-    BRK #$96              ; {28584}
-    COP [80] ( #2A )      ; {28586}
-    COP [82]              ; {28589}
-    COP [80] ( #2F )      ; {28591}
-    COP [82]              ; {28594}
-    BRL loc_006FB7        ; {28596}
+    COP [08] ( #$9B03, &code_006F82 )
+    COP [80] ( #01 )
+    COP [82]
+    BRK #$96
+    COP [80] ( #2A )
+    COP [82]
+    COP [80] ( #2F )
+    COP [82]
+    BRL loc_006FB7
 
   loc_006FB7:
-    LDA $joy_pressed      ; {28599}
-    BIT #$0200            ; {28602}
-    BNE loc_006FDB        ; {28605}
-    BIT #$0800            ; {28607}
-    BNE loc_006FEF        ; {28610}
-    BIT #$8000            ; {28612}
-    BEQ code_006FD4       ; {28615}
-    BRK #$98              ; {28617}
-    COP [10] ( #$0500, #00, #$0070, #$0050 ) ; {28619}
+    LDA $joy_pressed
+    BIT #$0200
+    BNE loc_006FDB
+    BIT #$0800
+    BNE loc_006FEF
+    BIT #$8000
+    BEQ code_006FD4
+    BRK #$98
+    COP [10] ( #$0500, #00, #$0070, #$0050 )
 
   code_006FD4:
-    COP [80] ( #02 )      ; {28628}
-    COP [82]              ; {28631}
-    BRA loc_006FB7        ; {28633}
+    COP [80] ( #02 )
+    COP [82]
+    BRA loc_006FB7
 
   loc_006FDB:
-    COP [80] ( #03 )      ; {28635}
-    COP [82]              ; {28638}
-    BRK #$96              ; {28640}
-    COP [80] ( #2B )      ; {28642}
-    COP [82]              ; {28645}
-    COP [80] ( #2E )      ; {28647}
-    COP [82]              ; {28650}
-    BRL loc_006F65        ; {28652}
+    COP [80] ( #03 )
+    COP [82]
+    BRK #$96
+    COP [80] ( #2B )
+    COP [82]
+    COP [80] ( #2E )
+    COP [82]
+    BRL loc_006F65
 
   loc_006FEF:
-    COP [08] ( #$9B04, &code_006FD4 ) ; {28655}
-    COP [80] ( #03 )      ; {28661}
-    COP [82]              ; {28664}
-    BRK #$96              ; {28666}
-    COP [80] ( #2C )      ; {28668}
-    COP [82]              ; {28671}
-    COP [80] ( #2E )      ; {28673}
-    COP [82]              ; {28676}
-    BRL loc_007009        ; {28678}
+    COP [08] ( #$9B04, &code_006FD4 )
+    COP [80] ( #03 )
+    COP [82]
+    BRK #$96
+    COP [80] ( #2C )
+    COP [82]
+    COP [80] ( #2E )
+    COP [82]
+    BRL loc_007009
 
   loc_007009:
-    LDA $joy_pressed      ; {28681}
-    BIT #$0400            ; {28684}
-    BNE loc_00702D        ; {28687}
-    BIT #$0800            ; {28689}
-    BNE loc_007041        ; {28692}
-    BIT #$8000            ; {28694}
-    BEQ code_007026       ; {28697}
-    BRK #$98              ; {28699}
-    COP [10] ( #$0600, #00, #$0070, #$0050 ) ; {28701}
+    LDA $joy_pressed
+    BIT #$0400
+    BNE loc_00702D
+    BIT #$0800
+    BNE loc_007041
+    BIT #$8000
+    BEQ code_007026
+    BRK #$98
+    COP [10] ( #$0600, #00, #$0070, #$0050 )
 
   code_007026:
-    COP [80] ( #10 )      ; {28710}
-    COP [82]              ; {28713}
-    BRA loc_007009        ; {28715}
+    COP [80] ( #10 )
+    COP [82]
+    BRA loc_007009
 
   loc_00702D:
-    COP [80] ( #01 )      ; {28717}
-    COP [82]              ; {28720}
-    BRK #$96              ; {28722}
-    COP [80] ( #2D )      ; {28724}
-    COP [82]              ; {28727}
-    COP [80] ( #2F )      ; {28729}
-    COP [82]              ; {28732}
-    BRL loc_006FB7        ; {28734}
+    COP [80] ( #01 )
+    COP [82]
+    BRK #$96
+    COP [80] ( #2D )
+    COP [82]
+    COP [80] ( #2F )
+    COP [82]
+    BRL loc_006FB7
 
   loc_007041:
-    COP [08] ( #$9B05, &code_007026 ) ; {28737}
-    COP [80] ( #01 )      ; {28743}
-    COP [82]              ; {28746}
-    BRK #$96              ; {28748}
-    COP [80] ( #1F )      ; {28750}
-    COP [82]              ; {28753}
-    COP [80] ( #2E )      ; {28755}
-    COP [82]              ; {28758}
-    BRL loc_00705B        ; {28760}
+    COP [08] ( #$9B05, &code_007026 )
+    COP [80] ( #01 )
+    COP [82]
+    BRK #$96
+    COP [80] ( #1F )
+    COP [82]
+    COP [80] ( #2E )
+    COP [82]
+    BRL loc_00705B
 
   loc_00705B:
-    LDA $joy_pressed      ; {28763}
-    BIT #$0100            ; {28766}
-    BNE loc_00707A        ; {28769}
-    BIT #$8000            ; {28771}
-    BEQ loc_007073        ; {28774}
-    BRK #$98              ; {28776}
-    COP [10] ( #$0700, #00, #$0070, #$0050 ) ; {28778}
+    LDA $joy_pressed
+    BIT #$0100
+    BNE loc_00707A
+    BIT #$8000
+    BEQ loc_007073
+    BRK #$98
+    COP [10] ( #$0700, #00, #$0070, #$0050 )
 
   loc_007073:
-    COP [80] ( #10 )      ; {28787}
-    COP [82]              ; {28790}
-    BRA loc_00705B        ; {28792}
+    COP [80] ( #10 )
+    COP [82]
+    BRA loc_00705B
 
   loc_00707A:
-    COP [80] ( #01 )      ; {28794}
-    COP [82]              ; {28797}
-    BRK #$96              ; {28799}
-    COP [80] ( #1E )      ; {28801}
-    COP [82]              ; {28804}
-    COP [80] ( #2E )      ; {28806}
-    COP [82]              ; {28809}
-    BRL loc_007009        ; {28811}
+    COP [80] ( #01 )
+    COP [82]
+    BRK #$96
+    COP [80] ( #1E )
+    COP [82]
+    COP [80] ( #2E )
+    COP [82]
+    BRL loc_007009
 }
 
 code_00708E {
-    LDY $player_actor     ; {28814}
-    LDA $0000, Y          ; {28817}
-    STA $player_x         ; {28820}
-    LSR                   ; {28823}
-    LSR                   ; {28824}
-    LSR                   ; {28825}
-    LSR                   ; {28826}
-    STA $player_tile_x    ; {28827}
-    LDA $0002, Y          ; {28830}
-    STA $player_y         ; {28833}
-    LSR                   ; {28836}
-    LSR                   ; {28837}
-    LSR                   ; {28838}
-    LSR                   ; {28839}
-    DEC                   ; {28840}
-    STA $player_tile_y    ; {28841}
-    PHX                   ; {28844}
-    JSL $@lib_010000.code_010000 ; {28845}
-    PLX                   ; {28849}
-    RTL                   ; {28850}
+    LDY $player_actor
+    LDA $0000, Y
+    STA $player_x
+    LSR 
+    LSR 
+    LSR 
+    LSR 
+    STA $player_tile_x
+    LDA $0002, Y
+    STA $player_y
+    LSR 
+    LSR 
+    LSR 
+    LSR 
+    DEC 
+    STA $player_tile_y
+    PHX 
+    JSL $@lib_010000.code_010000
+    PLX 
+    RTL 
 }

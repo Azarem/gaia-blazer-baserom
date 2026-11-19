@@ -5,24 +5,24 @@
 ---------------------------------------------
 
 code_0FA3A5 {
-    COP [17] ( &code_0FA3AE ) ; {1024933}
-    COP [15]              ; {1024937}
-    COP [91]              ; {1024939}
-    RTL                   ; {1024941}
+    COP [17] ( &code_0FA3AE )
+    COP [15]
+    COP [91]
+    RTL 
 }
 
 code_0FA3AE {
-    COP [07] ( #$0000, &code_0FA3C9 ) ; {1024942}
-    COP [01] ( &asciistring_0FA3DB ) ; {1024948}
-    COP [3C] ( #04 )      ; {1024952}
-    COP [10] ( #$0106, #03, #$00C0, #$0040 ) ; {1024955}
-    COP [09] ( #$8704 )   ; {1024964}
-    RTL                   ; {1024968}
+    COP [07] ( #$0000, &code_0FA3C9 )
+    COP [01] ( &asciistring_0FA3DB )
+    COP [3C] ( #04 )
+    COP [10] ( #$0106, #03, #$00C0, #$0040 )
+    COP [09] ( #$8704 )
+    RTL 
 }
 
 code_0FA3C9 {
-    COP [01] ( &asciistring_0FA3CE ) ; {1024969}
-    RTL                   ; {1024973}
+    COP [01] ( &asciistring_0FA3CE )
+    RTL 
 }
 
 asciistring_0FA3CE |[10]-------- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|

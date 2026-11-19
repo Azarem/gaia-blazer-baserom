@@ -8,113 +8,113 @@
 ---------------------------------------------
 
 code_01C98A {
-    COP [14] ( #$0061, &code_01C991 ) ; {117130}
-    RTL                   ; {117136}
+    COP [14] ( #$0061, &code_01C991 )
+    RTL 
 }
 
 code_01C991 {
-    COP [30] ( #$0061, &code_01CA7E, #03 ) ; {117137}
-    COP [07] ( #$9F02, &code_01C9C0 ) ; {117144}
-    COP [85] ( @engine_0026F3.code_00299D ) ; {117150}
-    COP [85] ( @code_01CA63 ) ; {117155}
-    COP [17] ( &code_01CA43 ) ; {117160}
-    COP [15]              ; {117164}
-    COP [91]              ; {117166}
-    COP [07] ( #$0402, &code_01C9BF ) ; {117168}
-    COP [17] ( &code_01CA5E ) ; {117174}
-    COP [80] ( #1A )      ; {117178}
-    COP [82]              ; {117181}
+    COP [30] ( #$0061, &code_01CA7E, #03 )
+    COP [07] ( #$9F02, &code_01C9C0 )
+    COP [85] ( @engine_0026F3.code_00299D )
+    COP [85] ( @code_01CA63 )
+    COP [17] ( &code_01CA43 )
+    COP [15]
+    COP [91]
+    COP [07] ( #$0402, &code_01C9BF )
+    COP [17] ( &code_01CA5E )
+    COP [80] ( #1A )
+    COP [82]
 }
 
 code_01C9BF {
-    RTL                   ; {117183}
+    RTL 
 }
 
 code_01C9C0 {
-    LDA #$BFC0            ; {117184}
-    TSB $joy_block_mask   ; {117187}
-    LDA $0016, X          ; {117190}
-    ORA #$2000            ; {117193}
-    STA $0016, X          ; {117196}
-    COP [03] ( #65 )      ; {117199}
-    COP [04]              ; {117202}
-    COP [01] ( &asciistring_01CBA8 ) ; {117204}
-    COP [03] ( #79 )      ; {117208}
-    COP [04]              ; {117211}
-    COP [A1] ( #$0010, #$FFF0 ) ; {117213}
-    LDA $0016, X          ; {117219}
-    AND #$DFFF            ; {117222}
-    STA $0016, X          ; {117225}
-    COP [81] ( #28, #08 ) ; {117228}
-    COP [83]              ; {117232}
-    COP [81] ( #27, #10 ) ; {117234}
-    COP [83]              ; {117238}
-    COP [03] ( #5B )      ; {117240}
-    COP [04]              ; {117243}
-    COP [01] ( &asciistring_01CC05 ) ; {117245}
-    COP [03] ( #79 )      ; {117249}
-    COP [04]              ; {117252}
-    COP [81] ( #24, #04 ) ; {117254}
-    COP [83]              ; {117258}
-    COP [03] ( #29 )      ; {117260}
-    COP [04]              ; {117263}
-    COP [81] ( #27, #10 ) ; {117265}
-    COP [83]              ; {117269}
-    COP [81] ( #28, #08 ) ; {117271}
-    COP [83]              ; {117275}
-    LDA $0016, X          ; {117277}
-    ORA #$2000            ; {117280}
-    STA $0016, X          ; {117283}
-    COP [03] ( #79 )      ; {117286}
-    COP [04]              ; {117289}
-    LDA #$0020            ; {117291}
-    STA $03B4             ; {117294}
-    COP [10] ( #$0101, #03, #$03B0, #$01D8 ) ; {117297}
-    LDA #$BFC0            ; {117306}
-    TRB $joy_block_mask   ; {117309}
-    COP [91]              ; {117312}
-    RTL                   ; {117314}
+    LDA #$BFC0
+    TSB $joy_block_mask
+    LDA $0016, X
+    ORA #$2000
+    STA $0016, X
+    COP [03] ( #65 )
+    COP [04]
+    COP [01] ( &asciistring_01CBA8 )
+    COP [03] ( #79 )
+    COP [04]
+    COP [A1] ( #$0010, #$FFF0 )
+    LDA $0016, X
+    AND #$DFFF
+    STA $0016, X
+    COP [81] ( #28, #08 )
+    COP [83]
+    COP [81] ( #27, #10 )
+    COP [83]
+    COP [03] ( #5B )
+    COP [04]
+    COP [01] ( &asciistring_01CC05 )
+    COP [03] ( #79 )
+    COP [04]
+    COP [81] ( #24, #04 )
+    COP [83]
+    COP [03] ( #29 )
+    COP [04]
+    COP [81] ( #27, #10 )
+    COP [83]
+    COP [81] ( #28, #08 )
+    COP [83]
+    LDA $0016, X
+    ORA #$2000
+    STA $0016, X
+    COP [03] ( #79 )
+    COP [04]
+    LDA #$0020
+    STA $03B4
+    COP [10] ( #$0101, #03, #$03B0, #$01D8 )
+    LDA #$BFC0
+    TRB $joy_block_mask
+    COP [91]
+    RTL 
 }
 
 code_01CA43 {
-    COP [19] ( #1C, &code_01CA59 ) ; {117315}
-    COP [01] ( &asciistring_01CAB9 ) ; {117320}
-    COP [3C] ( #04 )      ; {117324}
-    COP [10] ( #$0504, #03, #$0160, #$01C0 ) ; {117327}
-    RTL                   ; {117336}
+    COP [19] ( #1C, &code_01CA59 )
+    COP [01] ( &asciistring_01CAB9 )
+    COP [3C] ( #04 )
+    COP [10] ( #$0504, #03, #$0160, #$01C0 )
+    RTL 
 }
 
 code_01CA59 {
-    COP [01] ( &asciistring_01CAAF ) ; {117337}
-    RTL                   ; {117341}
+    COP [01] ( &asciistring_01CAAF )
+    RTL 
 }
 
 code_01CA5E {
-    COP [01] ( &asciistring_01CADE ) ; {117342}
-    RTL                   ; {117346}
+    COP [01] ( &asciistring_01CADE )
+    RTL 
 }
 
 code_01CA63 {
-    COP [91]              ; {117347}
-    COP [0D] ( #00, #12, #2C, &code_01CA6D ) ; {117349}
-    RTL                   ; {117356}
+    COP [91]
+    COP [0D] ( #00, #12, #2C, &code_01CA6D )
+    RTL 
 }
 
 code_01CA6D {
-    COP [01] ( &asciistring_01CA85 ) ; {117357}
-    COP [91]              ; {117361}
-    COP [0D] ( #00, #12, #2C, &code_01CA7D ) ; {117363}
-    BRL code_01CA63       ; {117370}
+    COP [01] ( &asciistring_01CA85 )
+    COP [91]
+    COP [0D] ( #00, #12, #2C, &code_01CA7D )
+    BRL code_01CA63
 }
 
 code_01CA7D {
-    RTL                   ; {117373}
+    RTL 
 }
 
 code_01CA7E {
-    COP [01] ( &asciistring_01CB73 ) ; {117374}
-    COP [86]              ; {117378}
-    RTL                   ; {117380}
+    COP [01] ( &asciistring_01CB73 )
+    COP [86]
+    RTL 
 }
 
 asciistring_01CA85 |[10]Here lies Turbo, [N]builder of GreenWood- [JMP:&w1_shared_01EBC2.asciistring_01EC46]|

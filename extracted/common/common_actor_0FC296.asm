@@ -3,194 +3,194 @@
 ---------------------------------------------
 
 code_0FC296 {
-    COP [AA] ( #02 )      ; {1032854}
+    COP [AA] ( #02 )
 
   code_0FC299:
-    LDA $0016, X          ; {1032857}
-    BIT #$8000            ; {1032860}
-    BEQ loc_0FC2A7        ; {1032863}
+    LDA $0016, X
+    BIT #$8000
+    BEQ loc_0FC2A7
 
   code_0FC2A1:
-    COP [1B] ( &code_0FC299, #$0008 ) ; {1032865}
+    COP [1B] ( &code_0FC299, #$0008 )
 
   loc_0FC2A7:
-    COP [9A] ( #$0010, &code_0FC2B1, &code_0FC2C3, &code_0FC2BA ) ; {1032871}
+    COP [9A] ( #$0010, &code_0FC2B1, &code_0FC2C3, &code_0FC2BA )
 }
 
 code_0FC2B1 {
-    COP [97]              ; {1032881}
-    COP [80] ( #13 )      ; {1032883}
-    COP [82]              ; {1032886}
-    BRA code_0FC303       ; {1032888}
+    COP [97]
+    COP [80] ( #13 )
+    COP [82]
+    BRA code_0FC303
 }
 
 code_0FC2BA {
-    COP [96]              ; {1032890}
-    COP [80] ( #13 )      ; {1032892}
-    COP [82]              ; {1032895}
-    BRA code_0FC303       ; {1032897}
+    COP [96]
+    COP [80] ( #13 )
+    COP [82]
+    BRA code_0FC303
 }
 
 code_0FC2C3 {
-    COP [9B] ( #$0010, &code_0FC2CD, &code_0FC303, &code_0FC2E8 ) ; {1032899}
+    COP [9B] ( #$0010, &code_0FC2CD, &code_0FC303, &code_0FC2E8 )
 }
 
 code_0FC2CD {
-    COP [97]              ; {1032909}
-    COP [81] ( #0F, #02 ) ; {1032911}
-    COP [83]              ; {1032915}
-    COP [81] ( #15, #02 ) ; {1032917}
-    COP [83]              ; {1032921}
-    COP [85] ( @code_0FC39C ) ; {1032923}
-    COP [81] ( #0F, #02 ) ; {1032928}
-    COP [83]              ; {1032932}
-    BRA code_0FC303       ; {1032934}
+    COP [97]
+    COP [81] ( #0F, #02 )
+    COP [83]
+    COP [81] ( #15, #02 )
+    COP [83]
+    COP [85] ( @code_0FC39C )
+    COP [81] ( #0F, #02 )
+    COP [83]
+    BRA code_0FC303
 }
 
 code_0FC2E8 {
-    COP [97]              ; {1032936}
-    COP [81] ( #0E, #02 ) ; {1032938}
-    COP [83]              ; {1032942}
-    COP [81] ( #14, #02 ) ; {1032944}
-    COP [83]              ; {1032948}
-    COP [85] ( @code_0FC3B9 ) ; {1032950}
-    COP [81] ( #0E, #02 ) ; {1032955}
-    COP [83]              ; {1032959}
-    BRA code_0FC303       ; {1032961}
+    COP [97]
+    COP [81] ( #0E, #02 )
+    COP [83]
+    COP [81] ( #14, #02 )
+    COP [83]
+    COP [85] ( @code_0FC3B9 )
+    COP [81] ( #0E, #02 )
+    COP [83]
+    BRA code_0FC303
 }
 
 code_0FC303 {
-    COP [9B] ( #$0010, &code_0FC30D, &code_0FC320, &code_0FC316 ) ; {1032963}
+    COP [9B] ( #$0010, &code_0FC30D, &code_0FC320, &code_0FC316 )
 }
 
 code_0FC30D {
-    COP [97]              ; {1032973}
-    COP [80] ( #12 )      ; {1032975}
-    COP [82]              ; {1032978}
-    BRA code_0FC299       ; {1032980}
+    COP [97]
+    COP [80] ( #12 )
+    COP [82]
+    BRA code_0FC299
 }
 
 code_0FC316 {
-    COP [97]              ; {1032982}
-    COP [80] ( #11 )      ; {1032984}
-    COP [82]              ; {1032987}
-    BRL code_0FC299       ; {1032989}
+    COP [97]
+    COP [80] ( #11 )
+    COP [82]
+    BRL code_0FC299
 }
 
 code_0FC320 {
-    COP [9A] ( #$0010, &code_0FC32A, &code_0FC2A1, &code_0FC346 ) ; {1032992}
+    COP [9A] ( #$0010, &code_0FC32A, &code_0FC2A1, &code_0FC346 )
 }
 
 code_0FC32A {
-    COP [97]              ; {1033002}
-    COP [81] ( #10, #02 ) ; {1033004}
-    COP [83]              ; {1033008}
-    COP [81] ( #16, #02 ) ; {1033010}
-    COP [83]              ; {1033014}
-    COP [85] ( @code_0FC362 ) ; {1033016}
-    COP [81] ( #10, #02 ) ; {1033021}
-    COP [83]              ; {1033025}
-    BRL code_0FC2A1       ; {1033027}
+    COP [97]
+    COP [81] ( #10, #02 )
+    COP [83]
+    COP [81] ( #16, #02 )
+    COP [83]
+    COP [85] ( @code_0FC362 )
+    COP [81] ( #10, #02 )
+    COP [83]
+    BRL code_0FC2A1
 }
 
 code_0FC346 {
-    COP [96]              ; {1033030}
-    COP [81] ( #10, #02 ) ; {1033032}
-    COP [83]              ; {1033036}
-    COP [81] ( #16, #02 ) ; {1033038}
-    COP [83]              ; {1033042}
-    COP [85] ( @code_0FC37F ) ; {1033044}
-    COP [81] ( #10, #02 ) ; {1033049}
-    COP [83]              ; {1033053}
-    BRL code_0FC2A1       ; {1033055}
+    COP [96]
+    COP [81] ( #10, #02 )
+    COP [83]
+    COP [81] ( #16, #02 )
+    COP [83]
+    COP [85] ( @code_0FC37F )
+    COP [81] ( #10, #02 )
+    COP [83]
+    BRL code_0FC2A1
 }
 
 code_0FC362 {
-    JSR $&code_0FC3D6     ; {1033058}
-    COP [80] ( #1B )      ; {1033061}
-    COP [82]              ; {1033064}
-    COP [A6]              ; {1033066}
+    JSR $&code_0FC3D6
+    COP [80] ( #1B )
+    COP [82]
+    COP [A6]
 
   loc_0FC36C:
-    COP [23] ( &code_0FC377 ) ; {1033068}
-    COP [80] ( #37 )      ; {1033072}
-    COP [82]              ; {1033075}
-    BRA loc_0FC36C        ; {1033077}
+    COP [23] ( &code_0FC377 )
+    COP [80] ( #37 )
+    COP [82]
+    BRA loc_0FC36C
 }
 
 code_0FC377 {
-    COP [80] ( #38 )      ; {1033079}
-    COP [82]              ; {1033082}
-    COP [86]              ; {1033084}
-    RTL                   ; {1033086}
+    COP [80] ( #38 )
+    COP [82]
+    COP [86]
+    RTL 
 }
 
 code_0FC37F {
-    JSR $&code_0FC3D6     ; {1033087}
-    COP [80] ( #1B )      ; {1033090}
-    COP [82]              ; {1033093}
-    COP [A6]              ; {1033095}
+    JSR $&code_0FC3D6
+    COP [80] ( #1B )
+    COP [82]
+    COP [A6]
 
   loc_0FC389:
-    COP [24] ( &code_0FC394 ) ; {1033097}
-    COP [80] ( #37 )      ; {1033101}
-    COP [82]              ; {1033104}
-    BRA loc_0FC389        ; {1033106}
+    COP [24] ( &code_0FC394 )
+    COP [80] ( #37 )
+    COP [82]
+    BRA loc_0FC389
 }
 
 code_0FC394 {
-    COP [80] ( #38 )      ; {1033108}
-    COP [82]              ; {1033111}
-    COP [86]              ; {1033113}
-    RTL                   ; {1033115}
+    COP [80] ( #38 )
+    COP [82]
+    COP [86]
+    RTL 
 }
 
 code_0FC39C {
-    JSR $&code_0FC3D6     ; {1033116}
-    COP [80] ( #19 )      ; {1033119}
-    COP [82]              ; {1033122}
-    COP [A6]              ; {1033124}
+    JSR $&code_0FC3D6
+    COP [80] ( #19 )
+    COP [82]
+    COP [A6]
 
   loc_0FC3A6:
-    COP [21] ( &code_0FC3B1 ) ; {1033126}
-    COP [80] ( #36 )      ; {1033130}
-    COP [82]              ; {1033133}
-    BRA loc_0FC3A6        ; {1033135}
+    COP [21] ( &code_0FC3B1 )
+    COP [80] ( #36 )
+    COP [82]
+    BRA loc_0FC3A6
 }
 
 code_0FC3B1 {
-    COP [80] ( #38 )      ; {1033137}
-    COP [82]              ; {1033140}
-    COP [86]              ; {1033142}
-    RTL                   ; {1033144}
+    COP [80] ( #38 )
+    COP [82]
+    COP [86]
+    RTL 
 }
 
 code_0FC3B9 {
-    JSR $&code_0FC3D6     ; {1033145}
-    COP [80] ( #17 )      ; {1033148}
-    COP [82]              ; {1033151}
-    COP [A6]              ; {1033153}
+    JSR $&code_0FC3D6
+    COP [80] ( #17 )
+    COP [82]
+    COP [A6]
 
   loc_0FC3C3:
-    COP [22] ( &code_0FC3CE ) ; {1033155}
-    COP [80] ( #35 )      ; {1033159}
-    COP [82]              ; {1033162}
-    BRA loc_0FC3C3        ; {1033164}
+    COP [22] ( &code_0FC3CE )
+    COP [80] ( #35 )
+    COP [82]
+    BRA loc_0FC3C3
 }
 
 code_0FC3CE {
-    COP [80] ( #38 )      ; {1033166}
-    COP [82]              ; {1033169}
-    COP [86]              ; {1033171}
-    RTL                   ; {1033173}
+    COP [80] ( #38 )
+    COP [82]
+    COP [86]
+    RTL 
 }
 
 code_0FC3D6 {
-    LDA #$0202            ; {1033174}
-    STA $0016, X          ; {1033177}
-    COP [AA] ( #02 )      ; {1033180}
-    COP [A3]              ; {1033183}
-    COP [A0] ( #$FFEE )   ; {1033185}
-    BRK #$61              ; {1033189}
-    RTS                   ; {1033191}
+    LDA #$0202
+    STA $0016, X
+    COP [AA] ( #02 )
+    COP [A3]
+    COP [A0] ( #$FFEE )
+    BRK #$61
+    RTS 
 }

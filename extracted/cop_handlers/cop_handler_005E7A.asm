@@ -5,13 +5,13 @@
 ---------------------------------------------
 
 Cop80_SetAnimation {
-    TYX                   ; {24186}
-    LDA [$38]             ; {24187}
-    INC $38               ; {24189}
-    AND #$00FF            ; {24191}
-    STA $001E, X          ; {24194}
-    STZ $0020, X          ; {24197}
-    LDA $38               ; {24200}
-    STA $0018, X          ; {24202}
-    BRL cop_handler_006473.loc_0064BF ; {24205}
+    TYX 
+    LDA [$38]
+    INC $38
+    AND #$00FF
+    STA $001E, X
+    STZ $0020, X
+    LDA $38
+    STA $0018, X
+    BRL cop_handler_006473.loc_0064BF
 }

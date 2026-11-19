@@ -7,35 +7,35 @@
 ---------------------------------------------
 
 code_022289 {
-    COP [2E] ( #00, #$0018, &code_022297 ) ; {139913}
-    COP [80] ( #07 )      ; {139920}
-    COP [82]              ; {139923}
-    BRA code_022289       ; {139925}
+    COP [2E] ( #00, #$0018, &code_022297 )
+    COP [80] ( #07 )
+    COP [82]
+    BRA code_022289
 }
 
 code_022297 {
-    COP [80] ( #0C )      ; {139927}
-    COP [82]              ; {139930}
-    BRA code_022289       ; {139932}
+    COP [80] ( #0C )
+    COP [82]
+    BRA code_022289
 }
 
 code_02229E {
-    COP [1F]              ; {139934}
-    LDA $rng_state+1      ; {139936}
-    AND #$0003            ; {139939}
-    BEQ loc_0222B0        ; {139942}
-    DEC                   ; {139944}
-    BEQ loc_0222B5        ; {139945}
-    COP [01] ( &asciistring_0222BA ) ; {139947}
-    RTL                   ; {139951}
+    COP [1F]
+    LDA $rng_state+1
+    AND #$0003
+    BEQ loc_0222B0
+    DEC 
+    BEQ loc_0222B5
+    COP [01] ( &asciistring_0222BA )
+    RTL 
 
   loc_0222B0:
-    COP [01] ( &asciistring_0222E2 ) ; {139952}
-    RTL                   ; {139956}
+    COP [01] ( &asciistring_0222E2 )
+    RTL 
 
   loc_0222B5:
-    COP [01] ( &asciistring_0222FF ) ; {139957}
-    RTL                   ; {139961}
+    COP [01] ( &asciistring_0222FF )
+    RTL 
 }
 
 asciistring_0222BA |[10]Ouch---- it hurts! [N]Somebody please help [N]me! [JMP:&w3_shared_02249A.asciistring_02251E]|

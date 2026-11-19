@@ -5,30 +5,30 @@
 ---------------------------------------------
 
 code_0055C6 {
-    LDA $0016, X          ; {21958}
-    ORA #$0010            ; {21961}
-    STA $0016, X          ; {21964}
-    COP [91]              ; {21967}
-    SEP #$20              ; {21969}
-    LDA $0466             ; {21971}
-    BNE loc_0055E6        ; {21974}
-    LDA #$2C              ; {21976}
-    XBA                   ; {21978}
-    LDA #$^binary_0055F5  ; {21979}
-    LDY #$&binary_0055F5+4 ; {21981}
-    JSL $@lib_01186E.code_01188A ; {21984}
-    BRA loc_0055F2        ; {21988}
+    LDA $0016, X
+    ORA #$0010
+    STA $0016, X
+    COP [91]
+    SEP #$20
+    LDA $0466
+    BNE loc_0055E6
+    LDA #$2C
+    XBA 
+    LDA #$^binary_0055F5
+    LDY #$&binary_0055F5+4
+    JSL $@lib_01186E.code_01188A
+    BRA loc_0055F2
 
   loc_0055E6:
-    LDA #$2C              ; {21990}
-    XBA                   ; {21992}
-    LDA #$^binary_0055F5  ; {21993}
-    LDY #$&binary_0055F5  ; {21995}
-    JSL $@lib_01186E.code_01188A ; {21998}
+    LDA #$2C
+    XBA 
+    LDA #$^binary_0055F5
+    LDY #$&binary_0055F5
+    JSL $@lib_01186E.code_01188A
 
   loc_0055F2:
-    REP #$20              ; {22002}
-    RTL                   ; {22004}
+    REP #$20
+    RTL 
 }
 ---------------------------------------------
 

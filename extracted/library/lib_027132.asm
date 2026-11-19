@@ -5,38 +5,38 @@
 ---------------------------------------------
 
 code_027132 {
-    PHP                   ; {160050}
-    PHB                   ; {160051}
-    PHX                   ; {160052}
-    REP #$20              ; {160053}
-    LDA $03A4             ; {160055}
-    XBA                   ; {160058}
-    ASL                   ; {160059}
-    ASL                   ; {160060}
-    TAX                   ; {160061}
-    JSL $@lib_shared_02716E.code_02716E ; {160062}
-    LDA $16               ; {160066}
-    CMP $7003FA, X        ; {160068}
-    BNE loc_027169        ; {160072}
-    LDA $18               ; {160074}
-    CMP $7003FC, X        ; {160076}
-    BNE loc_027169        ; {160080}
-    LDY #$0203            ; {160082}
-    LDA #$01FF            ; {160085}
-    MVN #$7F, #$70        ; {160088}
-    LDY #$1A5E            ; {160091}
-    LDA #$01F9            ; {160094}
-    MVN #$01, #$70        ; {160097}
-    PLX                   ; {160100}
-    PLB                   ; {160101}
-    PLP                   ; {160102}
-    CLC                   ; {160103}
-    RTL                   ; {160104}
+    PHP 
+    PHB 
+    PHX 
+    REP #$20
+    LDA $03A4
+    XBA 
+    ASL 
+    ASL 
+    TAX 
+    JSL $@lib_shared_02716E.code_02716E
+    LDA $16
+    CMP $7003FA, X
+    BNE loc_027169
+    LDA $18
+    CMP $7003FC, X
+    BNE loc_027169
+    LDY #$0203
+    LDA #$01FF
+    MVN #$7F, #$70
+    LDY #$1A5E
+    LDA #$01F9
+    MVN #$01, #$70
+    PLX 
+    PLB 
+    PLP 
+    CLC 
+    RTL 
 
   loc_027169:
-    PLX                   ; {160105}
-    PLB                   ; {160106}
-    PLP                   ; {160107}
-    SEC                   ; {160108}
-    RTL                   ; {160109}
+    PLX 
+    PLB 
+    PLP 
+    SEC 
+    RTL 
 }

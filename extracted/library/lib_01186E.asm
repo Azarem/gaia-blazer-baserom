@@ -9,54 +9,54 @@
 ---------------------------------------------
 
 code_01186E {
-    PHP                   ; {71790}
-    PHX                   ; {71791}
-    SEP #$20              ; {71792}
-    PHA                   ; {71794}
-    LDA #$00              ; {71795}
-    XBA                   ; {71797}
-    PHA                   ; {71798}
-    TAX                   ; {71799}
-    LDA $@binary_0118BC, X ; {71800}
-    LDX $46               ; {71804}
-    ORA #$40              ; {71806}
-    STA $DMAP0, X         ; {71808}
-    LDA $02, S            ; {71811}
-    STA $DASB0, X         ; {71813}
-    BRA loc_01189D        ; {71816}
+    PHP 
+    PHX 
+    SEP #$20
+    PHA 
+    LDA #$00
+    XBA 
+    PHA 
+    TAX 
+    LDA $@binary_0118BC, X
+    LDX $46
+    ORA #$40
+    STA $DMAP0, X
+    LDA $02, S
+    STA $DASB0, X
+    BRA loc_01189D
 }
 
 code_01188A {
-    PHP                   ; {71818}
-    PHX                   ; {71819}
-    SEP #$20              ; {71820}
-    PHA                   ; {71822}
-    LDA #$00              ; {71823}
-    XBA                   ; {71825}
-    PHA                   ; {71826}
-    TAX                   ; {71827}
-    LDA $@binary_0118BC, X ; {71828}
-    LDX $46               ; {71832}
-    STA $DMAP0, X         ; {71834}
+    PHP 
+    PHX 
+    SEP #$20
+    PHA 
+    LDA #$00
+    XBA 
+    PHA 
+    TAX 
+    LDA $@binary_0118BC, X
+    LDX $46
+    STA $DMAP0, X
 
   loc_01189D:
-    PLA                   ; {71837}
-    STA $BBAD0, X         ; {71838}
-    REP #$20              ; {71841}
-    TYA                   ; {71843}
-    STA $A1T0L, X         ; {71844}
-    SEP #$20              ; {71847}
-    PLA                   ; {71849}
-    STA $A1B0, X          ; {71850}
-    LDA $44               ; {71853}
-    TSB $42               ; {71855}
-    ASL $44               ; {71857}
-    LDA $46               ; {71859}
-    ADC #$10              ; {71861}
-    STA $46               ; {71863}
-    PLX                   ; {71865}
-    PLP                   ; {71866}
-    RTL                   ; {71867}
+    PLA 
+    STA $BBAD0, X
+    REP #$20
+    TYA 
+    STA $A1T0L, X
+    SEP #$20
+    PLA 
+    STA $A1B0, X
+    LDA $44
+    TSB $42
+    ASL $44
+    LDA $46
+    ADC #$10
+    STA $46
+    PLX 
+    PLP 
+    RTL 
 }
 ---------------------------------------------
 

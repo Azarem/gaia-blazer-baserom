@@ -8,72 +8,72 @@
 ---------------------------------------------
 
 code_0180F7 {
-    COP [14] ( #$0002, &code_0180FE ) ; {98551}
-    RTL                   ; {98557}
+    COP [14] ( #$0002, &code_0180FE )
+    RTL 
 }
 
 code_0180FE {
-    COP [30] ( #$0002, &code_018159, #03 ) ; {98558}
-    COP [14] ( #$0009, &code_018114 ) ; {98565}
-    COP [17] ( &code_01812B ) ; {98571}
-    COP [15]              ; {98575}
-    COP [91]              ; {98577}
-    RTL                   ; {98579}
+    COP [30] ( #$0002, &code_018159, #03 )
+    COP [14] ( #$0009, &code_018114 )
+    COP [17] ( &code_01812B )
+    COP [15]
+    COP [91]
+    RTL 
 }
 
 code_018114 {
-    COP [07] ( #$9F02, &code_018128 ) ; {98580}
-    COP [17] ( &code_018160 ) ; {98586}
-    COP [11] ( #04, #3B, #1E ) ; {98590}
-    COP [15]              ; {98595}
-    COP [91]              ; {98597}
-    RTL                   ; {98599}
+    COP [07] ( #$9F02, &code_018128 )
+    COP [17] ( &code_018160 )
+    COP [11] ( #04, #3B, #1E )
+    COP [15]
+    COP [91]
+    RTL 
 }
 
 code_018128 {
-    COP [86]              ; {98600}
-    RTL                   ; {98602}
+    COP [86]
+    RTL 
 }
 
 code_01812B {
-    COP [07] ( #$8101, &code_018152 ) ; {98603}
-    COP [01] ( &asciistring_01816F ) ; {98609}
-    COP [1A] ( &lib_014F02.asciistring_014F02, #02, &code_01814D ) ; {98613}
-    LDA $L_choice_result  ; {98620}
-    BNE code_01814D       ; {98624}
-    COP [09] ( #$8101 )   ; {98626}
-    COP [01] ( &asciistring_018211 ) ; {98630}
-    BRL loc_018156        ; {98634}
+    COP [07] ( #$8101, &code_018152 )
+    COP [01] ( &asciistring_01816F )
+    COP [1A] ( &lib_014F02.asciistring_014F02, #02, &code_01814D )
+    LDA $L_choice_result
+    BNE code_01814D
+    COP [09] ( #$8101 )
+    COP [01] ( &asciistring_018211 )
+    BRL loc_018156
 }
 
 code_01814D {
-    COP [01] ( &asciistring_0181F8 ) ; {98637}
-    RTL                   ; {98641}
+    COP [01] ( &asciistring_0181F8 )
+    RTL 
 }
 
 code_018152 {
-    COP [01] ( &asciistring_018255 ) ; {98642}
+    COP [01] ( &asciistring_018255 )
 
   loc_018156:
-    COP [37]              ; {98646}
-    RTL                   ; {98648}
+    COP [37]
+    RTL 
 }
 
 code_018159 {
-    COP [01] ( &asciistring_01832D ) ; {98649}
-    COP [86]              ; {98653}
-    RTL                   ; {98655}
+    COP [01] ( &asciistring_01832D )
+    COP [86]
+    RTL 
 }
 
 code_018160 {
-    COP [18] ( #29, &code_01816A ) ; {98656}
-    COP [01] ( &asciistring_0182E7 ) ; {98661}
-    RTL                   ; {98665}
+    COP [18] ( #29, &code_01816A )
+    COP [01] ( &asciistring_0182E7 )
+    RTL 
 }
 
 code_01816A {
-    COP [01] ( &asciistring_0182AC ) ; {98666}
-    RTL                   ; {98670}
+    COP [01] ( &asciistring_0182AC )
+    RTL 
 }
 
 asciistring_01816F |[10]My husband used to be [N]the village Chief- [FIN]One day he suddenly [N]disappeared along with[N]the other villagers- [FIN]I feel so lonely---- [N]How about being one of[N]my children? [END]|

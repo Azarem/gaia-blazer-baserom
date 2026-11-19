@@ -122,20 +122,20 @@
 ; Native-mode COP vector. In: X = actor slot (copied to Y), stack = return address of the COP instruction. Sets $3A (script bank) and $38 (script pointer at the command id), reads the id, advances $38 and dispatches through code_list_005638,X.
 
 native_mode_cop_00561E {
-    SEP #$20              ; {22046}
-    TXY                   ; {22048}
-    LDA $04, S            ; {22049}
-    STA $3A               ; {22051}
-    REP #$20              ; {22053}
-    LDA $02, S            ; {22055}
-    DEC                   ; {22057}
-    STA $38               ; {22058}
-    LDA [$38]             ; {22060}
-    INC $38               ; {22062}
-    AND #$00FF            ; {22064}
-    ASL                   ; {22067}
-    TAX                   ; {22068}
-    JMP ($&code_list_005638, X) ; {22069}
+    SEP #$20
+    TXY 
+    LDA $04, S
+    STA $3A
+    REP #$20
+    LDA $02, S
+    DEC 
+    STA $38
+    LDA [$38]
+    INC $38
+    AND #$00FF
+    ASL 
+    TAX 
+    JMP ($&code_list_005638, X)
 }
 ---------------------------------------------
 

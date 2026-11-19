@@ -11,19 +11,19 @@ asciistring_026DF2 |[10]There are many [N]treasure chests hidden[N]in the baseme
 ---------------------------------------------
 
 code_026E75 {
-    COP [01] ( &asciistring_026DF2 ) ; {159349}
+    COP [01] ( &asciistring_026DF2 )
 
   code_026E79:
-    COP [01] ( &w5_shared_02706C.asciistring_027090 ) ; {159353}
-    COP [1A] ( &lib_014F5B.asciistring_014F5B, #02, &code_026E98 ) ; {159357}
-    LDA $L_choice_result  ; {159364}
-    BEQ code_026E98       ; {159368}
-    COP [01] ( &w5_shared_02706C.asciistring_0270B8 ) ; {159370}
-    COP [10] ( #$0110, #00, #$01F0, #$0140 ) ; {159374}
-    RTL                   ; {159383}
+    COP [01] ( &w5_shared_02706C.asciistring_027090 )
+    COP [1A] ( &lib_014F5B.asciistring_014F5B, #02, &code_026E98 )
+    LDA $L_choice_result
+    BEQ code_026E98
+    COP [01] ( &w5_shared_02706C.asciistring_0270B8 )
+    COP [10] ( #$0110, #00, #$01F0, #$0140 )
+    RTL 
 }
 
 code_026E98 {
-    COP [01] ( &w5_shared_02706C.asciistring_0270CB ) ; {159384}
-    RTL                   ; {159388}
+    COP [01] ( &w5_shared_02706C.asciistring_0270CB )
+    RTL 
 }

@@ -5,13 +5,13 @@
 ---------------------------------------------
 
 Cop98_SetFlipY {
-    TYX                   ; {24850}
-    LDA $001C, X          ; {24851}
-    BIT #$8000            ; {24854}
-    BNE loc_006121        ; {24857}
-    ORA #$8000            ; {24859}
-    STA $001C, X          ; {24862}
+    TYX 
+    LDA $001C, X
+    BIT #$8000
+    BNE loc_006121
+    ORA #$8000
+    STA $001C, X
 
   loc_006121:
-    BRL cop_handler_006473.loc_0064BF ; {24865}
+    BRL cop_handler_006473.loc_0064BF
 }
