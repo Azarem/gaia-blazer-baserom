@@ -88,7 +88,7 @@ asset_list_028000 [
     palette < #00, #30, #80, %palette_0F6E72 >   ;04
     spritemap < #00, #00, #00, %spritemap_0E8A13 >   ;05
     asset8 < #D2 >   ;06
-    graphics < #00, #10, #00, %graphics_0708EF >   ;07
+    graphics < #00, #10, #00, %graphics_0706EF >   ;07
     tileset < #00, #20, #00, #01, %tileset_048200 >   ;08
     palette < #00, #70, #10, %palette_0F3A6B >   ;09
     graphics < #00, #10, #10, %graphics_0BE120 >   ;0A
@@ -822,7 +822,7 @@ asset_list_028000 [
     tilemap < #01, %tilemap_0EF620 >   ;04
     graphics < #00, #10, #10, %graphics_090000 >   ;05
     tileset < #00, #20, #00, #02, %tileset_0E7C3B >   ;06
-    tilemap < #02, %tilemap_077AFD4 >   ;07
+    tilemap < #02, %tilemap_07AFD4 >   ;07
     graphics < #00, #10, #30, %graphics_0A8000 >   ;08
     palette < #00, #30, #80, %palette_0F7652 >   ;09
     spritemap < #00, #00, #00, %spritemap_0C3797 >   ;0A

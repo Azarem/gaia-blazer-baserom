@@ -1,0 +1,3 @@
+{
+    "code_0120F9": "Store an entry number into the inventory/progress table $1B1E (entry n at $1B1E + n - 1). In: A (8-bit) = entry number. Entries below $19: the byte is overwritten with n. Others: bit 7 of the old byte is kept and n is ORed in; when bit 7 is set the value goes to $1B64 too; when the old value was $38, $043B = $1B8A - $1B88 is recomputed. Called by Cop0A_SetInventoryIfEmpty."
+}

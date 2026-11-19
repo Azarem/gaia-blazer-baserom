@@ -1,7 +1,526 @@
 {
   "system": {
     "prefix": "sy",
+    "scenes": {}
+  },
+  "up_above": {
+    "prefix": "a00",
+    "description": "Up Above (world shrines)",
     "scenes": {
+      "grass_valley_shrine": {
+        "id": 1,
+        "description": "Grass Valley Shrine"
+      },
+      "greenwood_shrine": {
+        "id": 2,
+        "description": "GreenWood Shrine"
+      },
+      "st_elles_shrine": {
+        "id": 3,
+        "description": "St. Elles Shrine"
+      },
+      "soul_sanctuary": {
+        "id": 4,
+        "description": "The Soul's Sanctuary (Mountain of Souls shrine)"
+      },
+      "laboratory_shrine": {
+        "id": 5,
+        "description": "The Laboratory Shrine"
+      },
+      "magridd_castle_shrine": {
+        "id": 6,
+        "description": "Magridd Castle Shrine"
+      },
+      "evil_world_shrine": {
+        "id": 7,
+        "description": "The Evil World Shrine"
+      },
+      "trial_room": {
+        "id": 8,
+        "description": "Trial room"
+      },
+      "unnamed_0f": {
+        "id": 9,
+        "description": "Up Above, location 0F (no name string)"
+      },
+      "unnamed_10": {
+        "id": 10,
+        "description": "Up Above, location 10 (no name string)"
+      },
+      "unnamed_11": {
+        "id": 11,
+        "description": "Up Above, location 11 (no name string)"
+      },
+      "unnamed_12": {
+        "id": 12,
+        "description": "Up Above, location 12 (no name string)"
+      },
+      "unnamed_13": {
+        "id": 13,
+        "description": "Up Above, location 13 (no name string)"
+      }
+    }
+  },
+  "grass_valley_village": {
+    "prefix": "a01",
+    "description": "Grass Valley",
+    "scenes": {
+      "highlands": {
+        "id": 257,
+        "description": "Grass Valley highlands"
+      },
+      "childs_secret_passage": {
+        "id": 258,
+        "description": "Child's secret passage"
+      },
+      "treasure_room": {
+        "id": 259,
+        "description": "Treasure room"
+      },
+      "chiefs_room": {
+        "id": 260,
+        "description": "The village Chief's room"
+      }
+    }
+  },
+  "underground_castle": {
+    "prefix": "a02",
+    "description": "Underground Castle",
+    "scenes": {
+      "west": {
+        "id": 513,
+        "description": "Underground Castle, west"
+      },
+      "east": {
+        "id": 514,
+        "description": "Underground Castle, east"
+      },
+      "lisas_dream": {
+        "id": 515,
+        "description": "Lisa's dream"
+      }
+    }
+  },
+  "leos_paintings": {
+    "prefix": "a03",
+    "description": "Leo's Paintings",
+    "scenes": {
+      "paintings_1": {
+        "id": 769,
+        "description": "Leo's Paintings 1"
+      },
+      "paintings_2": {
+        "id": 770,
+        "description": "Leo's Paintings 2"
+      },
+      "paintings_3": {
+        "id": 771,
+        "description": "Leo's Paintings 3"
+      },
+      "tulips_dream": {
+        "id": 772,
+        "description": "Tulip's Dream"
+      },
+      "paintings_4": {
+        "id": 773,
+        "description": "Leo's Paintings 4"
+      },
+      "metal_mantis": {
+        "id": 774,
+        "description": "Monster in the paintings (Metal Mantis)"
+      }
+    }
+  },
+  "woods_of_greenwood": {
+    "prefix": "a04",
+    "description": "Woods of GreenWood",
+    "scenes": {
+      "woods": {
+        "id": 1025,
+        "description": "Woods of GreenWood"
+      },
+      "moles_hole": {
+        "id": 1026,
+        "description": "A mole's hole"
+      },
+      "squirrels_house": {
+        "id": 1027,
+        "description": "A squirrel's house"
+      },
+      "squirrel_exchanger": {
+        "id": 1028,
+        "description": "Squirrel, the Exchanger"
+      },
+      "birds_dream": {
+        "id": 1029,
+        "description": "Bird's Dream"
+      },
+      "stumps_dream": {
+        "id": 1030,
+        "description": "Stump's Dream"
+      }
+    }
+  },
+  "lostside_marsh": {
+    "prefix": "a05",
+    "description": "Lostside, a marsh",
+    "scenes": {
+      "marsh": {
+        "id": 1281,
+        "description": "Lostside, a marsh"
+      },
+      "water_shrine_1": {
+        "id": 1282,
+        "description": "Water Shrine 1"
+      },
+      "water_shrine_2": {
+        "id": 1283,
+        "description": "Water Shrine 2"
+      },
+      "water_shrine_3": {
+        "id": 1284,
+        "description": "Water Shrine 3"
+      },
+      "fire_shrine_1": {
+        "id": 1285,
+        "description": "Fire Shrine 1"
+      },
+      "fire_shrine_2": {
+        "id": 1286,
+        "description": "Fire Shrine 2"
+      },
+      "fire_shrine_3": {
+        "id": 1287,
+        "description": "Fire Shrine 3"
+      },
+      "light_shrine_1": {
+        "id": 1288,
+        "description": "Light Shrine 1"
+      },
+      "light_shrine_2": {
+        "id": 1289,
+        "description": "Light Shrine 2"
+      },
+      "statue_tomb": {
+        "id": 1290,
+        "description": "Tomb of a stone statue (Light, Water and Fire Statues)"
+      }
+    }
+  },
+  "seabed_sanctuary": {
+    "prefix": "a06",
+    "description": "The Seabed Sanctuary",
+    "scenes": {
+      "sanctuary": {
+        "id": 1537,
+        "description": "The Seabed Sanctuary"
+      }
+    }
+  },
+  "seabed_of_st_elles": {
+    "prefix": "a07",
+    "description": "The Seabed of St. Elles",
+    "scenes": {
+      "seabed_1": {
+        "id": 1793,
+        "description": "The Seabed of St. Elles"
+      },
+      "secret_cave_1": {
+        "id": 1794,
+        "description": "The Secret Cave 1"
+      },
+      "secret_cave_2": {
+        "id": 1795,
+        "description": "The Secret Cave 2"
+      },
+      "dolphins_dream": {
+        "id": 1796,
+        "description": "A dolphin's dream"
+      },
+      "seabed_2": {
+        "id": 1797,
+        "description": "The Seabed of St. Elles (second location id)"
+      }
+    }
+  },
+  "st_elles_coast": {
+    "prefix": "a08",
+    "description": "St. Elles coast and dungeons",
+    "scenes": {
+      "southerta": {
+        "id": 2049,
+        "description": "Southerta"
+      },
+      "rockbird_reef": {
+        "id": 2050,
+        "description": "Shore reef of Rockbird"
+      },
+      "durean": {
+        "id": 2051,
+        "description": "Durean"
+      },
+      "blester": {
+        "id": 2052,
+        "description": "Blester"
+      }
+    }
+  },
+  "ghost_ship": {
+    "prefix": "a09",
+    "description": "Ghost ship",
+    "scenes": {
+      "ship": {
+        "id": 2305,
+        "description": "A ghost ship"
+      },
+      "servas_dream": {
+        "id": 2306,
+        "description": "Servas's dream"
+      }
+    }
+  },
+  "soul_of_mountain_house": {
+    "prefix": "a0A",
+    "description": "Soul of Mountain House",
+    "scenes": {
+      "house": {
+        "id": 2561,
+        "description": "Soul of Mountain House"
+      }
+    }
+  },
+  "mountain_of_souls_dungeon": {
+    "prefix": "a0B",
+    "description": "Mountain of Souls",
+    "scenes": {
+      "north_slope": {
+        "id": 2817,
+        "description": "Mountain, North+slope"
+      },
+      "aurora_ridge": {
+        "id": 2818,
+        "description": "Aurora's Ridge"
+      },
+      "old_mans_dream": {
+        "id": 2819,
+        "description": "An old man's dream"
+      },
+      "passage_to_lune": {
+        "id": 2820,
+        "description": "A passage to Lune"
+      },
+      "lune_lake": {
+        "id": 2821,
+        "description": "Underground lake, Lune"
+      },
+      "mushrooms_dream": {
+        "id": 2822,
+        "description": "A mushroom's dream"
+      },
+      "poseidon": {
+        "id": 2823,
+        "description": "Poseidon"
+      }
+    }
+  },
+  "snow_mountain": {
+    "prefix": "a0C",
+    "description": "Snow Mountain and Laynole",
+    "scenes": {
+      "summit": {
+        "id": 3073,
+        "description": "The top of Snow Mountain"
+      },
+      "ice_hill": {
+        "id": 3074,
+        "description": "An ice hill"
+      },
+      "laynole_ice_field": {
+        "id": 3075,
+        "description": "Ice field of Laynole"
+      }
+    }
+  },
+  "leos_laboratory": {
+    "prefix": "a0D",
+    "description": "Leo's Laboratory",
+    "scenes": {
+      "laboratory_1": {
+        "id": 3329,
+        "description": "Leo's Laboratory 1"
+      },
+      "laboratory_2": {
+        "id": 3330,
+        "description": "Leo's Laboratory 2"
+      },
+      "attic": {
+        "id": 3331,
+        "description": "An attic"
+      },
+      "mice_nest": {
+        "id": 3332,
+        "description": "A mice nest"
+      },
+      "cats_dream": {
+        "id": 3333,
+        "description": "A cat's dream"
+      }
+    }
+  },
+  "laboratory_dungeon": {
+    "prefix": "a0E",
+    "description": "Laboratory Dungeon",
+    "scenes": {
+      "basement_1": {
+        "id": 3585,
+        "description": "Basement of Laboratory 1"
+      },
+      "basement_2": {
+        "id": 3586,
+        "description": "Basement of Laboratory 2"
+      },
+      "power_plant": {
+        "id": 3587,
+        "description": "Power plant"
+      },
+      "tin_doll": {
+        "id": 3588,
+        "description": "Tin Doll"
+      },
+      "dream": {
+        "id": 3589,
+        "description": "A dream (Laboratory)"
+      }
+    }
+  },
+  "town_models": {
+    "prefix": "a0F",
+    "description": "Town models",
+    "scenes": {
+      "model_1": {
+        "id": 3841,
+        "description": "Model of a town 1"
+      },
+      "model_2": {
+        "id": 3842,
+        "description": "Model of a town 2"
+      }
+    }
+  },
+  "castle_of_magridd": {
+    "prefix": "a10",
+    "description": "Castle of King Magridd",
+    "scenes": {
+      "castle": {
+        "id": 4097,
+        "description": "Castle of King Magridd"
+      }
+    }
+  },
+  "castle_dungeon": {
+    "prefix": "a11",
+    "description": "Castle Dungeon (lower)",
+    "scenes": {
+      "torture_chamber": {
+        "id": 4353,
+        "description": "The torture chamber"
+      },
+      "basement_1": {
+        "id": 4354,
+        "description": "Basement of the castle 1"
+      },
+      "basement_2": {
+        "id": 4355,
+        "description": "Basement of the castle 2"
+      },
+      "dream": {
+        "id": 4356,
+        "description": "A dream (Castle)"
+      }
+    }
+  },
+  "castle_towers": {
+    "prefix": "a12",
+    "description": "Castle Dungeon (towers and prison)",
+    "scenes": {
+      "left_tower_1": {
+        "id": 4609,
+        "description": "The left tower 1"
+      },
+      "left_tower_2": {
+        "id": 4610,
+        "description": "The left tower 2"
+      },
+      "prison": {
+        "id": 4611,
+        "description": "A prison"
+      },
+      "right_tower_1": {
+        "id": 4612,
+        "description": "The right tower 1"
+      },
+      "right_tower_2": {
+        "id": 4613,
+        "description": "The right tower 2"
+      },
+      "right_tower_3": {
+        "id": 4614,
+        "description": "The right tower 3"
+      },
+      "dock_corridor": {
+        "id": 4615,
+        "description": "A corridor to the dock"
+      }
+    }
+  },
+  "airship_dock": {
+    "prefix": "a13",
+    "description": "Airship dock",
+    "scenes": {
+      "dock": {
+        "id": 4865,
+        "description": "The dock for an airship"
+      },
+      "deck": {
+        "id": 4866,
+        "description": "The deck of an airship"
+      },
+      "soldiers_dream": {
+        "id": 4867,
+        "description": "A soldier's dream"
+      }
+    }
+  },
+  "evil_world": {
+    "prefix": "a14",
+    "description": "World of Evil",
+    "scenes": {
+      "world_of_evil_1": {
+        "id": 5121,
+        "description": "World of Evil 1"
+      },
+      "world_of_evil_2": {
+        "id": 5122,
+        "description": "World of Evil 2"
+      },
+      "dazzling_space": {
+        "id": 5123,
+        "description": "Dazzling Space"
+      }
+    }
+  },
+  "deathtolls_shrine": {
+    "prefix": "a15",
+    "description": "Deathtoll's Shrine",
+    "scenes": {
+      "shrine": {
+        "id": 5377,
+        "description": "Deathtoll's Shrine"
+      },
+      "battle": {
+        "id": 5378,
+        "description": "Battle with Deathtoll"
+      }
     }
   }
 }

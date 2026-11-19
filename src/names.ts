@@ -14,9 +14,11 @@
  * import and array entry below.
  */
 import bank00 from '../us/names/bank00.json' with { type: 'json' };
+import bank02 from '../us/names/bank02.json' with { type: 'json' };
 
 const bankNames: Record<string, string>[] = [
     bank00,
+    bank02,
 ];
 
 export const names: Record<string, string> = Object.assign({}, ...bankNames);

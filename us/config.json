@@ -1,7 +1,7 @@
 {
   "compression": "QuintetLZ",
   "sfxLocation": 229376,
-  "sfxCount": 32,
+  "sfxCount": 33,
   "sfxType": "Sequential",
   "uncompress": false,
   "memoryMode": "Lo",
