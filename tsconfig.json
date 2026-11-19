@@ -21,7 +21,7 @@
   "include": [
     "src/**/*",
     "us/**/*.json",
-    "snes/**/*.json"
+    "notes/**/*.json"
   ],
   "exclude": [
     "node_modules",

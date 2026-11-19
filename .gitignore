@@ -1,5 +1,11 @@
 node_modules
 dist
-extracted
+extracted/**/*.bin
+extracted/**/*.bgm
+extracted/**/*.sfx
+extracted/**/*.pal
+extracted-jp
 rebuilt
 package-lock.json
+.env
+.env.local

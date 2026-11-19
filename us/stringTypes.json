@@ -1,17 +1,20 @@
 ﻿{
   "ASCIIString": {
     "delimiter": "|",
-    "shiftType": null,
     "terminator": 0,
-    "characterMap": [
-      null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
-      null, null, null, null, null, null, null, null, null, null, null, null, null, "⸓", null, null,
-      " ", "!", "ˎ", "Æ", "←", "˳", "‥", "˲", "[", "]", "*", "►", ",", "+", "-", "/",
-      "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ":", "·", "\"", "▼", "ˮ", "?",
-      "█", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O",
-      "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "-", "'", "<", ">", "#",
-      " ", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o",
-      "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "¥", "_", "{", "}", "¦"
+    "layers": [
+      {
+        "map": [
+          null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+          null, null, null, null, null, null, null, null, null, null, null, null, null, "⸓", null, null,
+          " ", "!", "ˎ", "Æ", "←", "˳", "‥", "˲", "[", "]", "*", "►", ",", "+", "-", "/",
+          "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ":", "·", "\"", "▼", "ˮ", "?",
+          "█", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O",
+          "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "-", "'", "<", ">", "#",
+          " ", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o",
+          "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "¥", "_", "{", "}", "¦"
+        ]
+      }
     ],
     "commands": {
       "00": { "id": 0, "types": [], "halt": true },
@@ -39,7 +42,6 @@
     "dictionaries": {
       "lookup_108000": {
         "base": 128,
-        "range": 255,
         "entries": [
           "All ",
           "A ",

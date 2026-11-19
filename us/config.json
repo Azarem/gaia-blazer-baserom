@@ -3,15 +3,18 @@
   "sfxLocation": 229376,
   "sfxCount": 32,
   "sfxType": "Sequential",
+  "uncompress": false,
   "memoryMode": "Lo",
   "cpuMode": "Slow",
   "chipset": 2,
   "ramSize": 3,
-  "entryPoints": [
-    { "location": 32740, "name": "native_mode_cop_00561E" },
-    { "location": 32742, "name": "native_mode_brk_0055FC" },
-    { "location": 32746, "name": "native_mode_nmi_000342" },
-    { "location": 32750, "name": "native_mode_irq_0005A5" },
-    { "location": 32764, "name": "emulation_mode_reset_000000" }
-  ]
+  "countryCode": 1,
+  "developerId": 180,
+  "gameTitle": "SOULBLAZER - 1 USA",
+  "gameVersion": 0,
+  "nativeCop": "native_mode_cop_00561E",
+  "nativeBrk": "native_mode_brk_0055FC",
+  "nativeNmi": "native_mode_nmi_000342",
+  "nativeIrq": "native_mode_irq_0005A5",
+  "emulationReset": "emulation_mode_reset_000000"
 }

@@ -19,30 +19,24 @@
         "prebuild": "node -p \"'export const BASEROM_VERSION = ' + JSON.stringify(require('./package.json').version) + ';'\" > src/version.ts",
         "build": "tsdown",
         "dev": "tsdown --watch",
-        "lint": "eslint src --ext .ts,.tsx",
-        "lint:fix": "eslint src --ext .ts,.tsx --fix",
-        "test": "vitest run",
-        "test:watch": "vitest --watch",
         "type-check": "tsc --noEmit",
         "clean": "rm -rf dist",
         "clean-install": "rm -rf node_modules && rm -rf package-lock.json && npm install",
         "publish": "tsdown && npm publish --access public",
-        "extract": "node src/index.ts extract",
-        "extract-jp": "node src/index.ts extract-jp",
+        "extract": "node --env-file-if-exists=.env.local src/index.ts extract",
+        "extract:lt": "node --env-file-if-exists=.env.local src/index.ts extract --linetracking",
+        "extract-jp": "node --env-file-if-exists=.env.local src/index.ts extract-jp",
         "extract-strings": "node src/extractStrings.ts",
-        "rebuild": "node src/index.ts rebuild"
+        "rebuild": "node src/index.ts rebuild",
+        "merge": "node src/index.ts merge",
+        "names": "node src/index.ts names"
     },
     "dependencies": {
-        "@gaialabs/core": "^0.2.3"
+        "@gaialabs/core": "1.0.7"
     },
     "devDependencies": {
-        "@types/node": "^20.19.29",
-        "@typescript-eslint/eslint-plugin": "^8.53.0",
-        "@typescript-eslint/parser": "^8.53.0",
-        "eslint": "^9.39.2",
-        "tsdown": "^0.20.0-beta.3",
-        "typescript": "^5.9.3",
-        "vitest": "^4.0.17"
+        "tsdown": "^0.23.0",
+        "typescript": "^6.0.3"
     },
     "exports": {
         ".": {
