@@ -1,12 +1,31 @@
+; The enemies of Leo's Paintings (file offsets 1027370-1028341, bank 1F): the Yellow Knight ($26) with three spear actors, the Metal Crawler ($27), the Purple Bird ($28), the Green Torch ($29) with its fireball, the Monster Blocks ($2E) and the spikes ($2F).
+; 
+; === ROSTER ===
+; Stats from MetaGrassValley and the walkthrough bestiary: Yellow Knight 9 HP / 5 EXP ('throwing spears'), Metal Crawler 24 HP / 250 EXP ('running around', metal), Purple Bird 4 HP / 3 EXP, Green Torch 9 HP / 4 EXP ('fireballs'), Monster Blocks 4 HP ('jumping at you'), spikes 1 HP / 0 EXP. The lair records give the identities: record $22 (type $28, the Purple Birds' lair that frees a tulip) and the walkthrough's 'Purple Birds' lair to release a tulip'. The Metal Crawlers need the Zantetsu Sword (walkthrough). The spikes are placed four times in A03S02 (the walkthrough: 'stone, non-moving paths (unless you some spike fetish)').
+; 
+; === NOTES ===
+; - DISCREPANCY: MetaGrassValley type $2E gives the Monster Blocks 3 EXP, the walkthrough bestiary 2 EXP (OQ-I034-11). The $2E identity itself comes from the jump-at-you behaviour.
+; - Type $2F as 'spikes' rests on the placements and the walkthrough sentence above, not on a name in the ROM (OQ-I034-10).
+---------------------------------------------
+
 ?BANK 1F
 
 ---------------------------------------------
 
-code_0FAD2A {
+; The Yellow Knight: walks and throws spears when lined up with the hero.
+; 
+; When: meta type $26; spawned by Leo's Paintings lairs.
+; Sees: a knight that walks towards the hero ($0E / $14 / $0D / $13 / $0C / $12 animations) and, when lined up within $10 pixels, throws a spear in that direction (animations $16 / $15 / $17, then $10 / $0F / $11).
+; Why: COP 9A / 9B / 9C choose the direction.
+; In: actor script, X = own slot.
+; Out: spears gv_enemy_knight_spear_0FAEAF / _0FAEBA / _0FAE8F.
+; Clobbers: A.
+
+gv_enemy_yellow_knight_0FAD2A {
     LDA $0016, X
     BIT #$8000
     BEQ loc_0FAD38
-    COP [1B] ( &code_0FAD2A, #$0010 )
+    COP [1B] ( &gv_enemy_yellow_knight_0FAD2A, #$0010 )
 
   loc_0FAD38:
     COP [9A] ( #$0010, &code_0FAD42, &code_0FAE1B, &code_0FAD42 )
@@ -109,7 +128,7 @@ code_0FAE07 {
 }
 
 code_0FAE11 {
-    COP [9B] ( #$0010, &code_0FAD2A, &code_0FAE53, &code_0FAD2A )
+    COP [9B] ( #$0010, &gv_enemy_yellow_knight_0FAD2A, &code_0FAE53, &gv_enemy_yellow_knight_0FAD2A )
 }
 
 code_0FAE1B {
@@ -121,10 +140,10 @@ code_0FAE25 {
     COP [82]
     COP [80] ( #16 )
     COP [82]
-    COP [85] ( @code_0FAEAF )
+    COP [85] ( @gv_enemy_knight_spear_0FAEAF )
     COP [80] ( #10 )
     COP [82]
-    BRL code_0FAD2A
+    BRL gv_enemy_yellow_knight_0FAD2A
 }
 
 code_0FAE3C {
@@ -132,10 +151,10 @@ code_0FAE3C {
     COP [82]
     COP [80] ( #15 )
     COP [82]
-    COP [85] ( @code_0FAEBA )
+    COP [85] ( @gv_enemy_knight_spear_0FAEBA )
     COP [80] ( #0F )
     COP [82]
-    BRL code_0FAD2A
+    BRL gv_enemy_yellow_knight_0FAD2A
 }
 
 code_0FAE53 {
@@ -147,10 +166,10 @@ code_0FAE5D {
     COP [82]
     COP [80] ( #17 )
     COP [82]
-    COP [85] ( @code_0FAE8F )
+    COP [85] ( @gv_enemy_knight_spear_0FAE8F )
     COP [80] ( #11 )
     COP [82]
-    BRL code_0FAD2A
+    BRL gv_enemy_yellow_knight_0FAD2A
 }
 
 code_0FAE74 {
@@ -159,14 +178,24 @@ code_0FAE74 {
     COP [82]
     COP [80] ( #17 )
     COP [82]
-    COP [85] ( @code_0FAE8F )
+    COP [85] ( @gv_enemy_knight_spear_0FAE8F )
     COP [80] ( #11 )
     COP [82]
     COP [97]
-    BRL code_0FAD2A
+    BRL gv_enemy_yellow_knight_0FAD2A
 }
 
-code_0FAE8F {
+---------------------------------------------
+; Spear thrown by the Yellow Knight (the flipped sideways throw).
+; 
+; When: spawned by gv_enemy_yellow_knight_0FAD2A.
+; Sees: a spear that flies until it leaves the screen.
+; Why: flags $0200, priority $30, in front; BRK $5B; offset (-1, -8).
+; In: actor script, X = own slot.
+; Out: loops animation $26 and ends with COP 86 when COP 1C finds $16 bit $8000 (off screen).
+; Clobbers: A.
+
+gv_enemy_knight_spear_0FAE8F {
     COP [A1] ( #$FFFF, #$FFF8 )
     LDA #$0200
     STA $0016, X
@@ -181,13 +210,33 @@ code_0FAE8F {
     BRA loc_0FAEA2
 }
 
-code_0FAEAF {
+---------------------------------------------
+; Spear thrown by the Yellow Knight (offset (+4, -15), animation $25).
+; 
+; When: spawned by gv_enemy_yellow_knight_0FAD2A.
+; Sees: as gv_enemy_knight_spear_0FAE8F.
+; Why: the entry only sets the offset and animation, then joins the shared tail at loc_0FAEC3.
+; In: actor script, X = own slot.
+; Out: COP 91 and a loop until the actor is off screen, then COP 86.
+; Clobbers: A.
+
+gv_enemy_knight_spear_0FAEAF {
     COP [A1] ( #$0004, #$FFF1 )
     LDA #$0025
     BRA loc_0FAEC3
 }
 
-code_0FAEBA {
+---------------------------------------------
+; Spear thrown by the Yellow Knight (offset (-4, -8), animation $24).
+; 
+; When: spawned by gv_enemy_yellow_knight_0FAD2A.
+; Sees: as gv_enemy_knight_spear_0FAE8F.
+; Why: the entry only sets the offset and animation, then joins the shared tail at loc_0FAEC3.
+; In: actor script, X = own slot.
+; Out: as gv_enemy_knight_spear_0FAEAF.
+; Clobbers: A.
+
+gv_enemy_knight_spear_0FAEBA {
     COP [A1] ( #$FFFC, #$FFF8 )
     LDA #$0024
 
@@ -213,7 +262,16 @@ code_0FAEE2 {
 }
 ---------------------------------------------
 
-code_0FAEE5 {
+; The Metal Crawler: runs along the walls and is immune until the Zantetsu Sword.
+; 
+; When: meta type $27; spawned by the Metal Crawler lairs of Leo's Paintings (the walkthrough: 'the monster lair you pass is for the Metal Crawlers').
+; Sees: a metal creature that crawls back and forth, turning at walls (24 HP, 250 EXP).
+; Why: COP A5 branches on the flip bits and COP 21-24 test the tiles around it, so it turns at obstacles; the animations are $1F-$21.
+; In: actor script, X = own slot; it ORs $0400 into its $1A flags first (the bit is undocumented, the walkthrough calls the monster 'Metal').
+; Out: loops for ever.
+; Clobbers: A.
+
+gv_enemy_metal_crawler_0FAEE5 {
     LDA $001A, X
     ORA #$0400
     STA $001A, X
@@ -279,7 +337,16 @@ code_0FAF38 {
 }
 ---------------------------------------------
 
-code_0FAF44 {
+; The Purple Bird: flutters towards the hero.
+; 
+; When: meta type $28; spawned by the Purple Birds' lair (record $22, which frees a tulip in the village).
+; Sees: a bird that flaps in place and darts towards the hero (4 HP, 3 EXP).
+; Why: COP 9C picks the axis, COP 9A / 9B the side; animations $18-$1D, each played twice with COP 81 and followed by the rest pose.
+; In: actor script, X = own slot; priority $30 and drawn in front (COP A2 / A3).
+; Out: loops for ever; waits 16 frames while off screen.
+; Clobbers: A.
+
+gv_enemy_purple_bird_0FAF44 {
     COP [A2] ( #30 )
     COP [A3]
 
@@ -338,11 +405,20 @@ code_0FAF9C {
 }
 ---------------------------------------------
 
-code_0FAFAD {
+; The Green Torch: turns to the hero and shoots fireballs.
+; 
+; When: meta type $29; spawned by Leo's Paintings lairs ('a ton of Green Torches').
+; Sees: a torch that faces the hero and fires a fireball in his direction (9 HP, 4 EXP).
+; Why: COP 9A / 9B choose up, down, left or right; COP 84 spawns gv_enemy_torch_fireball_0FB02F and the animation $27 / $28 / $29 of the child tells the direction.
+; In: actor script, X = own slot.
+; Out: after the shot it plays animation $22 and loops.
+; Clobbers: A, Y (the child).
+
+gv_enemy_green_torch_0FAFAD {
     LDA $0016, X
     BIT #$8000
     BEQ loc_0FAFBB
-    COP [1B] ( &code_0FAFAD, #$0008 )
+    COP [1B] ( &gv_enemy_green_torch_0FAFAD, #$0008 )
 
   loc_0FAFBB:
     COP [97]
@@ -352,7 +428,7 @@ code_0FAFAD {
 }
 
 code_0FAFCC {
-    COP [9A] ( #$0010, &code_0FAFAD, &code_0FAFF6, &code_0FAFAD )
+    COP [9A] ( #$0010, &gv_enemy_green_torch_0FAFAD, &code_0FAFF6, &gv_enemy_green_torch_0FAFAD )
 }
 
 code_0FAFD6 {
@@ -393,7 +469,7 @@ code_0FB00A {
 
   loc_0FB014:
     PHA 
-    COP [84] ( @code_0FB02F )
+    COP [84] ( @gv_enemy_torch_fireball_0FB02F )
     PLA 
     STA $001E, Y
     LDA #$0000
@@ -401,10 +477,20 @@ code_0FB00A {
     COP [97]
     COP [81] ( #22, #04 )
     COP [83]
-    BRL code_0FAFAD
+    BRL gv_enemy_green_torch_0FAFAD
 }
 
-code_0FB02F {
+---------------------------------------------
+; The fireball of the Green Torch.
+; 
+; When: spawned by gv_enemy_green_torch_0FAFAD.
+; Sees: a fireball (BRK $64) that flies in the direction of its animation.
+; Why: flags $0200, priority $30, in front; moved up by 4 first (COP A0).
+; In: actor script, X = own slot; the parent has written animation $27-$29 into $1E.
+; Out: COP 91, then animation steps until off screen and COP 86.
+; Clobbers: A.
+
+gv_enemy_torch_fireball_0FB02F {
     LDA #$0200
     STA $0016, X
     COP [A2] ( #30 )
@@ -425,13 +511,22 @@ code_0FB04C {
 }
 ---------------------------------------------
 
-code_0FB04F {
+; The Monster Blocks: sit still and then jump at the hero.
+; 
+; When: meta type $2E; spawned by Leo's Paintings lairs (walkthrough: 'Monster Blocks ... jump around and are easily beaten').
+; Sees: a block that waits until the hero is inside its box widened by 5, then plays animation $02, $03 (two repeats) and $01 (the jump) and follows him with $04-$06 while he stays near.
+; Why: COP 21-24 stop it at walls; COP 9A / 9B pick the direction.
+; In: actor script, X = own slot.
+; Out: loops for ever; waits 16 frames while off screen.
+; Clobbers: A.
+
+gv_enemy_monster_blocks_0FB04F {
     LDA $0016, X
     BIT #$8000
     BEQ loc_0FB05D
 
   loc_0FB057:
-    COP [1B] ( &code_0FB04F, #$0010 )
+    COP [1B] ( &gv_enemy_monster_blocks_0FB04F, #$0010 )
 
   loc_0FB05D:
     COP [0C] ( #00, #05, &code_0FB065 )
@@ -502,7 +597,16 @@ code_0FB0CF {
 }
 ---------------------------------------------
 
-code_0FB0D6 {
+; The spikes of A03S02: a harmless-looking object that hurts.
+; 
+; When: meta type $2F; placed four times in A03S02 (one with placement flags $C1).
+; Sees: static spikes, drawn behind (COP A4); they play animation $2C or $2D for 255 repeats depending on the flip state.
+; Why: they are an actor so the engine can handle the contact damage like a monster's (1 HP, 0 EXP in MetaGrassValley).
+; In: actor script, X = own slot.
+; Out: loops for ever.
+; Clobbers: A.
+
+gv_enemy_spikes_0FB0D6 {
     COP [A2] ( #00 )
     COP [A4]
     COP [A5] ( &code_0FB0E5, &code_0FB0ED, &code_0FB0ED, &code_0FB0ED )

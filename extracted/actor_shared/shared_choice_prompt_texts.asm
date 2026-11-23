@@ -7,7 +7,7 @@
 ; 
 ; === NOTES ===
 ; - Which actor asks which string is documented at each part; the questions themselves are in the actor files.
-; - The Master's menu is the walkthrough's northern square of Up Above: 'The northern square will allow you to save your adventure, as well as move on later in the game' (01-in-the-beginning.md; also 'go there to heal and save if wanted', 06-dr-leos-lab.md). 'Record' is the saving; 'Move' is the later 'move on', added once the Grass Valley chief has handed over the Brown Stone (OQ-I030-1).
+; - The Master's menu is the walkthrough's northern square of Up Above: 'The northern square will allow you to save your adventure, as well as move on later in the game' (01-in-the-beginning.md; also 'go there to heal and save if wanted', 06-dr-leos-lab.md). 'Record' is the saving; 'Move' is the later 'move on', added once the Grass Valley chief has handed over the Brown Stone; it leaves for the Up Above hub (A00S09), where the walker starts on the stop of the current world (cm_npc_master_move_to_hub_0076B2).
 ---------------------------------------------
 
 ?BANK 02
@@ -40,11 +40,11 @@ ChoiceYesOnlyText |[CUR:308][07:4,2] Yes[CUR:38A]|
 
 ; Record / Move / Quit option window (3 options): the Master's menu once 'Move' is available.
 ; 
-; When: Cop1A_ChoiceMenu with count 3 in code_00769C of shared_actor_helpers_bank0 (the Master's menu actor code_00766C): reached when COP [07] ( #$9B00 ) finds event flag $1B00 set. Another script sets it: code_01A0C6 of gv_village_actors_019475 runs COP [09] ( #$9B00 ) right after the Master's voice says the Brown Stone is a key to the World of Evil (walkthrough 02-grass-valley.md: the chief hands over the Brown Stone).
+; When: Cop1A_ChoiceMenu with count 3 in cm_npc_master_greeting_with_move_00769C of shared_actor_helpers_bank0 (the Master's menu actor cm_npc_master_shrine_menu_00766C): reached when COP [07] ( #$9B00 ) finds event flag $1B00 set. Another script sets it: code_01A0C6 of gv_village_actors_019475 runs COP [09] ( #$9B00 ) right after the Master's voice says the Brown Stone is a key to the World of Evil (walkthrough 02-grass-valley.md: the chief hands over the Brown Stone).
 ; Sees: a window at row 8, column 4 (7 x 6) with ' Record', ' Move ' and ' Quit', after the Master's 'how can I help you?'.
 ; Why: the Master offers saving at any time; Move is the third entry, which the walkthrough calls 'move on later in the game' (01-in-the-beginning.md).
 ; In: n/a (data). The trailing [CUR:28A] is the arrow cell of Record.
-; Out: n/a. Index 0 Record (asks 'I will record all you have accomplished- Is this okay?' and calls lib_save_system.SaveGameToSlot), 1 Move (sets scene_next = 9 and warp_dest_x / warp_dest_y from data_0076D3 by world_index; what it does in game is OQ-I030-1), 2 Quit (and Y) = the farewell code_007754.
+; Out: n/a. Index 0 Record (asks 'I will record all you have accomplished- Is this okay?' and calls lib_save_system.SaveGameToSlot), 1 Move (sets scene_next = 9 and warp_dest_x / warp_dest_y from cm_data_master_move_hub_positions_0076D3 by world_index; scene 9 of area 0 is the Up Above hub A00S09, where the map walker starts on the stop of the current world), 2 Quit (and Y) = the farewell cm_npc_master_farewell_007754.
 ; Clobbers: n/a.
 
 ChoiceRecordMoveQuitText |[CUR:208][07:7,6] Record[N][N] Move [N][N] Quit[CUR:28A]|
@@ -52,11 +52,11 @@ ChoiceRecordMoveQuitText |[CUR:208][07:7,6] Record[N][N] Move [N][N] Quit[CUR:28
 
 ; Record / Quit option window (2 options): the Master's menu before 'Move' is available.
 ; 
-; When: Cop1A_ChoiceMenu with count 2 in code_00767F of shared_actor_helpers_bank0 (the Master's menu actor code_00766C), when event flag $1B00 is clear.
+; When: Cop1A_ChoiceMenu with count 2 in cm_npc_master_greeting_00767F of shared_actor_helpers_bank0 (the Master's menu actor cm_npc_master_shrine_menu_00766C), when event flag $1B00 is clear.
 ; Sees: a window at row 10, column 4 (7 x 4) with ' Record' and ' Quit'.
 ; Why: the same menu as ChoiceRecordMoveQuitText without the third entry.
 ; In: n/a (data). The trailing [CUR:30A] is the arrow cell of Record.
-; Out: n/a. Index 0 Record (code_0076EF), any other answer and Y = the farewell code_007754.
+; Out: n/a. Index 0 Record (cm_npc_master_record_0076EF), any other answer and Y = the farewell cm_npc_master_farewell_007754.
 ; Clobbers: n/a.
 
 ChoiceRecordQuitText |[CUR:288][07:7,4] Record[N][N] Quit[CUR:30A]|

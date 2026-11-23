@@ -23,6 +23,7 @@
 !player_tile_y                  037A
 !vram_upload_flags              03B8
 !text_resume_pos                03F3
+!front_end_step                 0482
 !location_id                    1C6A
 !actor_run_count                1F00
 !JOY2H                          421B
@@ -237,7 +238,7 @@ DebugApplyItem {
 UnusedAnimWaitStep4 {
     COP [80] ( #07 )
     COP [82]
-    LDA $0482
+    LDA $front_end_step
     CMP #$0004
     BNE UnusedAnimWaitStep4
     COP [80] ( #07 )
@@ -246,7 +247,7 @@ UnusedAnimWaitStep4 {
     COP [82]
     COP [80] ( #09 )
     COP [82]
-    INC $0482
+    INC $front_end_step
     COP [91]
     RTL 
 }

@@ -234,40 +234,40 @@
         "gv_boss_metal_mantis": {
             "scene": "leos_paintings",
             "parts": {
-                "code_0031AD": { "start": 12717, "end": 13254, "type": "Code" }
+                "gv_boss_metal_mantis_0031AD": { "start": 12717, "end": 13254, "type": "Code" }
             }
         },
         "gv_front_end": {
             "scene": "front_end",
             "parts": {
-                "code_0066C6": { "start": 26310, "end": 26364, "type": "Code" },
-                "code_0066FC": { "start": 26364, "end": 27270, "type": "Code" },
-                "binary_006A86": { "start": 27270, "end": 27275, "type": "Binary" },
-                "binary_006A8B": { "start": 27275, "end": 27280, "type": "Binary" },
-                "code_006A90": { "start": 27280, "end": 27519, "type": "Code" },
-                "code_00729D": { "start": 29341, "end": 29873, "type": "Code" },
-                "code_0074D3": { "start": 29907, "end": 30316, "type": "Code" }
+                "gv_obj_boot_loader_0066C6": { "start": 26310, "end": 26364, "type": "Code" },
+                "gv_obj_title_and_prologue_0066FC": { "start": 26364, "end": 27270, "type": "Code" },
+                "gv_hdma_title_bgmode_006A86": { "start": 27270, "end": 27275, "type": "Binary" },
+                "gv_hdma_title_tm_006A8B": { "start": 27275, "end": 27280, "type": "Binary" },
+                "gv_obj_title_sprite_motion_006A90": { "start": 27280, "end": 27519, "type": "Code" },
+                "gv_obj_ending_sequence_00729D": { "start": 29341, "end": 29873, "type": "Code" },
+                "gv_obj_ending_scroll_0074D3": { "start": 29907, "end": 30316, "type": "Code" }
             }
         },
         "gv_up_above_actors_and_name_entry": {
             "scene": "up_above",
             "parts": {
-                "code_006E28": { "start": 28200, "end": 28851, "type": "Code" },
-                "code_0070B3": { "start": 28851, "end": 28885, "type": "Code" },
+                "gv_obj_up_above_map_walker_006E28": { "start": 28200, "end": 28851, "type": "Code" },
+                "gv_obj_up_above_scenery_gated_0070B3": { "start": 28851, "end": 28885, "type": "Code" },
                 "code_0070D5": { "start": 28885, "end": 28891, "type": "Code" },
                 "code_0070DB": { "start": 28891, "end": 28897, "type": "Code" },
                 "code_0070E1": { "start": 28897, "end": 28898, "type": "Code" },
                 "code_0070E2": { "start": 28898, "end": 28899, "type": "Code" },
-                "code_0070E3": { "start": 28899, "end": 28916, "type": "Code" },
-                "code_0070F4": { "start": 28916, "end": 28931, "type": "Code" },
+                "gv_obj_up_above_boss_marker_0070E3": { "start": 28899, "end": 28916, "type": "Code" },
+                "gv_obj_up_above_boss_marker_0070F4": { "start": 28916, "end": 28931, "type": "Code" },
                 "code_007103": { "start": 28931, "end": 28932, "type": "Code" },
-                "code_007104": { "start": 28932, "end": 28949, "type": "Code" },
+                "gv_obj_up_above_boss_marker_007104": { "start": 28932, "end": 28949, "type": "Code" },
                 "code_007115": { "start": 28949, "end": 28955, "type": "Code" },
                 "code_00711B": { "start": 28955, "end": 28961, "type": "Code" },
                 "code_007121": { "start": 28961, "end": 28967, "type": "Code" },
-                "code_007127": { "start": 28967, "end": 28993, "type": "Code" },
-                "code_007141": { "start": 28993, "end": 29341, "type": "Code" },
-                "code_00797B": { "start": 31099, "end": 31314, "type": "Code" }
+                "gv_obj_up_above_backdrop_007127": { "start": 28967, "end": 28993, "type": "Code" },
+                "gv_obj_up_above_path_markers_007141": { "start": 28993, "end": 29341, "type": "Code" },
+                "gv_obj_name_entry_voice_00797B": { "start": 31099, "end": 31314, "type": "Code" }
             }
         },
         "gv_title_texts": {
@@ -316,64 +316,64 @@
         "gv_village_actors_018000": {
             "scene": "grass_valley_village",
             "parts": {
-                "code_018000": { "start": 98304, "end": 98551, "type": "Code" },
-                "code_0180F7": { "start": 98551, "end": 99155, "type": "Code" },
-                "code_018353": { "start": 99155, "end": 99456, "type": "Code" },
+                "gv_npc_old_man_crab_walk_018000": { "start": 98304, "end": 98551, "type": "Code" },
+                "gv_npc_old_woman_0180F7": { "start": 98551, "end": 99155, "type": "Code" },
+                "gv_npc_tool_shop_owner_018353": { "start": 99155, "end": 99456, "type": "Code" },
                 "asciistring_018480": { "start": 99456, "end": 99466, "type": "ASCIIString" },
-                "code_01848A": { "start": 99466, "end": 99769, "type": "Code" },
-                "code_0185B9": { "start": 99769, "end": 100002, "type": "Code" },
-                "code_0186A2": { "start": 100002, "end": 100634, "type": "Code" },
-                "code_01891A": { "start": 100634, "end": 100953, "type": "Code" },
-                "code_018A59": { "start": 100953, "end": 102388, "type": "Code" },
-                "code_018FF4": { "start": 102388, "end": 102668, "type": "Code" },
-                "code_01910C": { "start": 102668, "end": 102866, "type": "Code" },
-                "code_0191D2": { "start": 102866, "end": 103269, "type": "Code" },
-                "code_019365": { "start": 103269, "end": 103541, "type": "Code" }
+                "gv_npc_tulip_water_mill_01848A": { "start": 99466, "end": 99769, "type": "Code" },
+                "gv_npc_bridge_guard_0185B9": { "start": 99769, "end": 100002, "type": "Code" },
+                "gv_npc_water_mill_keeper_0186A2": { "start": 100002, "end": 100634, "type": "Code" },
+                "gv_npc_goat_pen_01891A": { "start": 100634, "end": 100953, "type": "Code" },
+                "gv_npc_lisa_018A59": { "start": 100953, "end": 102388, "type": "Code" },
+                "gv_npc_tulip_dream_rod_018FF4": { "start": 102388, "end": 102668, "type": "Code" },
+                "gv_npc_architect_gaudi_01910C": { "start": 102668, "end": 102866, "type": "Code" },
+                "gv_npc_tool_shop_son_0191D2": { "start": 102866, "end": 103269, "type": "Code" },
+                "gv_npc_tulip_dream_boundary_019365": { "start": 103269, "end": 103541, "type": "Code" }
             }
         },
         "gv_village_actors_019475": {
             "scene": "grass_valley_village",
             "parts": {
-                "code_019475": { "start": 103541, "end": 104004, "type": "Code" },
-                "code_019644": { "start": 104004, "end": 104022, "type": "Code" },
-                "code_019656": { "start": 104022, "end": 104040, "type": "Code" },
-                "code_019668": { "start": 104040, "end": 104410, "type": "Code" },
-                "code_0197DA": { "start": 104410, "end": 104614, "type": "Code" },
-                "code_0198A6": { "start": 104614, "end": 105004, "type": "Code" },
-                "code_019A2C": { "start": 105004, "end": 105694, "type": "Code" },
-                "code_019CDE": { "start": 105694, "end": 106228, "type": "Code" },
-                "code_019EF4": { "start": 106228, "end": 106362, "type": "Code" },
-                "code_019F7A": { "start": 106362, "end": 106500, "type": "Code" },
-                "code_01A004": { "start": 106500, "end": 106648, "type": "Code" },
-                "code_01A098": { "start": 106648, "end": 107339, "type": "Code" },
-                "code_01A34B": { "start": 107339, "end": 107440, "type": "Code" },
-                "code_01AA26": { "start": 109094, "end": 109391, "type": "Code" },
-                "code_01AB4F": { "start": 109391, "end": 109497, "type": "Code" },
-                "code_01AC06": { "start": 109574, "end": 109618, "type": "Code" }
+                "gv_obj_leos_painting_019475": { "start": 103541, "end": 104004, "type": "Code" },
+                "gv_obj_water_mill_anim_1C_019644": { "start": 104004, "end": 104022, "type": "Code" },
+                "gv_obj_water_mill_anim_1D_019656": { "start": 104022, "end": 104040, "type": "Code" },
+                "gv_npc_boy_secret_hut_019668": { "start": 104040, "end": 104410, "type": "Code" },
+                "gv_npc_tulip_clubhouse_pass_0197DA": { "start": 104410, "end": 104614, "type": "Code" },
+                "gv_npc_boy_secret_passage_0198A6": { "start": 104614, "end": 105004, "type": "Code" },
+                "gv_npc_lonely_goat_guide_019A2C": { "start": 105004, "end": 105694, "type": "Code" },
+                "gv_npc_gourmet_goat_019CDE": { "start": 105694, "end": 106228, "type": "Code" },
+                "gv_npc_old_man_pet_goat_019EF4": { "start": 106228, "end": 106362, "type": "Code" },
+                "gv_npc_goat_reincarnation_019F7A": { "start": 106362, "end": 106500, "type": "Code" },
+                "gv_npc_tulip_hidden_item_hint_01A004": { "start": 106500, "end": 106648, "type": "Code" },
+                "gv_npc_village_chief_01A098": { "start": 106648, "end": 107339, "type": "Code" },
+                "gv_obj_chief_rocking_chair_01A34B": { "start": 107339, "end": 107440, "type": "Code" },
+                "gv_npc_castle_entrance_voice_01AA26": { "start": 109094, "end": 109391, "type": "Code" },
+                "gv_npc_fairy_recover_sword_01AB4F": { "start": 109391, "end": 109497, "type": "Code" },
+                "gv_npc_fairy_exp_80_01AC06": { "start": 109574, "end": 109618, "type": "Code" }
             }
         },
         "gv_leos_paintings_actors": {
             "scene": "leos_paintings",
             "parts": {
-                "code_01A3B0": { "start": 107440, "end": 107584, "type": "Code" },
-                "code_01AD42": { "start": 109890, "end": 110072, "type": "Code" },
-                "code_01B21A": { "start": 111130, "end": 111165, "type": "Code" },
-                "code_01B273": { "start": 111219, "end": 111236, "type": "Code" },
-                "binary_01B284": { "start": 111236, "end": 111275, "type": "Binary" }
+                "gv_npc_tulip_dream_01A3B0": { "start": 107440, "end": 107584, "type": "Code" },
+                "gv_npc_fairy_metal_hint_01AD42": { "start": 109890, "end": 110072, "type": "Code" },
+                "gv_obj_bg2_scroll_drift_01B21A": { "start": 111130, "end": 111165, "type": "Code" },
+                "gv_fx_hdma_gradient_01B273": { "start": 111219, "end": 111236, "type": "Code" },
+                "gv_hdma_gradient_table_01B284": { "start": 111236, "end": 111275, "type": "Binary" }
             }
         },
         "gv_underground_castle_actors": {
             "scene": "underground_castle",
             "parts": {
-                "code_01A440": { "start": 107584, "end": 107769, "type": "Code" },
+                "gv_npc_lisa_dream_01A440": { "start": 107584, "end": 107769, "type": "Code" },
                 "asciistring_01A50A": { "start": 107786, "end": 108460, "type": "ASCIIString" },
-                "code_01AC32": { "start": 109618, "end": 109851, "type": "Code" },
-                "code_01AD1B": { "start": 109851, "end": 109890, "type": "Code" },
-                "code_01ADF8": { "start": 110072, "end": 110233, "type": "Code" },
-                "code_01AE99": { "start": 110233, "end": 110428, "type": "Code" },
-                "code_01AF5C": { "start": 110428, "end": 110589, "type": "Code" },
-                "code_01B23D": { "start": 111165, "end": 111182, "type": "Code" },
-                "binary_01B24E": { "start": 111182, "end": 111219, "type": "Binary" },
+                "gv_npc_fairy_exp_30_01AC32": { "start": 109618, "end": 109851, "type": "Code" },
+                "ReturnToGrassValleyPrompt": { "start": 109851, "end": 109890, "type": "Code" },
+                "gv_npc_fairy_heart_of_castle_01ADF8": { "start": 110072, "end": 110233, "type": "Code" },
+                "gv_obj_elevator_01AE99": { "start": 110233, "end": 110428, "type": "Code" },
+                "gv_obj_elevator_platform_01AF5C": { "start": 110428, "end": 110589, "type": "Code" },
+                "gv_fx_hdma_gradient_01B23D": { "start": 111165, "end": 111182, "type": "Code" },
+                "gv_hdma_gradient_table_01B24E": { "start": 111182, "end": 111219, "type": "Binary" },
                 "asciistring_01B2AB": { "start": 111275, "end": 111418, "type": "ASCIIString" }
             }
         },
@@ -385,9 +385,9 @@
         "gv_up_above_trial_room_and_lisa_turbo_actors": {
             "scene": "up_above",
             "parts": {
-                "code_01A7AC": { "start": 108460, "end": 109094, "type": "Code" },
-                "code_01B33A": { "start": 111418, "end": 112999, "type": "Code" },
-                "code_01B967": { "start": 112999, "end": 113032, "type": "Code" }
+                "gv_npc_magician_01A7AC": { "start": 108460, "end": 109094, "type": "Code" },
+                "gv_npc_lisa_epilogue_01B33A": { "start": 111418, "end": 112999, "type": "Code" },
+                "gv_npc_turbo_01B967": { "start": 112999, "end": 113032, "type": "Code" }
             }
         },
         "gv_watching_over_world_texts": {
@@ -397,35 +397,35 @@
         },
         "gv_multi_area_actors": {
             "parts": {
-                "code_01AFFD": { "start": 110589, "end": 110658, "type": "Code" },
-                "unk16_01B042": { "start": 110658, "end": 110945, "type": "unk16" },
-                "code_01B1F7": { "start": 111095, "end": 111130, "type": "Code" }
+                "gv_obj_push_zone_setup_01AFFD": { "start": 110589, "end": 110658, "type": "Code" },
+                "gv_push_zones_underground_west_01B042": { "start": 110658, "end": 110945, "type": "unk16" },
+                "gv_obj_bg2_scroll_drift_01B1F7": { "start": 111095, "end": 111130, "type": "Code" }
             }
         },
         "gv_enemy_0FAA49": {
             "parts": {
-                "code_0FAA49": { "start": 1026633, "end": 1026703, "type": "Code" }
+                "gv_enemy_green_humanoid_0FAA49": { "start": 1026633, "end": 1026703, "type": "Code" }
             }
         },
         "gv_underground_castle_enemies": {
             "scene": "underground_castle",
             "parts": {
-                "code_0FAA8F": { "start": 1026703, "end": 1026970, "type": "Code" },
-                "code_0FAB9A": { "start": 1026970, "end": 1027121, "type": "Code" },
-                "code_0FAC31": { "start": 1027121, "end": 1027194, "type": "Code" },
-                "code_0FAC7A": { "start": 1027194, "end": 1027314, "type": "Code" },
-                "code_0FACF2": { "start": 1027314, "end": 1027370, "type": "Code" }
+                "gv_enemy_yellow_humanoid_0FAA8F": { "start": 1026703, "end": 1026970, "type": "Code" },
+                "gv_enemy_walking_bush_0FAB9A": { "start": 1026970, "end": 1027121, "type": "Code" },
+                "gv_enemy_fly_0FAC31": { "start": 1027121, "end": 1027194, "type": "Code" },
+                "gv_enemy_blue_liquid_0FAC7A": { "start": 1027194, "end": 1027314, "type": "Code" },
+                "gv_enemy_blue_torch_0FACF2": { "start": 1027314, "end": 1027370, "type": "Code" }
             }
         },
         "gv_leos_paintings_enemies": {
             "scene": "leos_paintings",
             "parts": {
-                "code_0FAD2A": { "start": 1027370, "end": 1027813, "type": "Code" },
-                "code_0FAEE5": { "start": 1027813, "end": 1027908, "type": "Code" },
-                "code_0FAF44": { "start": 1027908, "end": 1028013, "type": "Code" },
-                "code_0FAFAD": { "start": 1028013, "end": 1028175, "type": "Code" },
-                "code_0FB04F": { "start": 1028175, "end": 1028310, "type": "Code" },
-                "code_0FB0D6": { "start": 1028310, "end": 1028341, "type": "Code" }
+                "gv_enemy_yellow_knight_0FAD2A": { "start": 1027370, "end": 1027813, "type": "Code" },
+                "gv_enemy_metal_crawler_0FAEE5": { "start": 1027813, "end": 1027908, "type": "Code" },
+                "gv_enemy_purple_bird_0FAF44": { "start": 1027908, "end": 1028013, "type": "Code" },
+                "gv_enemy_green_torch_0FAFAD": { "start": 1028013, "end": 1028175, "type": "Code" },
+                "gv_enemy_monster_blocks_0FB04F": { "start": 1028175, "end": 1028310, "type": "Code" },
+                "gv_enemy_spikes_0FB0D6": { "start": 1028310, "end": 1028341, "type": "Code" }
             }
         }
     },
@@ -433,84 +433,84 @@
         "gw_boss_light_water_fire_statues": {
             "scene": "lostside_marsh",
             "parts": {
-                "code_0033C6": { "start": 13254, "end": 15939, "type": "Code" }
+                "gw_boss_light_water_fire_statues_0033C6": { "start": 13254, "end": 15939, "type": "Code" }
             }
         },
         "gw_woods_actors_01B98D": {
             "scene": "woods_of_greenwood",
             "parts": {
-                "code_01B98D": { "start": 113037, "end": 113471, "type": "Code" },
-                "code_01BB3F": { "start": 113471, "end": 113900, "type": "Code" },
-                "code_01BCEC": { "start": 113900, "end": 114149, "type": "Code" },
-                "code_01BDE5": { "start": 114149, "end": 114482, "type": "Code" },
-                "code_01BF32": { "start": 114482, "end": 115449, "type": "Code" },
-                "code_01C2F9": { "start": 115449, "end": 115658, "type": "Code" },
-                "code_01C3CA": { "start": 115658, "end": 116091, "type": "Code" },
-                "code_01C57B": { "start": 116091, "end": 116900, "type": "Code" },
-                "code_01C8A4": { "start": 116900, "end": 117130, "type": "Code" },
-                "code_01C98A": { "start": 117130, "end": 117857, "type": "Code" },
-                "code_01CC61": { "start": 117857, "end": 118077, "type": "Code" },
-                "code_01CD3D": { "start": 118077, "end": 118101, "type": "Code" },
-                "code_01CD55": { "start": 118101, "end": 118125, "type": "Code" },
-                "code_01CD6D": { "start": 118125, "end": 118593, "type": "Code" },
-                "code_01CF41": { "start": 118593, "end": 118853, "type": "Code" }
+                "gw_npc_dog_restaurant_01B98D": { "start": 113037, "end": 113471, "type": "Code" },
+                "gw_npc_deer_woodstin_trio_01BB3F": { "start": 113471, "end": 113900, "type": "Code" },
+                "gw_npc_dog_graveyard_guard_01BCEC": { "start": 113900, "end": 114149, "type": "Code" },
+                "gw_npc_bird_shy_red_hot_mirror_01BDE5": { "start": 114149, "end": 114482, "type": "Code" },
+                "gw_npc_deer_master_emblems_01BF32": { "start": 114482, "end": 115449, "type": "Code" },
+                "gw_npc_squirrel_stump_circler_01C2F9": { "start": 115449, "end": 115658, "type": "Code" },
+                "gw_npc_bird_trees_and_seeds_01C3CA": { "start": 115658, "end": 116091, "type": "Code" },
+                "gw_npc_dog_walk_01C57B": { "start": 116091, "end": 116900, "type": "Code" },
+                "gw_npc_bird_stump_hint_01C8A4": { "start": 116900, "end": 117130, "type": "Code" },
+                "gw_npc_bird_turbo_grave_01C98A": { "start": 117130, "end": 117857, "type": "Code" },
+                "gw_npc_crocodile_walk_over_01CC61": { "start": 117857, "end": 118077, "type": "Code" },
+                "gw_npc_crocodile_bridge_01CD3D": { "start": 118077, "end": 118101, "type": "Code" },
+                "gw_npc_crocodile_bridge_01CD55": { "start": 118101, "end": 118125, "type": "Code" },
+                "gw_npc_dog_smell_01CD6D": { "start": 118125, "end": 118593, "type": "Code" },
+                "gw_npc_squirrel_restaurant_01CF41": { "start": 118593, "end": 118853, "type": "Code" }
             }
         },
         "gw_woods_actors_01D045": {
             "scene": "woods_of_greenwood",
             "parts": {
-                "code_01D045": { "start": 118853, "end": 119539, "type": "Code" },
-                "code_01D2F3": { "start": 119539, "end": 119965, "type": "Code" },
+                "gw_npc_squirrel_billy_01D045": { "start": 118853, "end": 119539, "type": "Code" },
+                "gw_npc_dog_woodstin_trio_01D2F3": { "start": 119539, "end": 119965, "type": "Code" },
                 "asciistring_01D49D": { "start": 119965, "end": 120057, "type": "ASCIIString" },
-                "code_01D4F9": { "start": 120057, "end": 120340, "type": "Code" },
-                "code_01D614": { "start": 120340, "end": 120341, "type": "Code" },
-                "code_01D615": { "start": 120341, "end": 120491, "type": "Code" },
-                "code_01D6AB": { "start": 120491, "end": 120919, "type": "Code" },
-                "code_01D857": { "start": 120919, "end": 121032, "type": "Code" },
-                "code_01D8C8": { "start": 121032, "end": 121230, "type": "Code" },
-                "code_01D98E": { "start": 121230, "end": 121663, "type": "Code" },
-                "code_01DB3F": { "start": 121663, "end": 121829, "type": "Code" },
-                "code_01DBE5": { "start": 121829, "end": 122295, "type": "Code" },
-                "code_01DDB7": { "start": 122295, "end": 122739, "type": "Code" },
-                "code_01DF73": { "start": 122739, "end": 122885, "type": "Code" },
-                "code_01E005": { "start": 122885, "end": 123188, "type": "Code" },
-                "code_01E134": { "start": 123188, "end": 123328, "type": "Code" },
-                "code_01E1C0": { "start": 123328, "end": 123457, "type": "Code" },
-                "code_01E241": { "start": 123457, "end": 123643, "type": "Code" },
-                "code_01E2FB": { "start": 123643, "end": 123874, "type": "Code" },
-                "code_01E3E2": { "start": 123874, "end": 124027, "type": "Code" },
-                "code_01E9D3": { "start": 125395, "end": 125563, "type": "Code" },
-                "word_01EA7B": { "start": 125563, "end": 125691, "type": "Word" }
+                "gw_npc_guardian_of_the_woods_01D4F9": { "start": 120057, "end": 120340, "type": "Code" },
+                "gw_actor_empty_01D614": { "start": 120340, "end": 120341, "type": "Code" },
+                "gw_npc_bird_phoenix_hint_01D615": { "start": 120341, "end": 120491, "type": "Code" },
+                "gw_npc_mole_soul_of_light_01D6AB": { "start": 120491, "end": 120919, "type": "Code" },
+                "gw_npc_mole_light_return_voice_01D857": { "start": 120919, "end": 121032, "type": "Code" },
+                "gw_npc_mole_ghost_ribbon_01D8C8": { "start": 121032, "end": 121230, "type": "Code" },
+                "gw_npc_mole_digger_01D98E": { "start": 121230, "end": 121663, "type": "Code" },
+                "gw_npc_mole_prankster_01DB3F": { "start": 121663, "end": 121829, "type": "Code" },
+                "gw_npc_mole_roommate_bracelet_01DBE5": { "start": 121829, "end": 122295, "type": "Code" },
+                "gw_npc_mole_monmo_01DDB7": { "start": 122295, "end": 122739, "type": "Code" },
+                "gw_npc_squirrel_turbo_raft_01DF73": { "start": 122739, "end": 122885, "type": "Code" },
+                "gw_npc_squirrel_exchanger_01E005": { "start": 122885, "end": 123188, "type": "Code" },
+                "gw_npc_squirrel_exchanger_return_voice_01E134": { "start": 123188, "end": 123328, "type": "Code" },
+                "gw_npc_squirrel_master_emblem_c_01E1C0": { "start": 123328, "end": 123457, "type": "Code" },
+                "gw_npc_bird_birds_dream_01E241": { "start": 123457, "end": 123643, "type": "Code" },
+                "gw_npc_turbo_ghost_01E2FB": { "start": 123643, "end": 123874, "type": "Code" },
+                "gw_npc_bird_stumps_dream_01E3E2": { "start": 123874, "end": 124027, "type": "Code" },
+                "gw_effect_wave_hdma_01E9D3": { "start": 125395, "end": 125563, "type": "Code" },
+                "gw_wave_offsets_01EA7B": { "start": 125563, "end": 125691, "type": "Word" }
             }
         },
         "gw_lostside_marsh_actors": {
             "scene": "lostside_marsh",
             "parts": {
-                "code_01E47B": { "start": 124027, "end": 124091, "type": "Code" },
-                "code_01E4C3": { "start": 124099, "end": 124137, "type": "Code" },
-                "code_01E4E9": { "start": 124137, "end": 124176, "type": "Code" },
-                "code_01E510": { "start": 124176, "end": 124224, "type": "Code" },
-                "code_01E540": { "start": 124224, "end": 124308, "type": "Code" },
-                "code_01E594": { "start": 124308, "end": 124346, "type": "Code" },
-                "code_01E5BA": { "start": 124346, "end": 124458, "type": "Code" },
-                "code_01E62A": { "start": 124458, "end": 124761, "type": "Code" },
-                "code_01E759": { "start": 124761, "end": 124764, "type": "Code" },
-                "code_01E75C": { "start": 124764, "end": 124885, "type": "Code" },
-                "code_01E7D5": { "start": 124885, "end": 124888, "type": "Code" },
-                "code_01E7D8": { "start": 124888, "end": 125009, "type": "Code" },
-                "code_01E851": { "start": 125009, "end": 125012, "type": "Code" },
-                "code_01E854": { "start": 125012, "end": 125165, "type": "Code" },
-                "code_01E8ED": { "start": 125165, "end": 125168, "type": "Code" },
-                "code_01E8F0": { "start": 125168, "end": 125325, "type": "Code" },
-                "code_01E98D": { "start": 125325, "end": 125377, "type": "Code" },
-                "code_01E9C1": { "start": 125377, "end": 125395, "type": "Code" },
-                "code_01EAFB": { "start": 125691, "end": 125826, "type": "Code" },
-                "word_01EB82": { "start": 125826, "end": 125890, "type": "Word" }
+                "gw_trigger_strange_bottle_01E47B": { "start": 124027, "end": 124091, "type": "Code" },
+                "gw_npc_fairy_gem_exp_150_01E4C3": { "start": 124099, "end": 124137, "type": "Code" },
+                "gw_fairy_gem_return_prompt_01E4E9": { "start": 124137, "end": 124176, "type": "Code" },
+                "gw_npc_fairy_gem_exp_180_01E510": { "start": 124176, "end": 124224, "type": "Code" },
+                "gw_npc_fairy_gem_light_arrow_01E540": { "start": 124224, "end": 124308, "type": "Code" },
+                "gw_npc_fairy_gem_return_only_01E594": { "start": 124308, "end": 124346, "type": "Code" },
+                "gw_raft_placer_01E5BA": { "start": 124346, "end": 124458, "type": "Code" },
+                "gw_raft_leaves_check_01E62A": { "start": 124458, "end": 124761, "type": "Code" },
+                "gw_raft_north_entry_01E759": { "start": 124761, "end": 124764, "type": "Code" },
+                "gw_raft_north_01E75C": { "start": 124764, "end": 124885, "type": "Code" },
+                "gw_raft_south_entry_01E7D5": { "start": 124885, "end": 124888, "type": "Code" },
+                "gw_raft_south_01E7D8": { "start": 124888, "end": 125009, "type": "Code" },
+                "gw_raft_west_entry_01E851": { "start": 125009, "end": 125012, "type": "Code" },
+                "gw_raft_west_01E854": { "start": 125012, "end": 125165, "type": "Code" },
+                "gw_raft_east_entry_01E8ED": { "start": 125165, "end": 125168, "type": "Code" },
+                "gw_raft_east_01E8F0": { "start": 125168, "end": 125325, "type": "Code" },
+                "gw_effect_fire_bridge_heat_01E98D": { "start": 125325, "end": 125377, "type": "Code" },
+                "gw_effect_bg2_scroll_01E9C1": { "start": 125377, "end": 125395, "type": "Code" },
+                "gw_effect_water_ripple_hdma_01EAFB": { "start": 125691, "end": 125826, "type": "Code" },
+                "gw_ripple_offsets_01EB82": { "start": 125826, "end": 125890, "type": "Word" }
             }
         },
         "w1_actor_01E4BB": {
             "parts": {
-                "code_01E4BB": { "start": 124091, "end": 124099, "type": "Code" }
+                "gw_actor_fixed_gem_pickup_01E4BB": { "start": 124091, "end": 124099, "type": "Code" }
             }
         },
         "gw_watching_over_world_return_prompt_texts": {
@@ -521,24 +521,24 @@
         "gw_lostside_marsh_enemies": {
             "scene": "lostside_marsh",
             "parts": {
-                "code_0FB0F5": { "start": 1028341, "end": 1028866, "type": "Code" },
-                "code_0FB302": { "start": 1028866, "end": 1028936, "type": "Code" },
-                "code_0FB348": { "start": 1028936, "end": 1029171, "type": "Code" },
-                "code_0FB433": { "start": 1029171, "end": 1029473, "type": "Code" },
-                "code_0FB561": { "start": 1029473, "end": 1029532, "type": "Code" },
-                "code_0FB59C": { "start": 1029532, "end": 1029603, "type": "Code" },
-                "code_0FB5E3": { "start": 1029603, "end": 1029760, "type": "Code" },
-                "code_0FB695": { "start": 1029781, "end": 1029880, "type": "Code" },
-                "code_0FB898": { "start": 1030296, "end": 1030366, "type": "Code" },
-                "code_0FB8DE": { "start": 1030366, "end": 1030614, "type": "Code" },
-                "code_0FB9D6": { "start": 1030614, "end": 1030844, "type": "Code" },
-                "code_0FBABC": { "start": 1030844, "end": 1030943, "type": "Code" }
+                "gw_enemy_water_lizard_0FB0F5": { "start": 1028341, "end": 1028866, "type": "Code" },
+                "gw_enemy_mud_man_0FB302": { "start": 1028866, "end": 1028936, "type": "Code" },
+                "gw_enemy_walking_plant_0FB348": { "start": 1028936, "end": 1029171, "type": "Code" },
+                "gw_enemy_stone_statue_0FB433": { "start": 1029171, "end": 1029473, "type": "Code" },
+                "gw_enemy_purple_flower_0FB561": { "start": 1029473, "end": 1029532, "type": "Code" },
+                "gw_enemy_floor_spears_0FB59C": { "start": 1029532, "end": 1029603, "type": "Code" },
+                "gw_enemy_spirit_ball_0FB5E3": { "start": 1029603, "end": 1029760, "type": "Code" },
+                "gw_enemy_ghost_head_0FB695": { "start": 1029781, "end": 1029880, "type": "Code" },
+                "gw_enemy_lizard_man_chaser_0FB898": { "start": 1030296, "end": 1030366, "type": "Code" },
+                "gw_enemy_lizard_man_wanderer_0FB8DE": { "start": 1030366, "end": 1030614, "type": "Code" },
+                "gw_enemy_fire_man_0FB9D6": { "start": 1030614, "end": 1030844, "type": "Code" },
+                "gw_enemy_metal_scorpion_0FBABC": { "start": 1030844, "end": 1030943, "type": "Code" }
             }
         },
         "gw_enemies_without_placement": {
             "parts": {
-                "code_0FB680": { "start": 1029760, "end": 1029781, "type": "Code" },
-                "code_0FB6F8": { "start": 1029880, "end": 1030296, "type": "Code" }
+                "gw_unused_enemy_still_0FB680": { "start": 1029760, "end": 1029781, "type": "Code" },
+                "gw_unused_enemy_turret_0FB6F8": { "start": 1029880, "end": 1030296, "type": "Code" }
             }
         }
     },
@@ -546,136 +546,136 @@
         "se_boss_floating_skull": {
             "scene": "ghost_ship",
             "parts": {
-                "code_003E43": { "start": 15939, "end": 16635, "type": "Code" },
-                "code_0040FB": { "start": 16635, "end": 16642, "type": "Code" }
+                "se_boss_floating_skull_003E43": { "start": 15939, "end": 16635, "type": "Code" },
+                "se_boss_skull_halt_0040FB": { "start": 16635, "end": 16642, "type": "Code" }
             }
         },
         "se_ghost_ship_enemies": {
             "scene": "ghost_ship",
             "parts": {
-                "code_004102": { "start": 16642, "end": 16800, "type": "Code" },
-                "code_0041A0": { "start": 16800, "end": 16968, "type": "Code" },
-                "code_004248": { "start": 16968, "end": 17025, "type": "Code" },
-                "code_004281": { "start": 17025, "end": 17049, "type": "Code" }
+                "se_enemy_purple_worm_004102": { "start": 16642, "end": 16800, "type": "Code" },
+                "se_enemy_ghost_ship_torch_0041A0": { "start": 16800, "end": 16968, "type": "Code" },
+                "se_obj_worm_burst_004248": { "start": 16968, "end": 17025, "type": "Code" },
+                "se_enemy_worm_fragment_004281": { "start": 17025, "end": 17049, "type": "Code" }
             }
         },
         "se_seabed_sanctuary_actors_0F8000": {
             "scene": "seabed_sanctuary",
             "parts": {
-                "code_0F8000": { "start": 1015808, "end": 1015972, "type": "Code" },
-                "code_0F80A4": { "start": 1015972, "end": 1016329, "type": "Code" },
-                "code_0F8209": { "start": 1016329, "end": 1016541, "type": "Code" },
-                "code_0F82DD": { "start": 1016541, "end": 1016749, "type": "Code" },
-                "code_0F83AD": { "start": 1016749, "end": 1016902, "type": "Code" },
-                "code_0F8446": { "start": 1016902, "end": 1017207, "type": "Code" },
-                "code_0F8577": { "start": 1017207, "end": 1017313, "type": "Code" },
-                "code_0F85E1": { "start": 1017313, "end": 1017662, "type": "Code" },
-                "code_0F873E": { "start": 1017662, "end": 1017769, "type": "Code" },
-                "code_0F87A9": { "start": 1017769, "end": 1017936, "type": "Code" },
-                "code_0F8850": { "start": 1017936, "end": 1018060, "type": "Code" },
-                "code_0F88CC": { "start": 1018060, "end": 1018177, "type": "Code" },
-                "code_0F8941": { "start": 1018177, "end": 1018319, "type": "Code" },
-                "code_0F89CF": { "start": 1018319, "end": 1018382, "type": "Code" },
-                "code_0F8A0E": { "start": 1018382, "end": 1018494, "type": "Code" },
-                "code_0F8A7E": { "start": 1018494, "end": 1018663, "type": "Code" },
+                "se_npc_dolphin_servas_dream_0F8000": { "start": 1015808, "end": 1015972, "type": "Code" },
+                "se_npc_angelfish_soul_of_shield_0F80A4": { "start": 1015972, "end": 1016329, "type": "Code" },
+                "se_npc_angelfish_jumper_0F8209": { "start": 1016329, "end": 1016541, "type": "Code" },
+                "se_npc_mermaid_medical_herb_0F82DD": { "start": 1016541, "end": 1016749, "type": "Code" },
+                "se_npc_angelfish_best_jumper_0F83AD": { "start": 1016749, "end": 1016902, "type": "Code" },
+                "se_npc_mermaid_dance_teacher_0F8446": { "start": 1016902, "end": 1017207, "type": "Code" },
+                "se_npc_mermaid_anna_0F8577": { "start": 1017207, "end": 1017313, "type": "Code" },
+                "se_npc_mermaid_kanna_0F85E1": { "start": 1017313, "end": 1017662, "type": "Code" },
+                "se_npc_mermaid_nanna_0F873E": { "start": 1017662, "end": 1017769, "type": "Code" },
+                "se_npc_statue_blester_path_0F87A9": { "start": 1017769, "end": 1017936, "type": "Code" },
+                "se_npc_angelfish_coral_reef_creek_0F8850": { "start": 1017936, "end": 1018060, "type": "Code" },
+                "se_npc_angelfish_coral_reef_monsters_0F88CC": { "start": 1018060, "end": 1018177, "type": "Code" },
+                "se_npc_mermaid_queens_maid_0F8941": { "start": 1018177, "end": 1018319, "type": "Code" },
+                "se_npc_mermaid_servas_friend_0F89CF": { "start": 1018319, "end": 1018382, "type": "Code" },
+                "se_npc_dolphin_four_statues_0F8A0E": { "start": 1018382, "end": 1018494, "type": "Code" },
+                "se_npc_statue_rockbird_path_0F8A7E": { "start": 1018494, "end": 1018663, "type": "Code" },
                 "asciistring_0F8B27": { "start": 1018663, "end": 1018730, "type": "ASCIIString" },
-                "code_0F8B6A": { "start": 1018730, "end": 1019083, "type": "Code" },
-                "code_0F8CCB": { "start": 1019083, "end": 1019224, "type": "Code" }
+                "se_npc_mermaid_bubble_armor_0F8B6A": { "start": 1018730, "end": 1019083, "type": "Code" },
+                "se_npc_mermaid_guard_east_0F8CCB": { "start": 1019083, "end": 1019224, "type": "Code" }
             }
         },
         "se_seabed_sanctuary_actors_0F8D58": {
             "scene": "seabed_sanctuary",
             "parts": {
-                "code_0F8D58": { "start": 1019224, "end": 1019545, "type": "Code" },
-                "code_0F8E99": { "start": 1019545, "end": 1019717, "type": "Code" },
-                "code_0F8F45": { "start": 1019717, "end": 1019996, "type": "Code" },
-                "code_0F905C": { "start": 1019996, "end": 1020190, "type": "Code" },
-                "code_0F911E": { "start": 1020190, "end": 1021468, "type": "Code" },
-                "code_0F961C": { "start": 1021468, "end": 1021625, "type": "Code" },
-                "code_0F96B9": { "start": 1021625, "end": 1021843, "type": "Code" },
-                "code_0F9793": { "start": 1021843, "end": 1021999, "type": "Code" },
-                "code_0F982F": { "start": 1021999, "end": 1022197, "type": "Code" },
-                "code_0F98F5": { "start": 1022197, "end": 1022717, "type": "Code" },
-                "code_0FA014": { "start": 1024020, "end": 1024262, "type": "Code" },
-                "code_0FA7C4": { "start": 1025988, "end": 1026100, "type": "Code" },
+                "se_npc_mermaid_tears_hint_0F8D58": { "start": 1019224, "end": 1019545, "type": "Code" },
+                "se_npc_statue_durean_path_0F8E99": { "start": 1019545, "end": 1019717, "type": "Code" },
+                "se_npc_dolphin_pearl_ride_0F8F45": { "start": 1019717, "end": 1019996, "type": "Code" },
+                "se_npc_mermaid_magic_flair_0F905C": { "start": 1019996, "end": 1020190, "type": "Code" },
+                "se_npc_queen_0F911E": { "start": 1020190, "end": 1021468, "type": "Code" },
+                "se_npc_statue_ghost_ship_path_0F961C": { "start": 1021468, "end": 1021625, "type": "Code" },
+                "se_npc_mermaid_queen_dream_0F96B9": { "start": 1021625, "end": 1021843, "type": "Code" },
+                "se_npc_mermaid_coral_reef_pearls_0F9793": { "start": 1021843, "end": 1021999, "type": "Code" },
+                "se_npc_mermaid_red_hot_stick_0F982F": { "start": 1021999, "end": 1022197, "type": "Code" },
+                "se_npc_mermaid_guard_west_0F98F5": { "start": 1022197, "end": 1022717, "type": "Code" },
+                "se_npc_statue_arrival_hint_0FA014": { "start": 1024020, "end": 1024262, "type": "Code" },
+                "se_effect_sanctuary_wave_hdma_0FA7C4": { "start": 1025988, "end": 1026100, "type": "Code" },
                 "word_0FA834": { "start": 1026100, "end": 1026164, "type": "Word" }
             }
         },
         "se_seabed_of_st_elles_actors": {
             "scene": "seabed_of_st_elles",
             "parts": {
-                "code_0F9AFD": { "start": 1022717, "end": 1022859, "type": "Code" },
-                "code_0F9B8B": { "start": 1022859, "end": 1023422, "type": "Code" },
-                "code_0F9DBE": { "start": 1023422, "end": 1023700, "type": "Code" },
-                "code_0F9ED4": { "start": 1023700, "end": 1023780, "type": "Code" },
-                "code_0F9F24": { "start": 1023780, "end": 1023860, "type": "Code" },
-                "code_0F9F74": { "start": 1023860, "end": 1023940, "type": "Code" },
-                "code_0F9FC4": { "start": 1023940, "end": 1024020, "type": "Code" },
-                "code_0FA106": { "start": 1024262, "end": 1024571, "type": "Code" },
-                "code_0FA494": { "start": 1025172, "end": 1025220, "type": "Code" },
-                "code_0FA4C4": { "start": 1025220, "end": 1025268, "type": "Code" },
-                "code_0FA59C": { "start": 1025436, "end": 1025454, "type": "Code" },
+                "se_npc_dolphin_dream_cave_0F9AFD": { "start": 1022717, "end": 1022859, "type": "Code" },
+                "se_npc_dolphin_lue_0F9B8B": { "start": 1022859, "end": 1023422, "type": "Code" },
+                "se_npc_dolphin_lue_friend_0F9DBE": { "start": 1023422, "end": 1023700, "type": "Code" },
+                "se_obj_statue_gate_rockbird_0F9ED4": { "start": 1023700, "end": 1023780, "type": "Code" },
+                "se_obj_statue_gate_blester_0F9F24": { "start": 1023780, "end": 1023860, "type": "Code" },
+                "se_obj_statue_gate_durean_0F9F74": { "start": 1023860, "end": 1023940, "type": "Code" },
+                "se_obj_statue_gate_ghost_ship_0F9FC4": { "start": 1023940, "end": 1024020, "type": "Code" },
+                "se_npc_dolphin_big_pearl_0FA106": { "start": 1024262, "end": 1024571, "type": "Code" },
+                "se_npc_fairy_exp_300_0FA494": { "start": 1025172, "end": 1025220, "type": "Code" },
+                "se_npc_fairy_exp_250_0FA4C4": { "start": 1025220, "end": 1025268, "type": "Code" },
+                "se_obj_water_current_0FA59C": { "start": 1025436, "end": 1025454, "type": "Code" },
                 "unk16_0FA5AE": { "start": 1025454, "end": 1025471, "type": "unk16" },
-                "code_0FA64B": { "start": 1025611, "end": 1025781, "type": "Code" },
-                "code_0FA874": { "start": 1026164, "end": 1026309, "type": "Code" },
+                "se_effect_underwater_breath_0FA64B": { "start": 1025611, "end": 1025781, "type": "Code" },
+                "se_effect_seabed_wave_hdma_0FA874": { "start": 1026164, "end": 1026309, "type": "Code" },
                 "word_0FA905": { "start": 1026309, "end": 1026373, "type": "Word" }
             }
         },
         "se_ghost_ship_actors": {
             "scene": "ghost_ship",
             "parts": {
-                "code_0FA23B": { "start": 1024571, "end": 1024933, "type": "Code" },
-                "code_0FA3A5": { "start": 1024933, "end": 1025088, "type": "Code" }
+                "se_npc_servas_father_0FA23B": { "start": 1024571, "end": 1024933, "type": "Code" },
+                "se_npc_servas_son_0FA3A5": { "start": 1024933, "end": 1025088, "type": "Code" }
             }
         },
         "se_st_elles_coast_actors": {
             "scene": "st_elles_coast",
             "parts": {
-                "code_0FA440": { "start": 1025088, "end": 1025133, "type": "Code" },
-                "code_0FA46D": { "start": 1025133, "end": 1025172, "type": "Code" },
-                "code_0FA4F4": { "start": 1025268, "end": 1025436, "type": "Code" },
-                "code_0FA5BF": { "start": 1025471, "end": 1025494, "type": "Code" },
-                "code_0FA5D6": { "start": 1025494, "end": 1025611, "type": "Code" },
-                "code_0FA7A1": { "start": 1025953, "end": 1025988, "type": "Code" }
+                "se_npc_fairy_exp_200_0FA440": { "start": 1025088, "end": 1025133, "type": "Code" },
+                "se_npc_fairy_return_prompt_0FA46D": { "start": 1025133, "end": 1025172, "type": "Code" },
+                "se_npc_fairy_pyramid_hint_0FA4F4": { "start": 1025268, "end": 1025436, "type": "Code" },
+                "se_obj_durean_hot_coals_0FA5BF": { "start": 1025471, "end": 1025494, "type": "Code" },
+                "se_obj_durean_volcano_0FA5D6": { "start": 1025494, "end": 1025611, "type": "Code" },
+                "se_effect_bg2_scroll_follow_0FA7A1": { "start": 1025953, "end": 1025988, "type": "Code" }
             }
         },
         "w2_actor_0FA6F5": {
             "parts": {
-                "code_0FA6F5": { "start": 1025781, "end": 1025953, "type": "Code" }
+                "w2_effect_player_overlay_0FA6F5": { "start": 1025781, "end": 1025953, "type": "Code" }
             }
         },
         "w2_shared_0FA945": {
             "parts": {
-                "code_0FA945": { "start": 1026373, "end": 1026633, "type": "Code" }
+                "w2_obj_fairy_idle_loop_0FA945": { "start": 1026373, "end": 1026633, "type": "Code" }
             }
         },
         "se_seabed_of_st_elles_enemies": {
             "scene": "seabed_of_st_elles",
             "parts": {
-                "code_0FBB1F": { "start": 1030943, "end": 1031032, "type": "Code" },
-                "code_0FBBA3": { "start": 1031075, "end": 1031202, "type": "Code" },
-                "code_0FBC22": { "start": 1031202, "end": 1031442, "type": "Code" },
-                "code_0FBD12": { "start": 1031442, "end": 1031809, "type": "Code" },
-                "code_0FBE81": { "start": 1031809, "end": 1031973, "type": "Code" }
+                "se_enemy_sea_urchin_0FBB1F": { "start": 1030943, "end": 1031032, "type": "Code" },
+                "se_enemy_jellyfish_0FBBA3": { "start": 1031075, "end": 1031202, "type": "Code" },
+                "se_enemy_hermit_crab_0FBC22": { "start": 1031202, "end": 1031442, "type": "Code" },
+                "se_enemy_manta_ray_0FBD12": { "start": 1031442, "end": 1031809, "type": "Code" },
+                "se_enemy_yellow_seahorse_0FBE81": { "start": 1031809, "end": 1031973, "type": "Code" }
             }
         },
         "se_enemy_0FBB78": {
             "parts": {
-                "code_0FBB78": { "start": 1031032, "end": 1031075, "type": "Code" }
+                "se_unused_enemy_drifting_0FBB78": { "start": 1031032, "end": 1031075, "type": "Code" }
             }
         },
         "se_st_elles_coast_enemies": {
             "scene": "st_elles_coast",
             "parts": {
-                "code_0FBF25": { "start": 1031973, "end": 1032097, "type": "Code" },
-                "code_0FBFA1": { "start": 1032097, "end": 1032119, "type": "Code" },
-                "code_0FBFB7": { "start": 1032119, "end": 1032222, "type": "Code" },
-                "code_0FC01E": { "start": 1032222, "end": 1032421, "type": "Code" },
-                "code_0FC0E5": { "start": 1032421, "end": 1032526, "type": "Code" },
-                "code_0FC14E": { "start": 1032526, "end": 1032854, "type": "Code" },
-                "code_0FC296": { "start": 1032854, "end": 1033192, "type": "Code" },
-                "code_0FC3E8": { "start": 1033192, "end": 1033526, "type": "Code" },
-                "code_0FC536": { "start": 1033526, "end": 1034031, "type": "Code" }
+                "se_obj_lightning_pyramid_0FBF25": { "start": 1031973, "end": 1032097, "type": "Code" },
+                "se_obj_durean_vent_0FBFA1": { "start": 1032097, "end": 1032119, "type": "Code" },
+                "se_obj_durean_vent_tick_0FBFB7": { "start": 1032119, "end": 1032222, "type": "Code" },
+                "se_enemy_walking_tree_0FC01E": { "start": 1032222, "end": 1032421, "type": "Code" },
+                "se_enemy_monster_rock_0FC0E5": { "start": 1032421, "end": 1032526, "type": "Code" },
+                "se_enemy_purple_fish_0FC14E": { "start": 1032526, "end": 1032854, "type": "Code" },
+                "se_enemy_ape_0FC296": { "start": 1032854, "end": 1033192, "type": "Code" },
+                "se_enemy_metal_ape_0FC3E8": { "start": 1033192, "end": 1033526, "type": "Code" },
+                "se_enemy_tornadic_eagle_0FC536": { "start": 1033526, "end": 1034031, "type": "Code" }
             }
         }
     },
@@ -683,102 +683,102 @@
         "ms_boss_poseidon": {
             "scene": "mountain_of_souls_dungeon",
             "parts": {
-                "code_004299": { "start": 17049, "end": 18009, "type": "Code" }
+                "ms_boss_poseidon_004299": { "start": 17049, "end": 18009, "type": "Code" }
             }
         },
         "ms_soul_of_mountain_house_actors_020000": {
             "scene": "soul_of_mountain_house",
             "parts": {
-                "code_020000": { "start": 131072, "end": 131317, "type": "Code" },
-                "code_0200F5": { "start": 131317, "end": 131395, "type": "Code" },
-                "code_020143": { "start": 131395, "end": 131538, "type": "Code" },
-                "code_0201D2": { "start": 131538, "end": 131639, "type": "Code" },
-                "code_020237": { "start": 131639, "end": 131770, "type": "Code" },
-                "code_0202BA": { "start": 131770, "end": 131883, "type": "Code" },
-                "code_02032B": { "start": 131883, "end": 132178, "type": "Code" },
-                "code_020452": { "start": 132178, "end": 132451, "type": "Code" },
-                "code_020563": { "start": 132451, "end": 134227, "type": "Code" },
-                "code_020C53": { "start": 134227, "end": 134342, "type": "Code" },
-                "code_020CC6": { "start": 134342, "end": 134889, "type": "Code" },
-                "code_020EE9": { "start": 134889, "end": 135067, "type": "Code" },
-                "code_020F9B": { "start": 135067, "end": 135179, "type": "Code" }
+                "ms_npc_grandpa_room_invite_020000": { "start": 131072, "end": 131317, "type": "Code" },
+                "ms_npc_grandpa_wife_magic_0200F5": { "start": 131317, "end": 131395, "type": "Code" },
+                "ms_npc_grandma_magic_demo_020143": { "start": 131395, "end": 131538, "type": "Code" },
+                "ms_npc_boy_girlfriend_0201D2": { "start": 131538, "end": 131639, "type": "Code" },
+                "ms_npc_girl_new_love_020237": { "start": 131639, "end": 131770, "type": "Code" },
+                "ms_npc_grandpa_search_laynole_0202BA": { "start": 131770, "end": 131883, "type": "Code" },
+                "ms_npc_grandma_phoenix_east_02032B": { "start": 131883, "end": 132178, "type": "Code" },
+                "ms_npc_grandma_phoenix_west_020452": { "start": 132178, "end": 132451, "type": "Code" },
+                "ms_npc_king_phoenix_020563": { "start": 132451, "end": 134227, "type": "Code" },
+                "ms_npc_mushroom_dream_secret_020C53": { "start": 134227, "end": 134342, "type": "Code" },
+                "ms_npc_boy_mushroom_shoes_020CC6": { "start": 134342, "end": 134889, "type": "Code" },
+                "ms_npc_snail_vehicle_020EE9": { "start": 134889, "end": 135067, "type": "Code" },
+                "ms_npc_mushroom_dream_rod_020F9B": { "start": 135067, "end": 135179, "type": "Code" }
             }
         },
         "ms_soul_of_mountain_house_actors_02100B": {
             "scene": "soul_of_mountain_house",
             "parts": {
-                "code_02100B": { "start": 135179, "end": 135311, "type": "Code" },
-                "code_02108F": { "start": 135311, "end": 135779, "type": "Code" },
-                "code_021263": { "start": 135779, "end": 135934, "type": "Code" },
-                "code_0212FE": { "start": 135934, "end": 136277, "type": "Code" },
-                "code_021455": { "start": 136277, "end": 136625, "type": "Code" },
-                "code_0215B1": { "start": 136625, "end": 136977, "type": "Code" },
-                "code_021711": { "start": 136977, "end": 137177, "type": "Code" },
-                "code_0217D9": { "start": 137177, "end": 137407, "type": "Code" },
-                "code_0218BF": { "start": 137407, "end": 137567, "type": "Code" },
-                "code_02195F": { "start": 137567, "end": 137678, "type": "Code" },
-                "code_0219CE": { "start": 137678, "end": 137803, "type": "Code" },
-                "code_021A4B": { "start": 137803, "end": 137930, "type": "Code" },
-                "code_021ACA": { "start": 137930, "end": 138416, "type": "Code" },
-                "code_021CB0": { "start": 138416, "end": 138516, "type": "Code" }
+                "ms_npc_boy_leo_lab_hint_02100B": { "start": 135179, "end": 135311, "type": "Code" },
+                "ms_npc_snail_nome_silver_stone_02108F": { "start": 135311, "end": 135779, "type": "Code" },
+                "ms_npc_grandpa_lucky_blade_021263": { "start": 135779, "end": 135934, "type": "Code" },
+                "ms_npc_snail_jockey_legend_0212FE": { "start": 135934, "end": 136277, "type": "Code" },
+                "ms_npc_snail_jockey_flash_021455": { "start": 136277, "end": 136625, "type": "Code" },
+                "ms_npc_snail_jockey_third_0215B1": { "start": 136625, "end": 136977, "type": "Code" },
+                "ms_npc_mushroom_short_lives_021711": { "start": 136977, "end": 137177, "type": "Code" },
+                "ms_npc_grandpa_lune_gate_0217D9": { "start": 137177, "end": 137407, "type": "Code" },
+                "ms_npc_grandpa_dream_rod_0218BF": { "start": 137407, "end": 137567, "type": "Code" },
+                "ms_npc_snail_old_man_child_02195F": { "start": 137567, "end": 137678, "type": "Code" },
+                "ms_npc_mushroom_prison_0219CE": { "start": 137678, "end": 137803, "type": "Code" },
+                "ms_npc_snail_master_emblem_e_021A4B": { "start": 137803, "end": 137930, "type": "Code" },
+                "ms_npc_girl_race_starter_021ACA": { "start": 137930, "end": 138416, "type": "Code" },
+                "ms_npc_girl_mountain_warm_021CB0": { "start": 138416, "end": 138516, "type": "Code" }
             }
         },
         "ms_dungeon_actors": {
             "scene": "mountain_of_souls_dungeon",
             "parts": {
-                "code_021D14": { "start": 138516, "end": 138744, "type": "Code" },
-                "code_021DF8": { "start": 138744, "end": 138745, "type": "Code" },
-                "code_021DF9": { "start": 138745, "end": 138895, "type": "Code" },
-                "code_021E8F": { "start": 138895, "end": 138958, "type": "Code" },
-                "code_02230A": { "start": 140042, "end": 140158, "type": "Code" },
-                "code_02237E": { "start": 140158, "end": 140247, "type": "Code" },
-                "word_0223D7": { "start": 140247, "end": 140375, "type": "Word" },
-                "code_022457": { "start": 140375, "end": 140401, "type": "Code" },
-                "binary_022471": { "start": 140401, "end": 140442, "type": "Binary" }
+                "ms_npc_old_man_dream_021D14": { "start": 138516, "end": 138744, "type": "Code" },
+                "ms_npc_old_man_dream_girl_021DF8": { "start": 138744, "end": 138745, "type": "Code" },
+                "ms_npc_mushroom_dream_021DF9": { "start": 138745, "end": 138895, "type": "Code" },
+                "ms_obj_master_emblem_f_021E8F": { "start": 138895, "end": 138958, "type": "Code" },
+                "ms_effect_hdma_bg2_shear_02230A": { "start": 140042, "end": 140158, "type": "Code" },
+                "ms_effect_hdma_bg2_wave_02237E": { "start": 140158, "end": 140247, "type": "Code" },
+                "ms_hdma_wave_offsets_0223D7": { "start": 140247, "end": 140375, "type": "Word" },
+                "ms_effect_hdma_coldata_gradient_022457": { "start": 140375, "end": 140401, "type": "Code" },
+                "ms_hdma_coldata_table_022471": { "start": 140401, "end": 140442, "type": "Binary" }
             }
         },
         "ms_multi_area_actors": {
             "parts": {
-                "code_021ECE": { "start": 138958, "end": 139003, "type": "Code" },
-                "code_021EFB": { "start": 139003, "end": 139042, "type": "Code" },
-                "code_021F22": { "start": 139042, "end": 139090, "type": "Code" },
-                "code_02220D": { "start": 139789, "end": 139837, "type": "Code" },
-                "unk16_02223D": { "start": 139837, "end": 139913, "type": "unk16" }
+                "ms_npc_fairy_exp_300_021ECE": { "start": 138958, "end": 139003, "type": "Code" },
+                "ms_npc_fairy_return_prompt_021EFB": { "start": 139003, "end": 139042, "type": "Code" },
+                "ms_npc_fairy_exp_400_021F22": { "start": 139042, "end": 139090, "type": "Code" },
+                "ms_obj_push_zone_setup_02220D": { "start": 139789, "end": 139837, "type": "Code" },
+                "ms_push_zones_north_slope_02223D": { "start": 139837, "end": 139913, "type": "unk16" }
             }
         },
         "ms_snow_mountain_actors": {
             "scene": "snow_mountain",
             "parts": {
-                "code_021F52": { "start": 139090, "end": 139177, "type": "Code" },
-                "unk15_021FA9": { "start": 139177, "end": 139271, "type": "unk15" },
-                "code_022007": { "start": 139271, "end": 139314, "type": "Code" },
-                "byte_022032": { "start": 139314, "end": 139378, "type": "Byte" },
-                "code_022072": { "start": 139378, "end": 139789, "type": "Code" }
+                "ms_obj_ice_marker_scan_021F52": { "start": 139090, "end": 139177, "type": "Code" },
+                "ms_ice_markers_summit_021FA9": { "start": 139177, "end": 139271, "type": "unk15" },
+                "ms_obj_ice_slide_022007": { "start": 139271, "end": 139314, "type": "Code" },
+                "ms_ice_walk_anims_022032": { "start": 139314, "end": 139378, "type": "Byte" },
+                "ms_obj_ice_slide_move_022072": { "start": 139378, "end": 139789, "type": "Code" }
             }
         },
         "ms_multi_area_enemies": {
             "parts": {
-                "code_0FC72F": { "start": 1034031, "end": 1034309, "type": "Code" },
-                "code_0FC845": { "start": 1034309, "end": 1034494, "type": "Code" },
-                "code_0FC8FE": { "start": 1034494, "end": 1034684, "type": "Code" },
-                "code_0FC9BC": { "start": 1034684, "end": 1034805, "type": "Code" },
-                "code_0FCA35": { "start": 1034805, "end": 1035231, "type": "Code" },
-                "code_0FCBDF": { "start": 1035231, "end": 1035706, "type": "Code" },
-                "code_0FCDBA": { "start": 1035706, "end": 1036246, "type": "Code" },
-                "code_0FD11B": { "start": 1036571, "end": 1036773, "type": "Code" },
-                "code_0FD1E5": { "start": 1036773, "end": 1036917, "type": "Code" }
+                "ms_enemy_green_lizard_0FC72F": { "start": 1034031, "end": 1034309, "type": "Code" },
+                "ms_enemy_undead_caribou_0FC845": { "start": 1034309, "end": 1034494, "type": "Code" },
+                "ms_enemy_yeti_0FC8FE": { "start": 1034494, "end": 1034684, "type": "Code" },
+                "ms_enemy_fire_bat_0FC9BC": { "start": 1034684, "end": 1034805, "type": "Code" },
+                "ms_enemy_snowball_0FCA35": { "start": 1034805, "end": 1035231, "type": "Code" },
+                "ms_enemy_purple_wizard_0FCBDF": { "start": 1035231, "end": 1035706, "type": "Code" },
+                "ms_enemy_red_wizard_0FCDBA": { "start": 1035706, "end": 1036246, "type": "Code" },
+                "ms_enemy_cave_bat_0FD11B": { "start": 1036571, "end": 1036773, "type": "Code" },
+                "ms_enemy_green_blob_0FD1E5": { "start": 1036773, "end": 1036917, "type": "Code" }
             }
         },
         "ms_enemy_0FCFD6": {
             "scene": "mountain_of_souls_dungeon",
             "parts": {
-                "code_0FCFD6": { "start": 1036246, "end": 1036376, "type": "Code" }
+                "ms_enemy_ice_maker_0FCFD6": { "start": 1036246, "end": 1036376, "type": "Code" }
             }
         },
         "ms_enemy_0FD058": {
             "scene": "snow_mountain",
             "parts": {
-                "code_0FD058": { "start": 1036376, "end": 1036571, "type": "Code" }
+                "ms_enemy_ice_crystal_0FD058": { "start": 1036376, "end": 1036571, "type": "Code" }
             }
         }
     },
@@ -786,58 +786,58 @@
         "ll_boss_tin_doll": {
             "scene": "laboratory_dungeon",
             "parts": {
-                "code_004659": { "start": 18009, "end": 19438, "type": "Code" }
+                "ll_boss_tin_doll_004659": { "start": 18009, "end": 19438, "type": "Code" }
             }
         },
         "ll_laboratory_actors": {
             "scene": "leos_laboratory",
             "parts": {
-                "code_022523": { "start": 140579, "end": 140740, "type": "Code" },
-                "code_0225C4": { "start": 140740, "end": 140813, "type": "Code" },
-                "code_02260D": { "start": 140813, "end": 140992, "type": "Code" },
-                "code_0226C0": { "start": 140992, "end": 141204, "type": "Code" },
-                "code_022794": { "start": 141204, "end": 141446, "type": "Code" },
-                "code_022886": { "start": 141446, "end": 141692, "type": "Code" },
-                "code_02297C": { "start": 141692, "end": 141791, "type": "Code" },
-                "code_0229DF": { "start": 141791, "end": 142075, "type": "Code" },
-                "code_022AFB": { "start": 142075, "end": 142208, "type": "Code" },
-                "code_022B80": { "start": 142208, "end": 142460, "type": "Code" },
-                "code_022C7C": { "start": 142460, "end": 142597, "type": "Code" },
-                "code_022D05": { "start": 142597, "end": 142790, "type": "Code" },
-                "code_022DC6": { "start": 142790, "end": 142864, "type": "Code" },
-                "code_022E10": { "start": 142864, "end": 143208, "type": "Code" },
-                "code_022F68": { "start": 143208, "end": 143663, "type": "Code" },
-                "code_02312F": { "start": 143663, "end": 143743, "type": "Code" },
-                "code_02317F": { "start": 143743, "end": 143892, "type": "Code" },
-                "code_023214": { "start": 143892, "end": 144051, "type": "Code" },
-                "code_0232B3": { "start": 144051, "end": 144477, "type": "Code" },
-                "code_02345D": { "start": 144477, "end": 144620, "type": "Code" },
-                "code_0234EC": { "start": 144620, "end": 145319, "type": "Code" },
-                "code_0237A7": { "start": 145319, "end": 145453, "type": "Code" },
-                "code_02382D": { "start": 145453, "end": 145575, "type": "Code" },
-                "code_0238A7": { "start": 145575, "end": 145850, "type": "Code" },
-                "code_0239BA": { "start": 145850, "end": 145912, "type": "Code" },
-                "code_0239F8": { "start": 145912, "end": 145974, "type": "Code" },
-                "code_023A36": { "start": 145974, "end": 146187, "type": "Code" },
-                "code_023B0B": { "start": 146187, "end": 146795, "type": "Code" },
-                "code_023D6B": { "start": 146795, "end": 146820, "type": "Code" },
-                "code_023D84": { "start": 146820, "end": 146899, "type": "Code" }
+                "ll_npc_drawers_exercise_022523": { "start": 140579, "end": 140740, "type": "Code" },
+                "ll_npc_door_silent_0225C4": { "start": 140740, "end": 140813, "type": "Code" },
+                "ll_npc_door_locked_key_02260D": { "start": 140813, "end": 140992, "type": "Code" },
+                "ll_npc_mouse_cats_scared_0226C0": { "start": 140992, "end": 141204, "type": "Code" },
+                "ll_npc_cat_follower_a_022794": { "start": 141204, "end": 141446, "type": "Code" },
+                "ll_npc_cat_follower_b_022886": { "start": 141446, "end": 141692, "type": "Code" },
+                "ll_npc_cat_door_hint_02297C": { "start": 141692, "end": 141791, "type": "Code" },
+                "ll_npc_drawers_mystic_armor_0229DF": { "start": 141791, "end": 142075, "type": "Code" },
+                "ll_npc_plant_door_soul_hint_022AFB": { "start": 142075, "end": 142208, "type": "Code" },
+                "ll_npc_plant_medical_herb_022B80": { "start": 142208, "end": 142460, "type": "Code" },
+                "ll_npc_plant_models_story_022C7C": { "start": 142460, "end": 142597, "type": "Code" },
+                "ll_npc_mouse_purify_022D05": { "start": 142597, "end": 142790, "type": "Code" },
+                "ll_npc_door_silent_022DC6": { "start": 142790, "end": 142864, "type": "Code" },
+                "ll_npc_door_soul_of_detection_022E10": { "start": 142864, "end": 143208, "type": "Code" },
+                "ll_npc_cat_dream_key_022F68": { "start": 143208, "end": 143663, "type": "Code" },
+                "ll_npc_mouse_magic_hint_02312F": { "start": 143663, "end": 143743, "type": "Code" },
+                "ll_npc_plant_actinidia_02317F": { "start": 143743, "end": 143892, "type": "Code" },
+                "ll_npc_doll_machines_story_023214": { "start": 143892, "end": 144051, "type": "Code" },
+                "ll_npc_drawers_herb_storage_0232B3": { "start": 144051, "end": 144477, "type": "Code" },
+                "ll_npc_cat_marie_room_02345D": { "start": 144477, "end": 144620, "type": "Code" },
+                "ll_npc_marie_purple_stone_0234EC": { "start": 144620, "end": 145319, "type": "Code" },
+                "ll_npc_mouse_weak_timid_0237A7": { "start": 145319, "end": 145453, "type": "Code" },
+                "ll_npc_mouse_born_plant_02382D": { "start": 145453, "end": 145575, "type": "Code" },
+                "ll_npc_mouse_spark_bomb_0238A7": { "start": 145575, "end": 145850, "type": "Code" },
+                "ll_obj_model_town_1_0239BA": { "start": 145850, "end": 145912, "type": "Code" },
+                "ll_obj_model_town_2_0239F8": { "start": 145912, "end": 145974, "type": "Code" },
+                "ll_npc_door_entrance_talk_023A36": { "start": 145974, "end": 146187, "type": "Code" },
+                "ll_dream_scene_023B0B": { "start": 146187, "end": 146795, "type": "Code" },
+                "ll_dream_actor_a_023D6B": { "start": 146795, "end": 146820, "type": "Code" },
+                "ll_dream_actor_b_023D84": { "start": 146820, "end": 146899, "type": "Code" }
             }
         },
         "ll_laboratory_dungeon_actors": {
             "scene": "laboratory_dungeon",
             "parts": {
-                "code_023DD3": { "start": 146899, "end": 146944, "type": "Code" },
-                "code_023E00": { "start": 146944, "end": 146983, "type": "Code" },
-                "code_023E57": { "start": 147031, "end": 147079, "type": "Code" },
-                "code_023F17": { "start": 147223, "end": 147251, "type": "Code" }
+                "ll_npc_fairy_exp_300_023DD3": { "start": 146899, "end": 146944, "type": "Code" },
+                "ll_fairy_return_prompt_023E00": { "start": 146944, "end": 146983, "type": "Code" },
+                "ll_npc_fairy_exp_300_023E57": { "start": 147031, "end": 147079, "type": "Code" },
+                "ll_obj_fire_pit_023F17": { "start": 147223, "end": 147251, "type": "Code" }
             }
         },
         "ll_town_models_actors": {
             "scene": "town_models",
             "parts": {
-                "code_023E27": { "start": 146983, "end": 147031, "type": "Code" },
-                "code_023E87": { "start": 147079, "end": 147223, "type": "Code" }
+                "ll_npc_fairy_exp_300_023E27": { "start": 146983, "end": 147031, "type": "Code" },
+                "ll_effect_model_release_023E87": { "start": 147079, "end": 147223, "type": "Code" }
             }
         },
         "ll_watching_over_world_return_prompt_texts": {
@@ -848,22 +848,22 @@
         "ll_laboratory_dungeon_enemies": {
             "scene": "laboratory_dungeon",
             "parts": {
-                "code_0FD275": { "start": 1036917, "end": 1037125, "type": "Code" },
-                "code_0FD345": { "start": 1037125, "end": 1037314, "type": "Code" },
-                "code_0FD402": { "start": 1037314, "end": 1037570, "type": "Code" },
-                "code_0FD502": { "start": 1037570, "end": 1038060, "type": "Code" },
-                "code_0FD6EC": { "start": 1038060, "end": 1038162, "type": "Code" },
-                "code_0FD752": { "start": 1038162, "end": 1038660, "type": "Code" }
+                "ll_enemy_mini_race_car_0FD275": { "start": 1036917, "end": 1037125, "type": "Code" },
+                "ll_enemy_mini_bulldozer_0FD345": { "start": 1037125, "end": 1037314, "type": "Code" },
+                "ll_enemy_mini_helicopter_0FD402": { "start": 1037314, "end": 1037570, "type": "Code" },
+                "ll_enemy_ball_worm_0FD502": { "start": 1037570, "end": 1038060, "type": "Code" },
+                "ll_enemy_flail_0FD6EC": { "start": 1038060, "end": 1038162, "type": "Code" },
+                "ll_enemy_sweeper_bot_0FD752": { "start": 1038162, "end": 1038660, "type": "Code" }
             }
         },
         "ll_town_models_enemies": {
             "scene": "town_models",
             "parts": {
-                "code_0FD944": { "start": 1038660, "end": 1038822, "type": "Code" },
-                "code_0FD9E6": { "start": 1038822, "end": 1039085, "type": "Code" },
-                "code_0FDAED": { "start": 1039085, "end": 1039355, "type": "Code" },
-                "code_0FDBFB": { "start": 1039355, "end": 1039612, "type": "Code" },
-                "code_0FDCFC": { "start": 1039612, "end": 1039944, "type": "Code" }
+                "ll_enemy_toy_soldier_0FD944": { "start": 1038660, "end": 1038822, "type": "Code" },
+                "ll_enemy_toy_spear_0FD9E6": { "start": 1038822, "end": 1039085, "type": "Code" },
+                "ll_enemy_toy_lunge_0FDAED": { "start": 1039085, "end": 1039355, "type": "Code" },
+                "ll_enemy_catapult_0FDBFB": { "start": 1039355, "end": 1039612, "type": "Code" },
+                "ll_enemy_spike_launcher_0FDCFC": { "start": 1039612, "end": 1039944, "type": "Code" }
             }
         }
     },
@@ -871,55 +871,55 @@
         "mc_boss_demon_falcon": {
             "scene": "airship_dock",
             "parts": {
-                "code_004BEE": { "start": 19438, "end": 19851, "type": "Code" }
+                "mc_boss_demon_falcon_004BEE": { "start": 19438, "end": 19851, "type": "Code" }
             }
         },
         "mc_castle_actors": {
             "scene": "castle_of_magridd",
             "parts": {
-                "code_023FA8": { "start": 147368, "end": 147495, "type": "Code" },
-                "code_024027": { "start": 147495, "end": 147684, "type": "Code" },
-                "code_0240E4": { "start": 147684, "end": 147685, "type": "Code" },
-                "code_0240E5": { "start": 147685, "end": 148057, "type": "Code" },
-                "code_024259": { "start": 148057, "end": 148502, "type": "Code" },
-                "code_024416": { "start": 148502, "end": 148719, "type": "Code" },
-                "code_0244EF": { "start": 148719, "end": 148887, "type": "Code" },
-                "code_024597": { "start": 148887, "end": 149646, "type": "Code" },
-                "code_02488E": { "start": 149646, "end": 149834, "type": "Code" },
-                "code_02494A": { "start": 149834, "end": 150260, "type": "Code" },
-                "code_024AF4": { "start": 150260, "end": 150472, "type": "Code" },
-                "code_024BC8": { "start": 150472, "end": 150873, "type": "Code" },
-                "code_024D59": { "start": 150873, "end": 151123, "type": "Code" },
-                "code_024E53": { "start": 151123, "end": 151370, "type": "Code" },
-                "code_024F4A": { "start": 151370, "end": 151507, "type": "Code" },
-                "code_024FD3": { "start": 151507, "end": 151680, "type": "Code" },
-                "code_025080": { "start": 151680, "end": 151899, "type": "Code" },
-                "code_02515B": { "start": 151899, "end": 152028, "type": "Code" },
-                "code_0251DC": { "start": 152028, "end": 152322, "type": "Code" },
-                "code_025302": { "start": 152322, "end": 152546, "type": "Code" },
-                "code_0253E2": { "start": 152546, "end": 152738, "type": "Code" },
-                "code_0254A2": { "start": 152738, "end": 152834, "type": "Code" },
-                "code_025502": { "start": 152834, "end": 152929, "type": "Code" },
-                "code_025561": { "start": 152929, "end": 154282, "type": "Code" },
-                "code_025AAA": { "start": 154282, "end": 154394, "type": "Code" }
+                "mc_npc_soldier_ghost_hint_023FA8": { "start": 147368, "end": 147495, "type": "Code" },
+                "mc_npc_soldier_gaudi_nephew_024027": { "start": 147495, "end": 147684, "type": "Code" },
+                "mc_npc_inert_placeholder_0240E4": { "start": 147684, "end": 147685, "type": "Code" },
+                "mc_npc_soldier_elemental_hint_0240E5": { "start": 147685, "end": 148057, "type": "Code" },
+                "mc_npc_soldier_elemental_mail_024259": { "start": 148057, "end": 148502, "type": "Code" },
+                "mc_npc_soldier_guard_patrol_024416": { "start": 148502, "end": 148719, "type": "Code" },
+                "mc_npc_soldier_king_shock_0244EF": { "start": 148719, "end": 148887, "type": "Code" },
+                "mc_npc_singer_theater_harp_024597": { "start": 148887, "end": 149646, "type": "Code" },
+                "mc_npc_soldier_traitor_warning_02488E": { "start": 149646, "end": 149834, "type": "Code" },
+                "mc_npc_queen_vip_card_02494A": { "start": 149834, "end": 150260, "type": "Code" },
+                "mc_npc_soldier_platinum_gate_guard_024AF4": { "start": 150260, "end": 150472, "type": "Code" },
+                "mc_npc_soldier_theater_guard_024BC8": { "start": 150472, "end": 150873, "type": "Code" },
+                "mc_npc_singer_friend_story_024D59": { "start": 150873, "end": 151123, "type": "Code" },
+                "mc_npc_maid_medical_herb_024E53": { "start": 151123, "end": 151370, "type": "Code" },
+                "mc_npc_maid_music_listener_024F4A": { "start": 151370, "end": 151507, "type": "Code" },
+                "mc_npc_maid_dormitory_dust_024FD3": { "start": 151507, "end": 151680, "type": "Code" },
+                "mc_npc_soldier_vip_gate_guard_025080": { "start": 151680, "end": 151899, "type": "Code" },
+                "mc_npc_soldier_shiny_hint_02515B": { "start": 151899, "end": 152028, "type": "Code" },
+                "mc_npc_soldier_soul_of_reality_0251DC": { "start": 152028, "end": 152322, "type": "Code" },
+                "mc_npc_soldier_emblem_h_025302": { "start": 152322, "end": 152546, "type": "Code" },
+                "mc_npc_soldier_airship_key_stolen_0253E2": { "start": 152546, "end": 152738, "type": "Code" },
+                "mc_npc_soldier_herb_maid_fan_0254A2": { "start": 152738, "end": 152834, "type": "Code" },
+                "mc_npc_soldier_river_scare_025502": { "start": 152834, "end": 152929, "type": "Code" },
+                "mc_npc_king_magridd_025561": { "start": 152929, "end": 154282, "type": "Code" },
+                "mc_npc_soldier_dust_in_eye_025AAA": { "start": 154282, "end": 154394, "type": "Code" }
             }
         },
         "mc_airship_dock_actors": {
             "scene": "airship_dock",
             "parts": {
-                "code_025B1A": { "start": 154394, "end": 154790, "type": "Code" },
-                "code_025CA6": { "start": 154790, "end": 155233, "type": "Code" },
-                "code_025E61": { "start": 155233, "end": 156220, "type": "Code" },
+                "mc_dock_soldier_start_ship_025B1A": { "start": 154394, "end": 154790, "type": "Code" },
+                "mc_dock_soldier_outburst_025CA6": { "start": 154790, "end": 155233, "type": "Code" },
+                "mc_dock_dr_leo_025E61": { "start": 155233, "end": 156220, "type": "Code" },
                 "asciistring_026240": { "start": 156224, "end": 158198, "type": "ASCIIString" },
-                "code_026A4E": { "start": 158286, "end": 159073, "type": "Code" },
-                "code_026D61": { "start": 159073, "end": 159094, "type": "Code" },
-                "code_026D76": { "start": 159094, "end": 159104, "type": "Code" },
-                "code_026D80": { "start": 159104, "end": 159191, "type": "Code" },
-                "code_026F48": { "start": 159560, "end": 159571, "type": "Code" },
-                "code_026F53": { "start": 159571, "end": 159575, "type": "Code" },
-                "code_026F57": { "start": 159575, "end": 159769, "type": "Code" },
-                "code_027019": { "start": 159769, "end": 159787, "type": "Code" },
-                "unk16_02702B": { "start": 159787, "end": 159852, "type": "unk16" }
+                "mc_dream_soldier_dialogue_026A4E": { "start": 158286, "end": 159073, "type": "Code" },
+                "mc_dream_actor_a_026D61": { "start": 159073, "end": 159094, "type": "Code" },
+                "mc_dream_actor_b_026D76": { "start": 159094, "end": 159104, "type": "Code" },
+                "mc_deck_airship_return_026D80": { "start": 159104, "end": 159191, "type": "Code" },
+                "mc_deck_bg2_scroll_y_fast_026F48": { "start": 159560, "end": 159571, "type": "Code" },
+                "mc_dream_bg2_scroll_y_026F53": { "start": 159571, "end": 159575, "type": "Code" },
+                "mc_dock_key_wheel_026F57": { "start": 159575, "end": 159769, "type": "Code" },
+                "mc_deck_push_zones_027019": { "start": 159769, "end": 159787, "type": "Code" },
+                "mc_deck_push_zone_records_02702B": { "start": 159787, "end": 159852, "type": "unk16" }
             }
         },
         "mc_unreferenced_string_stub_02623C": {
@@ -930,49 +930,49 @@
         "mc_castle_dungeon_actors": {
             "scene": "castle_dungeon",
             "parts": {
-                "code_0269F6": { "start": 158198, "end": 158286, "type": "Code" },
-                "code_026E9D": { "start": 159389, "end": 159416, "type": "Code" },
+                "mc_obj_harp_string_pickup_0269F6": { "start": 158198, "end": 158286, "type": "Code" },
+                "mc_npc_fairy_dungeon_hint_026E9D": { "start": 159389, "end": 159416, "type": "Code" },
                 "asciistring_026EB8": { "start": 159416, "end": 159529, "type": "ASCIIString" },
-                "code_026F29": { "start": 159529, "end": 159536, "type": "Code" },
-                "code_026F30": { "start": 159536, "end": 159556, "type": "Code" }
+                "mc_npc_fairy_dungeon_hint_text_026F29": { "start": 159529, "end": 159536, "type": "Code" },
+                "mc_obj_floor_spikes_026F30": { "start": 159536, "end": 159556, "type": "Code" }
             }
         },
         "mc_castle_towers_actors": {
             "scene": "castle_towers",
             "parts": {
-                "code_026DD7": { "start": 159191, "end": 159218, "type": "Code" },
-                "code_026F44": { "start": 159556, "end": 159560, "type": "Code" }
+                "mc_npc_fairy_chest_hint_026DD7": { "start": 159191, "end": 159218, "type": "Code" },
+                "mc_towers_bg2_scroll_x_026F44": { "start": 159556, "end": 159560, "type": "Code" }
             }
         },
         "mc_return_prompt_and_chest_hint_texts": {
             "parts": {
                 "asciistring_026DF2": { "start": 159218, "end": 159349, "type": "ASCIIString" },
-                "code_026E75": { "start": 159349, "end": 159389, "type": "Code" },
+                "mc_fairy_chest_hint_then_prompt_026E75": { "start": 159349, "end": 159389, "type": "Code" },
                 "asciistring_02706C": { "start": 159852, "end": 159972, "type": "ASCIIString" }
             }
         },
         "mc_castle_dungeon_enemies": {
             "scene": "castle_dungeon",
             "parts": {
-                "code_0FDE48": { "start": 1039944, "end": 1039985, "type": "Code" },
-                "code_0FDE71": { "start": 1039985, "end": 1040320, "type": "Code" },
-                "code_0FDFC3": { "start": 1040323, "end": 1040453, "type": "Code" },
-                "code_0FE045": { "start": 1040453, "end": 1040718, "type": "Code" },
-                "code_0FE14E": { "start": 1040718, "end": 1040940, "type": "Code" },
-                "code_0FE22C": { "start": 1040940, "end": 1040950, "type": "Code" },
-                "code_0FE236": { "start": 1040950, "end": 1041427, "type": "Code" }
+                "mc_obj_wall_spear_0FDE48": { "start": 1039944, "end": 1039985, "type": "Code" },
+                "mc_obj_statue_shooter_0FDE71": { "start": 1039985, "end": 1040320, "type": "Code" },
+                "mc_enemy_bouncing_ball_0FDFC3": { "start": 1040323, "end": 1040453, "type": "Code" },
+                "mc_enemy_wraithe_0FE045": { "start": 1040453, "end": 1040718, "type": "Code" },
+                "mc_enemy_green_snake_0FE14E": { "start": 1040718, "end": 1040940, "type": "Code" },
+                "mc_obj_wall_prop_0FE22C": { "start": 1040940, "end": 1040950, "type": "Code" },
+                "mc_enemy_skeleton_soldier_0FE236": { "start": 1040950, "end": 1041427, "type": "Code" }
             }
         },
         "mc_castle_towers_enemies": {
             "scene": "castle_towers",
             "parts": {
-                "code_0FE413": { "start": 1041427, "end": 1041650, "type": "Code" },
-                "code_0FE4F2": { "start": 1041650, "end": 1041936, "type": "Code" },
-                "code_0FE610": { "start": 1041936, "end": 1041946, "type": "Code" },
-                "code_0FE61A": { "start": 1041946, "end": 1042281, "type": "Code" },
-                "code_0FE76C": { "start": 1042284, "end": 1042494, "type": "Code" },
-                "code_0FE83E": { "start": 1042494, "end": 1042574, "type": "Code" },
-                "code_0FE88E": { "start": 1042574, "end": 1042973, "type": "Code" }
+                "mc_enemy_purple_knight_0FE413": { "start": 1041427, "end": 1041650, "type": "Code" },
+                "mc_enemy_red_knight_0FE4F2": { "start": 1041650, "end": 1041936, "type": "Code" },
+                "mc_obj_static_prop_0FE610": { "start": 1041936, "end": 1041946, "type": "Code" },
+                "mc_obj_statue_shooter_0FE61A": { "start": 1041946, "end": 1042281, "type": "Code" },
+                "mc_enemy_mimic_0FE76C": { "start": 1042284, "end": 1042494, "type": "Code" },
+                "mc_enemy_bronze_robot_0FE83E": { "start": 1042494, "end": 1042574, "type": "Code" },
+                "mc_enemy_chess_knight_0FE88E": { "start": 1042574, "end": 1042973, "type": "Code" }
             }
         }
     },
@@ -980,46 +980,46 @@
         "we_deathtolls_shrine_actors": {
             "scene": "deathtolls_shrine",
             "parts": {
-                "code_004D8B": { "start": 19851, "end": 20301, "type": "Code" },
-                "code_004F4D": { "start": 20301, "end": 20547, "type": "Code" },
-                "code_005043": { "start": 20547, "end": 21332, "type": "Code" },
-                "code_0055C6": { "start": 21958, "end": 22005, "type": "Code" },
-                "binary_0055F5": { "start": 22005, "end": 22012, "type": "Binary" }
+                "we_boss_deathtoll_mage_004D8B": { "start": 19851, "end": 20301, "type": "Code" },
+                "we_boss_deathtoll_mage_handover_004F4D": { "start": 20301, "end": 20547, "type": "Code" },
+                "we_boss_deathtoll_demon_005043": { "start": 20547, "end": 21332, "type": "Code" },
+                "we_fx_ending_tm_curtain_0055C6": { "start": 21958, "end": 22005, "type": "Code" },
+                "we_data_ending_tm_curtain_hdma_0055F5": { "start": 22005, "end": 22012, "type": "Binary" }
             }
         },
         "w6_actor_01EC4B": {
             "scene": "up_above",
             "parts": {
-                "code_01EC4B": { "start": 126027, "end": 126573, "type": "Code" },
+                "we_obj_master_shrine_event_01EC4B": { "start": 126027, "end": 126573, "type": "Code" },
                 "asciistring_01EEC5": { "start": 126661, "end": 126666, "type": "ASCIIString" }
             }
         },
         "we_evil_world_actors": {
             "scene": "evil_world",
             "parts": {
-                "code_01EE6D": { "start": 126573, "end": 126661, "type": "Code" },
-                "code_01EECA": { "start": 126666, "end": 126707, "type": "Code" },
-                "code_01EEF3": { "start": 126707, "end": 126819, "type": "Code" },
-                "word_01EF63": { "start": 126819, "end": 127075, "type": "Word" },
-                "code_01F063": { "start": 127075, "end": 127183, "type": "Code" },
-                "word_01F0CF": { "start": 127183, "end": 127311, "type": "Word" }
+                "we_obj_phoenix_call_scene_01EE6D": { "start": 126573, "end": 126661, "type": "Code" },
+                "we_obj_dazzling_space_hazard_01EECA": { "start": 126666, "end": 126707, "type": "Code" },
+                "we_fx_bg2_hofs_wave_01EEF3": { "start": 126707, "end": 126819, "type": "Code" },
+                "we_data_bg2_hofs_wave_table_01EF63": { "start": 126819, "end": 127075, "type": "Word" },
+                "we_fx_bg2_vofs_wobble_01F063": { "start": 127075, "end": 127183, "type": "Code" },
+                "we_data_bg2_vofs_wobble_table_01F0CF": { "start": 127183, "end": 127311, "type": "Word" }
             }
         },
         "w6_actor_01F14F": {
             "scene": "deathtolls_shrine",
             "parts": {
-                "code_01F14F": { "start": 127311, "end": 127482, "type": "Code" }
+                "we_fx_battle_bg2_hofs_bands_01F14F": { "start": 127311, "end": 127482, "type": "Code" }
             }
         },
         "we_evil_world_enemies": {
             "scene": "evil_world",
             "parts": {
-                "code_0FEA1D": { "start": 1042973, "end": 1043349, "type": "Code" },
-                "code_0FEB95": { "start": 1043349, "end": 1043673, "type": "Code" },
-                "code_0FECD9": { "start": 1043673, "end": 1043721, "type": "Code" },
-                "code_0FED09": { "start": 1043721, "end": 1043855, "type": "Code" },
-                "code_0FED8F": { "start": 1043855, "end": 1044133, "type": "Code" },
-                "code_0FEEA5": { "start": 1044133, "end": 1044134, "type": "Code" }
+                "we_enemy_purple_bull_0FEA1D": { "start": 1042973, "end": 1043349, "type": "Code" },
+                "we_enemy_firefly_0FEB95": { "start": 1043349, "end": 1043673, "type": "Code" },
+                "we_enemy_wall_tile_0FECD9": { "start": 1043673, "end": 1043721, "type": "Code" },
+                "we_enemy_popup_turret_0FED09": { "start": 1043721, "end": 1043855, "type": "Code" },
+                "we_enemy_arc_jet_0FED8F": { "start": 1043855, "end": 1044133, "type": "Code" },
+                "we_enemy_static_hazard_0FEEA5": { "start": 1044133, "end": 1044134, "type": "Code" }
             }
         }
     },
@@ -1469,11 +1469,11 @@
     "actor_shared": {
         "shared_actor_helpers_bank0": {
             "parts": {
-                "code_0029E8": { "start": 10728, "end": 10732, "type": "Code" },
-                "code_002D67": { "start": 11623, "end": 11968, "type": "Code" },
-                "code_00766C": { "start": 30316, "end": 30419, "type": "Code" },
-                "data_0076D3": { "start": 30419, "end": 30447, "type": "unk4" },
-                "code_0076EF": { "start": 30447, "end": 31099, "type": "Code" },
+                "cm_fx_palette_cycle_loop_0029E8": { "start": 10728, "end": 10732, "type": "Code" },
+                "cm_enemy_aimed_shot_body_002D67": { "start": 11623, "end": 11968, "type": "Code" },
+                "cm_npc_master_shrine_menu_00766C": { "start": 30316, "end": 30419, "type": "Code" },
+                "cm_data_master_move_hub_positions_0076D3": { "start": 30419, "end": 30447, "type": "unk4" },
+                "cm_npc_master_record_0076EF": { "start": 30447, "end": 31099, "type": "Code" },
                 "asciistring_007A52": { "start": 31314, "end": 31319, "type": "ASCIIString" }
             }
         },
@@ -1488,15 +1488,15 @@
         },
         "shared_actor_helpers_bank3": {
             "parts": {
-                "code_01B161": { "start": 110945, "end": 110972, "type": "Code" },
-                "code_01B17C": { "start": 110972, "end": 110993, "type": "Code" },
-                "code_01B191": { "start": 110993, "end": 111095, "type": "Code" },
+                "cm_npc_fairy_gem_setup_01B161": { "start": 110945, "end": 110972, "type": "Code" },
+                "cm_npc_fairy_gem_idle_01B17C": { "start": 110972, "end": 110993, "type": "Code" },
+                "cm_npc_captive_plea_01B191": { "start": 110993, "end": 111095, "type": "Code" },
                 "asciistring_01B988": { "start": 113032, "end": 113037, "type": "ASCIIString" }
             }
         },
         "shared_actor_helpers_bank4": {
             "parts": {
-                "code_022289": { "start": 139913, "end": 140042, "type": "Code" },
+                "cm_npc_fairy_gem_idle_022289": { "start": 139913, "end": 140042, "type": "Code" },
                 "asciistring_02249A": { "start": 140442, "end": 140579, "type": "ASCIIString" }
             }
         }

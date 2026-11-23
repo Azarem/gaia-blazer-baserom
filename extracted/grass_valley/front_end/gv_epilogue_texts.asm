@@ -1,7 +1,7 @@
 ; Ending narration, 7 pages, and 'THE END' (file offsets 82322-82863, SNES $02:C192-$C3AF, bank 02). The staff roll string StaffRollText (file offsets 90724-92320, SNES $02:E264-$E8A0) is noted in its own part (batch A8; answers OQ-I029-5).
 ; 
 ; === MODEL ===
-; The ending actor (code_00729D in gv_front_end, meta entry $57) prints EndingPage1Text to EndingPage7Text with a scene change between the fourth and fifth page; TheEndText is printed by code_01B508 (gv_up_above_trial_room_and_lisa_turbo_actors). The story: Grass Valley at sunset, the creatures looking at the sunset, a light ray that nobody notices, and Lisa alone, who now finds the sunset beautiful and believes she can be happy as her father turned the impossible into the possible.
+; The ending actor (gv_obj_ending_sequence_00729D in gv_front_end, meta entry $57) prints EndingPage1Text to EndingPage7Text with a scene change between the fourth and fifth page; TheEndText is printed by gv_obj_the_end_text_01B508 (gv_up_above_trial_room_and_lisa_turbo_actors). The story: Grass Valley at sunset, the creatures looking at the sunset, a light ray that nobody notices, and Lisa alone, who now finds the sunset beautiful and believes she can be happy as her father turned the impossible into the possible.
 ; 
 ; === NOTES ===
 ; - The ending font prints the period as ':' and the comma as '¥' (the extract shows the glyph names).
@@ -14,7 +14,7 @@
 
 ; Ending page 1: it begins 'Grass Valley at sunset' and ends 'The restored world was beautiful'.
 ; 
-; When: the ending actor (code_00729D in gv_front_end), first page.
+; When: the ending actor (gv_obj_ending_sequence_00729D in gv_front_end), first page.
 ; Sees: four lines of narration.
 ; Why: the first of the seven ending pages; EndingPage2Text to EndingPage7Text follow in address order.
 ; In: PrintTextString with Y = this string.
@@ -43,7 +43,7 @@ EndingPage7Text |[CUR:240]  Just like her father changed [N][N][N]  impossible t
 
 ; 'THE END'.
 ; 
-; When: code_01B508 (gv_up_above_trial_room_and_lisa_turbo_actors), at the end of the game.
+; When: gv_obj_the_end_text_01B508 (gv_up_above_trial_room_and_lisa_turbo_actors), at the end of the game.
 ; Sees: the words THE END in two-row glyphs.
 ; Why: closes the game.
 ; In: PrintTextString with Y = this string.
@@ -54,7 +54,7 @@ TheEndText |[09][CUR:358]THE END|
 
 ; The staff roll text: the credits scrolled up BG3 after the ending.
 ; 
-; When: printed once by the credits actor of gv_front_end (code_007638, PHX, Y = this string) through ScrollStaffRollText. After the roll the actor waits $F0 frames (COP [1B]), fades the music (COP [31], track 0), waits $F0 frames again and changes scene with COP [10] to area $00, scene $0D (arrival animation 2, x = y = 0).
+; When: printed once by the credits actor of gv_front_end (gv_obj_staff_roll_007638, PHX, Y = this string) through ScrollStaffRollText. After the roll the actor waits $F0 frames (COP [1B]), fades the music (COP [31], track 0), waits $F0 frames again and changes scene with COP [10] to area $00, scene $0D (arrival animation 2, x = y = 0).
 ; Sees: the credits roll upward: the heading 'The staff of Soul Blazer', then one block per role (scenario, programming, graphics, music composed, arranged, sound, music coordinated, scenario assistant, English text, three staff groups of the Japanese and American company, special thanks, assistant producer, director, producer, publisher), the copyright lines and 'Licensed by NINTENDO' and 'Presented by'.
 ; Why: the roll is far longer than the 32-row BG3 page; ScrollStaffRollText prints it line by line while scrolling.
 ; In: n/a (data). 1597 bytes. 218 [N] line breaks (each scrolls the layer 32 pixels in 32 frames, so about 6976 frames, roughly 116 seconds at 60 frames per second, before the end delays); [14:n] indents a line (n tiles, hex) to centre it. The company-name glyph runs (5 and 6 glyphs, printed as symbols such as the run '·"▼ˮ?') are font tiles, not letters (OQ-I010-11).

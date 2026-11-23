@@ -7,7 +7,7 @@
 ; Save order: SaveGameToSlot first stores saved_scene ($1B90) = world_index + 1 into the live image (so it is saved too), then save_slot into $70:1FFE, copies lair_state and the image, stores the checksum and mirrors the slot ($3FE bytes, which include the checksum words) to +$1000. LoadGameFromSlot validates the main copy only: repairing a damaged main copy from the mirror is the job of the file select (DrawSaveSlotMenu in engine_title_file_select), which also refreshes the mirror.
 ; 
 ; === NOTES ===
-; - Callers: the Master's record question (code_0076EF in shared_actor_helpers_bank0, after the answer Yes) calls SaveGameToSlot; the file select (engine_title_file_select) calls LoadGameFromSlot and ComputeSlotChecksum.
+; - Callers: the Master's record question (cm_npc_master_record_0076EF in shared_actor_helpers_bank0, after the answer Yes) calls SaveGameToSlot; the file select (engine_title_file_select) calls LoadGameFromSlot and ComputeSlotChecksum.
 ; - saved_scene = world_index + 1 is the scene of area 0 the file select loads after Continue: scene 1 to 7 of Up Above are the shrines of the worlds in world order (docs/areas-and-scenes.md). The walkthrough describes saving at the Master's Shrine (06-dr-leos-lab.md, 'go there to heal and save').
 ; - All three routines are JSL and need 16-bit index registers (LDX #$0203); X is preserved, DBR and P are restored.
 ---------------------------------------------
@@ -22,7 +22,7 @@
 
 ; Writes the live game state into slot save_slot of SRAM, with checksum and backup copy.
 ; 
-; When: after the player answers Yes to the Master's record question (code_0076EF in shared_actor_helpers_bank0, which plays BRK #$66 first); the only caller.
+; When: after the player answers Yes to the Master's record question (cm_npc_master_record_0076EF in shared_actor_helpers_bank0, which plays BRK #$66 first); the only caller.
 ; Sees: nothing is drawn here; the Master's script goes on with its farewell. The saved game restarts in the shrine of the current world (saved_scene).
 ; Why: one routine owns the slot format, the checksum and the mirror, so a half-written slot can be recognised and repaired.
 ; In: JSL; X = 16-bit; save_slot ($03A4) = 0-3; world_index ($03BA, read as a word).

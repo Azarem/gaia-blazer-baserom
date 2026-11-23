@@ -21,6 +21,7 @@
 !warp_dest_y                    037E
 !warp_dest_anim                 0380
 !save_slot                      03A4
+!file_select_request            0445
 !reload_menu_gfx                0454
 !m7x_shadow                     046A
 !m7y_shadow                     046C
@@ -320,7 +321,7 @@ HandleFileSelectChoice {
     STA $warp_dest_x
     LDA #$0060
     STA $warp_dest_y
-    STZ $0445
+    STZ $file_select_request
     INC $reload_menu_gfx
     COP [91]
     RTL 

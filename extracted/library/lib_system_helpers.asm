@@ -2,7 +2,7 @@
 ; 
 ; === HDMA CHANNEL QUEUE ===
 ; HDMA channels 4-7 are handed out one per call within a frame; channels 0-2 are used by the NMI for OAM, CGRAM and VRAM transfers (HandleVBlank, engine_vblank_nmi). State lives in the direct page: dp$42 is the pending channel mask (the NMI copies it to HDMAEN), dp$44 the bit of the next free channel ($10 first), dp$46 the offset of that channel's register block from $4300 ($40 first, so channel 4 = $4340) and dp$48 is set to $6000 and never read. ResetHdmaQueue empties the queue at the start of every work phase. QueueHdmaDirect and QueueHdmaIndirect program the next channel; both are entered by long call with M = 8 and X = 16, take A.low = bank, B = PPU register index ($00-$3F, the low byte of the $21xx register) and Y = table address (load them with LDA #reg, XBA, LDA #bank, LDY #addr) and finish in the shared tail WriteHdmaChannelRegisters. HdmaDmapByRegister, indexed by the register number, supplies the DMA mode byte (one register, a register pair or the same register twice).
-; Indirect mode (DMAP or $40) sets both the table bank A1Bn and the indirect data bank DASBn to the bank given, so the table and the data it points to share one bank; every caller passes $7E and a WRAM table at $7800 or $7000. Direct mode reads the table as is (ROM tables binary_006A86 and binary_01B284 or WRAM).
+; Indirect mode (DMAP or $40) sets both the table bank A1Bn and the indirect data bank DASBn to the bank given, so the table and the data it points to share one bank; every caller passes $7E and a WRAM table at $7800 or $7000. Direct mode reads the table as is (ROM tables gv_hdma_title_bgmode_006A86 and gv_hdma_gradient_table_01B284 or WRAM).
 ; There is no overflow guard: the fourth call shifts $80 out of dp$44 and the carry that ADC #$10 then adds (there is no CLC) makes dp$46 = $81; a fifth call per frame would write $4381-$4387, which is not a DMA channel (OQ-I009-9).
 ; 
 ; === NMI AND VBLANK ===
@@ -78,7 +78,7 @@ QueueHdmaIndirect {
 ---------------------------------------------
 ; Programs the next free HDMA channel (4-7) for a direct table and enables it.
 ; 
-; When: 14 call sites (player and world actors, the soul code in lib_011695 and lib_0116C3); tables are ROM (binary_006A86, binary_01B284) or WRAM.
+; When: 14 call sites (player and world actors, the soul code in lib_011695 and lib_0116C3); tables are ROM (gv_hdma_title_bgmode_006A86, gv_hdma_gradient_table_01B284) or WRAM.
 ; Sees: as QueueHdmaIndirect.
 ; Why: same queue as the indirect entry; direct mode needs no data bank.
 ; In: as QueueHdmaIndirect (the bank is the table's bank).

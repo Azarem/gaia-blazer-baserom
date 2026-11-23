@@ -1,7 +1,7 @@
 ; Story narration of the intro, 14 pages (file offsets 80773-82293, SNES $02:BB85-$C175, bank 02).
 ; 
 ; === MODEL ===
-; The intro actor (code_0066FC in gv_front_end, meta entry $56) prints the pages one after the other in address order, each on its own BG3 position (the [CUR:o] at the start of the page; $240, $280 or $300 depending on the line count). After the last page it warps to scene $0A of area 0, the Mode 7 scene (OQ-I011-4). The story: the Freil Empire under King Magridd, the inventor Dr. Leo, the deal with the king of evil Deathtoll that empties the world, and the Master sending the player to revive it as a Soul Blazer.
+; The intro actor (gv_obj_title_and_prologue_0066FC in gv_front_end, meta entry $56) prints the pages one after the other in address order, each on its own BG3 position (the [CUR:o] at the start of the page; $240, $280 or $300 depending on the line count). After the last page it warps to scene $0A of area 0, the Mode 7 scene (OQ-I011-4). The story: the Freil Empire under King Magridd, the inventor Dr. Leo, the deal with the king of evil Deathtoll that empties the world, and the Master sending the player to revive it as a Soul Blazer.
 ; 
 ; === NOTES ===
 ; - The text is printed with the intro font: the period prints as '-' and the apostrophe as a blank (the extract shows 'Dr-Leo-'). Line breaks are [N][N][N].

@@ -1,7 +1,7 @@
 ; Staff roll (credits) scroller (file offsets 75471-75625, SNES $02:A6CF-$A768, bank 02).
 ; 
 ; === MODEL ===
-; ScrollStaffRollText prints a long string line by line on BG3 while scrolling the layer. The only caller is the credits actor of gv_front_end (code_007638, Y = gv_epilogue_texts.StaffRollText, 'The staff of Soul Blazer ...'); afterwards the actor waits two COP 1B delays of $F0 frames and changes scene with COP 10. The walkthrough (08-world-of-evil.md) says only 'Enjoy the credits'; the credits text is not quoted there.
+; ScrollStaffRollText prints a long string line by line on BG3 while scrolling the layer. The only caller is the credits actor of gv_front_end (gv_obj_staff_roll_007638, Y = gv_epilogue_texts.StaffRollText, 'The staff of Soul Blazer ...'); afterwards the actor waits two COP 1B delays of $F0 frames and changes scene with COP 10. The walkthrough (08-world-of-evil.md) says only 'Enjoy the credits'; the credits text is not quoted there.
 ; Each glyph is two tiles: tile c with attribute $21 (tile bit 8 set) at the write cell and tile c with attribute $20 one row below ((X + $40) & $7FF, wrapping inside the 2 KB page). [N] ($0D) scrolls scroll_bg3_y by 32 pixels, one pixel per RunSubFrame, moves the line start four tile rows down ((old + $100) & $7FF) and clears 128 words (four rows of tile 0, attribute $20) there. [14:n] moves the write cell right by n tiles. 0 ends.
 ; The line start lives on the stack (one word, replaced on every [N]); the routine pops it at the end, so X is not preserved.
 ; 
@@ -21,11 +21,11 @@
 
 ; Prints and scrolls the staff roll text, one line per 32 frames.
 ; 
-; When: the credits actor of gv_front_end (code_007638), with Y = the credits string.
+; When: the credits actor of gv_front_end (gv_obj_staff_roll_007638), with Y = the credits string.
 ; Sees: the credits (heading, names, copyright lines) scroll up the BG3 layer.
 ; Why: the text is far longer than the 32-row BG3 page, so each line is written as the layer scrolls and the page rows that have scrolled away are reused.
 ; In: long call (JSL); Y = string (bank $02); M = 8, X = 16; NMI off (RunSubFrame requires it, OQ-I005-20).
-; Out: the whole string printed and scrolled; P and DBR restored (DBR is forced to $02 inside). X is not preserved: it is popped from the line-start slot, so the caller saves it (code_007638 does PHX/PLX).
+; Out: the whole string printed and scrolled; P and DBR restored (DBR is forced to $02 inside). X is not preserved: it is popped from the line-start slot, so the caller saves it (gv_obj_staff_roll_007638 does PHX/PLX).
 ; Clobbers: A, X, Y.
 
 ScrollStaffRollText {

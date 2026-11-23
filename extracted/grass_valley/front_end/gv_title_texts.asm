@@ -1,7 +1,7 @@
 ; Title screen, tile block and save slot menu strings (file offsets 80679-80772, 82294-82321 and 82864-83036, SNES $02:BB27-$BB84, $02:C176-$C191 and $02:C3B0-$C45C, bank 02).
 ; 
 ; === MODEL ===
-; TitlePushStartText and TitleCopyrightText are printed by the title actor (code_0066FC in gv_front_end, meta entry $56): the copyright block first, then 'PUSH START' at BG3 offset $4D6 ([09] = two-row glyphs). The walkthrough says the player presses Start at the title screen to reach the file selection menu. TileBlockText draws a 4x5 block of tiles at BG3 rows 11-15, columns 14-17 from the insert list entries 4-8 ([02:n]); it is printed by code_0066C6 (gv_front_end) and what it draws is not identified (OQ-I011-9).
+; TitlePushStartText and TitleCopyrightText are printed by the title actor (gv_obj_title_and_prologue_0066FC in gv_front_end, meta entry $56): the copyright block first, then 'PUSH START' at BG3 offset $4D6 ([09] = two-row glyphs). The walkthrough says the player presses Start at the title screen to reach the file selection menu. TileBlockText draws a 4x5 block of tiles at BG3 rows 11-15, columns 14-17 from the insert list entries 4-8 ([02:n]); it is printed by gv_obj_boot_loader_0066C6 (gv_front_end) and what it draws is not identified (OQ-I011-9).
 ; SaveSlotMenuText draws the file selection window (DrawSaveSlotMenu in engine_title_file_select): 'Please choose a record', the column heads Name, Lev and Area, 'No1:' to 'No4:' and 'Erase record'. The four slot lines are filled in by SaveSlotLineTemplates, an 80-byte table that is really four 20-byte STRINGS, stepped by $14: [CUR:o1][02:3][CUR:o2][06:2,0450][CUR:o3][06:1,0452] and an end byte. [02:3] is the slot name (insert entry 3, $0447), [06:2,0450] the level as BCD and [06:1,0452] a word read from the save block at +$1B90, the value the file select later loads into scene_next (OQ-I011-12). The cursor offsets are $2D4, $2E8 and $2F2 for slot 1 and each next slot adds $C0.
 ; 
 ; === NOTES ===
@@ -15,7 +15,7 @@
 
 ; 'PUSH START' on the title screen.
 ; 
-; When: the title actor (code_0066FC in gv_front_end), after the copyright block.
+; When: the title actor (gv_obj_title_and_prologue_0066FC in gv_front_end), after the copyright block.
 ; Sees: the words PUSH START at the lower middle of the title screen.
 ; Why: the walkthrough: pressing Start at the title screen leads to the file selection menu.
 ; In: PrintTextString with Y = this string.
@@ -37,7 +37,7 @@ TitleCopyrightText |[09][CUR:5C0][14:6]ALL RIGHTS RESERVED[N]  COPYRIGHT 1992 QU
 
 ; A 4x5 block of tiles on BG3.
 ; 
-; When: code_0066C6 (gv_front_end).
+; When: gv_obj_boot_loader_0066C6 (gv_front_end).
 ; Sees: a picture made of tiles at BG3 rows 11-15, columns 14-17; which picture is open (OQ-I011-9).
 ; Why: the insert list entries 4-8 (the ListTileBlockRow1-5 tile strings of lib_text_render) carry the tile numbers, one row each.
 ; In: PrintTextString with Y = this string.

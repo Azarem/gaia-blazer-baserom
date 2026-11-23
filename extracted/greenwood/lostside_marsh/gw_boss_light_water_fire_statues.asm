@@ -1,3 +1,21 @@
+; The boss of the Lostside marsh, the three Elemental Statues (file offsets 13254-15939, SNES $00:B3C6-$BE42, bank 00). One root script serves all three statues; the walkthrough calls them the Light Statue (far left, T-shaped thunderbolts), the Water Statue (rushes and leaves water that stays and hurts) and the Fire Statue (rushes and streams of fire). Each has 50 HP and gives 30 EXP (meta type $3D, 9/5/50 HP, EXP BCD $0030; 90 EXP in all, as in the bestiary).
+; 
+; === HOW THE FIGHT IS BUILT ===
+; The lair is record $50 (A05S0A, the statue tomb, RunLairFormation, 3 monsters, formation $20): three rows, ($F0,$90) with no flip, ($40,$60) flip X and ($1A0,$60) flip Y. The root gw_boss_light_water_fire_statues_0033C6 runs in all three: it clears exit_list_ofs, increments boss_fight_active, sets $0200 in $16, spawns engine_003005.RunBossMapPatch with patch id 1 (the map patch of the boss room) and then COP A5 sends each statue to its own script by flip state: none to code_0033EA, flip X to code_003732, flip Y to code_003A3D.
+; Only one statue is the boss at a time (boss_actor $039A). The Light Statue (code_003732) sets boss_actor at once; the other two sleep (animations $21 and $13, COP 91 loop) and wait until the boss_actor's $16 has bit $0400, which RunBossDeath sets when it writes $0700 into $16 of the dying boss. Then they wait 8 frames and write their own slot into boss_actor. Because the hand-over happens while the 32 explosions of the dead statue still run, RunBossDeath finds X != boss_actor at its end and skips KillAllOtherActors and the music change: only the last statue (boss_actor still its own) clears the room and ends the fight. The Water Statue takes over only when boss_actor is the actor in the slot after its own (code_0033EA: TXA / ADC #$0080 / CMP boss_actor), the Fire Statue (code_003A3D) after any boss_actor death (OQ-I035-12).
+; A statue that has become the boss waits again until the hero is inside its box widened by 4 (COP 0C, slot 0), spawns a wake effect (code_003E1C animation $3A for the Water Statue, code_003E29 animation $3C for the Light Statue, code_003E36 animation $3E for the Fire Statue), clears $0300 in $16, zeroes contact_lock and starts its loop after 60 frames. The loops are tile and distance driven: COP 9A / 9B compare the distance to the hero, COP 21-24 and COP AE test tiles, COP 80 picks the animation per direction.
+; 
+; === THE THREE ATTACKS ===
+; Light Statue (code_003732 ... code_003A15): rushes at the hero (the walkthrough: 'general rushing') and the T-shaped bolt. The bolt is eight children made one after the other (COP 85): two for each direction, south (code_0039AE, code_0039BD), west (code_0039CA, code_0039D9), north (code_0039E6, code_0039F5) and east (code_003A04, code_003A15), each a piece of the T (offsets in COP A1, direction in $1E, $2A = 4) that vanishes by itself. The order matches the walkthrough: south, west, north, east. A COP 27 loop starts the cycle again.
+; Water Statue (code_0033EA ... code_00372B): rushes at the hero (the walkthrough: equal-length rushes, turns of 90 degrees); every so often (COP 07 #$9905 tests the lock, COP 09 sets it) it spawns a puddle trail (code_003661, code_0036BF, then the chain code_003630 ... code_0036A2 / code_0036CF). Each puddle spawns the next one step further (COP 21-24 decide when the trail ends) and counts the segments in byte 0 of event_flags (at most 4); the last one clears the lock flag $1905 and the counter. The walkthrough: the water stays for some time and hurts on touch.
+; Fire Statue (code_003A3D ... code_003CFE): rushes at the hero (the walkthrough: rushes of varying length); when the tile test in its facing and the four probes ahead (COP AE, 64-80 pixels away) all pass it spawns a flame (code_003D3C, code_003D0D, code_003D6F, code_003DA1 by direction, which spawn the flame code_003DE4 with animations $22, $40 and $3F) and waits 30 frames.
+; 
+; === SHARED STATE ===
+; boss_actor $039A (the active statue), boss_fight_active $0458, exit_list_ofs $03B2, contact_lock $042D, flag $1905 (puddle trail running), byte 0 of event_flags ($1A5E: flags $0000-$0007, the puddle counter; the statue clears it at the start and the trail at its end, OQ-I035-8). The statue tomb is entered from the Lostside; after the third statue the switch $50 releases the Guardian of the Woods (walkthrough: the switch under the lair in the north-west corner).
+; 
+; Open points: the position of the Water and the Fire Statue (the walkthrough puts the Water Statue at the far right; by the rows of formation $20 the far right row runs the Fire script, OQ-I035-13, DISCREPANCY), the exact hand-over order of the second and third statue (OQ-I035-12), the clearing of event_flags byte 0 (OQ-I035-8).
+---------------------------------------------
+
 ?BANK 00
 
 ?INCLUDE 'engine_003005'
@@ -10,16 +28,25 @@
 
 ---------------------------------------------
 
-code_0033C6 {
+; The root of all three Elemental Statues: starts the boss fight and sends each statue to its own script.
+; 
+; When: meta type $3D, lair record $50 (A05S0A, 3 monsters, formation $20): every statue starts here.
+; Sees: nothing yet; the statues are asleep until their turn (see the block note).
+; Why: the three statues share the fight start (boss_fight_active, the map patch) and differ only after COP A5 by flip state. The patch actor RunBossMapPatch is spawned three times, once by each statue (it blocks the buttons while the room is patched; whether it closes or opens the room is OQ-I024-3).
+; In: actor script, X = the statue's slot, Y = the new patch actor after COP 85.
+; Out: STZ exit_list_ofs, boss_fight_active + 1, $16 bit $0200 set, patch id 1 in $30 of the patch actor; then a jump by COP A5 to code_0033EA, code_003732 or code_003A3D.
+; Clobbers: A, Y.
+
+gw_boss_light_water_fire_statues_0033C6 {
     STZ $exit_list_ofs
-    INC $boss_fight_active
+    INC $boss_fight_active ; ends with the boss music change (RunBossDeath of the last statue)
     LDA $0016, X
     ORA #$0200
     STA $0016, X
-    COP [85] ( @engine_003005.RunBossMapPatch )
+    COP [85] ( @engine_003005.RunBossMapPatch ) ; patch id 1 goes into its $30 (Y = the new actor)
     LDA #$0001
     STA $0030, Y
-    COP [A5] ( &code_0033EA, &code_003732, &code_003A3D, &code_003A3D )
+    COP [A5] ( &code_0033EA, &code_003732, &code_003A3D, &code_003A3D ) ; none: Water (0033EA), flip X: Light (003732), flip Y: Fire (003A3D)
 }
 
 code_0033EA {
@@ -29,7 +56,7 @@ code_0033EA {
     TXA 
     CLC 
     ADC #$0080
-    CMP $boss_actor
+    CMP $boss_actor       ; the Water Statue takes over only from the actor in the next slot
     BEQ loc_0033FC
     RTL 
 
@@ -37,7 +64,7 @@ code_0033EA {
     COP [91]
     LDY $boss_actor
     LDA $0016, Y
-    BIT #$0400
+    BIT #$0400            ; $0400: RunBossDeath wrote $0700 into $16 of the dying boss
     BNE loc_00340A
     RTL 
 
@@ -46,7 +73,7 @@ code_0033EA {
 }
 
 code_003410 {
-    STX $boss_actor
+    STX $boss_actor       ; this statue is now the boss: its death ends the fight
     COP [91]
     COP [0C] ( #00, #04, &code_00341C )
     RTL 
@@ -54,9 +81,9 @@ code_003410 {
 
 code_00341C {
     COP [85] ( @code_003E1C )
-    COP [09] ( #$1905 )
+    COP [09] ( #$1905 )   ; no puddle trail is running
     SEP #$20
-    STZ $event_flags
+    STZ $event_flags      ; event_flags byte 0 = the puddle counter (OQ-I035-8)
     REP #$20
     LDA $0016, X
     AND #$FCFF
@@ -74,7 +101,7 @@ code_003448 {
   loc_003452:
     COP [07] ( #$9905, &code_00346B )
     COP [24] ( &code_00346B )
-    COP [09] ( #$9905 )
+    COP [09] ( #$9905 )   ; flag $1905 set: a puddle trail is out
     COP [85] ( @code_003661 )
     COP [1B] ( &code_00346B, #$0028 )
 }
@@ -358,7 +385,7 @@ code_003621 {
     COP [A0] ( #$FFF0 )
     COP [80] ( #27 )
     COP [82]
-    LDA $event_flags
+    LDA $event_flags      ; at most 4 puddle segments
     AND #$00FF
     CMP #$0004
     BCC loc_00364A
@@ -370,7 +397,7 @@ code_003621 {
 
 code_003650 {
     SEP #$20
-    INC $event_flags
+    INC $event_flags      ; one more segment
     REP #$20
     COP [9A] ( #$0000, &code_003720, &code_003720, &code_00370A )
 }
@@ -442,7 +469,7 @@ code_0036BF {
   code_0036EC:
     COP [09] ( #$1905 )
     SEP #$20
-    STZ $event_flags
+    STZ $event_flags      ; trail over: counter cleared, lock cleared just before
     REP #$20
 
   loc_0036F7:
@@ -483,11 +510,11 @@ code_00372B {
 }
 
 code_003732 {
-    STX $boss_actor
+    STX $boss_actor       ; the Light Statue is the boss from the start
     COP [80] ( #19 )
     COP [82]
     COP [91]
-    COP [0C] ( #00, #04, &code_003743 )
+    COP [0C] ( #00, #04, &code_003743 ) ; slot 0 (the hero) inside the box widened by 4: wake up
     RTL 
 }
 
@@ -553,7 +580,7 @@ code_0037CD {
 code_0037D7 {
     COP [81] ( #19, #02 )
     COP [83]
-    COP [85] ( @code_0039AE )
+    COP [85] ( @code_0039AE ) ; the T-shaped bolt: two pieces per direction, south, west, north, east
     COP [85] ( @code_0039BD )
     COP [80] ( #19 )
     COP [82]
@@ -903,7 +930,7 @@ code_003A3D {
     COP [91]
     LDY $boss_actor
     LDA $0016, Y
-    BIT #$0400
+    BIT #$0400            ; $0400: the boss is dying; any statue may follow (OQ-I035-12)
     BNE loc_003A50
     RTL 
 
@@ -912,7 +939,7 @@ code_003A3D {
 }
 
 code_003A56 {
-    STX $boss_actor
+    STX $boss_actor       ; the Fire Statue is the boss now
     COP [91]
     COP [0C] ( #00, #04, &code_003A62 )
     RTL 
@@ -943,7 +970,7 @@ code_003A93 {
     COP [AE] ( #$0000, #$FFB0, &code_003A7F )
     COP [AE] ( #$0010, #$FFC0, &code_003A7F )
     COP [AE] ( #$0010, #$FFB0, &code_003A7F )
-    COP [85] ( @code_003D3C )
+    COP [85] ( @code_003D3C ) ; the five tile tests ahead passed: place a flame
     COP [1B] ( &code_003A7F, #$001E )
 
   loc_003AC2:

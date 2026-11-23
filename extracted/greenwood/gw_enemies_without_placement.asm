@@ -1,21 +1,41 @@
+; Two monster scripts of world 1 that no scene uses (file offsets 1029760-1029781 and 1029880-1030296, SNES $1F:B680-$B694 and $1F:B6F8-$B897, bank 1F; they lie inside gw_lostside_marsh_enemies). MetaGreenwood has entries for meta types $34 and $36, but neither type appears in a placement row of areas 4 and 5 or in a lair record (the lair records of the marsh and the shrines use $2D, $2E, $2F, $33, $35, $37, $38, $48, $49, $3D). They are left-over monsters of the unused set (OQ-I035-11).
+; $34 an unused still monster 1/2/5 HP, EXP 0: sits in animation $12 and does nothing. $36 an unused turret 1/2/5 HP, EXP 0: hides, and when the hero is within $40 pixels in front it appears (animation $13), spawns a shot child and hides again for 60 frames.
+---------------------------------------------
+
 ?BANK 1F
 
 ---------------------------------------------
 
-code_0FB680 {
+; An unused monster that only stands still.
+; 
+; When: meta type $34 (1/2/5 HP, 0 EXP); no placement row and no lair record (OQ-I035-11).
+; Sees: nothing but animation $12.
+; In: actor script, X = own slot.
+; Out: stays in the animation.
+; Clobbers: A.
+
+gw_unused_enemy_still_0FB680 {
     LDA $0016, X
     BIT #$8000
     BEQ loc_0FB68E
-    COP [1B] ( &code_0FB680, #$0010 )
+    COP [1B] ( &gw_unused_enemy_still_0FB680, #$0010 )
 
   loc_0FB68E:
     COP [80] ( #12 )
     COP [82]
-    BRA code_0FB680
+    BRA gw_unused_enemy_still_0FB680
 }
 ---------------------------------------------
 
-code_0FB6F8 {
+; An unused turret monster that pops up and shoots.
+; 
+; When: meta type $36 (1/2/5 HP, 0 EXP); no placement row and no lair record (OQ-I035-11).
+; Sees: COP A5 picks one of four facings; when the hero is within $40 pixels (COP 9A / 9B) it appears (animation $13), spawns a shot child (animations $14-$17 with offsets of 4 or 8 pixels per facing) and hides for 60 frames.
+; In: actor script, X = own slot.
+; Out: loops forever.
+; Clobbers: A, Y.
+
+gw_unused_enemy_turret_0FB6F8 {
     COP [A5] ( &code_0FB702, &code_0FB767, &code_0FB7CC, &code_0FB833 )
 }
 
