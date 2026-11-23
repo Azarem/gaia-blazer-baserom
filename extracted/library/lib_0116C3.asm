@@ -1,11 +1,16 @@
 ?BANK 02
 
-?INCLUDE 'data_00F9F7'
+?INCLUDE 'data_engine_tables'
 ?INCLUDE 'engine_003005'
-?INCLUDE 'lib_01186E'
+?INCLUDE 'lib_system_helpers'
 
 !scroll_bg1_x                   033A
 !scroll_bg1_y                   033C
+!bg2_offset_x                   038A
+!bg2_offset_y                   038C
+!soul_orb_actor                 03A0
+!w12sel_shadow                  03C3
+!souls_flags                    1B82
 !W12SEL                         2123
 !W34SEL                         2124
 !WOBJSEL                        2125
@@ -16,7 +21,7 @@
 ---------------------------------------------
 
 code_0116C3 {
-    LDA $1B82
+    LDA $souls_flags
     AND #$0002
     BNE loc_0116CC
     RTL 
@@ -33,7 +38,7 @@ code_0116C3 {
     BRA loc_01175D
 
   code_0116E2:
-    LDA $1B82
+    LDA $souls_flags
     AND #$0010
     BNE loc_0116EB
     RTL 
@@ -42,17 +47,17 @@ code_0116C3 {
     SEP #$20
     LDA #$20
     STA $W12SEL
-    STA $03C3
+    STA $w12sel_shadow
     STZ $W34SEL
     STZ $WOBJSEL
     LDA #$01
-    STA $038A
-    STA $038C
+    STA $bg2_offset_x
+    STA $bg2_offset_y
     REP #$20
     BRA loc_01175D
 
   code_011707:
-    LDA $1B82
+    LDA $souls_flags
     AND #$0008
     BNE loc_011710
     RTL 
@@ -61,18 +66,18 @@ code_0116C3 {
     SEP #$20
     LDA #$20
     STA $W12SEL
-    STA $03C3
+    STA $w12sel_shadow
     STZ $W34SEL
     LDA #$01
     STA $WOBJSEL
     LDA #$01
-    STA $038A
-    STA $038C
+    STA $bg2_offset_x
+    STA $bg2_offset_y
     REP #$20
     BRA loc_01175D
 
   code_01172E:
-    LDA $1B82
+    LDA $souls_flags
     AND #$0004
     BNE loc_011737
     RTL 
@@ -81,7 +86,7 @@ code_0116C3 {
     SEP #$20
     LDA #$33
     STA $W12SEL
-    STA $03C3
+    STA $w12sel_shadow
     STZ $W34SEL
     STZ $WOBJSEL
     STZ $TMW
@@ -90,12 +95,12 @@ code_0116C3 {
     LDA #$82
     STA $CGWSEL
     REP #$20
-    COP [B0] ( @engine_003005.code_00310F, #$2010 )
+    COP [B0] ( @engine_003005.DestroyHazardsNearOrb, #$2010 )
 
   loc_01175D:
     COP [91]
     PHX 
-    LDY $03A0
+    LDY $soul_orb_actor
     LDA $0000, Y
     SEC 
     SBC $scroll_bg1_x
@@ -181,7 +186,7 @@ code_0116C3 {
     STA $7E7800, X
     LDA $16
     SEC 
-    SBC $&data_00F9F7.binary_00FDC4, Y
+    SBC $&data_engine_tables.CircleHalfWidths, Y
     BCS loc_011803
     LDA #$00
 
@@ -189,7 +194,7 @@ code_0116C3 {
     STA $7E7001, X
     LDA $16
     CLC 
-    ADC $&data_00F9F7.binary_00FDC4, Y
+    ADC $&data_engine_tables.CircleHalfWidths, Y
     BCC loc_011811
     LDA #$FF
 
@@ -219,12 +224,12 @@ code_0116C3 {
     XBA 
     LDA #$7E
     LDY #$7000
-    JSL $@lib_01186E.code_01188A
+    JSL $@lib_system_helpers.QueueHdmaDirect
     LDA #$27
     XBA 
     LDA #$7E
     LDY #$7800
-    JSL $@lib_01186E.code_01188A
+    JSL $@lib_system_helpers.QueueHdmaDirect
     PLX 
     REP #$20
     RTL 

@@ -1,7 +1,7 @@
 ?BANK 02
 
-?INCLUDE 'data_048000'
-?INCLUDE 'data_04F000'
+?INCLUDE 'data_iris_and_icon_tiles'
+?INCLUDE 'data_menu_palettes_and_groups'
 
 !vram_upload_flags              03B8
 
@@ -14,9 +14,9 @@ code_012390 {
     PHA 
     PLB 
     REP #$20
-    LDY #$&data_04F000.binary_04F200
+    LDY #$&data_menu_palettes_and_groups.MenuTileGroupMap
     STY $00
-    LDA #$*data_04F000.binary_04F200
+    LDA #$*data_menu_palettes_and_groups.MenuTileGroupMap
     STA $02
     LDY #$0000
 
@@ -28,13 +28,13 @@ code_012390 {
     ASL 
     ASL 
     TAX 
-    LDA $@data_048000.unk17_048800, X
+    LDA $@data_iris_and_icon_tiles.IconTileRecords, X
     STA $7800, Y
-    LDA $@data_048000.unk17_048800+2, X
+    LDA $@data_iris_and_icon_tiles.IconTileRecords+2, X
     STA $7802, Y
-    LDA $@data_048000.unk17_048800+4, X
+    LDA $@data_iris_and_icon_tiles.IconTileRecords+4, X
     STA $7840, Y
-    LDA $@data_048000.unk17_048800+6, X
+    LDA $@data_iris_and_icon_tiles.IconTileRecords+6, X
     STA $7842, Y
     INY 
     INY 

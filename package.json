@@ -23,13 +23,15 @@
         "clean": "rm -rf dist",
         "clean-install": "rm -rf node_modules && rm -rf package-lock.json && npm install",
         "publish": "tsdown && npm publish --access public",
-        "extract": "node --env-file-if-exists=.env.local src/index.ts extract",
-        "extract:lt": "node --env-file-if-exists=.env.local src/index.ts extract --linetracking",
+        "extract": "rm -rf extracted && node --env-file-if-exists=.env.local src/index.ts extract",
+        "extract:lt": "rm -rf extracted && node --env-file-if-exists=.env.local src/index.ts extract --linetracking",
         "extract-jp": "node --env-file-if-exists=.env.local src/index.ts extract-jp",
         "extract-strings": "node src/extractStrings.ts",
         "rebuild": "node src/index.ts rebuild",
         "merge": "node src/index.ts merge",
-        "names": "node src/index.ts names"
+        "names": "node src/index.ts names",
+        "audit": "node src/index.ts audit",
+        "blocks": "node src/index.ts blocks"
     },
     "dependencies": {
         "@gaialabs/core": "1.0.7"

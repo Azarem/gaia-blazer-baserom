@@ -12,9 +12,9 @@
   "developerId": 180,
   "gameTitle": "SOULBLAZER - 1 USA",
   "gameVersion": 0,
-  "nativeCop": "native_mode_cop_00561E",
-  "nativeBrk": "native_mode_brk_0055FC",
-  "nativeNmi": "native_mode_nmi_000342",
-  "nativeIrq": "native_mode_irq_0005A5",
-  "emulationReset": "emulation_mode_reset_000000"
+  "nativeCop": "HandleCop",
+  "nativeBrk": "HandleBrk",
+  "nativeNmi": "HandleVBlank",
+  "nativeIrq": "HandleIrq",
+  "emulationReset": "BootGame"
 }

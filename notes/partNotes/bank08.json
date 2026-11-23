@@ -1,0 +1,3 @@
+{
+    "Dictionary": "The dictionary of 128 common words, 12 bytes each.\n\nWhen: every string byte of $80 or more in dialogue, menus and item names.\nSees: the word typed out followed by a blank.\nWhy: dialogue and menu text repeat common words, so each is stored once and referenced by one byte.\nIn: n/a (data): entry = byte and $7F; 12 bytes: the characters, then zero padding.\nOut: up to 12 characters of the entry are drawn.\nClobbers: n/a (data)."
+}

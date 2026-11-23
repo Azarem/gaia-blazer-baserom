@@ -2,7 +2,7 @@
 
 Maps the folder keys in `us/groups.json` / `us/files.json` (and `extracted/<area>/<scene>/`) to the game's
 location ids and in-game names. Scene id = `(area << 8) | scene` (decimal in `groups.json`). Names come from the
-ROM's own location-name table `lib_014536_part2.asciistring_list_0147C2`, indexed by `$1C6A`, which is the first
+ROM's own location-name table `lib_banner_texts.LocationNameList`, indexed by `$1C6A`, which is the first
 `asset8` byte of the scene's asset-list record (checked in the emulator: area 3 scene 1 gives `$1C6A = 07`,
 "Leo's Paintings"). The guide texts in `docs/walkthrough/` describe the same places.
 

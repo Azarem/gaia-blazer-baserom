@@ -1,4 +1,9 @@
 {
-    "chunk_000000": [
+    "chunk_000000": [],
+    "lib_animation": [
+        {
+            "key": "LDA \\$&WorldMetaPointers, Y",
+            "value": "LDA $$8000, Y"
+        }
     ]
 }

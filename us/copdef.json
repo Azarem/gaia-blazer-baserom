@@ -1,6 +1,6 @@
 {
   "00": { "id": 0, "size": 0, "parts": [] },
-  "01": { "id": 1, "size": 2, "parts": [ "&ASCIIString" ], "note": "loads word into Y and jumps to code_012C27" },
+  "01": { "id": 1, "size": 2, "parts": [ "&ASCIIString" ], "note": "loads word into Y and jumps to ShowDialogueText" },
   "02": { "id": 2, "size": 2, "parts": [ "&Code" ], "note": "conditionally RTI to offset" },
   "03": { "id": 3, "size": 1, "parts": [ "Byte" ] },
   "04": { "id": 4, "size": 0, "parts": [] },
@@ -69,7 +69,7 @@
   "8A": { "id": 138, "size": 4, "parts": [ "Word", "&Code" ], "note": "unused in the scripts; same operand shape as 89, Y axis" },
   "8B": { "id": 139, "size": 4, "parts": [ "Word", "&Code" ], "note": "unused in the scripts; same operand shape as 89, opposite test, X axis" },
   "8C": { "id": 140, "size": 4, "parts": [ "Word", "&Code" ], "note": "unused in the scripts; same operand shape as 89, opposite test, Y axis" },
-  "8D": { "id": 141, "size": 2, "parts": [ "&Code" ], "note": "unused in the scripts; the handler (Cop8D_JumpIfBit15Clear) jumps to the word operand when actor bit $16.15 is clear and, when it is set, continues WITHOUT skipping the operand (see questions OQ-I001-1)" },
+  "8D": { "id": 141, "size": 2, "parts": [ "&Code" ], "note": "unused in the scripts; the handler (Cop8D_JumpIfOnScreen) jumps to the word operand when actor bit $16.15 is clear and, when it is set, continues WITHOUT skipping the operand (see questions OQ-I001-1)" },
   "8E": { "id": 142, "size": 2, "parts": [ "&Code" ], "note": "unused in the scripts; mirror of 8D (jumps when bit $16.15 is set; same no-skip behavior when clear)" },
   "8F": { "id": 143, "size": 0, "parts": [] },
   "90": { "id": 144, "size": 0, "parts": [] },

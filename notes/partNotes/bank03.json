@@ -1,0 +1,3 @@
+{
+    "SpcDriverBlock": "The block uploaded to the sound chip at boot after the loader.\n\nWhen: code_0FEFBC in engine_spc_ipl_upload, once, at the start of the game.\nSees: nothing directly; the game's music and sound effects depend on it.\nWhy: the SPC700 runs its own program, so the CPU has to send it.\nIn: n/a (data): 1807 bytes, an upload stream whose first words are $004E (a length) and $2E00 (a destination).\nOut: read by code_0FEFF5 with dp$29-$2B = this address and $0320 = $3000.\nClobbers: n/a (data)."
+}

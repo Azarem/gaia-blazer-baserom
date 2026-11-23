@@ -1,0 +1,3 @@
+{
+    "data_spc_driver": "SPC700 sound driver block as uploaded at boot (file offsets 196608-198414, SNES $06:8000-$870E, bank 03; 1807 bytes).\n\n=== MODEL ===\nengine_spc_ipl_upload (code_0FEFBC) first uploads spc_0FF14E, writes $FF to APUIO0 and then uploads this block through the same upload routine (code_0FEFF5) with $0320 = $3000. The song data of MusicPointerTable is uploaded by the same routine later, one song at a time (MusicLoadUpload). The block is an IPL transfer stream: it starts with the length word $004E and the destination word $2E00 and continues with the data; its contents were not disassembled in this audit (the sound engine is documented elsewhere), so the name rests on its place in the boot sequence."
+}

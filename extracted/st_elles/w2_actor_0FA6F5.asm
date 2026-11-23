@@ -1,6 +1,7 @@
 ?BANK 1F
 
 !player_actor                   039C
+!subframe_active                03A6
 
 ---------------------------------------------
 
@@ -8,7 +9,7 @@ code_0FA6F5 {
     COP [85] ( @code_0FA78C )
     COP [85] ( @code_0FA777 )
     COP [91]
-    LDA $03A6
+    LDA $subframe_active
     BNE loc_0FA717
     LDY $player_actor
     LDA $0004, Y

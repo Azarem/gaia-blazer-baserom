@@ -1,6 +1,6 @@
 ?BANK 02
 
-?INCLUDE 'lib_01186E'
+?INCLUDE 'lib_system_helpers'
 
 !location_id                    1C6A
 
@@ -19,7 +19,7 @@ code_011695 {
     XBA 
     LDA #$^binary_0116AD
     LDY #$&binary_0116AD
-    JSL $@lib_01186E.code_01188A
+    JSL $@lib_system_helpers.QueueHdmaDirect
     RTL 
 }
 ---------------------------------------------

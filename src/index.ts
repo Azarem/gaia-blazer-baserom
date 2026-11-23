@@ -10,6 +10,8 @@ import { merge } from './merge.ts';
 import { mergeCheckCli, pruneNotes } from './merge-check.ts';
 import { applyNames, checkNames } from './names-merge.ts';
 import { assertExtractComplete, extractWithSweep } from './extract-state.ts';
+import { runAudit } from './audit.ts';
+import { applyBlocks } from './blocks-edit.ts';
 
 const __pkgRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -242,9 +244,37 @@ if (isMainModule) {
                     if (!namesResult.ok) process.exit(1);
                     break;
                 }
+                case 'audit': {
+                    const top = values['top'] !== undefined ? parseInt(values['top'], 10) : undefined;
+                    if (top !== undefined && (!Number.isInteger(top) || top < 1)) {
+                        console.error('Usage: audit [--blocks] [--group=<name>] [--block=<name>] [--matrix] [--top=N] [--json=<path>]');
+                        process.exit(1);
+                    }
+                    const ok = runAudit(__pkgRoot, {
+                        group: values['group'],
+                        block: values['block'],
+                        blocks: flags.includes('blocks'),
+                        matrix: flags.includes('matrix'),
+                        top,
+                        json: values['json'],
+                    });
+                    if (!ok) process.exit(1);
+                    break;
+                }
+                case 'blocks': {
+                    if (args.length === 0) {
+                        console.error('Usage: blocks <spec.json> [--dry-run]');
+                        process.exit(1);
+                    }
+                    const blocksResult = await applyBlocks(__pkgRoot, args[0], {
+                        dryRun: flags.includes('dry-run') || flags.includes('dryrun'),
+                    }, db);
+                    if (!blocksResult.ok) process.exit(1);
+                    break;
+                }
                 default:
                     console.error('Unknown command:', command);
-                    console.log('Available commands: extract, extract-jp, rebuild, merge, names');
+                    console.log('Available commands: extract, extract-jp, rebuild, merge, names, audit, blocks');
                     process.exit(1);
             }
         } catch (error) {

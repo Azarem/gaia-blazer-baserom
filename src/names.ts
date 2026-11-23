@@ -15,10 +15,24 @@
  */
 import bank00 from '../us/names/bank00.json' with { type: 'json' };
 import bank02 from '../us/names/bank02.json' with { type: 'json' };
+import bank01 from '../us/names/bank01.json' with { type: 'json' };
+import bank03 from '../us/names/bank03.json' with { type: 'json' };
+import bank04 from '../us/names/bank04.json' with { type: 'json' };
+import bank05 from '../us/names/bank05.json' with { type: 'json' };
+import bank06 from '../us/names/bank06.json' with { type: 'json' };
+import bank07 from '../us/names/bank07.json' with { type: 'json' };
+import bank08 from '../us/names/bank08.json' with { type: 'json' };
 
 const bankNames: Record<string, string>[] = [
     bank00,
     bank02,
+    bank01,
+    bank03,
+    bank04,
+    bank05,
+    bank06,
+    bank07,
+    bank08,
 ];
 
 export const names: Record<string, string> = Object.assign({}, ...bankNames);

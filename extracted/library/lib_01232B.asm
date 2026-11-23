@@ -23,8 +23,8 @@ code_01232B {
     STZ $CGADSUB
     LDA #$09
     STA $BGMODE
-    JSR $&lib_shared_012416.code_012416
-    JSR $&lib_shared_012416.code_01243D
+    JSR $&lib_shared_012416.LoadMenuBg2Graphics
+    JSR $&lib_shared_012416.LoadMenuPalette
     JSR $&lib_shared_012390.code_012390
     PLP 
     RTL 
