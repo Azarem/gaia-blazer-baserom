@@ -1,0 +1,23 @@
+[
+  { "address": 18009, "old": "code_004659", "new": "ll_boss_tin_doll_004659", "row": "I038-E1" },
+  { "address": 18088, "old": "code_0046A8", "new": "ll_boss_tin_doll_contact_0046A8", "row": "I038-E1" },
+  { "address": 18158, "old": "code_0046EE", "new": "ll_boss_tin_doll_contact_0046EE", "row": "I038-E1" },
+  { "address": 18223, "old": "code_00472F", "new": "ll_boss_tin_doll_contact_00472F", "row": "I038-E1" },
+  { "address": 18288, "old": "code_004770", "new": "ll_boss_tin_doll_contact_004770", "row": "I038-E1" },
+  { "address": 18301, "old": "code_00477D", "new": "ll_boss_tin_doll_go_top_00477D", "row": "I038-E1" },
+  { "address": 18372, "old": "code_0047C4", "new": "ll_boss_tin_doll_go_bottom_0047C4", "row": "I038-E1" },
+  { "address": 18443, "old": "code_00480B", "new": "ll_boss_tin_doll_go_left_00480B", "row": "I038-E1" },
+  { "address": 18498, "old": "code_004842", "new": "ll_boss_tin_doll_go_right_004842", "row": "I038-E1" },
+  { "address": 18553, "old": "code_004879", "new": "ll_boss_tin_doll_fire_004879", "row": "I038-E1" },
+  { "address": 18651, "old": "code_0048DB", "new": "ll_boss_tin_doll_fire_0048DB", "row": "I038-E1" },
+  { "address": 18749, "old": "code_00493D", "new": "ll_boss_tin_doll_fire_00493D", "row": "I038-E1" },
+  { "address": 18847, "old": "code_00499F", "new": "ll_boss_tin_doll_fire_00499F", "row": "I038-E1" },
+  { "address": 19179, "old": "code_004AEB", "new": "ll_boss_tin_doll_random_row_004AEB", "row": "I038-E1" },
+  { "address": 19228, "old": "code_004B1C", "new": "ll_boss_tin_doll_flower_004B1C", "row": "I038-E1" },
+  { "address": 19254, "old": "code_004B36", "new": "ll_boss_tin_doll_meteor_launcher_004B36", "row": "I038-E1" },
+  { "address": 19299, "old": "code_004B63", "new": "ll_boss_tin_doll_meteor_004B63", "row": "I038-E1" },
+  { "address": 19371, "old": "code_004BAB", "new": "ll_boss_tin_doll_fireball_004BAB", "row": "I038-E1" },
+  { "address": 19382, "old": "code_004BB6", "new": "ll_boss_tin_doll_fireball_004BB6", "row": "I038-E1" },
+  { "address": 19393, "old": "code_004BC1", "new": "ll_boss_tin_doll_fireball_004BC1", "row": "I038-E1" },
+  { "address": 19404, "old": "code_004BCC", "new": "ll_boss_tin_doll_fireball_004BCC", "row": "I038-E1" }
+]

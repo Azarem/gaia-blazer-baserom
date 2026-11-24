@@ -1,0 +1,65 @@
+[
+  {
+    "op": "merge",
+    "blocks": ["w0_actor_01AC32", "w0_shared_01AD1B"],
+    "into": "gv_fairy_gem_advice_return",
+    "row": "W0-1",
+    "note": "Grass Valley jewel actor: advice text, then COP [09] set flag, then falls into the 'return to Grass Valley?' prompt (code_01AD1B). Adjacent in the original, same group, bank 03. Pinned (no movable): code_01AD1B is reached through a 2-byte COP [07] operand from the actor itself and w0_actor_01ADF8 reaches it by BRL."
+  },
+  {
+    "op": "merge",
+    "blocks": ["w1_actor_01E4C3", "w1_shared_01E4E9"],
+    "into": "gw_fairy_gem_return_prompt",
+    "row": "W0-2",
+    "note": "GreenWood Fairy Gem actor: EXP text, COP [09] set flag, falls into the 'return to GreenWood?' prompt (code_01E4E9), which three more actors (w1_actor_01E510, 01E540, 01E594) enter by COP [07] / BRL. Pinned."
+  },
+  {
+    "op": "merge",
+    "blocks": ["w1_actor_01E759", "w1_shared_01E75C"],
+    "into": "gw_player_shift_north",
+    "row": "W0-3",
+    "note": "COP [AD] yield-while-in-view shim falls into the body (code_01E75C, COP [2F] with dy = -2). Meta type 39 of world 1. Pinned."
+  },
+  {
+    "op": "merge",
+    "blocks": ["w1_actor_01E7D5", "w1_shared_01E7D8"],
+    "into": "gw_player_shift_south",
+    "row": "W0-4",
+    "note": "COP [AD] shim falls into the body (code_01E7D8, COP [2F] with dy = +2). Meta type 3B of world 1. Pinned."
+  },
+  {
+    "op": "merge",
+    "blocks": ["w1_actor_01E851", "w1_shared_01E854"],
+    "into": "gw_player_shift_west",
+    "row": "W0-5",
+    "note": "COP [AD] shim falls into the body (code_01E854, COP [2F] with dx = -2). Meta type 3A of world 1. Pinned."
+  },
+  {
+    "op": "merge",
+    "blocks": ["w1_actor_01E8ED", "w1_shared_01E8F0"],
+    "into": "gw_player_shift_east",
+    "row": "W0-6",
+    "note": "COP [AD] shim falls into the body (code_01E8F0, COP [2F] with dx = +2). Meta type 3C of world 1. Pinned."
+  },
+  {
+    "op": "merge",
+    "blocks": ["w2_actor_0FA440", "w2_shared_0FA46D"],
+    "into": "se_fairy_gem_return_prompt",
+    "row": "W0-7",
+    "note": "St. Elles Fairy Gem actor: EXP text, COP [09] set flag, falls into the 'return to the Seabed Palace?' prompt (code_0FA46D), which w2_actor_0FA494 and 0FA4C4 also enter. Bank 1F. Pinned."
+  },
+  {
+    "op": "merge",
+    "blocks": ["w3_actor_021ECE", "w3_shared_021EFB"],
+    "into": "ms_fairy_gem_return_prompt",
+    "row": "W0-8",
+    "note": "Mountain of Souls Fairy Gem actor: EXP text, COP [09] set flag, falls into the 'return to the location of the Mountain of Souls?' prompt (code_021EFB), which w3_actor_021F22 also enters. Bank 04. Pinned."
+  },
+  {
+    "op": "merge",
+    "blocks": ["w4_actor_023DD3", "w4_shared_023E00"],
+    "into": "ll_fairy_gem_return_prompt",
+    "row": "W0-9",
+    "note": "Dr. Leo's Laboratory Fairy Gem actor: EXP text, COP [09] set flag, falls into the 'go back to Dr. Leo's Laboratory?' prompt (code_023E00), which w4_actor_023E27 and 023E57 also enter. Bank 04. Pinned."
+  }
+]

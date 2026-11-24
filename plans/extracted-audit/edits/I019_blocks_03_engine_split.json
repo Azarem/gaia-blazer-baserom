@@ -1,0 +1,66 @@
+[
+  {
+    "op": "merge",
+    "blocks": ["engine_0026F3", "engine_death_drops_ending", "engine_002EC0", "cop_handler_005CF0_part1"],
+    "into": "engine_spawn_lairs_death_drops",
+    "group": "system",
+    "row": "W2-10",
+    "note": "engine_spawn (placement 6.1), first part: lair spawners (code_0026F3 .. code_00295E, 567 references from 138 files, mostly the script words of the lair records in data_00BA0D), enemy death, gem drop, EXP popup, boss death and RunEnding (code_0029EC .. code_005354; RunBossDeath pushes code_005354-1 as a return address, both bank 0), the fixed gem pickup (code_002EC0, FM-A2 X076) and the music-load actor chain code_002C9B .. code_002D31 with the respawn-or-kill routine loc_002D40 (FM-A3 2.13; the BRL from code_002B7E into loc_002D40 becomes internal; the old name cop_handler_005CF0_part1 was not a COP handler). Moved from group cop_handlers to system for the last block. Bank 0, pinned."
+  },
+  {
+    "op": "move-part",
+    "part": "code_0012AF",
+    "from": "engine_000000",
+    "to": "engine_spawn_lairs_death_drops",
+    "row": "W2-11",
+    "note": "R48 .. R52 of FM-A1 (4783 to 5394): InitActorPool, SpawnSceneActors, SpawnPlacementList, InitActorFromPlacement (also called from loc_002D40) and SpawnLairMonster. It follows the collision part in the ROM and precedes the lair scripts in the target block (4783, then 9971 ...). Ends with RTL; the part before it ends with RTS, so there was no fall-through. Bank 0."
+  },
+  {
+    "op": "move-part",
+    "part": "emulation_mode_reset_000000",
+    "from": "engine_000000",
+    "to": "engine_boot_main_loop",
+    "create": { "group": "system" },
+    "row": "W2-12",
+    "note": "R01 .. R04 of FM-A1 (0 to 517): the reset vector (config emulationReset), the main loop and the three sub-frame helpers RunSubFrameLoader, RunSubFrameTransition and RunSubFrame (called with JSL from the scene change, menu, tile trigger, lair return and text code of the library). The part ends with RTL, the next part (debug code) is never entered from it. Bank 0, pinned."
+  },
+  {
+    "op": "move-part",
+    "part": "native_mode_nmi_000342",
+    "from": "engine_000000",
+    "to": "engine_vblank_nmi",
+    "create": { "group": "system" },
+    "row": "W2-13",
+    "note": "R13 .. R23 of FM-A1 (834 to 1445): the NMI vector (config nativeNmi) with the OAM, palette, BG3 tilemap, scroll, strip and sprite tile DMA routines and the VRAM write queue flush. The part ends with RTS (code_00058B) and the next part starts with the IRQ stub RTI, so nothing falls through. Bank 0, pinned."
+  },
+  {
+    "op": "move-part",
+    "parts": ["code_000205", "binary_00030D", "code_00031D"],
+    "from": "engine_000000",
+    "to": "engine_unreferenced_code",
+    "create": { "group": "system" },
+    "row": "W2-14",
+    "note": "R05 .. R12 of FM-A1 (517 to 834): the pad 2 debug code (bank scan, position readout, hex digit table, debug item grant). The extraction has no reference to code_000205 or code_00031D; the other labels are only used inside this cluster (code_0002FC falls into code_000300 inside the part). Gathered with the other unreferenced code of bank 0 (W2-15). Not proven dead at run time. Bank 0, pinned."
+  },
+  {
+    "op": "merge",
+    "blocks": ["engine_unreferenced_code", "engine_0074B1"],
+    "into": "engine_unreferenced_code",
+    "row": "W2-15",
+    "note": "engine_0074B1 (29873, 34 bytes): a COP [80]/[82] actor script that loops until $0482 = 4 with no reference in extracted/ (placement 4.8). Joins the debug cluster of W2-14 as the bank 0 file for code that nothing references."
+  },
+  {
+    "op": "rename",
+    "block": "engine_000000",
+    "to": "engine_scheduler_sprites_combat_collision",
+    "row": "W2-16",
+    "note": "What is left of engine_000000 after W2-11 .. W2-14: native_mode_irq_0005A5 (1445 to 4783, 3,338 bytes, R24 .. R47 of FM-A1): the IRQ vector (one RTI), the actor scheduler (RunActors, RunActorList), cull and sort, OAM and sprite building, SetActorAnimFrame, hit detection and the sword and projectile hits, and the tile collision (MoveActorWithTileCollision, CollideEast/West/South/North, GetTileType). Kept as one part: npm run blocks cannot split a part (OQ-I015-8). Bank 0, pinned."
+  },
+  {
+    "op": "rename",
+    "block": "engine_006B7F",
+    "to": "engine_title_file_select",
+    "row": "W2-17",
+    "note": "code_006B7F (27519, 681 bytes): the title screen with its Mode 7 matrix registers, the file select (code_006CD0), the slot menu (code_006D4E) and the erase menu; reached from common_actor_0066FC by BRL into loc_006CC1 (FM-A5, FM-A7, FM-A9). Rename only (placement 6.1 engine_title)."
+  }
+]

@@ -2,7 +2,7 @@
 ; 
 ; === PLACEMENT AND STATS (walkthrough against ROM) ===
 ; - A15S01 (PlacementA15S01): hero row ($07,$03); row ;01 type $09 (the Mage) at tile ($07,$05), flags $01; row ;02 type $13 (the hand-over actor, meta flags $2050 = hidden) at the same tile.
-; - A15S02 (PlacementA15S02): row ;01 type $08 (the BG2 band effect, w6_actor_01F14F), row ;02 type $11 (the Demon) at tile ($07,$04). The walkthrough's RAM address of the Demon's HP, $7E08A5, is slot $02 ($0880) + $25, the HP byte of an actor slot, so it is this actor.
+; - A15S02 (PlacementA15S02): row ;01 type $08 (the BG2 band effect, we_fx_battle_bg2_hofs_bands), row ;02 type $11 (the Demon) at tile ($07,$04). The walkthrough's RAM address of the Demon's HP, $7E08A5, is slot $02 ($0880) + $25, the HP byte of an actor slot, so it is this actor.
 ; - MetaWorldOfEvil: $09 attack $1A, defence $15, HP $63 (99), EXP 0, flags $0200 (cannot be hit at first); $11 attack $1C, defence $FF, HP $64 (100), EXP 0, flags $0201; $13 flags $2050. The walkthrough gives 'Maximum HP: 100 HP' for each form (200 in enemy-bestiary.md) and 0 EXP: the Mage is 99 in the ROM (DISCREPANCY, OQ-I033-1 refined by OQ-I040-2). The Demon's defence $FF fits 'Each Phoenix will only do 1 ~ 2 points of damage'.
 ; - There is no lair record for Deathtoll: both forms are placed and both set boss_actor ($039A).
 ; 
@@ -28,7 +28,7 @@
 
 ?BANK 00
 
-?INCLUDE 'engine_003005'
+?INCLUDE 'engine_player_death_and_actor_helpers'
 ?INCLUDE 'lib_system_helpers'
 
 !joy_block_mask                 0326
@@ -64,7 +64,7 @@ we_boss_deathtoll_mage_004D8B {
     RTL 
 
   loc_004DA9:
-    COP [85] ( @engine_003005.RunBossMapPatch )
+    COP [85] ( @engine_player_death_and_actor_helpers.RunBossMapPatch )
     LDA #$0004            ; patch id 4 (OQ-I024-3: whether the patch closes or opens the room)
     STA $0030, Y
     COP [1B] ( &we_boss_deathtoll_mage_intro_004DBA, #$0004 )

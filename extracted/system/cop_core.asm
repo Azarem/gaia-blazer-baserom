@@ -2,7 +2,7 @@
 ; 
 ; === CONVENTIONS OF EVERY HANDLER ===
 ; HandleCop enters a handler with X = Y = the actor slot, DP $38 = the script pointer just past the id byte (the first operand byte) and DP $3A = the script bank. Every handler starts with TYX, reads its operands with LDA [$38] / INC $38 (a word costs two INCs; a Byte operand is read as a word and masked with $00FF) and leaves through the exit chain with BRL. A and Y are scratch; X is the actor slot again on exit, so the next COP of the script finds it intact. Scratch DP used by handlers: $00, $0C, $0E, $16, $18 (listed in each part note). A script that calls COP from its own code must keep X = actor slot (AGENTS.md, COP register requirement).
-; A jump command reads the target word and leaves through CopExitJump; a failed condition leaves through the CopExitSkipN that matches the operand bytes still unread. A wait command (Cop05, Cop82, Cop83, CopAD) does not move past itself while the wait lasts: it saves a resume pointer that re-runs the same COP next frame and yields. A command that spawns, kills or changes fields simply continues through CopExitContinue.
+; A jump command reads the target word and leaves through CopExitJump; a failed condition leaves through the CopExitSkipN that matches the operand bytes still unread. A wait command does not move past itself while the wait lasts: Cop05 and CopAD save a resume pointer that re-runs their own COP and yield; Cop82, Cop83 and Cop9E yield with the resume pointer that the animation command before them (Cop80, Cop81, Cop9D) saved, which points at the wait command in the usual pair. A command that spawns, kills or changes fields simply continues through CopExitContinue.
 ; 
 ; === EXIT CHAIN ===
 ; The chain (CopExitSkip5 .. CopExitYield) is entered by BRL from the handlers: CopExitSkip5 skips 5 operand bytes, CopExitSkip4 skips 4, CopExitSkip3 skips 3, CopExitSkip2 skips 2, CopExitSkip1 skips 1, CopExitContinue skips none. They fall through to CopExitJump, which writes A over the return address on the stack ($02,S) and returns with RTI, so the script continues at A (for a jump, A is the target). CopExitSaveResume stores $38 as the actor's resume pointer ($18,X) and falls into CopExitYield, which pops the COP frame and returns with RTL (yield to the actor loop).
@@ -11,7 +11,7 @@
 ; Event flags are a bit array at $1A5E. A flag word has the bit number (0-7) in its low byte and the byte index in bits 8-14; bit 15 is a command-specific sense bit (Cop05_WaitWhileFlagEquals, Cop09_SetOrClearFlag). The inventory/progress bytes are at $1B1E (entry n at $1B1E + n - 1, bit 7 = flag, bits 0-6 = value).
 ; 
 ; === ACTORS, TILES, SPAWNING ===
-; Actor slots are 0x40 bytes wide from $0800. Actors are in a doubly linked list ($3C = next, $3E = previous; heads $06A6 and $06A8). Free slots are kept on a stack addressed by $4A (word entries; a taken entry is zeroed); when it is empty PopFreeSlot returns the scratch slot $06AA with carry set and the spawn handlers, which never test the carry, write into that slot. The spawn helpers link a new actor after (SpawnActorAfter) or before (SpawnActorBefore) the caller and clone the caller's first $3C bytes into it (InitSpawnedActor); the handlers then set the entry address ($18, bank $36) and optionally position and $16. BlockActorFootprint and ClearActorFootprint write the $F0 block mark into tile_type_map ($7F8000) for the box of an actor (width $10, height $12; a box with width + height below $21 is one tile at (x, y - 16)).
+; Actor slots are 0x40 bytes wide from $0800. Actors are in a doubly linked list ($3C points toward the tail = earlier in run order, $3E toward the head = later; actor_list_tail $06A6 runs first, actor_list_head $06A8 last). Free slots are kept on a stack addressed by $4A (word entries; a taken entry is zeroed); when it is empty PopFreeSlot returns the scratch slot $06AA with carry set and the spawn handlers, which never test the carry, write into that slot. The spawn helpers link a new actor on the $3C side of the caller (SpawnActorAfter: the new actor runs before the caller, first on the next frame) or on the $3E side (SpawnActorBefore: it runs right after the caller, in the same frame) and clone the caller's first $3C bytes into it (InitSpawnedActor); the handlers then set the entry address ($18, bank $36) and optionally position and $16. BlockActorFootprint and ClearActorFootprint write the $F0 block mark into tile_type_map ($7F8000) for the box of an actor (width $10, height $12; a box with width + height below $21 is one tile at (x, y - 16)).
 ---------------------------------------------
 
 ?BANK 00
@@ -99,10 +99,10 @@ CopB2_SpawnBeforeRelative {
   CopExitContinue:
     LDA $38
 
-; A = new script pointer (jump target or $38). Replaces the return address on the stack and returns with RTI.
+; A = new script pointer (jump target or $38). Replaces only the PC word of the COP frame (the bank byte stays, so a jump target is always in the bank of the COP) and returns with RTI, which also restores the P the script had at the COP.
 
   CopExitJump:
-    STA $02, S
+    STA $02, S            ; $02,S is the PC word of the COP frame; the bank at $04,S is not touched, so the script continues in its own bank
     RTI 
 
 ; Save $38 as the actor's resume pointer ($18,X), then yield.
@@ -111,10 +111,10 @@ CopB2_SpawnBeforeRelative {
     LDA $38
     STA $0018, X
 
-; Yield: PLA PLA RTL back to the actor loop. The script resumes next time from $18,X/$36,X.
+; Yield: PLA PLA RTL back to the actor loop. The actor loop calls the script again at $18,X/$36,X once the wait counter $14 has run out (a plain yield leaves it at 0, so the next frame).
 
   CopExitYield:
-    PLA 
+    PLA                   ; Two 16-bit PLAs drop the 4-byte COP frame (P, PC, PB); RTL then returns to the address the scheduler pushed (StepActorMotion - 1)
     PLA 
     RTL 
 }
@@ -231,7 +231,7 @@ BlockActorFootprint {
     CLC 
     ADC $0012, X
     CMP #$0021            ; Width + height below $21: the box covers one tile at (x, y - 16); otherwise width / 16 by height / 16 tiles
-    BCS loc_006563
+    BCS BlockFootprintMultiTile
     PHX 
     LDA $0000, X
     STA $16
@@ -246,7 +246,7 @@ BlockActorFootprint {
     PLX 
     RTS 
 
-  loc_006563:
+  BlockFootprintMultiTile:
     TXY 
     LDA $0012, Y
     LSR 
@@ -289,7 +289,7 @@ BlockActorFootprint {
 
 ; Clears the collision footprint of the actor at X.
 ; 
-; When: Cop16_UnblockOwnTiles, and Cop11_MoveActorToTile before it moves an actor.
+; When: Cop16_UnblockOwnTiles, and Cop11_MoveActorToTile, which calls it for the other actor after it has stored the new position (OQ-I025-8).
 ; Sees: the tiles the actor blocked become walkable again (a door or a statue that moves away).
 ; Why: the tile map keeps one blocking entry per tile; an actor that moves or disappears must release its tiles. Counterpart of Cop15_BlockOwnTiles, which ORs $F0 into the same entries.
 ; In: X = actor; position $00/$02, box width $10 and height $12.
@@ -301,7 +301,7 @@ ClearActorFootprint {
     CLC 
     ADC $0012, X
     CMP #$0021            ; Width + height below $21: the box covers one tile at (x, y - 16); otherwise width / 16 by height / 16 tiles
-    BCS loc_0065D3
+    BCS ClearFootprintMultiTile
     PHX 
     LDA $0000, X
     STA $16
@@ -316,7 +316,7 @@ ClearActorFootprint {
     PLX 
     RTS 
 
-  loc_0065D3:
+  ClearFootprintMultiTile:
     TXY 
     LDA $0012, Y
     LSR 
@@ -399,7 +399,7 @@ TileToPixel {
 ; 
 ; When: Cop14_JumpIfSwitchSet and Cop3B_JumpIfSwitchSetElseHold, when the script first tests a switch.
 ; Sees: nothing at once; the actor later reacts when its switch is triggered (the walkthrough's green switch under a cleared lair).
-; Why: switch_owner_table ($7F0483, word entries, cleared at every scene load by lib_scene_change_init) maps a switch number to the actor that owns it. Its readers are not traced yet.
+; Why: switch_owner_table ($7F0483, word entries, zeroed only on a return trip by ClearSwitchOwnersOnReturn, not at every scene load) maps a switch number to the actor that owns it. Its one reader is FacePlayerTowardReturnTarget (player_core), which waits for switch_owner_table[return_record] and turns the hero toward that actor after a return trip.
 ; In: A = switch index, X = actor. Out: switch_owner_table[A] = X. Clobbers: none (A and X preserved).
 
 RegisterSwitchOwner {
@@ -418,7 +418,7 @@ RegisterSwitchOwner {
 ; Spawns an actor and links it after the actor X in the list.
 ; 
 ; When: Cop84_SpawnActorAfter, CopAB, CopAF, CopB1 and other spawn handlers.
-; Sees: a monster, effect, projectile or pickup appears next to its spawner.
+; Sees: a monster, effect, projectile or pickup appears next to its spawner; it sits before X in run order, so its first run is the next frame.
 ; Why: one shared path for allocating, linking and initialising a new actor.
 ; In: X = spawner.
 ; Out: Y = new slot ($3E of the new actor = X, $3C = the old $3C of X; actor_list_tail updated when the new actor is last), then InitSpawnedActor; carry set and nothing linked when no slot is free (Y = $06AA). X preserved.
@@ -426,7 +426,7 @@ RegisterSwitchOwner {
 
 SpawnActorAfter {
     JSL $@PopFreeSlot
-    BCS loc_006661
+    BCS SpawnAfterDone
     TXA 
     STA $003E, Y
     LDA $003C, X
@@ -435,19 +435,19 @@ SpawnActorAfter {
     STA $003C, X
     PHX 
     LDX $003C, Y
-    BNE loc_006659
+    BNE SpawnAfterLinkOldPrev
     STY $actor_list_tail
-    BRA loc_00665D
+    BRA SpawnAfterInit
 
-  loc_006659:
+  SpawnAfterLinkOldPrev:
     TYA 
     STA $003E, X
 
-  loc_00665D:
+  SpawnAfterInit:
     PLX 
     JSR $&InitSpawnedActor
 
-  loc_006661:
+  SpawnAfterDone:
     RTS 
 }
 
@@ -455,7 +455,7 @@ SpawnActorAfter {
 ; Spawns an actor and links it before the actor X in the list.
 ; 
 ; When: Cop85_SpawnActorBefore, CopAC, CopB0 and the lair code (SpawnLairMonster, SpawnLairActor).
-; Sees: a monster, effect, projectile or pickup appears; an actor linked before X runs earlier in the actor loop.
+; Sees: a monster, effect, projectile or pickup appears; it sits on the $3E side of X, so it runs right after X in the same frame (the actor loop follows $3E).
 ; Why: one shared path for allocating, linking and initialising a new actor.
 ; In: X = spawner.
 ; Out: Y = new slot ($3C of the new actor = X, $3E = the old $3E of X; actor_list_head updated when the new actor is first), then InitSpawnedActor; carry set and nothing linked when no slot is free (Y = $06AA). X preserved.
@@ -463,7 +463,7 @@ SpawnActorAfter {
 
 SpawnActorBefore {
     JSL $@PopFreeSlot
-    BCS loc_006689
+    BCS SpawnBeforeDone
     TXA 
     STA $003C, Y
     LDA $003E, X
@@ -472,19 +472,19 @@ SpawnActorBefore {
     STA $003E, X
     PHX 
     LDX $003E, Y
-    BEQ loc_006682
+    BEQ SpawnBeforeSetHead
     TYA 
     STA $003C, X
-    BRA loc_006685
+    BRA SpawnBeforeInit
 
-  loc_006682:
+  SpawnBeforeSetHead:
     STY $actor_list_head
 
-  loc_006685:
+  SpawnBeforeInit:
     PLX 
     JSR $&InitSpawnedActor
 
-  loc_006689:
+  SpawnBeforeDone:
     RTS 
 }
 
@@ -500,7 +500,7 @@ SpawnActorBefore {
 
 PopFreeSlot {
     LDA ($4A)
-    BEQ loc_00669E
+    BEQ PopFreeSlotEmpty
     TAY 
     LDA #$0000
     STA ($4A)
@@ -511,7 +511,7 @@ PopFreeSlot {
     CLC 
     RTL 
 
-  loc_00669E:
+  PopFreeSlotEmpty:
     SEC 
     LDY #$06AA            ; Stack empty: scratch slot $06AA, carry set (the caller must check it)
     RTL 

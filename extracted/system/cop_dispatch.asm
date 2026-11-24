@@ -1,7 +1,7 @@
 ; COP and BRK dispatchers and the COP command tables (from file offset 22012, SNES $00:D5FC, bank 00).
 ; 
 ; === BRK (HandleBrk) ===
-; BRK #n is the sound request. HandleBrk reads the signature byte n after the BRK (return address minus 1, long pointer in DP $3B-$3D). When bit 6 ($40) of n is set, n and $BF is stored in $0399 (the high byte of the sound word); otherwise n is stored in $0398 (sound_request, the low byte). HandleVBlank writes the word to APUIO2 on even frames and clears it (engine_vblank_nmi, section SOUND). A is preserved; DP $3B-$3D are clobbered. What the two bytes mean to the sound driver is OQ-I024-1. us/config.json lists HandleBrk and HandleCop as the native BRK and COP vectors (nativeBrk, nativeCop).
+; BRK #n is the sound request. HandleBrk reads the signature byte n after the BRK (return address minus 1, long pointer in DP $3B-$3D). When bit 6 ($40) of n is set, n and $BF is stored in $0399 (the high byte of the sound word); otherwise n is stored in $0398 (sound_request, the low byte). HandleVBlank writes the word to APUIO2 on even frames and clears it (engine_vblank_nmi, section SOUND). A is preserved; DP $3B-$3D are clobbered. The low byte (APUIO2) asks the SPC for a sound on voice 7, the high byte (APUIO3) on voice 8, bit 7 of the low byte on both; bits 0-5 are the sound id, 1-$26 (docs/code/spc-interface.md, OQ-I024-1). us/config.json lists HandleBrk and HandleCop as the native BRK and COP vectors (nativeBrk, nativeCop).
 ; 
 ; === COP (HandleCop) ===
 ; The COP instruction runs actor scripts. HandleCop takes the actor slot from X (TXY), builds the script pointer in DP $38/$3A from the pushed return address (bank byte from $04,S, address $02,S minus 1, so the pointer starts on the COP signature byte), reads the command id, advances $38 and jumps through the word table at CopHandlerTable_00_3C indexed by id*2.
@@ -26,17 +26,17 @@
 
 ; Native-mode BRK vector: the sound request.
 ; 
-; When: every BRK #n in the game (about a hundred call sites: sword swings, spawns, pickups, deaths, scripts).
+; When: every BRK #n in the game (289 BRK #n instructions in extracted/: sword swings, spawns, pickups, deaths, scripts).
 ; Sees: nothing itself; the sound driver plays the request one or two frames later.
 ; Why: a two-byte instruction is the cheapest way for scripts and engine code to ask for a sound.
 ; In: stack = return address of the BRK (the byte after the BRK opcode is n).
 ; Out: bit 6 of n clear: sound_request ($0398) = n; bit 6 set: $0399 = n and $BF. The previous value of the byte is overwritten, so two requests in one frame lose the first.
-; Clobbers: DP $3B-$3D; A and P restored (PHA/PLA, RTI).
+; Clobbers: DP $3B-$3D; A and P restored (PHA/PLA, RTI). It never writes the script pointer $38-$3A, so a BRK between COP commands or inside a handler (Cop39_DamagePlayer) leaves the script alone.
 
 HandleBrk {
     REP #$20
     PHA 
-    LDA $04, S
+    LDA $04, S            ; After PHA the frame is A (2 bytes), P, PC (BRK address + 2), PB: $04,S = PC, $06,S = the bank
     DEC 
     STA $3B
     SEP #$20
@@ -44,15 +44,15 @@ HandleBrk {
     STA $3D
     LDA [$3B]
     BIT #$40              ; Bit 6 of the BRK signature byte: set = n and $BF goes to the high byte $0399 of the sound word, clear = n goes to sound_request ($0398)
-    BNE loc_005615
+    BNE BrkStoreHighByte
     STA $sound_request
-    BRA loc_00561A
+    BRA BrkReturn
 
-  loc_005615:
+  BrkStoreHighByte:
     AND #$BF
     STA $0399
 
-  loc_00561A:
+  BrkReturn:
     REP #$20
     PLA 
     RTI 
@@ -71,7 +71,7 @@ HandleBrk {
 HandleCop {
     SEP #$20
     TXY 
-    LDA $04, S
+    LDA $04, S            ; Native COP frame: $01,S = P, $02,S = PC (COP address + 2), $04,S = PB; this reads the bank of the script
     STA $3A
     REP #$20
     LDA $02, S
@@ -153,7 +153,7 @@ CopHandlerTable_00_3C [
 ]
 ---------------------------------------------
 
-; Filler words (#$0000 or #$FFFF) that cover command ids 3D-7F so that CopHandlerTable_80_B2 starts at id 80 (CopHandlerTable_00_3C + $100). No handler.
+; Filler words (#$0000 and #$FFFF, plus one #$0020 at index $26, id $63) that cover command ids 3D-7F so that CopHandlerTable_80_B2 starts at id 80 (CopHandlerTable_00_3C + $100). No handler.
 
 CopFillerTable_3D_7F [
   #$0000   ;00

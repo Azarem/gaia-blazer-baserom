@@ -1,0 +1,8 @@
+[
+  { "address": 19573, "old": "mc_boss_demon_falcon_feather_drop_004C75", "new": "mc_boss_demon_falcon_fire_drop_004C75", "row": "I039h-1" },
+  { "address": 19626, "old": "mc_boss_demon_falcon_feather_004CAA", "new": "mc_boss_demon_falcon_fire_stream_004CAA", "row": "I039h-2" },
+  { "address": 19663, "old": "mc_boss_demon_falcon_feather_fall_004CCF", "new": "mc_boss_demon_falcon_fire_fall_004CCF", "row": "I039h-3" },
+  { "address": 19679, "old": "mc_boss_demon_falcon_feather_trail_004CDF", "new": "mc_boss_demon_falcon_fire_trail_004CDF", "row": "I039h-4" },
+  { "address": 19694, "old": "mc_boss_demon_falcon_feather_trail_check_004CEE", "new": "mc_boss_demon_falcon_fire_trail_check_004CEE", "row": "I039h-5" },
+  { "address": 19702, "old": "mc_boss_demon_falcon_feather_trail_spawn_004CF6", "new": "mc_boss_demon_falcon_fire_trail_spawn_004CF6", "row": "I039h-6" }
+]

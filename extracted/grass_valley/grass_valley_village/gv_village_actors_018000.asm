@@ -28,7 +28,7 @@
 
 ?BANK 03
 
-?INCLUDE 'engine_003005'
+?INCLUDE 'engine_player_death_and_actor_helpers'
 ?INCLUDE 'engine_spawn_lairs_death_drops'
 ?INCLUDE 'shared_actor_helpers_bank3'
 ?INCLUDE 'shared_choice_prompt_texts'
@@ -901,7 +901,7 @@ asciistring_01919A |[10]What do you think of [N]these walls? [N]I am known to be
 ; 
 ; When: meta type $15, COP 3B on switch $16 (lair record $16 frees name 7 'tool shop owner s son' to his home tile ($18,$17); the walkthrough: 'use the resultant switches to release the son of the owner of the tool shop').
 ; Sees: if the hero has no Goat's Food ($19): 'I am helping my mother. Would you like to buy some goat's food? Do you want to know how much it costs? Well. How about one billion dollars plus tax?!' (a Yes / No menu whose answer does not matter: both lead on); then 'TEDDY!! I'm sorry, I will give it to you for free. <name> received a bag of goat's food!' (sound $5E, COP 0A $19), and the tool shop owner (slot 5) is made to play a short animation. With the food: 'Oh, you don't need many bags of goat's food, return here after you have used the one I have given you.'
-; Why: COP 3B is the 'hold' variant of COP 14: while the lair is not released the actor's talk handler is the shared shared_actor_helpers_bank3.cm_npc_captive_plea_01B191 and the root continues in engine_003005.HoldActorUntilReleased (through the pushed return address); the walkthrough: the food is infinitely available, so it is no treasure.
+; Why: COP 3B is the 'hold' variant of COP 14: while the lair is not released the actor's talk handler is the shared shared_actor_helpers_bank3.cm_npc_captive_plea_01B191 and the root continues in engine_player_death_and_actor_helpers.HoldActorUntilReleased (through the pushed return address); the walkthrough: the food is infinitely available, so it is no treasure.
 ; In: actor script, X = own slot.
 ; Out: after the release: appear puff, talk handler code_01922C, then a loop that turns the actor towards the hero (flip, animation $11 or $0C).
 ; Clobbers: A.
@@ -910,10 +910,10 @@ gv_npc_tool_shop_son_0191D2 {
     COP [3B] ( #$0016, &code_0191E8 )
     COP [17] ( &shared_actor_helpers_bank3.cm_npc_captive_plea_01B191 )
     SEP #$20
-    LDA #$^engine_003005.HoldActorUntilReleased
+    LDA #$^engine_player_death_and_actor_helpers.HoldActorUntilReleased
     PHA 
     REP #$20
-    LDA #$&engine_003005.HoldActorUntilReleased-1
+    LDA #$&engine_player_death_and_actor_helpers.HoldActorUntilReleased-1
     PHA 
     RTL 
 }

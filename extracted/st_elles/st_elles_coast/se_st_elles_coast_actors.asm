@@ -21,7 +21,7 @@
 ?INCLUDE 'lib_map_index_helpers'
 ?INCLUDE 'shared_actor_helpers_bank3'
 ?INCLUDE 'shared_choice_prompt_texts'
-?INCLUDE 'w2_shared_0FA945'
+?INCLUDE 'w2_obj_fairy_idle_loop'
 
 !L_choice_result                0003D0
 !scroll_bg2_x                   033E
@@ -35,7 +35,7 @@
 ; A fairy gem that pays 200 EXP (switch $A6, flag $1D00).
 ; 
 ; When: placement script; COP 14 until the lair $A6 is released.
-; Sees: JSL cm_npc_fairy_gem_setup_01B161 (the shared fairy setup), talk handler code_0FA45B, then the idle loop of w2_shared_0FA945 through a pushed return address.
+; Sees: JSL cm_npc_fairy_gem_setup_01B161 (the shared fairy setup), talk handler code_0FA45B, then the idle loop of w2_obj_fairy_idle_loop through a pushed return address.
 ; In: X = D = slot.
 ; Out: RTL into w2_obj_fairy_idle_loop_0FA945.
 ; Clobbers: A, Y.
@@ -49,10 +49,10 @@ code_0FA447 {
     JSL $@shared_actor_helpers_bank3.cm_npc_fairy_gem_setup_01B161
     COP [17] ( &code_0FA45B )
     SEP #$20
-    LDA #$^w2_shared_0FA945.w2_obj_fairy_idle_loop_0FA945
+    LDA #$^w2_obj_fairy_idle_loop.w2_obj_fairy_idle_loop_0FA945
     PHA 
     REP #$20
-    LDA #$&w2_shared_0FA945.w2_obj_fairy_idle_loop_0FA945-1
+    LDA #$&w2_obj_fairy_idle_loop.w2_obj_fairy_idle_loop_0FA945-1
     PHA 
     RTL 
 }
@@ -66,7 +66,7 @@ code_0FA447 {
 
 code_0FA45B {
     COP [07] ( #$9D00, &se_npc_fairy_return_prompt_0FA46D ) ; flag $1D00: the 200 EXP were already paid
-    COP [01] ( &w2_shared_0FA945.asciistring_0FA9C5 )
+    COP [01] ( &w2_obj_fairy_idle_loop.asciistring_0FA9C5 )
     COP [38] ( #$0200 )   ; 200 EXP in BCD
     COP [09] ( #$9D00 )
 }
@@ -82,18 +82,18 @@ code_0FA45B {
 ; Clobbers: A.
 
 se_npc_fairy_return_prompt_0FA46D {
-    COP [01] ( &w2_shared_0FA945.asciistring_0FA9F0 )
+    COP [01] ( &w2_obj_fairy_idle_loop.asciistring_0FA9F0 )
     COP [1A] ( &shared_choice_prompt_texts.ChoiceStayGoBackText, #02, &code_0FA48F )
     LDA $L_choice_result
     BEQ code_0FA48F       ; menu result 0 (the first entry of ChoiceStayGoBackText, stay) or cancel: 'Visit me again'
-    COP [01] ( &w2_shared_0FA945.asciistring_0FAA15 )
+    COP [01] ( &w2_obj_fairy_idle_loop.asciistring_0FAA15 )
     INC $contact_lock
     COP [10] ( #$0106, #00, #$01F8, #$0200 ) ; A06S01 at pixel ($1F8,$200): back to the Sanctuary
     RTL 
 }
 
 code_0FA48F {
-    COP [01] ( &w2_shared_0FA945.asciistring_0FAA29 )
+    COP [01] ( &w2_obj_fairy_idle_loop.asciistring_0FAA29 )
     RTL 
 }
 ---------------------------------------------
@@ -101,7 +101,7 @@ code_0FA48F {
 ; The fairy of the lightning pyramids (switch $B8, meta type $54).
 ; 
 ; When: placement script; COP 14 until the lair $B8 is released.
-; Sees: JSL cm_npc_fairy_gem_setup_01B161, talk handler code_0FA50F (the pyramid text, then the return prompt), then the idle loop of w2_shared_0FA945.
+; Sees: JSL cm_npc_fairy_gem_setup_01B161, talk handler code_0FA50F (the pyramid text, then the return prompt), then the idle loop of w2_obj_fairy_idle_loop.
 ; Why: tells the player how to use the pyramids: wear the Thunder Ring and touch them (se_obj_lightning_pyramid_0FBF25).
 ; In: X = D = slot.
 ; Out: RTL into w2_obj_fairy_idle_loop_0FA945.
@@ -116,10 +116,10 @@ code_0FA4FB {
     JSL $@shared_actor_helpers_bank3.cm_npc_fairy_gem_setup_01B161
     COP [17] ( &code_0FA50F )
     SEP #$20
-    LDA #$^w2_shared_0FA945.w2_obj_fairy_idle_loop_0FA945
+    LDA #$^w2_obj_fairy_idle_loop.w2_obj_fairy_idle_loop_0FA945
     PHA 
     REP #$20
-    LDA #$&w2_shared_0FA945.w2_obj_fairy_idle_loop_0FA945-1
+    LDA #$&w2_obj_fairy_idle_loop.w2_obj_fairy_idle_loop_0FA945-1
     PHA 
     RTL 
 }
@@ -225,7 +225,7 @@ code_0FA60D {
     RTL 
 }
 
-asciistring_0FA626 |[10][02:2] poured [N]out the mermaid s [N]tears- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0FA626 |[10][02:2] poured [N]out the mermaid s [N]tears- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 ---------------------------------------------
 
 ; The BG2 scroller (meta type $2F).

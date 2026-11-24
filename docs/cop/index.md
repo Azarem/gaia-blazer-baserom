@@ -1,9 +1,11 @@
 # Soul Blazer COP script system
 
-Soul Blazer runs every actor (NPCs, enemies, lairs, doors, cutscene objects) from a small byte-code script.
-The script commands are issued with the 65C816 `COP` instruction. Extracted `.asm` shows them as
+Soul Blazer runs every actor (NPCs, enemies, lairs, doors, cutscene objects) from a script of 65C816 machine code
+in which the game's own commands are issued with the `COP` instruction. Extracted `.asm` shows them as
 `COP [id] ( operands )` and `us/copdef.json` is the operand schema (`size`, `parts`). This page documents the
-dispatcher, the conventions every handler follows, and each of the 108 commands.
+dispatcher, the conventions every handler follows, and each of the 108 commands. How the mechanism works (the
+stack frame, the exit chain, the waiting idioms, the position conventions, the helpers) is explained in
+[docs/code/cop-dispatch.md](../code/cop-dispatch.md); this page is the command list.
 
 Sources: `extracted/system/cop_dispatch.asm` (dispatcher and tables), `extracted/cop_handlers/*.asm` (five files grouped by
 family: flow and flags, items and stats, conditions, actor fields and animation, tiles and spawn), `us/copdef.json`. Every claim below was read from those files. The numbers in `{}` are the
@@ -32,7 +34,7 @@ JMP ($&CopHandlerTable_00_3C,X)
 - Script pointer: direct page `$38` (word) and `$3A` (bank byte). Operands are read with `LDA [$38]` and `$38` is
   advanced by hand.
 - One word-pointer table is indexed by `id * 2`, split in three extracted parts: `CopHandlerTable_00_3C` (ids
-  `00-3C`), `CopFillerTable_3D_7F` (ids `3D-7F`, filler words `#$0000` / `#$FFFF`, no handlers) and `CopHandlerTable_80_B2`
+  `00-3C`), `CopFillerTable_3D_7F` (ids `3D-7F`, filler words `#$0000` / `#$FFFF` and one `#$0020` at index `$26`, no handlers) and `CopHandlerTable_80_B2`
   (ids `80-B2`, file offset 22328). The ids `0E`, `0F`, `2C`, `2D` have `#$0000` entries (no handler); ids `3D-7F`
   and `B3+` are not defined and must never be executed.
 - Every handler starts with `TYX` (X = actor slot again) and ends with a `BRL` into the exit chain at the end of
@@ -50,7 +52,7 @@ JMP ($&CopHandlerTable_00_3C,X)
 | `CopExitContinue` | continue at `$38` (all operands already consumed) |
 | `CopExitJump` | `A` is the new script pointer: `STA $02,S` then `RTI`, so the script continues at `A` (jump) |
 | `CopExitSaveResume` | store `$38` into the actor's resume pointer (`$18,X`), then yield |
-| `CopExitYield` | yield: `PLA PLA RTL`, back to the actor loop; the script is resumed next frame from `$18,X`/`$36,X` |
+| `CopExitYield` | yield: `PLA PLA RTL`, back to the actor loop; the script is resumed from `$18,X`/`$36,X` once `$14` has run out (next frame when `$14` is 0) |
 
 A conditional jump handler reads its operand words and exits through `CopExitJump` when taken and through the
 `CopExitSkipN` that matches the unread operand bytes when not taken. A and Y are scratch across a handler; X is the
@@ -73,7 +75,7 @@ handlers:
 | `$1E` / `$20` | animation id / animation step |
 | `$30` | general data word (`Cop13`, `Cop17`) |
 | `$2C` / `$2E` | loop start / loop counter of `Cop03`/`Cop04` (one loop per actor; also the lair monster counter) |
-| `$3C` / `$3E` | next / previous actor link |
+| `$3C` / `$3E` | list links: `$3C` toward the tail (runs earlier), `$3E` toward the head (runs later); `RunActors` follows `$3E` from `actor_list_tail` (see `docs/code/actor-system.md`) |
 
 `$16` flag meanings other than bit 15, and `$1A`, `$22`, `$24`, `$2C`, `$34`: unknown (OQ-I001-4).
 
@@ -118,13 +120,13 @@ Columns: operands from `copdef.json`; **Uses** = occurrences of `COP [id]` in `e
 | Id | Handler | Operands | Uses | Behavior |
 |---|---|---|---|---|
 | 09 | `Cop09_SetOrClearFlag` {22631} | Word | 213 | bit 15 of the word set: set the flag, clear: clear it. Low 15 bits: flag number |
-| 0A | `Cop0A_GiveItemIfNotOwned` {22644} | Byte | 47 | looks the `$1B1E` entry up with `cop_core.LookupInventoryEntry` (value bits 0-6); when the value is zero calls `lib_0109D6_part3.StoreInventoryEntry`, which stores the entry number into it (entries `< $19` are overwritten, others keep bit 7; `$1B64` is set when bit 7 is set; when the old value was `$38` (Medical Herb), `$043B` is recomputed). Entry ids: Medical Herb `$38`, Strange Bottle `$39`, Magic Bell `$40`, Magic Armor `$0C` (`docs/walkthrough/items.md`) |
+| 0A | `Cop0A_GiveItemIfNotOwned` {22644} | Byte | 47 | looks the `$1B1E` entry up with `cop_core.LookupInventoryEntry` (value bits 0-6); when the value is zero calls `lib_inventory_store.StoreInventoryEntry`, which stores the entry number into it (entries `< $19` are overwritten, others keep bit 7; `$1B64` is set when bit 7 is set; when the old value was `$38` (Medical Herb), `$043B` is recomputed). Entry ids: Medical Herb `$38`, Strange Bottle `$39`, Magic Bell `$40`, Magic Armor `$0C` (`docs/walkthrough/items.md`) |
 | 0B | `Cop0B_RemoveItem` {22664} | Byte | 27 | when the entry's value bits are non-zero, clears them (bit 7 is kept; if bit 7 was set `$1B64` is zeroed) |
 | 18 | `Cop18_JumpIfItemMissing` {23055} | Byte, &Code | 55 | jumps when the entry is zero |
 | 19 | `Cop19_JumpUnlessItemEquipped` {23080} | Byte, &Code | 36 | jumps when the entry is zero or bit 7 is clear |
 | 10 | `Cop10_SetNextScene` {22854} | Word, Byte, Word, Word | 65 | operand byte 0 = area, byte 1 = scene (`XBA` into `scene_next`), then `$0380`, `$037C`, `$037E` (arrival values) |
 | 3C | `Cop3C_SetTransitionType` {24172} | Byte | 23 | stores the byte in `transition_type` (`$03E3`); always `#$04` and always just before `Cop10` (OQ-I025-6) |
-| 38 | `Cop38_QueueExp` {23998} | Word | 13 | stores the BCD amount in `exp_pending` (`$043D`); `lib_player_stats.DrainPendingExp` pays it into `$1B78`/`$1B7A` one digit step per 8 frames |
+| 38 | `Cop38_QueueExp` {23998} | Word | 13 | stores the BCD amount in `exp_pending` (`$043D`); `lib_player_helpers.DrainPendingExp` pays it into `$1B78`/`$1B7A` one digit step per 8 frames |
 | 1F | `Cop1F_StepRandom` {23254} | none | 49 | advances the additive random generator in `rng_state` (`$0301`; the bytes `$0302`-`$0311` are the state) (adds each byte to its neighbor with carry, then increments) |
 | 35 | `Cop35_RandomMod` {23926} | Byte | 9 | `$0437` = random value modulo the byte (RNG state `$0302`) |
 | 37 | `Cop37_HealPlayerToFull` {23984} | none | 12 | `heal_pending` (`$043B`) = `$1B8A - $1B88`; the HP rises one point every 4 frames |
@@ -137,7 +139,7 @@ Columns: operands from `copdef.json`; **Uses** = occurrences of `COP [id]` in `e
 |---|---|---|---|---|
 | 01 | `Cop01_ShowText` {22434} | &ASCIIString | 608 | draws the text at the word pointer using the script bank (`ShowDialogueText`) |
 | 02 | `Cop02_PromptYesNo` {22461} | &Code | 0 | opens the Yes/No choice (string `ChoiceYesNoText`); jumps when cancelled or the choice is non-zero (unused; `Cop1A` makes the same prompt) |
-| 1A | `Cop1A_ChoiceMenu` {23107} | &ASCIIString$2, Byte, &Code | 27 | shows the string and a choice menu (byte = menu type); the choice goes to `$03D0`; jumps when cancelled |
+| 1A | `Cop1A_ChoiceMenu` {23107} | &ASCIIString$2, Byte, &Code | 27 | shows the string (always in bank `$02`, `shared_choice_prompt_texts`) and a choice menu (byte = number of entries); the choice goes to `$03D0`; jumps when cancelled |
 
 ### 4.4 Actor movement, position and animation
 
@@ -155,7 +157,7 @@ Columns: operands from `copdef.json`; **Uses** = occurrences of `COP [id]` in `e
 | A9 | `CopA9_SetDynamicTileSource` {25281} | Word, Byte | 1 | sets `$34`, `$2C`, and `$1A \|= $8000` |
 | 80 | `Cop80_SetAnimation` {24186} | Byte | 1614 | animation id to `$1E`, step `$20 = 0`, saves the resume pointer, continues |
 | 81 | `Cop81_SetAnimationRepeat` {24208} | Byte, Byte | 522 | like 80, the second byte goes to `$2A` (repeat count) |
-| 82 | `Cop82_WaitAnimationDone` {24240} | none | 1623 | runs one animation step (`engine_scheduler_sprites_combat_collision.SetActorAnimFrame`); when it reports done (carry set) continues, otherwise yields |
+| 82 | `Cop82_WaitAnimationDone` {24240} | none | 1623 | runs one animation step (`engine_actor_scheduler_and_sprites.SetActorAnimFrame`); when it reports done (carry set) continues, otherwise yields |
 | 83 | `Cop83_WaitAnimationRepeat` {24253} | none | 529 | animation steps; each time one finishes `$2A` is decremented and the animation restarts until `$2A` is zero, then continues; yields while a step is running |
 | 92 | `Cop92_StartAnimation` {24693} | Byte | 21 | animation id to `$1E`, step `$20 = 0`, runs `NextFrameRecord` and `CopyFrameData` (both in block `lib_animation`) once, saves the resume pointer and yields |
 | 93 | `Cop93_StartAnimationCount` {24718} | Byte, Byte | 0 | as 92 with a count |
@@ -186,10 +188,10 @@ Columns: operands from `copdef.json`; **Uses** = occurrences of `COP [id]` in `e
 | 89 / 8A | `Cop89_JumpIfPlayerWithinX` {24415} / `Cop8A_JumpIfPlayerWithinY` {24453} | Word, &Code | 0 / 0 | jumps when the absolute player-to-actor distance on the axis is `<=` the word (unused) |
 | 8B / 8C | `Cop8B_JumpIfPlayerBeyondX` {24491} / `Cop8C_JumpIfPlayerBeyondY` {24529} | Word, &Code | 0 / 0 | jumps when the distance is `>` the word (unused) |
 | 8D / 8E | `Cop8D_JumpIfOnScreen` {24567} / `Cop8E_JumpIfOffScreen` {24588} | &Code | 0 / 0 | jump on `$16` bit 15 clear / set; on the other path the handler continues without skipping the operand (OQ-I001-1) |
-| 9A / 9B | `Cop9A_JumpByPlayerDeltaX` {24886} / `Cop9B_JumpByPlayerDeltaY` {24925} | Word, &Code x3 | 175 / 174 | threshold word, then three targets: first when the player is left of (above) the actor by at least the threshold, second when within it, third when right of (below) it |
+| 9A / 9B | `Cop9A_JumpByPlayerDeltaX` {24886} / `Cop9B_JumpByPlayerDeltaY` {24925} | Word, &Code x3 | 175 / 174 | threshold T, then three targets with d = player - actor: first when the player is left of (above) the actor by more than T (`abs(d) > T`), third when right of (below) it by T or more (`d >= T`), second otherwise (also `d = 0`); the band is one pixel wider on the right/below side |
 | 9C | `Cop9C_JumpByPlayerAxis` {24964} | &Code, &Code | 28 | first target when the X distance to the player is greater than the Y distance, second otherwise |
 | A5 | `CopA5_JumpByFlipState` {25186} | &Code x4 | 25 | clears `$1C` bits 14-15 and jumps to one of four targets by their old value: none, flip X only, flip Y only, both (in that order) |
-| 26 | `Cop26_PayGemsOrJump` {23417} | Word, &Code | 8 | spell price check: the word is the Gem cost in BCD (1, 2, 4, 8, `$20`); it becomes 0 with the Magic Bell (`$1B64 = $40`) and is halved (at least 1) with the Magic Armor (`$1B60 = $0C`); `lib_player_stats.SubtractGems` subtracts it; carry set (not enough Gems, nothing taken): jumps; otherwise sets bit `$10` of `$0332` and skips |
+| 26 | `Cop26_PayGemsOrJump` {23417} | Word, &Code | 8 | spell price check: the word is the Gem cost in BCD (1, 2, 4, 8, `$20`); it becomes 0 with the Magic Bell (`$1B64 = $40`) and is halved (at least 1) with the Magic Armor (`$1B60 = $0C`); `lib_player_helpers.SubtractGems` subtracts it; carry set (not enough Gems, nothing taken): jumps; otherwise sets bit `$10` of `$0332` and skips |
 | AD | `CopAD_WaitUntilOnScreen` {25459} | Byte | 80 | while the actor is OFF screen (`$16` bit 15 set) sets `$18` to re-run this command, `$14` = byte and yields; once it is on screen skips the byte and continues |
 
 ### 4.6 Collision and tile tests
@@ -211,7 +213,9 @@ Columns: operands from `copdef.json`; **Uses** = occurrences of `COP [id]` in `e
 ### 4.7 Spawning
 
 All variants take a free slot from the free-slot stack at `$4A` (`PopFreeSlot`; carry set when none is left),
-link it into the actor list after (`cop_core.SpawnActorAfter`) or before (`SpawnActorBefore`) the caller, and then
+link it into the actor list on the `$3C` side of the caller (`cop_core.SpawnActorAfter`: the new actor runs before the
+caller, first on the next frame) or on the `$3E` side (`SpawnActorBefore`: it runs right after the caller, in the same
+frame), and then
 `InitSpawnedActor` clones the first `$3C` bytes of the caller into it (`MVN`), sets `$16 \|= $2000` and clears `$16`
 bit `$0010`, and zeroes `$1A`, `$30` and `$14`. The variants then overwrite the resume pointer (`$18` + bank `$36`)
 and, depending on the variant, X/Y and `$16`. Without an explicit position the new actor starts on the caller's.
@@ -228,8 +232,8 @@ and, depending on the variant, X/Y and `$16`. Without an explicit position the n
 
 ### 4.8 Not understood / unused
 
-`Cop25_AddGems` {23397} (Word BCD amount, copdef lists two Bytes; unused; `lib_player_stats.AddGems` adds it, capped at 999999, and sets bit `$10` of `$0332`) and
-`Cop3A_EnterPlayerName` {24069} (no operand, one use in `gv_up_above_actors_and_name_entry`: runs `lib_name_entry` between two
+`Cop25_AddGems` {23397} (Word BCD amount, copdef lists two Bytes; unused; `lib_player_helpers.AddGems` adds it, capped at 999999, and sets bit `$10` of `$0332`) and
+`Cop3A_EnterPlayerName` {24069} (no operand, one use in `gv_up_above_actors_and_name_entry`: runs `lib_name_entry_and_staff_roll` between two
 texts, the name entry of the walkthrough chapter In the Beginning). The handlers with 0 uses (00, 02, 06, 13, 25, 29, 36,
 89-8E, 93, 95, AB, B1) are listed in OQ-I025-4; older open points are in `plans/extracted-audit/questions/I001_questions.md`.
 

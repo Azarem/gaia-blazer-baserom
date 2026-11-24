@@ -1,7 +1,7 @@
 ; Animation bank $0A: the hero's animations without a weapon (file offsets 327680-330951, SNES $0A:8000-$8CC7, bank 05; 3272 bytes).
 ; 
 ; === MODEL ===
-; An animation bank is read through the actor's table pointer ($22, base $8000) and bank ($24): the word list at $8000 holds one pointer per animation id ($1E), each pointing to a step list; the actor's step counter ($20) selects the step, 8 bytes each: word duration, word dx, word dy, word &frame, with $FFFF ending the list (SetActorAnimFrame in engine_scheduler_sprites_combat_collision loads one step per call). A frame is a leaf: a 12-byte header (the box edges, width and height) followed by the sprite map of the pieces. This bank has 26 lists (ids $00-$19), 116 steps and 64 frame leaves. The hero uses it when he has no weapon or the scene has no combat (ApplyPlayerWeaponPose sets $24 = $0A).
+; An animation bank is read through the actor's table pointer ($22, base $8000) and bank ($24): the word list at $8000 holds one pointer per animation id ($1E), each pointing to a step list; the actor's step counter ($20) selects the step, 8 bytes each: word duration, word dx, word dy, word &frame, with $FFFF ending the list (SetActorAnimFrame in engine_actor_scheduler_and_sprites loads one step per call). A frame is a leaf: a 12-byte header (the box edges, width and height) followed by the sprite map of the pieces. This bank has 26 lists (ids $00-$19), 116 steps and 64 frame leaves. The hero uses it when he has no weapon or the scene has no combat (ApplyPlayerWeaponPose sets $24 = $0A).
 ; The lists are named by index in the pointer table and the leaves by address; they keep their auto names.
 ---------------------------------------------
 

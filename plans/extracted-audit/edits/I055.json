@@ -1,0 +1,89 @@
+{
+  "_note": "I055: note corrections found while writing docs/code/flags-switches-and-inventory-bytes.md. (1) switch_owner_table is zeroed only on a return trip (ClearSwitchOwnersOnReturn), not at every scene load, and its one reader is FacePlayerTowardReturnTarget. (2) Flag $FF (bit 7 of $1A7D) is set at boot and nothing clears it, so the 13 FlagMapPatchTable rows that test it always apply (settles the static part of OQ-I011-13 and OQ-I031-5). (3) The chest array $1A7E starts right behind the 32 event flag bytes; the old wording called it part of the switch array. (4) Flags $0706, $0A00, $0907 and $0601 are bit numbers of FlagMapPatchTable rows, so ApplyFlagMapPatches reads them (settles OQ-I037-4 and OQ-I035-6 for their 'no reader found'). (5) Flag $1B01 is the Green Stone's given flag; the six path markers of gv_up_above_actors_and_name_entry read $1B00-$1B05 (settles OQ-I035-7).",
+
+  "system/cop_core.asm": {
+    "partNotes": {
+      "RegisterSwitchOwner": {
+        "edit": [
+          {
+            "find": "cleared at every scene load by lib_boot_and_scene_init) maps a switch number to the actor that owns it. Its readers are not traced yet.",
+            "with": "zeroed only on a return trip by ClearSwitchOwnersOnReturn, not at every scene load) maps a switch number to the actor that owns it. Its one reader is FacePlayerTowardReturnTarget (player_core), which waits for switch_owner_table[return_record] and turns the hero toward that actor after a return trip."
+          }
+        ]
+      }
+    }
+  },
+
+  "library/lib_boot_and_scene_init.asm": {
+    "blockNote": {
+      "edit": [
+        {
+          "find": "whether it is ever cleared is open)",
+          "with": "nothing clears it afterwards: no COP 09 names it, ClearBitInArray has no caller and the per-scene clear is byte 0 only, so the 13 map-patch rows always apply)"
+        }
+      ]
+    }
+  },
+
+  "library/lib_map_tile_patches.asm": {
+    "blockNote": {
+      "edit": [
+        {
+          "find": "Which flag that is and who sets it is open (OQ-I011-13).",
+          "with": "It is bit 7 of $1A7D, set at every start-up by InitFixedState and never cleared, so these 13 rows always apply."
+        }
+      ]
+    }
+  },
+
+  "system/data_chest_lists.asm": {
+    "blockNote": {
+      "edit": [
+        {
+          "find": "$1A7E lies inside the first switch array ($1A5E + $20) and is the chest-opened array.",
+          "with": "the chest-opened array is $1A7E, right behind the 32 event flag bytes: chest bit n is bit number $100 + n of the shared bit space (16 of its 32 bytes are used)."
+        }
+      ]
+    }
+  },
+
+  "greenwood/woods_of_greenwood/gw_woods_actors_01D045.asm": {
+    "comments": {
+      "120106": {
+        "text": "flag $1B01 = the Green Stone was given (flags $1B00-$1B05 pair with stones $3A-$3F); gv_up_above_actors_and_name_entry reads $1B00-$1B05 for its path markers",
+        "expect": "COP [09]"
+      },
+      "121270": {
+        "text": "flag $0907 is set when $0307 and $0400 are clear and the ribbon is in the bag; it is bit number $4F of a FlagMapPatchTable row at location $16 that ApplyFlagMapPatches reads at scene load",
+        "expect": "COP [09]"
+      }
+    }
+  },
+
+  "mountain_of_souls/soul_of_mountain_house/ms_soul_of_mountain_house_actors_02100B.asm": {
+    "comments": {
+      "135806": {
+        "text": "flag $0706 is set once the King is free; it is bit number $3E of three FlagMapPatchTable rows at location $3D that ApplyFlagMapPatches reads at scene load",
+        "expect": "COP [09]"
+      }
+    }
+  },
+
+  "mountain_of_souls/soul_of_mountain_house/ms_soul_of_mountain_house_actors_020000.asm": {
+    "comments": {
+      "132536": {
+        "text": "flag $0A00 is set here; it is bit number $50 of three FlagMapPatchTable rows at location $7B that ApplyFlagMapPatches reads at scene load",
+        "expect": "COP [09]"
+      }
+    }
+  },
+
+  "st_elles/seabed_of_st_elles/se_seabed_of_st_elles_actors.asm": {
+    "comments": {
+      "1023459": {
+        "text": "flag $0601 = the wall of Lue's alcove is open (walkthrough); the flag is bit number $31 of a FlagMapPatchTable row at location $2C that ApplyFlagMapPatches reads at scene load",
+        "expect": "COP [09]"
+      }
+    }
+  }
+}

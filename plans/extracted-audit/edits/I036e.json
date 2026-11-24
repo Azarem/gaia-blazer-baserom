@@ -1,0 +1,46 @@
+{
+  "_note": "I036e: st_elles enemies of the seabed, seabed_of_st_elles/se_seabed_of_st_elles_enemies (1030943-1031032, 1031075-1031973) and se_enemy_0FBB78 (1031032-1031075). Stats from MetaStElles (attack, defence, HP binary, EXP BCD) and the walkthrough bestiary; lair records from LairRecords (+B lair location, +11 count, +13 meta type). Light depth.",
+  "st_elles/seabed_of_st_elles/se_seabed_of_st_elles_enemies.asm": {
+    "blockNote": [
+      "The enemies of the seabed scenes (world 2, St. Elles; file offsets 1030943-1031032 and 1031075-1031973, SNES $1F:BB1F-$BB77 and $BBA3-$BF24): the Sea Urchin ($32), the Jellyfish ($34), the Hermit Crab ($35), the Manta Ray ($36) with its bolt and the Yellow Seahorse ($37). The unused type $33 sits between them in se_enemy_0FBB78.",
+      "",
+      "=== ROSTER (meta type: attack / defence / HP / EXP; bestiary row) ===",
+      "- $32 Sea Urchin: 9 / 2 / 36 / 20 (bestiary: 36 HP, 20 EXP, 'Moving around'). Not in any lair: placed directly.",
+      "- $34 Jellyfish: 6 / 1 / 10 / 25 (10 HP, 25 EXP, 'Quick rushes'). Lair records $78, $7B, $82, $83 (releases the jumping angelfish), $85, $88 and $C2 (Anna).",
+      "- $35 Hermit Crab: 9 / 4 / 15 / 22 (15 HP, 22 EXP, 'Walking around'). Lair records $77, $80, $86 (the best jumper angelfish), $AD (the creek angelfish) and $B7.",
+      "- $36 Manta Ray: 8 / 3 / 10 / 30 (10 HP, 30 EXP, 'Electric projectiles'). Lair records $7A (the 250 EXP fairy), $7C (Servas), $7E and $84 (the herb mermaid).",
+      "- $37 Yellow Seahorse: 6 / 3 / 8 / 21 (8 HP, 21 EXP, 'Moving around'). Lair records $7F (the 300 EXP fairy), $81, $87 and $C1 (the pearl ride dolphin).",
+      "",
+      "=== NOTES ===",
+      "- The Hermit Crab sets bit $0400 (the metal immunity class: only the Zantetsu Sword hurts) of its $1A while it hides in its shell and clears it while it walks; the walkthrough bestiary lists it as 'Metal? No' (OQ-I036-8).",
+      "- The identities rest on the HP / EXP match in MetaStElles (inferred, no names in the ROM) and, for the lairs, on the walkthrough sentences: 'Jellyfish lair that releases an angelfish', 'Yellow Seahorse lair ... releases a Fairy Gem that hands over 300 EXP', 'Manta Rays ... Use the lair to release a mermaid'."
+    ],
+    "partNotes": {
+      "se_enemy_sea_urchin_0FBB1F": "The Sea Urchin: sits and turns toward the hero.\n\nWhen: meta type $32; placed directly in the seabed scenes (no lair).\nSees: while off screen ($16 bit $8000) it waits 16 frames per pass; otherwise animation $04 until the hero is inside its box widened by 5 (COP 0C), then it faces him: COP 9C picks the axis, COP 9A / 9B the side, animation $07 sideways (flip set or cleared) or $06 / $05 vertically.\nWhy: walkthrough: 'They move rather slowly, so it's not their offense that annoys, but their defense'.\nIn: actor script, X = own slot.\nOut: loops for ever.\nClobbers: A.",
+      "se_enemy_jellyfish_0FBBA3": "The Jellyfish: drifts at random and rushes when the hero is lined up.\n\nWhen: meta type $34; spawned by the Jellyfish lairs.\nSees: drawn in front (COP A3, priority $30); waits until on screen (COP AD); when the hero is within $18 pixels on one axis it rushes along the other with animations $28-$2B (two repeats); otherwise code_0FBBD3 picks one of animations $03, $2C, $02, $01 at random (COP 1F, rng_state+1 AND 3).\nWhy: walkthrough: 'let their fast tackles carry them over to you so you can mash them with your sword'.\nIn: actor script, X = own slot.\nOut: loops for ever.\nClobbers: A.",
+      "se_enemy_hermit_crab_0FBC22": "The Hermit Crab: hides in its shell, comes out to walk and goes back.\n\nWhen: meta type $35; spawned by the Hermit Crab lairs.\nSees: ORs $0400 into $1A (metal class while hidden); off screen it waits 30 frames per pass; then a random direction (COP 1F, AND 3) is tried in a ring: COP 23 / 24 / 21 / 22 test the tile left, right, above, below and fall through to the next direction when it is blocked; the crab clears $0400, plays animation $1B (out), $1D, the walk ($20 left, $21 right, $1F up, $1E down) and $1C, ORs $0400 back and plays $1A (in), then starts again.\nWhy: walkthrough: 'Walking around'.\nIn: actor script, X = own slot.\nOut: loops for ever.\nClobbers: A.",
+      "se_enemy_manta_ray_0FBD12": "The Manta Ray: turns toward the hero, charges and fires an electric bolt.\n\nWhen: meta type $36; spawned by the Manta Ray lairs.\nSees: COP A5 chooses the first animation by the flip state ($08, $0A, $0A flipped, $09); then COP AD and COP 9C pick the axis; sideways it turns (COP 96 / 97), animation $0A and a charge loop with animation $0D until the hero is level (COP 9A); vertically animations $09 / $08 and $0C / $0B with COP 9B; to fire it ORs $0200 into its $16 (unhittable while it fires: the engine's target mask $EEC0), COP B2 spawns se_enemy_manta_bolt_0FBE44 at (-8, +8) with flags $0200, clears the bit and plays the shot animation twice.\nWhy: walkthrough: 'pretty hard to beat if you let them live too long because of their electrical shocks'.\nIn: actor script, X = own slot.\nOut: loops for ever.\nClobbers: A.",
+      "se_enemy_manta_bolt_0FBE44": "The bolt of the Manta Ray.\n\nWhen: spawned by the Manta Ray (COP B2) with flags $0200.\nSees: drawn in front, flips cleared; animation $10 eight times, a sound (BRK #$4B), then by the larger distance to the hero (COP 9C / 9A / 9B) the flight animation $0F (sideways, flipped to the hero's side) or $0E (vertical, flip Y for 'above') for 32 repeats; then it kills itself.\nIn: X = D = slot of the new actor; RTL after COP 86.\nOut: RTL.\nClobbers: A.",
+      "se_enemy_yellow_seahorse_0FBE81": "The Yellow Seahorse: swims toward the hero and flinches when it is hit.\n\nWhen: meta type $37; spawned by the Yellow Seahorse lairs.\nSees: remembers its HP in $30; waits until on screen; COP 9C / 9A / 9B pick the side and the swim animation ($16 / $15 / $14, eight repeats, flipped by COP 96 / 97); after each swim code_0FBF13 compares the HP; when it changed the hit animations ($19 or $18 or $17, then $13 or $12 or $11) play.\nWhy: walkthrough: 'their IQ is as low as their health'.\nIn: actor script, X = own slot.\nOut: loops for ever.\nClobbers: A.",
+      "code_0FBF13": "HP change test of the Yellow Seahorse.\n\nWhen: after every swim step.\nSees: compares the low byte of the HP ($25) with the remembered value in $30; when they differ the new value is stored.\nIn: X = own slot.\nOut: carry set when the HP changed (the seahorse was hit), carry clear otherwise.\nClobbers: A."
+    },
+    "comments": {
+      "1031205": { "text": "$1A bit $0400 = metal immunity class (only the Zantetsu Sword hurts): set while the crab hides in its shell, cleared while it walks", "expect": "ORA #$0400" },
+      "1031244": { "text": "COP 23 / 24 / 21 / 22 test the tile left / right / above / below; a blocked side falls through to the next direction", "expect": "COP [23]" },
+      "1031530": { "text": "spawns the bolt at (-8,+8) with flags $0200", "expect": "COP [B2]" },
+      "1031815": { "text": "$30 = the last HP seen; code_0FBF13 compares it with the HP in $25", "expect": "STA $0030" }
+    }
+  },
+  "st_elles/se_enemy_0FBB78.asm": {
+    "blockNote": [
+      "One enemy script that nothing uses (file offsets 1031032-1031075, SNES $1F:BB78-$BBA2): meta type $33 of MetaStElles (attack 1, defence 2, HP 3, EXP 0, animation $22, flags $2310). No lair record of the world uses it and no placement of A06-A09 has it; the types $33 in the placements of other worlds belong to the other worlds' lists.",
+      "",
+      "=== OPEN ===",
+      "What it was meant to be is not known; it hides itself ($16 bit $2000), plays animation $22 and moves down by $48 pixels (OQ-I036-9)."
+    ],
+    "partNotes": {
+      "se_unused_enemy_drifting_0FBB78": "An unused enemy of world 2 (meta type $33).\n\nWhen: never in the shipped data (no lair or placement of the world refers to type $33).\nSees: off screen it waits 60 frames per pass; otherwise it clears the hidden bit ($2000) of its $16, plays animation $22, sets the bit again, adds $48 to its Y (COP A0) and starts over.\nWhy: not known (OQ-I036-9).\nIn: actor script, X = own slot.\nOut: loops for ever.\nClobbers: A."
+    },
+    "comments": {}
+  }
+}

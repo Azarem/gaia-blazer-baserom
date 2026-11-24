@@ -1,0 +1,77 @@
+# I038 results (PC annotate actor batch leos_lab)
+
+## Scope
+
+Group `leos_lab`, 7 blocks in 8 files (file offsets 140579-147367 for the actors and texts, 1036917-1039943 for the enemies, 18009-19437 for the boss):
+
+| Block | File | Part of the work |
+|-------|------|------------------|
+| `ll_laboratory_actors` | `leos_lab/leos_laboratory/ll_laboratory_actors.asm` | the NPCs, doors, models and dream actors of the five laboratory scenes (A0DS01-A0DS05) |
+| `ll_laboratory_dungeon_actors` | `leos_lab/laboratory_dungeon/ll_laboratory_dungeon_actors.asm` | two Fairy Gems, the return prompt, the fire pit |
+| `ll_town_models_actors` | `leos_lab/town_models/ll_town_models_actors.asm` | the third Fairy Gem, the building-removal effect and its pieces |
+| `ll_watching_over_world_return_prompt_texts` | `leos_lab/ll_watching_over_world_return_prompt_texts.asm` | block note only |
+| `ll_laboratory_dungeon_enemies` | `leos_lab/laboratory_dungeon/ll_laboratory_dungeon_enemies.asm` | six enemy types and the Sweeper Bot burst |
+| `ll_town_models_enemies` | `leos_lab/town_models/ll_town_models_enemies.asm` | five enemy types with hitboxes, boulders and spikes |
+| `ll_boss_tin_doll` | `leos_lab/laboratory_dungeon/ll_boss_tin_doll.asm` | the Tin Doll with fireballs, flower and meteor rain |
+
+Depth: actors, light (a name from the walkthrough, a block note with role, trigger, flags and dialogue, a part note per root and per helper actor, comments only for non-obvious logic). The Tin Doll got the state machine because it is a boss.
+
+## Counts
+
+| Item | Count |
+|------|-------|
+| Names added / renamed (`renames/apply-I038a..e_names.json`) | 96 (names total now 2159) |
+| Block notes | 7 |
+| Part notes | 96 (34 + 7 + 17 + 17 + 21) |
+| Comments | 78 (38 + 11 + 6 + 4 + 19), each with an `expect` guard |
+| Mnemonics | 0 (no evidence for a mnemonic name was found; `us/mnemonics.json` untouched) |
+| Open questions | 13 (`questions/I038_questions.md`) |
+
+Merge specs: `edits/I038a.json` (laboratory actors), `I038b.json` (dungeon actors, town model actors, texts), `I038c.json` (dungeon enemies), `I038d.json` (town model enemies), `I038e.json` (Tin Doll). Each was dry-run first, applied, and followed by `npm run extract:lt`.
+
+## Gate
+
+| Check | Result |
+|-------|--------|
+| `npm run extract:lt` | OK |
+| `npm run rebuild` | OK, SHA-1 `3148390ed40ce14060b33c1387303a8a77e7a0c1`, 1,081,344 bytes (unchanged) |
+| `npm run names -- --check` | OK (2159 names) |
+| `npm run merge -- --check` | OK (1228 comments, 1334 part notes, 127 block notes; 0 errors, 0 warnings, 0 orphans) |
+
+## Findings
+
+- The laboratory is a roster of tools (doors, drawers, cats, mice, plants, dolls) tied to lair records through COP 14: a switch id is the lair record index, and the record's +9 name index gives the NPC's name. Every identity was proved by the chain meta type, placement, location, walkthrough; nothing was named from a guess (`ll_enemy_toy_spear_*` / `ll_enemy_toy_lunge_*` stay neutral until OQ-I038-3 is answered).
+- The three Fairy Gems ($2F, $30, $32) give 300 EXP once (latch flags `$1D01`-`$1D03`) and then offer the way back to laboratory 1 (area $0D scene 1 at pixel ($0188,$0190)).
+- The fire pit is an invisible actor that hurts with 4 damage on metatiles `$F3` / `$E1` unless the Ice Armor (`$0A`) is worn; the helper `IsPlayerOnMetatile` already documented this.
+- The Sweeper Bot bursts on contact by popping the JSR return address in a COP 0C jump and pushing it back afterwards (comments at 1038435 and 1038566).
+- `$16` bit `$0100` (not a hit source) and `$0200` (not a hit target) explain the Flail, the boulders and every projectile; `$1000` marks the lunge's tile collision.
+- The Tin Doll patrols four directions, attacks on contact (the flower and meteor rain the first time, fireballs afterwards) and leaves the field at x = `$70` / `$160` to return on a random one of five rows.
+- Discrepancies against the walkthrough, logged as OQs: Tin Doll metal flag (OQ-I038-2), Toy Calvary stats (OQ-I038-3), the push of the drawers (OQ-I038-7), the mouse's missing reward (OQ-I038-10). The ROM HP of the Tin Doll (89 against 80) is covered by OQ-I033-1.
+
+## Corrections
+
+None to notes of earlier iterations. In this iteration the first draft of `edits/I038a.json` had five wrong dream-flag comment addresses, a placeholder comment and two sloppy wordings; they were corrected against `extract:lt` before the dry-run, and the OQ numbers of the enemy and boss specs were renumbered (-12, -13) to avoid clashing with the laboratory notes.
+
+## Files changed
+
+- `us/names/bank02.json`, `us/names/bank00.json`, `us/names/bank0F.json` (96 names), plus the references that `npm run names` rewrote in `us/blocks.json` and the notes
+- `notes/blockNotes/bank00.json`, `bank02.json`, `bank0F.json`; `notes/partNotes/bank00.json`, `bank02.json`, `bank0F.json`; `notes/comments/bank00.json`, `bank02.json`, `bank0F.json`
+- `extracted/leos_lab/**` (regenerated by `extract:lt`; the line-tracking annotations are in the working tree, run `npm run extract` for a clean commit)
+- `plans/extracted-audit/renames/apply-I038a..e_names.json`, `edits/I038a..e.json`, `questions/I038_questions.md`, `results/I038_results.md`, `plans/doc-audit/I038_checklist.md`
+
+## Open questions
+
+13, see `questions/I038_questions.md`; the main ones are OQ-I038-2 (Tin Doll metal), OQ-I038-3 (Toy Calvary) and OQ-I038-7 (the drawers).
+
+## Suggested commit message
+
+```
+I038: annotate actor batch leos_lab
+
+Name 96 parts and document the laboratory NPCs, the Fairy Gems and the
+fire pit, the dungeon and town model enemies and the Tin Doll boss:
+7 block notes, 96 part notes, 78 guarded comments, 13 open questions.
+ROM SHA-1 unchanged.
+```
+
+Please commit when you're ready.

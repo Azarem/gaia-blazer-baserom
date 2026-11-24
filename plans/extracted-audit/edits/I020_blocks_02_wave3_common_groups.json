@@ -1,0 +1,218 @@
+[
+  {
+    "op": "set",
+    "blocks": ["common_actor_001A28_part1", "player_spells_level_up", "engine_spc_ipl_upload"],
+    "group": "system",
+    "row": "W3-S01",
+    "note": "placement-audit 5.3, 6.1 and 7.4: the player pieces (all seven worlds, bank 0) and the SPC upload (called by engine code, bank 1F) belong to the engine, not to a world. Pinned, bank by start."
+  },
+  {
+    "op": "set",
+    "blocks": [
+      "shared_animation_tick_loop",
+      "shared_shrine_save_menu",
+      "shared_enemy_helper_002D67",
+      "shared_dialogue_tail_007A52",
+      "shared_animation_loop_helper_01B161",
+      "shared_help_me_message_0191D2",
+      "shared_dialogue_tail_01B988",
+      "shared_animation_loop_hurt_message_022289",
+      "shared_ms_fairy_gem_texts_dialogue_tail"
+    ],
+    "group": "actor_shared",
+    "createGroup": true,
+    "row": "W3-S02",
+    "note": "placement-audit 5.4: helpers that actors of several worlds use (bank 0: 0029E8, 00766C, 004659_part1, 007A52; bank 3: 01B161, 0191D2_part3, 01B988; bank 4: 022289, 02249A). Not merged into one world's file: that would turn the other users into cross-group callers. One file per bank is a wave 4 merge."
+  },
+
+  {
+    "op": "set",
+    "blocks": ["gv_front_end_boot", "gv_front_end_title_intro", "ending_sequence"],
+    "group": "grass_valley",
+    "scene": "front_end",
+    "row": "W3-S03",
+    "note": "scenes 00/0C (boot), 00/0A (title) and 00/0B (ending, FM-A7 meta entry $57; OQ-I018-1). Folder name settles OQ-I015-7: area 00 is 'up_above' in us/groups.json, but boot, title and ending are not walkthrough Up Above content."
+  },
+  {
+    "op": "set",
+    "blocks": [
+      "gv_up_above_name_entry_voice",
+      "gv_up_above_actor_006E28",
+      "gv_up_above_actor_0070B3",
+      "gv_up_above_actor_0070D5",
+      "gv_up_above_actor_0070DB",
+      "gv_up_above_actor_0070E1",
+      "gv_up_above_actor_0070E2",
+      "gv_up_above_actor_0070E3",
+      "gv_up_above_actor_0070F4",
+      "gv_up_above_actor_007103",
+      "gv_up_above_actor_007104",
+      "gv_up_above_actor_007115",
+      "gv_up_above_actor_00711B",
+      "gv_up_above_actor_007121",
+      "gv_up_above_actor_007127"
+    ],
+    "group": "grass_valley",
+    "scene": "up_above",
+    "row": "W3-S04",
+    "note": "scenes 00/01 (Grass Valley Shrine, name entry) and 00/09 (location 0F, no name string): area key 00 = up_above."
+  },
+  {
+    "op": "set",
+    "blocks": ["gv_boss_metal_mantis", "gv_enemy_0FAD2A", "gv_enemy_0FAEE5", "gv_enemy_0FAF44", "gv_enemy_0FAFAD", "gv_enemy_0FB04F", "gv_enemy_0FB0D6"],
+    "group": "grass_valley",
+    "scene": "leos_paintings",
+    "row": "W3-S05",
+    "note": "area 03 (boss spawn area 0C 'Monster in the paintings'; enemies placed in scenes 03/xx)."
+  },
+  {
+    "op": "set",
+    "blocks": ["gv_enemy_0FAA8F", "gv_enemy_0FAB9A", "gv_enemy_0FAC31", "gv_enemy_0FAC7A", "gv_enemy_0FACF2"],
+    "group": "grass_valley",
+    "scene": "underground_castle",
+    "row": "W3-S06",
+    "note": "area 02."
+  },
+  {
+    "op": "set",
+    "blocks": ["gv_enemy_0FAA49"],
+    "group": "grass_valley",
+    "row": "W3-S07",
+    "note": "placed in two areas (00 and 02): no scene folder."
+  },
+
+  {
+    "op": "set",
+    "blocks": [
+      "gw_boss_light_water_fire_statues",
+      "gw_enemy_0FB0F5", "gw_enemy_0FB302", "gw_enemy_0FB348", "gw_enemy_0FB433", "gw_enemy_0FB561", "gw_enemy_0FB59C",
+      "gw_enemy_0FB5E3", "gw_enemy_0FB695", "gw_enemy_0FB898", "gw_enemy_0FB8DE", "gw_enemy_0FB9D6", "gw_enemy_0FBABC"
+    ],
+    "group": "greenwood",
+    "scene": "lostside_marsh",
+    "row": "W3-S08",
+    "note": "area 05 (boss spawn area 22 'Tomb of a stone statue')."
+  },
+  {
+    "op": "set",
+    "blocks": ["gw_enemy_0FB680", "gw_enemy_0FB6F8"],
+    "group": "greenwood",
+    "row": "W3-S09",
+    "note": "meta entries w1:34 and w1:36 are unused (placement-audit 5.4): no placement row, no lair record, no scene folder."
+  },
+
+  {
+    "op": "set",
+    "blocks": ["se_boss_floating_skull", "se_ghost_ship_enemy_004102", "se_ghost_ship_enemy_0041A0", "se_ghost_ship_enemy_004248"],
+    "group": "st_elles",
+    "scene": "ghost_ship",
+    "row": "W3-S10",
+    "note": "area 09 (scene 09/01, boss spawn area 32)."
+  },
+  {
+    "op": "set",
+    "blocks": ["se_enemy_0FBB1F", "se_enemy_0FBBA3", "se_enemy_0FBC22", "se_enemy_0FBD12", "se_enemy_0FBE81"],
+    "group": "st_elles",
+    "scene": "seabed_of_st_elles",
+    "row": "W3-S11",
+    "note": "area 07."
+  },
+  {
+    "op": "set",
+    "blocks": ["se_enemy_0FBF25", "se_enemy_0FBFA1", "se_enemy_0FC01E", "se_enemy_0FC0E5", "se_enemy_0FC14E", "se_enemy_0FC296", "se_enemy_0FC3E8", "se_enemy_0FC536"],
+    "group": "st_elles",
+    "scene": "st_elles_coast",
+    "row": "W3-S12",
+    "note": "area 08."
+  },
+  {
+    "op": "set",
+    "blocks": ["se_enemy_0FBB78"],
+    "group": "st_elles",
+    "row": "W3-S13",
+    "note": "meta entry w2:33 is unused (placement-audit 5.4): no scene folder."
+  },
+
+  {
+    "op": "set",
+    "blocks": ["ms_boss_poseidon", "ms_enemy_0FCFD6"],
+    "group": "mountain_of_souls",
+    "scene": "mountain_of_souls_dungeon",
+    "row": "W3-S14",
+    "note": "area 0B (boss spawn area 44)."
+  },
+  {
+    "op": "set",
+    "blocks": ["ms_enemy_0FD058"],
+    "group": "mountain_of_souls",
+    "scene": "snow_mountain",
+    "row": "W3-S15",
+    "note": "area 0C."
+  },
+  {
+    "op": "set",
+    "blocks": ["ms_enemy_0FC72F", "ms_enemy_0FC845", "ms_enemy_0FC8FE", "ms_enemy_0FC9BC", "ms_enemy_0FCA35", "ms_enemy_0FCBDF", "ms_enemy_0FCDBA", "ms_enemy_0FD11B", "ms_enemy_0FD1E5"],
+    "group": "mountain_of_souls",
+    "row": "W3-S16",
+    "note": "placed in both areas 0B and 0C: no scene folder (placement-audit 5.5: the ten world 3 multi-area enemies)."
+  },
+
+  {
+    "op": "set",
+    "blocks": ["ll_boss_tin_doll", "ll_enemy_0FD275", "ll_enemy_0FD345", "ll_enemy_0FD402", "ll_enemy_0FD502", "ll_enemy_0FD6EC", "ll_enemy_0FD752"],
+    "group": "leos_lab",
+    "scene": "laboratory_dungeon",
+    "row": "W3-S17",
+    "note": "area 0E (boss spawn area 59)."
+  },
+  {
+    "op": "set",
+    "blocks": ["ll_enemy_0FD944", "ll_enemy_0FD9E6", "ll_enemy_0FDAED", "ll_enemy_0FDBFB", "ll_enemy_0FDCFC"],
+    "group": "leos_lab",
+    "scene": "town_models",
+    "row": "W3-S18",
+    "note": "area 0F."
+  },
+
+  {
+    "op": "set",
+    "blocks": ["mc_boss_demon_falcon"],
+    "group": "magridds_castle",
+    "scene": "airship_dock",
+    "row": "W3-S19",
+    "note": "area 13 (boss spawn area 72 'deck of an airship')."
+  },
+  {
+    "op": "set",
+    "blocks": ["mc_enemy_0FDE48", "mc_enemy_0FDE71", "mc_enemy_0FDFC3", "mc_enemy_0FE045", "mc_enemy_0FE14E", "mc_enemy_0FE22C", "mc_enemy_0FE236"],
+    "group": "magridds_castle",
+    "scene": "castle_dungeon",
+    "row": "W3-S20",
+    "note": "area 11."
+  },
+  {
+    "op": "set",
+    "blocks": ["mc_enemy_0FE413", "mc_enemy_0FE4F2", "mc_enemy_0FE610", "mc_enemy_0FE61A", "mc_enemy_0FE76C", "mc_enemy_0FE83E", "mc_enemy_0FE88E"],
+    "group": "magridds_castle",
+    "scene": "castle_towers",
+    "row": "W3-S21",
+    "note": "area 12."
+  },
+
+  {
+    "op": "set",
+    "blocks": ["we_boss_deathtoll_mage", "we_boss_deathtoll_demon", "we_shrine_actor_004F4D"],
+    "group": "world_of_evil",
+    "scene": "deathtolls_shrine",
+    "row": "W3-S22",
+    "note": "area 15 (scenes 15/01 and 15/02)."
+  },
+  {
+    "op": "set",
+    "blocks": ["we_enemy_0FEA1D", "we_enemy_0FEB95", "we_enemy_0FECD9", "we_enemy_0FED09", "we_enemy_0FED8F", "we_enemy_0FEEA5"],
+    "group": "world_of_evil",
+    "scene": "evil_world",
+    "row": "W3-S23",
+    "note": "area 14."
+  }
+]

@@ -1,0 +1,23 @@
+[
+  { "address": 124027, "old": "code_01E47B", "new": "gw_trigger_strange_bottle_01E47B", "row": "I035-B1" },
+  { "address": 124091, "old": "code_01E4BB", "new": "gw_actor_fixed_gem_pickup_01E4BB", "row": "I035-B1" },
+  { "address": 124099, "old": "code_01E4C3", "new": "gw_npc_fairy_gem_exp_150_01E4C3", "row": "I035-B1" },
+  { "address": 124137, "old": "code_01E4E9", "new": "gw_fairy_gem_return_prompt_01E4E9", "row": "I035-B1" },
+  { "address": 124176, "old": "code_01E510", "new": "gw_npc_fairy_gem_exp_180_01E510", "row": "I035-B1" },
+  { "address": 124224, "old": "code_01E540", "new": "gw_npc_fairy_gem_light_arrow_01E540", "row": "I035-B1" },
+  { "address": 124308, "old": "code_01E594", "new": "gw_npc_fairy_gem_return_only_01E594", "row": "I035-B1" },
+  { "address": 124346, "old": "code_01E5BA", "new": "gw_raft_placer_01E5BA", "row": "I035-B1" },
+  { "address": 124458, "old": "code_01E62A", "new": "gw_raft_leaves_check_01E62A", "row": "I035-B1" },
+  { "address": 124761, "old": "code_01E759", "new": "gw_raft_north_entry_01E759", "row": "I035-B1" },
+  { "address": 124764, "old": "code_01E75C", "new": "gw_raft_north_01E75C", "row": "I035-B1" },
+  { "address": 124885, "old": "code_01E7D5", "new": "gw_raft_south_entry_01E7D5", "row": "I035-B1" },
+  { "address": 124888, "old": "code_01E7D8", "new": "gw_raft_south_01E7D8", "row": "I035-B1" },
+  { "address": 125009, "old": "code_01E851", "new": "gw_raft_west_entry_01E851", "row": "I035-B1" },
+  { "address": 125012, "old": "code_01E854", "new": "gw_raft_west_01E854", "row": "I035-B1" },
+  { "address": 125165, "old": "code_01E8ED", "new": "gw_raft_east_entry_01E8ED", "row": "I035-B1" },
+  { "address": 125168, "old": "code_01E8F0", "new": "gw_raft_east_01E8F0", "row": "I035-B1" },
+  { "address": 125325, "old": "code_01E98D", "new": "gw_effect_fire_bridge_heat_01E98D", "row": "I035-B1" },
+  { "address": 125377, "old": "code_01E9C1", "new": "gw_effect_bg2_scroll_01E9C1", "row": "I035-B1" },
+  { "address": 125691, "old": "code_01EAFB", "new": "gw_effect_water_ripple_hdma_01EAFB", "row": "I035-B1" },
+  { "address": 125826, "old": "word_01EB82", "new": "gw_ripple_offsets_01EB82", "row": "I035-B1" }
+]

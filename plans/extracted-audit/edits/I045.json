@@ -1,0 +1,64 @@
+{
+  "_note": "I045: corrections and stack-frame comments found while writing docs/code/cop-dispatch.md. Evidence: rg '^\\s+BRK #' over extracted/ finds 289 instructions (HandleBrk said about a hundred); CopFillerTable_3D_7F has one #$0020 word (index $26); SpawnActorBefore links the new actor on the $3E side of the caller (I044: it runs right after the caller) but its part note still said earlier; Cop82/Cop83/Cop9E yield without writing $18 (the resume pointer comes from Cop80/Cop81/Cop9D) and SetActorAnimFrame puts the step duration in $14, so the next call is duration + 1 frames later, not next frame; CopExitJump writes only the PC word of the COP frame ($02,S), so a jump stays in the bank of the COP; no script uses a COP 81 repeat count below 2. Open points: questions/I045_questions.md.",
+
+  "system/cop_dispatch.asm": {
+    "partNotes": {
+      "HandleBrk": { "edit": [
+        { "find": "about a hundred call sites: sword swings, spawns, pickups, deaths, scripts",
+          "with": "289 BRK #n instructions in extracted/: sword swings, spawns, pickups, deaths, scripts" },
+        { "find": "Clobbers: DP $3B-$3D; A and P restored (PHA/PLA, RTI).",
+          "with": "Clobbers: DP $3B-$3D; A and P restored (PHA/PLA, RTI). It never writes the script pointer $38-$3A, so a BRK between COP commands or inside a handler (Cop39_DamagePlayer) leaves the script alone." }
+      ] },
+      "CopFillerTable_3D_7F": { "edit": [
+        { "find": "Filler words (#$0000 or #$FFFF)",
+          "with": "Filler words (#$0000 and #$FFFF, plus one #$0020 at index $26, id $63)" }
+      ] }
+    },
+    "comments": {
+      "22015": { "text": "After PHA the frame is A (2 bytes), P, PC (BRK address + 2), PB: $04,S = PC, $06,S = the bank", "expect": "LDA" },
+      "22049": { "text": "Native COP frame: $01,S = P, $02,S = PC (COP address + 2), $04,S = PB; this reads the bank of the script", "expect": "LDA" }
+    }
+  },
+
+  "system/cop_core.asm": {
+    "blockNote": { "edit": [
+      { "find": "A wait command (Cop05, Cop82, Cop83, CopAD) does not move past itself while the wait lasts: it saves a resume pointer that re-runs the same COP next frame and yields.",
+        "with": "A wait command does not move past itself while the wait lasts: Cop05 and CopAD save a resume pointer that re-runs their own COP and yield; Cop82, Cop83 and Cop9E yield with the resume pointer that the animation command before them (Cop80, Cop81, Cop9D) saved, which points at the wait command in the usual pair." }
+    ] },
+    "partNotes": {
+      "SpawnActorBefore": { "edit": [
+        { "find": "an actor linked before X runs earlier in the actor loop.",
+          "with": "it sits on the $3E side of X, so it runs right after X in the same frame (the actor loop follows $3E)." }
+      ] },
+      "CopExitJump": { "edit": [
+        { "find": "Replaces the return address on the stack and returns with RTI.",
+          "with": "Replaces only the PC word of the COP frame (the bank byte stays, so a jump target is always in the bank of the COP) and returns with RTI, which also restores the P the script had at the COP." }
+      ] },
+      "CopExitYield": { "edit": [
+        { "find": "The script resumes next time from $18,X/$36,X.",
+          "with": "The actor loop calls the script again at $18,X/$36,X once the wait counter $14 has run out (a plain yield leaves it at 0, so the next frame)." }
+      ] }
+    },
+    "comments": {
+      "25793": { "text": "$02,S is the PC word of the COP frame; the bank at $04,S is not touched, so the script continues in its own bank", "expect": "STA" },
+      "25801": { "text": "Two 16-bit PLAs drop the 4-byte COP frame (P, PC, PB); RTL then returns to the address the scheduler pushed (StepActorMotion - 1)", "expect": "PLA" }
+    }
+  },
+
+  "cop_handlers/cop_actor_fields_animation.asm": {
+    "blockNote": { "edit": [
+      { "find": "carry clear = a step was loaded, the actor yields and re-runs Cop82 next frame (the resume pointer points at it)",
+        "with": "carry clear = a step was loaded (its duration is now in $14), the actor yields and re-runs Cop82 when that wait has run out (the resume pointer points at it)" }
+    ] },
+    "partNotes": {
+      "Cop82_WaitAnimationDone": { "edit": [
+        { "find": "otherwise yield (re-runs next frame).",
+          "with": "otherwise yield; the step duration is in $14, so the next call comes that many frames + 1 later." }
+      ] },
+      "Cop83_WaitAnimationRepeat": { "edit": [
+        { "find": "Out: counter zero: continues; otherwise yield while a step is running.",
+          "with": "Out: counter zero: continues; otherwise yield while a step is running. The counter is decremented before it is tested, so a count of 0 would run 65536 times; no script uses a COP 81 count below 2." }
+      ] }
+    }
+  }
+}

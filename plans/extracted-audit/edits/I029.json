@@ -1,0 +1,305 @@
+{
+  "_note": "I029: PC annotate batch A7 (library 0133-0147): scene asset loader, Quintet LZ expander, scene profiles, boot hardware reset, lair state and flag map patches at scene load, title/intro/ending/banner/save-slot text, location names. No actor is in this batch, so the light actor depth does not apply.",
+
+  "library/lib_scene_asset_loader.asm": {
+    "blockNote": [
+      "Scene asset loader, Quintet LZ expander and boot hardware reset (file offsets 78281-78288 and 78450-80601, SNES $02:B1C9 and $02:B272-$BAD9, bank 02).",
+      "",
+      "=== MODEL ===",
+      "Every scene change calls LoadSceneAssets once (lib_scene_change_init code_0279B5), after the scene-change code has put the PPU in forced blank with NMI off. So every VRAM, CGRAM-buffer and WRAM write below happens without a vblank check. dp$2F-$31 is the long pointer to the asset list (asset_list_028000, $05:8000), set once at boot by InitHardwareAndClearWram.",
+      "The asset list has one record per scene: area, scene, commands, then a 00 byte. FindSceneRecord walks the records from the top and stops at the first whose scene equals scene_current ($0316) and whose area equals area_current ($0314). The first record is a dummy (area $53, scene $59) with no commands and the list has no end sentinel (OQ-I011-3). The other 97 records are exactly the 97 scenes that have a scene profile.",
+      "A command byte has exactly one bit set. LoadSceneAssets reads one command at a time and tries the bits from $80 down to $01 (a BIT ladder), calls the handler, which reads its own operands with ReadAssetByte, and stops on a 00 byte:",
+      "  $80 graphics   6 operand bytes  b0 start, b1 end (512-byte units, b0 bit 7 = raw), b2 VRAM page (word address b2 << 8), 3-byte pointer. LoadSceneGraphics. Skipped when asset_skip_mask bit 3 is set",
+      "  $40 palette    6 operand bytes  b0 first source colour, b1 end colour, b2 destination colour, pointer. LoadScenePalette. Skip bit 2",
+      "  $20 tileset    7 operand bytes  b0 start, b1 end (64-byte units, b0 bit 7 = raw), b2 destination offset, b3 layer mask (1 BG1, 2 BG2), pointer. LoadMetatileDefs. Skip bit 1",
+      "  $10 tilemap    4 operand bytes  type (1 BG1, 2 BG2, 0 Mode 7), pointer. LoadSceneTilemap. Skip bit 0",
+      "  $08 asset8     1 operand byte   id below $80 = scene profile, $80-$BF = jump to the label id or $40, $C0-$FF = a label. ApplySceneProfile. Never skipped",
+      "  $04 meta4      3 operand bytes  ignored. SkipMeta4Command (no record uses it)",
+      "  $02 music      5 operand bytes  b0 start command, b1 variant, pointer. LoadSceneMusic. Skip bit 5",
+      "  $01 spritemap  6 operand bytes  b0 (0 = $7E:3800, else $7E:F000), b1 and b2 ignored, pointer. LoadSceneSpritemap. Skip bit 4",
+      "Shared segments are how scenes of one world share graphics: an asset8 jump (id $80-$BF) makes FindAssetLabel scan the whole list for the matching label ($C0-$FF) and the walk continues after that label in the OTHER record, up to that record's 00. The 65 jumps in the list go to 37 labels.",
+      "",
+      "=== STREAM POINTERS AND CACHE ===",
+      "Every asset pointer in a record is a 3-byte linear FILE OFFSET (lo, mid, hi). ReadAssetPointer converts it to a LoROM address in dp$29-$2B: bank = offset >> 15, address = $8000 + (offset and $7FFF). Ten 3-byte cache cells at $0407-$0424 remember the pointer of the last asset loaded into a slot: graphics by VRAM page (asset_cache_gfx0-3 for b2 $00, $10, $20, $30), tileset per layer (asset_cache_tileset1/2), tilemap per layer (asset_cache_tilemap1/2), spritemap and music. CheckAssetCache compares the new pointer with the cell, stores it and says 'load' (carry set) only when different, so entering a scene that uses the same assets in the same slots costs nothing. Palettes have no cache. A graphics b2 other than $00/$10/$20/$30 ($40 and $FF), and a tileset or tilemap type other than 1 or 2, zero the cells of that kind and always load. A zeroed cell forces a reload: other code zeroes cells to invalidate them. The cache keys on the pointer only, not on the range (b0, b1); no two commands of the shipped list share a pointer with different ranges, so that hazard does not occur.",
+      "asset_skip_mask ($03B4) is a one-shot request: an actor that warps inside a world writes $0020 before the scene change so that the music is not reloaded (15 writer sites in 13 files), and code_0279B5 clears it after the load. Skipped commands still advance Y past their operands. The record walkers (FindSceneRecord, FindAssetLabel) ignore the mask.",
+      "",
+      "=== QUINTET LZ ===",
+      "DecompressQuintetLz is the Quintet LZ expander of corpus/gaia-core/quintet-lz.md: a 256-byte ring pre-filled with $20, first write position $EF, a flag bit per token (1 = literal byte, 0 = back reference of an 8-bit ring position and a 4-bit length, count = length + 2), bits read MSB first with the one-hot mask dp$1E. It does NOT read the 2-byte length word that precedes every compressed stream: each caller reads it into dp$23 first. The loader decompresses to $7E:6000 (graphics and tileset staging, 8 KB at most), $7E:C000 (Mode 7 map), $7E:3800 or $7E:F000 (spritemap) and the layer map pages.",
+      "",
+      "=== SCENE PROFILE, MUSIC AND VARIANT ===",
+      "ApplySceneProfile writes the PPU layout of the scene from a 12-byte record of lib_scene_profile_data (see its block note for the layout) and sets location_id, world_index, the BG tile attributes, the view height, the parallax ratios, scene_variant and no_combat_scene. scene_variant ($031E) selects which music record of the scene plays: LoadSceneMusic plays a record only when its variant byte equals scene_variant. code_0279B5 clears scene_variant after the load, so it is a one-shot request: an actor may set it before the scene change; otherwise LookupSceneVariant (lib_scene_map_patches) may set it from the switch rows of data_00F99A; otherwise bits 7 and 6 of profile byte 11 add 1 each. The profile command is always the first command of a record, so the variant is final before the music command runs.",
+      "",
+      "=== NOTES ===",
+      "- The loader never sets dp$2E, the bank byte of the copy destination [dp$2C]. Its only writer is the SPC upload (engine_spc_ipl_upload: $07 at the start, incremented per bank, $7E at the end), so the tileset and raw map copies write to the bank left by the last music upload. Whether the very first scene after boot sees $7E is open (OQ-I011-1).",
+      "- LoadMapLayer stores the height byte of a raw map with its flag bit into map_height_px (OQ-I011-2). The raw tilemap and tileset flags look unused in the shipped data.",
+      "- The LZ ring is the page $7E:0100-$01FF, which every decompression overwrites (OQ-I011-8).",
+      "- Two BRA instructions never run (after eight ASL of a non-zero byte): FindSceneRecord ends its ladder with BRA GraphicsCacheHit and FindAssetLabel with BRA loc_0139E6, a STZ BG2HOFS inside InitHardwareAndClearWram (OQ-I011-10). They pin the layout: a rebuild that keeps the bytes needs those labels at the same relative distance, so InitHardwareAndClearWram cannot move away from FindAssetLabel on its own.",
+      "- Walkthrough check: the places and bosses the walkthrough names (Grass Valley, GreenWood, St. Elles, Mountain of Souls, Leo's Laboratory, Magridd's Castle, World of Evil, Deathtoll) agree with the location names that profile ids select (LocationNameList); the story text is not in the walkthrough."
+    ],
+    "partNotes": {
+      "WaitVblankFrames": "Waits for A vblanks.\n\nWhen: UploadSceneMusic, three times (2, 2 and 3 frames around the SPC handshake).\nSees: nothing; the scene change is still blanked.\nWhy: the SPC needs time between the steps of the handshake and a frame is the clock the loader has.\nIn: JSL; M = 8, A = number of frames (0 means 256).\nOut: returns after A calls of lib_system_helpers.WaitVBlank; A = 0.\nClobbers: A.",
+      "DecompressQuintetLz": "Expands one Quintet LZ stream into bank $7E.\n\nWhen: LoadSceneGraphics, LoadMetatileDefs, LoadMapLayer, LoadMode7Map, LoadSceneSpritemap (5 sites) and three sites of lib_02719F.\nSees: the decoded graphics, tile definitions or map bytes that the caller then copies on.\nWhy: all scene data is stored compressed; the ring keeps the last 256 output bytes so a back reference costs 12 bits.\nIn: JSL; dp$29-$2B = source (behind the 2-byte length word), dp$23 = bytes to produce, dp$25 = destination offset in bank $7E. Sets M = 8, X = 16 itself and DBR = $7E for the call.\nOut: the bytes at $7E:[dp$25]; dp$29 advanced past the consumed bytes; the ring page $7E:0100-$01FF is overwritten (OQ-I011-8).\nClobbers: A, dp$1E-$22; P, B, X, Y are preserved.",
+      "ReadLzByte": "Reads the next 8 bits of the stream at any bit phase.\n\nWhen: DecompressQuintetLz, for a literal byte and for the 8-bit ring position of a back reference.\nSees: nothing directly.\nWhy: the flag bits sit between the data bits, so a byte of output is rarely aligned to a byte of input; the eight-way ladder picks the shift for the current phase of dp$1E.\nIn: JSR; M = 8; dp$1E = one-hot bit mask ($80 = aligned), dp$29 = source.\nOut: A.low = the 8 bits; dp$29 += 1; the mask is unchanged (the phase does not move); M = 8.\nClobbers: A (B is scrambled by XBA).",
+      "ReadLzNibble": "Reads the next 4 bits of the stream (the length of a back reference).\n\nWhen: DecompressQuintetLz, after the ring position of a back reference.\nSees: nothing directly.\nWhy: the length is 4 bits wide, so it moves the bit phase by 4.\nIn: JSR; M = 8; dp$1E = bit mask, dp$29 = source.\nOut: A = 0-15; dp$1E moved by 4 bits; dp$29 += 1 when a byte boundary was crossed.\nClobbers: A (B).",
+      "LoadSceneAssets": "Loads everything a scene needs: graphics, palette, tile definitions, maps, profile, music and sprite map.\n\nWhen: every scene change, from code_0279B5 (lib_scene_change_init), with the screen in forced blank.\nSees: after it returns the new scene's data is in VRAM and WRAM; the player sees it when the screen is unblanked.\nWhy: scenes are data. One list, one record per scene and one command per asset replace a loader routine per scene.\nIn: JSL; area_current, scene_current set; dp$2F-$31 = asset list.\nOut: FindSceneRecord, then the command ladder until a 00 byte (see the block note for the eight commands).\nClobbers: A, X, Y, dp$00-$06, dp$1E-$26, dp$29-$2C and the I/O registers the handlers write; P restored.",
+      "FindSceneRecord": "Finds the record of the current scene in the asset list.\n\nWhen: the start of LoadSceneAssets.\nSees: nothing.\nWhy: the list is a plain concatenation of variable-length records, so records of other scenes are skipped command by command.\nIn: JSR; M = 8, X = 16; dp$2F-$31 = list, area_current, scene_current.\nOut: Y = offset of the first command of the record whose scene (byte 1) and area (byte 0) match. Other records are skipped with the operand lengths 6, 6, 7, 4, 1, 3, 5, 6 for the commands $80 down to $01. A scene with no record runs off the end of the list (OQ-I011-3).\nClobbers: A, Y.",
+      "LoadSceneGraphics": "Loads one block of tile graphics into VRAM (command $80).\n\nWhen: LoadSceneAssets, for each graphics command (107 in the list).\nSees: the character graphics of the scene (backgrounds, sprite sets, the BG3 text font) appear in VRAM.\nWhy: a scene loads only the blocks it needs and the cache skips a block that is already in its VRAM page.\nIn: JSR; Y at the first operand; operands b0 start, b1 end (x $200 bytes, b0 bit 7 = raw), b2 VRAM page (word address b2 << 8), pointer.\nOut: compressed (the usual case): the stream is expanded to $7E:6000 and the words [b0 x $200, b1 x $200) go to VMDATAL. Raw: the same words are copied straight from the ROM pointer. b2 = $FF (the Mode 7 scene only, OQ-I011-4): VMADD = 0 and only VMDATAH is written, $4000 bytes. The cache cell of the page is updated; Y is past the 6 operand bytes. Skipped (only Y moves) when asset_skip_mask bit 3 is set.\nClobbers: A, X, dp$00, dp$02, dp$23, dp$25, dp$29-$2B.",
+      "LoadScenePalette": "Copies a range of colours from the asset into the CGRAM buffer (command $40).\n\nWhen: LoadSceneAssets, for each palette command (109 in the list).\nSees: the scene's colours after the NMI uploads the buffer.\nWhy: the buffer is uploaded by the NMI, so loading a palette is a memory copy with no hardware write and needs no cache.\nIn: JSR; Y at the first operand; b0 first source colour, b1 end colour (exclusive), b2 first destination colour, pointer.\nOut: colours [b0, b1) of the source copied to cgram_buffer + b2 x 2; Y past the 6 operand bytes. Skipped when asset_skip_mask bit 2 is set.\nClobbers: A, X, dp$00-$04, dp$29-$2B.",
+      "LoadMetatileDefs": "Loads the metatile definition tables of one or both background layers (command $20).\n\nWhen: LoadSceneAssets, for each tileset command (62 in the list; every one is b0 = 00, b1 = 20, b2 = 00).\nSees: the 16x16 blocks of the map get their four tiles and attributes (the map streamer reads the tables).\nWhy: the maps store one byte per metatile; this table says what the byte means.\nIn: JSR; Y at the first operand; b0 start, b1 end, b2 destination offset (all in 64-byte units, b0 bit 7 = raw), b3 layer mask (1 BG1, 2 BG2, 3 both), pointer.\nOut: the stream is expanded to $7E:6000 and bytes [b0 x 64, b1 x 64) are copied, word by word and byte-swapped, to $7E:2000 (BG1) and/or $7E:2800 (BG2) at offset b2 x 64 (eight bytes per metatile, 256 ids, $800 bytes per layer). A raw tileset (b0 bit 7) is copied 2 KB to [dp$2C] = $xx:6000 instead, in the bank left in dp$2E (OQ-I011-1); no shipped tileset is raw. Cache cell by b3: 1 asset_cache_tileset1, 2 asset_cache_tileset2, anything else zeroes both and loads. Y past the 7 operand bytes. Skipped when asset_skip_mask bit 1 is set.\nClobbers: A, X, dp$00-$06, dp$23, dp$25, dp$2C, dp$29-$2B.",
+      "CopyDefsToLayer": "Copies the staged tile definitions to one layer's table when the layer mask asks for it.\n\nWhen: LoadMetatileDefs, once for BG1 (X = $2000) and once for BG2 (X = $2800).\nSees: nothing directly.\nWhy: one staged definition set can feed one layer or both.\nIn: JSR; A = remaining layer mask (bit 0 = this layer), X = low word of the destination table, dp$00 start, dp$02 end, dp$04 destination offset.\nOut: bit 0 set: the words [dp$00, dp$02) of $7E:6000, byte-swapped, to [dp$2C] + dp$04 (dp$2E, the bank, is not set here: OQ-I011-1). A is shifted right for the next layer.\nClobbers: A and X (the caller reloads X); Y is preserved.",
+      "LoadSceneTilemap": "Loads the map of one background layer, or the Mode 7 map (command $10).\n\nWhen: LoadSceneAssets, for each tilemap command (135 in the list).\nSees: the scene's layout of metatiles, and its size for the camera clamp and the collision.\nWhy: the stream header gives the map size so one routine serves every scene.\nIn: JSR; Y at the first operand; type (1 BG1, 2 BG2, 0 Mode 7), pointer.\nOut: the stream header is two bytes, width and height in 256-pixel pages (height bit 7 = raw map, OQ-I011-2). The expected output length is width x height x 256 bytes (one byte per metatile; the product comes from lib_arithmetic.Multiply8x8), replaced by the length word of the stream when the map is compressed. Types 1 and 2 go to LoadMapLayer, type 0 to LoadMode7Map. Cache cell: type 1 asset_cache_tilemap1, type 2 asset_cache_tilemap2 (a hit skips the whole load, the sizes are not stored again); any other type zeroes both. Y past the 4 operand bytes. Skipped when asset_skip_mask bit 0 is set.\nClobbers: A, X, dp$00-$04, dp$23, dp$25, dp$29-$2B.",
+      "LoadMapLayer": "Stores the map size and expands or copies the map of one layer.\n\nWhen: LoadTilemapByType, with X = 0 for BG1 and X = 4 for BG2 (A = the type shifted so that bit 0 is this layer).\nSees: map_width_px, map_height_px (or the BG2 pair, map2_width_px, map2_height_px) and the layer's map page.\nWhy: both layers share the code and differ by the index X into the per-layer word tables.\nIn: JSR; A = type, X = 0 or 4; dp$00 = width x 256, dp$02 = height x 256, dp$23 = output length.\nOut: bit 0 set: size words stored at map_width_px + X and map_height_px + X, the map copied (raw) or expanded to the page at map_base_bg1 + X ($8000 BG1, $C000 BG2); carry set; A preserved. Otherwise carry clear and A shifted right.\nClobbers: Y is preserved; A as described.",
+      "LoadMode7Map": "Loads the Mode 7 map and writes it to VRAM (tilemap type 0).\n\nWhen: LoadTilemapByType, for the only Mode 7 scene (OQ-I011-4).\nSees: the Mode 7 floor map in the low bytes of VRAM word 0 onward.\nWhy: Mode 7 keeps its map in the low byte of the VRAM words and its characters in the high byte, so the map goes in with VMAIN = 0.\nIn: JSR; M = 16; dp$29-$2B = source, dp$03 bit 7 = raw.\nOut: $4000 bytes expanded (or copied) to $7E:C000, then written to VMDATAL from word 0 with VMAIN = 0; VMAIN back to $80.\nClobbers: A, X; Y and P are preserved.",
+      "ReadAssetPointer": "Converts the 3-byte file offset in the asset list to a LoROM address in dp$29-$2B.\n\nWhen: the pointer step of every asset command that loads data (graphics, palette, tileset, tilemap, music, spritemap).\nSees: nothing.\nWhy: the list stores plain file offsets; the loader reads through long pointers.\nIn: JSR; Y at the 3 pointer bytes of the list, X = $0029 (all six callers).\nOut: dp$29-$2B = $8000 + (offset and $7FFF) and bank offset >> 15: the middle byte becomes (mid and $7F) or $80 and the bank is the high byte x 2 plus bit 7 of the middle byte; Y += 3.\nClobbers: A.",
+      "ApplySceneProfile": "Applies a scene profile, or jumps to a shared label (command $08).\n\nWhen: LoadSceneAssets, once per record (the first command of every scene).\nSees: the scene's layer setup: which layers show, colour math, the 224 or 256 line view, where the maps sit in VRAM, how fast BG2 drifts.\nWhy: the settings that differ from scene to scene are 12 bytes, so they live in a table and one routine writes them to the PPU and the engine variables.\nIn: JSR; Y at the operand byte (the id). id below $80: profile; $80-$BF: jump to label id or $40; $C0-$FF: a label, nothing to do.\nOut: profile path: location_id = id; TM, TMW, TS, TSW, CGWSEL, CGADSUB, BG1SC, BG2SC, BGMODE written; tm_shadow, cgadsub_shadow, bg2sc_shadow, bg_scroll_swap, view_height_px, tile_attr_bg1/2, tile_mask_bg1/2 ($FDFF), scene_sprite_attr+1, the four parallax ratio words, world_index, no_combat_scene and scene_variant set (record layout in lib_scene_profile_data). Jump path: Y = position behind the label (FindAssetLabel) and the walk continues there.\nClobbers: A, X; Y is restored on the profile path.",
+      "SkipMeta4Command": "Skips the three operand bytes of command $04.\n\nWhen: LoadSceneAssets, if a record had a meta4 command; none does (OQ-I011-10).\nSees: nothing.\nWhy: the command is defined but unused.\nIn: JSR; Y at the operands.\nOut: Y += 3.\nClobbers: A.",
+      "LoadSceneMusic": "Starts the scene's music: the SPC handshake, the song upload and the start command (command $02).\n\nWhen: LoadSceneAssets, for each music command (65 in the list), unless asset_skip_mask bit 5 is set.\nSees: the music of the scene starts; a scene change that keeps the same song (same pointer) does not restart it.\nWhy: uploading a song through the SPC IPL takes several frames; the cache and the skip mask avoid it when the song is already loaded.\nIn: JSR; Y at the operands: b0 start command (always 1), b1 variant, pointer.\nOut: bgm_start_cmd = b0, bgm_record_variant = b1. Only when scene_variant equals b1 and the pointer differs from asset_cache_music: UploadSceneMusic. Y past the 5 operand bytes.\nClobbers: A, X, dp$29-$2B.",
+      "UploadSceneMusic": "Hands the song block at dp$29-$2B to the SPC.\n\nWhen: LoadSceneMusic, when the variant matches and the pointer is new.\nSees: the previous music stops; the new song starts at the end.\nWhy: the SPC must be taken out of its engine and into the IPL boot handler before a block can be sent.\nIn: dp$29-$2B = song block.\nOut: APUIO0 = $F0 and wait until the SPC answers 0; 2 frames; APUIO0 = $FF (the SPC's boot handshake handler, as in MusicLoadUpload); 2 frames; engine_spc_ipl_upload.code_0FEFF5 sends the block; 3 frames; APUIO0 = bgm_start_cmd.\nClobbers: A.",
+      "LoadSceneSpritemap": "Expands the scene's sprite map (command $01).\n\nWhen: LoadSceneAssets, for each spritemap command (47 in the list).\nSees: the meta entries of the scene's actors find their sprite pieces (they read the map at $7E:3800).\nWhy: the sprite maps of a scene are compressed in the ROM and live in WRAM while the scene runs.\nIn: JSR; Y at the operands: b0 (0 = $7E:3800, else $7E:F000), b1 and b2 ignored, pointer.\nOut: the stream is expanded to $7E:3800 or $7E:F000 unless the pointer equals asset_cache_spritemap; Y past the 6 operand bytes. Skipped when asset_skip_mask bit 4 is set.\nClobbers: A, X, dp$23, dp$25, dp$29-$2B.",
+      "ReadAssetByte": "Reads the next byte of the asset list.\n\nWhen: every handler of the loader (22 sites).\nSees: nothing.\nWhy: one place advances the list position.\nIn: JSR; Y = position in the list (dp$2F-$31 + Y).\nOut: A (16-bit, high byte 0) = the byte; Y += 1; P restored.\nClobbers: A.",
+      "FindAssetLabel": "Finds the shared segment that starts after an asset8 label.\n\nWhen: ApplySceneProfile, for a jump id ($80-$BF, passed as label id or $40).\nSees: nothing; the scene continues with the commands of another scene's record.\nWhy: scenes of one world share graphics and palettes by sharing a segment; the label marks where the shared commands start.\nIn: JSR; M = 8; A = label value ($C0-$FF).\nOut: Y = position behind the first asset8 command whose operand equals the label, scanning the list from the first record (each 00 byte skips the 2 header bytes of the next record).\nClobbers: A, Y, dp$00.",
+      "CheckAssetCache": "Compares the pointer in dp$29-$2B with a 3-byte cache cell and updates the cell.\n\nWhen: before every graphics, tileset, tilemap, music and spritemap load (10 sites).\nSees: nothing; an equal pointer means the asset is already in place and the load is skipped.\nWhy: a scene change that keeps the same assets in the same slots should cost nothing.\nIn: JSR; X = address of the cell (asset_cache_*), dp$29-$2B = pointer.\nOut: carry clear = equal, nothing to do; carry set = the cell now holds the pointer, load the asset. P otherwise restored.\nClobbers: A.",
+      "InitHardwareAndClearWram": "Puts the PPU, the DMA and math registers into a known state, clears WRAM and sets the asset list pointer.\n\nWhen: once at boot, from the reset path (engine_boot_main_loop BootGame), before any scene.\nSees: a black, forced-blank screen with every layer, window and effect off.\nWhy: the SNES powers up with undefined PPU and WRAM contents.\nIn: JSL; DBR must map WRAM at $0000 (banks $00-$3F; BootGame sets $01).\nOut: INIDISP = $80; OBJSEL, OAMADD, BGMODE, MOSAIC, the BGnSC, BGnNBA and the eight scroll registers (written twice each) = 0; VMAIN = $80, VMADD = 0; M7SEL = $80 and the Mode 7 matrix = identity (A = D = $0100, B = C = 0, X = Y = 0); CGADD, window and layer registers = 0; CGWSEL = $02, CGADSUB = 0, COLDATA = $E0, SETINI = 0; NMITIMEN = 0, WRIO = $FF; the multiplier, divider, timers, MDMAEN and HDMAEN = 0; MEMSEL = 0. WRAM $7E:0000-$1EFF and $7E:2000-$FFFF and the whole of bank $7F are cleared; $7E:1F00-$1FFF (the stack page) is kept. dp$2F-$31 = asset_list_028000 (set after the clear, since the direct page is inside it).\nClobbers: A, X; P restored."
+    },
+    "comments": {
+      "78462": { "text": "ring = $7E:0100-$01FF; the low byte of dp$1F (write) and dp$21 (read) is the ring position", "expect": "LDX #$0100" },
+      "78469": { "text": "the ring is pre-filled with $20", "expect": "LDA #$20" },
+      "78477": { "text": "first ring write position", "expect": "LDA #$EF" },
+      "78481": { "text": "flag-bit mask, MSB first; $80 = the stream is byte aligned", "expect": "LDA #$80" },
+      "78485": { "text": "X = output offset in bank $7E", "expect": "LDX $25" },
+      "78487": { "text": "Y = bytes still to produce", "expect": "LDY $23" },
+      "78507": { "text": "flag bit clear = back reference, set = literal byte", "expect": "BEQ CopyLzBackReference" },
+      "78533": { "text": "two INC: length = nibble + 2", "expect": "INC" },
+      "78857": { "text": "record byte 1 = scene (byte 0, the area, is compared next)", "expect": "CMP $scene_current" },
+      "78863": { "text": "record byte 0 = area", "expect": "CMP $area_current" },
+      "78900": { "text": "never taken: eight ASL of a non-zero byte; pins the layout (OQ-I011-10)", "expect": "BRA GraphicsCacheHit" },
+      "78932": { "text": "dp$00 = b0 << 8: start in 512-byte units, bit 15 = raw flag (shifted out by ASL at StartGraphicsCopy)", "expect": "STA $00" },
+      "78939": { "text": "dp$02 = b1 x $200: end offset", "expect": "STA $02" },
+      "78950": { "text": "VRAM word address = b2 << 8", "expect": "STA $VMADDL" },
+      "78980": { "text": "asset_cache_gfx0: VRAM page $0000", "expect": "LDX #$0407" },
+      "78990": { "text": "asset_cache_gfx1: VRAM page $1000", "expect": "LDX #$040A" },
+      "79000": { "text": "asset_cache_gfx2: VRAM page $2000", "expect": "LDX #$040D" },
+      "79010": { "text": "asset_cache_gfx3: VRAM page $3000", "expect": "LDX #$0410" },
+      "79038": { "text": "b2 = $FF: the Mode 7 character data, high bytes only (OQ-I011-4)", "expect": "CMP #$00FF" },
+      "79096": { "text": "expanded graphics are staged at $7E:6000", "expect": "LDX #$6000" },
+      "79106": { "text": "b2 = $FF: Mode 7 characters, $4000 bytes into VMDATAH", "expect": "CMP #$00FF" },
+      "79174": { "text": "palette bytes are colours: byte offset = colour x 2", "expect": "ASL" },
+      "79202": { "text": "the CGRAM buffer is uploaded by the NMI", "expect": "STA $cgram_buffer, X" },
+      "79288": { "text": "asset_cache_tileset1", "expect": "LDX #$0413" },
+      "79298": { "text": "asset_cache_tileset2", "expect": "LDX #$0416" },
+      "79319": { "text": "raw tileset: 2 KB copied to [dp$2C] = $xx:6000, bank in dp$2E (OQ-I011-1)", "expect": "LDA #$6000" },
+      "79360": { "text": "BG1 definitions: $7E:2000", "expect": "LDX #$2000" },
+      "79366": { "text": "BG2 definitions: $7E:2800", "expect": "LDX #$2800" },
+      "79379": { "text": "destination = [dp$2C] + dp$04; dp$2E (the bank) is not set here (OQ-I011-1)", "expect": "STX $2C" },
+      "79385": { "text": "the words are byte-swapped on the way", "expect": "LDA $7E6000, X" },
+      "79441": { "text": "asset_cache_tilemap2", "expect": "LDX #$041C" },
+      "79451": { "text": "asset_cache_tilemap1", "expect": "LDX #$0419" },
+      "79494": { "text": "width x height in pages", "expect": "Multiply8x8" },
+      "79501": { "text": "expected output length = pages x 256 (one byte per metatile)", "expect": "STA $23" },
+      "79505": { "text": "height bit 7 set = raw map: no length word, no expansion (OQ-I011-2)", "expect": "BMI LoadTilemapByType" },
+      "79560": { "text": "destination = the layer's map page base ($8000 BG1, $C000 BG2)", "expect": "LDY $map_base_bg1, X" },
+      "79638": { "text": "VMAIN = 0: only the low byte of each word is written", "expect": "STZ $VMAIN" },
+      "79659": { "text": "VMAIN restored to $80", "expect": "STA $VMAIN" },
+      "79686": { "text": "LoROM: middle byte = (mid and $7F) or $80, bank = high byte x 2 + bit 7 of the middle byte", "expect": "AND #$007F" },
+      "79708": { "text": "id below $80: scene profile; $80-$BF: jump to a label; $C0-$FF: a label (nothing to do)", "expect": "BIT #$80" },
+      "79717": { "text": "jump id $80-$BF becomes label $C0-$FF", "expect": "ORA #$40" },
+      "79738": { "text": "the list holds absolute addresses: subtract the list base to index it with long addressing", "expect": "SEC" },
+      "79791": { "text": "byte 4 bits 4-5: high byte of the default sprite attribute word", "expect": "STA $scene_sprite_attr+1" },
+      "79804": { "text": "$2000 = bit 13 of a tile word (tile priority); byte 4 bit 0 sets it for BG1, bit 1 for BG2", "expect": "LDY #$2000" },
+      "79823": { "text": "view height 224 lines", "expect": "LDY #$00E0" },
+      "79829": { "text": "byte 4 bit 6 set: 256-line view", "expect": "LDY #$0100" },
+      "79838": { "text": "byte 4 bit 7 clear: bit 8 of the BG2 tile attribute word (OQ-I029-4)", "expect": "LDA #$01" },
+      "79843": { "text": "both tile masks = $FDFF in every profile", "expect": "LDY #$FDFF" },
+      "79861": { "text": "byte 5 bit 7: BG1 and BG2 swap their roles (BG1SC base $7000, BG2SC base $6000)", "expect": "INC $bg_scroll_swap" },
+      "79877": { "text": "BG1SC = $60 + size bits: map base word $6000", "expect": "ADC #$60" },
+      "79888": { "text": "BG2SC = $70 + size bits: map base word $7000", "expect": "ADC #$70" },
+      "79936": { "text": "bytes 7-10, one per layer axis: high nibble = numerator (low byte of the ratio word), low nibble = divisor (high byte)", "expect": "SceneProfileList+7" },
+      "79967": { "text": "an actor already requested a variant: no lookup, bits 7 and 6 are ignored", "expect": "LDA $scene_variant" },
+      "79974": { "text": "carry set: a data_00F99A row had its switch set and wrote scene_variant", "expect": "LookupSceneVariant" },
+      "79994": { "text": "byte 11 bit 7: variant + 1", "expect": "INC $scene_variant" },
+      "80000": { "text": "byte 11 bit 6: variant + 1", "expect": "INC $scene_variant" },
+      "80006": { "text": "byte 11 bit 5: no-combat scene (OQ-I029-2)", "expect": "INC $no_combat_scene" },
+      "80015": { "text": "byte 11 low nibble = world index", "expect": "STA $world_index" },
+      "80064": { "text": "only the music record of this variant plays", "expect": "CMP $bgm_record_variant" },
+      "80070": { "text": "asset_cache_music", "expect": "LDX #$0422" },
+      "80081": { "text": "request $F0; the loop below waits for the SPC to clear port 0", "expect": "STA $APUIO0" },
+      "80097": { "text": "$FF = the SPC's boot handshake handler (as MusicLoadUpload)", "expect": "STA $APUIO0" },
+      "80106": { "text": "the song block at dp$29-$2B goes through the IPL transfer", "expect": "code_0FEFF5" },
+      "80119": { "text": "start command b0 (always 1 in the shipped list)", "expect": "STA $APUIO0" },
+      "80153": { "text": "asset_cache_spritemap", "expect": "LDX #$041F" },
+      "80175": { "text": "b0 = 0: $7E:3800", "expect": "LDX #$3800" },
+      "80181": { "text": "b0 non-zero: $7E:F000", "expect": "LDX #$F000" },
+      "80240": { "text": "never taken: eight ASL of a non-zero byte; pins the layout (OQ-I011-10)", "expect": "BRA loc_0139E6" },
+      "80305": { "text": "forced blank", "expect": "LDA #$80" },
+      "80407": { "text": "Mode 7 matrix = identity: A = D = $0100", "expect": "LDA #$01" },
+      "80495": { "text": "fixed colour: all planes selected, intensity 0", "expect": "LDA #$E0" },
+      "80562": { "text": "stops at $1EFE: the stack page $1F00-$1FFF is kept", "expect": "CPX #$1F00" },
+      "80567": { "text": "$7E:2000-$FFFF", "expect": "LDX #$2000" },
+      "80591": { "text": "dp$2F-$31 = long pointer to the asset list; set after the clear (the direct page is inside it)", "expect": "asset_list_028000" }
+    }
+  },
+
+  "library/lib_scene_profile_data.asm": {
+    "blockNote": [
+      "Scene profile list and the 97 scene profile records (file offsets 92321-93740, SNES $02:E8A1-$EE2C, bank 02).",
+      "",
+      "=== MODEL ===",
+      "A scene profile is a 12-byte record of video and game settings that a scene's asset record selects with an asset8 command whose id is below $80 (ApplySceneProfile in lib_scene_asset_loader). The id is also the location id (location_id, $1C6A): the pause banner uses it as the string number in LocationNameList. SceneProfileList holds 128 words, one per id: the bank-$02 address of the record, 0000 for the 31 ids that have none (25-27, 35-3B, 48-4F, 5D-63, 74-77, 7E-7F). The loader subtracts the list's own address from the word and indexes from the list label with long addressing. The records are not in id order (23 and 24 come before 19, 34 before 2E).",
+      "",
+      "=== RECORD LAYOUT (12 bytes) ===",
+      "  +0   TM, also TMW and tm_shadow (main screen layers)",
+      "  +1   TS, also TSW (sub screen layers)",
+      "  +2   CGWSEL",
+      "  +3   CGADSUB, also cgadsub_shadow",
+      "  +4   flags: bit 0 sets tile_attr_bg1 = $2000, bit 1 sets tile_attr_bg2 = $2000, bits 4-5 go to scene_sprite_attr+1, bit 6 view height (set 256, clear 224), bit 7 clear adds bit 8 to the BG2 tile attribute word; bits 2-3 are never read (OQ-I011-7)",
+      "  +5   BG layout: bits 0-1 screen size of the first layer, bits 2-3 of the second, bit 7 swaps the layers (bg_scroll_swap = 1): BG1SC = ($70 if swapped else $60) + size, BG2SC = ($60 if swapped else $70) + size, so the map bases are VRAM words $6000 and $7000",
+      "  +6   BGMODE ($09 = Mode 1 with BG3 priority, $0F = Mode 7 for location $10)",
+      "  +7..+10  four parallax ratios for BG1 x, BG1 y, BG2 x, BG2 y: high nibble = numerator, low nibble = divisor ($11 = same speed, $12 = half speed, $00 = fixed)",
+      "  +11  bits 0-3 world_index, bit 5 no_combat_scene, bits 6 and 7 each add 1 to scene_variant",
+      "",
+      "=== WORLDS ===",
+      "world_index 0 Grass Valley (ids 00-13: the village, the Underground Castle, Leo's Paintings, the dream rooms and the intro scenes), 1 GreenWood (14-24), 2 St. Elles (28-34), 3 Mountain of Souls (3C-47), 4 Leo's Laboratory (50-5C), 5 Magridd's Castle (64-73), 6 World of Evil (78-7D). The first id of each world (00, 14, 28, 3C, 50, 64, 78: the Master's shrine rooms) has byte 4 = $E4 and byte 5 = $0F; id 11 has the same two bytes.",
+      "",
+      "=== NOTES ===",
+      "- Byte 11 = $A0 or $A1-$A5 (variant + 1, no combat) occurs exactly in the 12 dream rooms (A dream: Tulip, Lisa, Bird, Stump, a dolphin, Servas, an old man, a mushroom, a cat, a soldier and the two rooms the ROM names 'A dream 1'). Byte 11 = $C0-$C5 (variant + 2) occurs exactly in six rooms: Monster in the paintings (0C), Tomb of a stone statue (22), A ghost ship (32), Poseidon (44), Tin Doll (59) and The deck of an airship (72). data_00F99A has a variant-0 row for the same six locations. The likely meaning is boss music until the boss switch is set, then the normal tune (OQ-I011-5, OQ-I011-6).",
+      "- Locations 0F-13 have a profile but an empty name: they are the intro and transition scenes (00/09-00/0D, and 00/0A is the Mode 7 scene), which show no banner.",
+      "- The records are read once per scene load; no code reads them again, so the list and the records can move together."
+    ],
+    "partNotes": {
+      "SceneProfileList": "128 words: the address of the profile record of each location id.\n\nWhen: ApplySceneProfile, once per scene load.\nSees: nothing directly; the id of the scene picks its layer setup.\nWhy: ids are sparse (97 of 128 have a record), so a list of addresses is smaller than 128 fixed slots.\nIn: index = id x 2.\nOut: bank-$02 address of the record, or 0000 for an unused id."
+    }
+  },
+
+  "library/lib_013ADA.asm": {
+    "blockNote": [
+      "Default PPU layout written at boot (file offsets 80602-80678, SNES $02:BADA-$BB26, bank 02).",
+      "",
+      "=== MODEL ===",
+      "ApplyBootPpuLayout runs once, right after InitHardwareAndClearWram (engine_boot_main_loop BootGame). InitHardwareAndClearWram zeroes every PPU register; this routine then sets the layout that the title screen and the first scenes expect before any scene profile is applied: Mode 1 with BG3 priority, BG1 map at VRAM word $6000 (BG1SC $63, 64x64), BG2 map at $7000 (BG2SC $73), BG3 map at $5800 (BG3SC $58), BG1 and BG2 characters at word 0, BG3 characters at $4000, windows 1 on every layer with the window spanning columns 0-255, CGWSEL = $82 and the main screen TM = $07 (BG1, BG2 and BG3).",
+      "",
+      "=== NOTES ===",
+      "- The values are the ones a scene profile computes later (ApplySceneProfile), so the boot layout only matters until the first scene is loaded."
+    ],
+    "partNotes": {
+      "ApplyBootPpuLayout": "Writes the default PPU layout.\n\nWhen: once at boot, after InitHardwareAndClearWram.\nSees: nothing yet; the screen is still in forced blank.\nWhy: the register reset leaves every layer off; this gives the title screen its layers and map bases.\nIn: JSL; M = 8.\nOut: OBJSEL = $01, BGMODE = $09, BG1SC = $63, BG2SC = $73, BG3SC = $58, BG12NBA = 0, BG34NBA = 4, W12SEL = W34SEL = WOBJSEL = $33, WH0-WH3 (window 1 over columns 0-255), CGWSEL = $82, TM = $07.\nClobbers: A."
+    }
+  },
+
+  "library/lib_scene_map_patches.asm": {
+    "blockNote": [
+      "Map rectangle copies of the release scenes (file offsets 69930-70388, SNES $02:912A-$92F4, bank 02), four release-scene routines that no batch has annotated yet (70389-71037), the lair state and flag map patches that run at every scene load (ApplyLairStatesToScene 71038-71152, ApplyFlagMapPatches 71153-71265, LookupSceneVariant 71266-71316, SNES $02:957E-$96D4) and FlagMapPatchTable (94861-95491, SNES $02:F28D-$F503).",
+      "",
+      "=== MODEL: RELEASE SCENES ===",
+      "The rectangle is given by the copied lair record bytes in $1C6D-$1C74: release_slab ($1C6E), release_npc_x/y ($1C6F-$1C70), release_rect_x/y ($1C71-$1C72, the destination in metatiles) and release_rect_w/h ($1C73-$1C74). A slab is an alternative full-size copy of the map stored behind the live map in the $7E8000 region: slab k starts k x (map size in bytes) after the live map; its cells are copied onto the same cells of the live map (CopyMapRectFromSlab). The staging copies instead read from a rectangle of the live map itself whose position the caller put in dp$16 / $18 (record +E / +F) and write to release_rect_x/y.",
+      "CopyMapRectFromSlab keeps the high nibble of the live collision byte (the actor block bits $F0) and takes the low nibble from the slab; the staging copies replace the whole byte. A width or height of $80 or more would hang on a BCS to itself (the guard before the loops); the shipped records never do that.",
+      "Nothing is queued for VRAM by these routines: the sweep redraw (StepSweepRedraw) draws the result.",
+      "",
+      "=== MODEL: SCENE LOAD ===",
+      "code_0279B5 (lib_scene_change_init) calls ApplyLairStatesToScene and ApplyFlagMapPatches right after LoadSceneAssets, so the map pages and collision map they change are the ones just loaded. The two routines make the scene show what the player already did: lairs that are released stay open and gone, and rooms whose event flag is set show their opened state.",
+      "ApplyLairStatesToScene visits the 420 lair records of data_00BA0D (32 bytes each, $FF terminator) with a running index X over ALL records (lair_state[X] is the state byte of record X). Records of this location count in lairs_left (the number the pause banner shows). State above 0: the lair still has monsters, SpawnLairActor creates it. State 0: every monster is dead and the tile at the record's (+C, +D) becomes $FE (the lair's release switch). State below 0: the lair was released, the tile becomes $FF and the lair stops counting. The tile is written to the BG1 page $7E8000 and, when record +8 is non-zero, to the BG2 page $7EC000.",
+      "ApplyFlagMapPatches walks FlagMapPatchTable. For each row of this location whose event flag is set it copies a rectangle of the map from a hidden staging place of the same map to the visible place (CopyMapRectFromStaging): the permanent map changes of the game (opened doors and passages). LookupSceneVariant walks data_00F99A and is called from ApplySceneProfile (see lib_scene_asset_loader).",
+      "",
+      "=== NOTES ===",
+      "- The routines from code_0112F5 to code_0114E4 (code_0112F5, code_011395 with its sub-label code_011445, code_0114D0, code_0114E4) belong to no function-map batch and stay unannotated here (OQ-I029-1).",
+      "- 13 of the 70 FlagMapPatchTable rows test event flag number $00FF (locations 00, 0E, 13, 71, 72, 73). Which flag that is and who sets it is open (OQ-I011-13)."
+    ],
+    "partNotes": {
+      "ApplyLairStatesToScene": "Applies the saved state of every lair of this location to the freshly loaded scene.\n\nWhen: every scene change, from code_0279B5, right after LoadSceneAssets.\nSees: lairs with monsters left spawn, a lair whose monsters are all dead shows its release switch, a released lair is gone; the Start-button banner shows how many lairs remain (walkthrough 01-in-the-beginning.md: the number of Monster Lairs in the area is shown by pressing Start).\nWhy: lair state is saved per record index; the map is rebuilt from the ROM at every scene change, so the state must be replayed.\nIn: JSL; X, Y 16-bit; location_id set; lair_state holds one state byte per record of data_00BA0D.\nOut: lairs_left = lairs of this location not yet released; per record: SpawnLairActor, or tile $FE (state 0) or $FF (state below 0) at record (+C, +D) in the BG1 page $7E8000 (and the BG2 page $7EC000 when record +8 is non-zero). M = 8 on return.\nClobbers: A, X, Y, dp$16, dp$18 (and what lib_map_index_helpers.code_0272B8 and SpawnLairActor use).",
+      "ApplyFlagMapPatches": "Applies the permanent map changes whose event flag is set.\n\nWhen: every scene change, from code_0279B5, after ApplyLairStatesToScene.\nSees: opened doors and passages stay open after the player reopens the area.\nWhy: the rooms are rebuilt from the ROM at every scene change, so each change an event flag stands for must be replayed.\nIn: JSL; M = 8, X 16-bit; FlagMapPatchTable (9-byte rows, $FF terminator), location_id, event_flags.\nOut: per row of this location whose event flag (bit number = the row's word) is set: release_rect_x/y/w/h = the destination rectangle, dp$16 / dp$18 = the staging position in pixels, CopyMapRectFromStaging copies the BG1 ids and the type bytes.\nClobbers: A, Y (loaded with $1A5E), dp$16, dp$18, dp$0E, dp$10, release_rect_x/y/w/h; X is restored per row.",
+      "LookupSceneVariant": "Looks for a switch row that forces the music variant of this location.\n\nWhen: ApplySceneProfile, when scene_variant is still 0 after the actors had their chance to set it.\nSees: the music of a boss room before the boss switch, and the music of the rest of the world after it (the likely story, OQ-I011-5).\nWhy: the boss and post-boss music of a world depend on a switch, not on the room.\nIn: JSL; M = 8, X 16-bit; data_00F99A rows of 4 bytes (location, switch word, variant; a first byte of $80 or more ends the table), the switch bit array at $1ADE.\nOut: carry set and scene_variant = the row's variant when a row of this location has its switch set; carry clear otherwise.\nClobbers: A (X and Y are preserved)."
+    },
+    "comments": {
+      "71042": { "text": "lairs_left counts the records of this location that are not released", "expect": "STZ $lairs_left" },
+      "71052": { "text": "record +B = location id", "expect": "LDA $&data_00BA0D+B, Y" },
+      "71063": { "text": "state byte of the running record index X (all records count, not only this location's)", "expect": "LDA $lair_state, X" },
+      "71067": { "text": "below 0: released; 0: all monsters dead; above 0: monsters left, spawn the lair", "expect": "BMI PaintLairTile" },
+      "71124": { "text": "$FE = the release switch tile (state 0)", "expect": "LDA #$FE" },
+      "71129": { "text": "$FF = released lair: no tile, and it no longer counts", "expect": "LDA #$FF" },
+      "71134": { "text": "BG1 map page", "expect": "STA $7E8000, X" },
+      "71145": { "text": "BG2 map page, only when record +8 is non-zero", "expect": "STA $7EC000, X" },
+      "71179": { "text": "event_flags ($1A5E): the row's word is a bit number in it", "expect": "LDY #$1A5E" },
+      "71258": { "text": "copies the staging rectangle (dp$16 / dp$18, in pixels) onto release_rect_x/y/w/h", "expect": "CopyMapRectFromStaging" },
+      "71288": { "text": "switch bit array at $1ADE ($80 bytes behind event_flags)", "expect": "LDY #$1ADE" },
+      "71297": { "text": "row +3 = the variant", "expect": "LDA $&data_00F99A+3, X" }
+    }
+  },
+
+  "library/lib_banner_texts.asm": {
+    "blockNote": [
+      "Banner strings (level up, pause banner with lair counter) and the location name list (file offsets 83222-83312 and 83906-85761, SNES $02:C516-$C570 and $02:C7C2-$CF01, bank 02).",
+      "",
+      "=== MODEL ===",
+      "Level up: LevelUpText prints 'LEVEL UP !' (control code 03:24 = attribute) at BG3 offset $216 when the player gains a level (player_spells_level_up); LevelUpClearText overprints the same cells with ten blank glyphs.",
+      "Pause banner (lib_027572, once per frame from the main loop): when Start is pressed it pauses the music and, unless A is held, prints LocationBannerText: a 24x2 window at $186 and then the name of the current location, chosen by [TBL:&LocationNameList,1C6A]. The control code reads the WORD at $1C6A and uses it as the string number; $1C6B is never written, so the number is location_id (OQ-I011-11). When no_combat_scene is 0 it also prints LairCounterText: a 12x4 window at $51E with 'Monster Lair / Remaining' and two BCD digits of lairs_left converted to lair_count_bcd ($1B80). PauseCloseText erases both windows when the player resumes. The walkthrough confirms the lair count: 'the number of Monster Lairs in the area can be found by pressing the Start Button' (01-in-the-beginning.md).",
+      "",
+      "=== LOCATION NAMES ===",
+      "LocationNameList holds 128 words (the address of the name of each location id) followed by the 128 name strings, in id order. Ids without a scene profile have a name that is a single terminator byte (25-27, 35-3B, 48-4F, 5D-63, 74-77, 7E, 7F). The ids 0F-13 have a profile but an empty name (no banner). Names are centred with a [14:n] blank run and printed with the intro font, in which the apostrophe prints as a blank and the period as '-' (so the extract shows 'Leo s Paintings' and 'St- Elles Shrine').",
+      "",
+      "=== NOTES ===",
+      "- The names agree with the walkthrough and plans/doc-audit/walkthrough-crosswalk.md apart from capitalisation ('power plant', 'Shore reef of Rockbird', 'Underground lake,Lune') and the two rooms the ROM calls 'A dream 1' (ids 5A and 69, OQ-I004-14). No discrepancy row arises.",
+      "- The four Soul names (SoulOf...Text) and the menu frames lie in the same address range but belong to the menu batch (lib_menus)."
+    ],
+    "partNotes": {
+      "LevelUpText": "Prints 'LEVEL UP !' on BG3.\n\nWhen: the level-up sequence (player_spells_level_up), once per level gained.\nSees: the words LEVEL UP !\nWhy: tells the player that the level went up.\nIn: PrintTextString with Y = this string.\nOut: ten glyph cells at BG3 offset $216 with the attribute from [03:24]. [09] selects the two-row glyphs.",
+      "LevelUpClearText": "Erases the level-up banner.\n\nWhen: the level-up sequence, after the banner has been shown.\nSees: the banner disappears.\nWhy: BG3 has no background, so the cells are overprinted with a blank glyph.\nIn: PrintTextString with Y = this string.\nOut: ten blank glyphs at BG3 offset $216.",
+      "LocationBannerText": "Prints the pause banner with the name of the current location.\n\nWhen: lib_027572, when Start is pressed and A is not held.\nSees: a two-row window at the top with the name of the place ('Grass Valley highlands', 'Leo s Laboratory').\nWhy: the player can see where they are; the name is data, not code.\nIn: PrintTextString with Y = this string; location_id = the string number ([TBL] reads the word at $1C6A).\nOut: ten blanks at $216 (the cells of LevelUpText), window 24x2 at $186, then the name from LocationNameList.",
+      "LairCounterText": "Prints the Monster Lair counter of the pause banner.\n\nWhen: lib_027572, when Start is pressed, A is not held and no_combat_scene is 0.\nSees: 'Monster Lair Remaining nn': how many lairs are left to release in this area.\nWhy: the walkthrough tells the player to press Start for the count.\nIn: PrintTextString with Y = this string; lair_count_bcd ($1B80) = the two BCD digits of lairs_left.\nOut: window 12x4 at $51E with the text and the digits ([06:2,1B80]).",
+      "PauseCloseText": "Erases the pause banner windows.\n\nWhen: lib_027572, when the player resumes.\nSees: both windows vanish.\nWhy: closes the banner and the counter in one print.\nIn: PrintTextString with Y = this string.\nOut: [08:186] erases the banner window and [08:51E] the counter window.",
+      "LocationNameList": "128 words (address of each location's name) and then the 128 names.\n\nWhen: the [TBL] control code of LocationBannerText, once per pause banner.\nSees: the name of the place in the banner.\nWhy: ids are sparse, so unused ids point at a one-byte empty string.\nIn: string number = location_id ($1C6A).\nOut: the string address."
+    }
+  },
+
+  "grass_valley/front_end/gv_title_texts.asm": {
+    "blockNote": [
+      "Title screen, tile block and save slot menu strings (file offsets 80679-80772, 82294-82321 and 82864-83036, SNES $02:BB27-$BB84, $02:C176-$C191 and $02:C3B0-$C45C, bank 02).",
+      "",
+      "=== MODEL ===",
+      "TitlePushStartText and TitleCopyrightText are printed by the title actor (code_0066FC in gv_front_end, meta entry $56): the copyright block first, then 'PUSH START' at BG3 offset $4D6 ([09] = two-row glyphs). The walkthrough says the player presses Start at the title screen to reach the file selection menu. TileBlockText draws a 4x5 block of tiles at BG3 rows 11-15, columns 14-17 from the insert list entries 4-8 ([02:n]); it is printed by code_0066C6 (gv_front_end) and what it draws is not identified (OQ-I011-9).",
+      "SaveSlotMenuText draws the file selection window (DrawSaveSlotMenu in engine_title_file_select): 'Please choose a record', the column heads Name, Lev and Area, 'No1:' to 'No4:' and 'Erase record'. The four slot lines are filled in by SaveSlotLineTemplates, an 80-byte table that is really four 20-byte STRINGS, stepped by $14: [CUR:o1][02:3][CUR:o2][06:2,0450][CUR:o3][06:1,0452] and an end byte. [02:3] is the slot name (insert entry 3, $0447), [06:2,0450] the level as BCD and [06:1,0452] a word read from the save block at +$1B90, the value the file select later loads into scene_next (OQ-I011-12). The cursor offsets are $2D4, $2E8 and $2F2 for slot 1 and each next slot adds $C0.",
+      "",
+      "=== NOTES ===",
+      "- The strings use the intro font: the apostrophe prints as a blank, the period as '-'.",
+      "- SaveSlotLineTemplates is typed Binary in the extract because it is mostly control codes; it is text."
+    ],
+    "partNotes": {
+      "TitlePushStartText": "'PUSH START' on the title screen.\n\nWhen: the title actor (code_0066FC in gv_front_end), after the copyright block.\nSees: the words PUSH START at the lower middle of the title screen.\nWhy: the walkthrough: pressing Start at the title screen leads to the file selection menu.\nIn: PrintTextString with Y = this string.\nOut: two-row glyphs at BG3 offset $4D6.",
+      "TitleCopyrightText": "The three copyright lines of the title screen.\n\nWhen: the title actor, before PUSH START.\nSees: ALL RIGHTS RESERVED, COPYRIGHT 1992 QUINTET/ENIX and LICENSED BY NINTENDO, indented with [14:6] and [14:9] blank runs.\nWhy: legal text of the cartridge.\nIn: PrintTextString with Y = this string.\nOut: two-row glyphs from BG3 offset $5C0.",
+      "TileBlockText": "A 4x5 block of tiles on BG3.\n\nWhen: code_0066C6 (gv_front_end).\nSees: a picture made of tiles at BG3 rows 11-15, columns 14-17; which picture is open (OQ-I011-9).\nWhy: the insert list entries 4-8 (the ListTileBlockRow1-5 tile strings of lib_text_render) carry the tile numbers, one row each.\nIn: PrintTextString with Y = this string.\nOut: [CUR:2DC], [CUR:31C], [CUR:35C], [CUR:39C], [CUR:3DC] each followed by one insert entry ([02:4] to [02:8]).",
+      "SaveSlotMenuText": "Draws the file selection menu.\n\nWhen: DrawSaveSlotMenu (engine_title_file_select), when the file selection screen opens.\nSees: a 22x22 window with 'Please choose a record', the heads Name, Lev and Area, the four slots 'No1:' to 'No4:' and 'Erase record'.\nWhy: the slot contents are drawn separately from SaveSlotLineTemplates, so the frame and labels are fixed text.\nIn: PrintTextString with Y = this string.\nOut: window at $88 (size 22x22), the prompt at $14A, the heads at $218, $226 and $22E and the slot labels from $2CA.",
+      "SaveSlotLineTemplates": "Four 20-byte template strings for the four save slot lines.\n\nWhen: DrawSaveSlotMenu (engine_title_file_select), once per slot (stepped by $14).\nSees: on each slot line the saved name, the level and the area number.\nWhy: the text renderer already knows how to print a name, a BCD value and a word, so the line is a string of control codes.\nIn: PrintTextString with Y = the slot's template.\nOut: [CUR:o1][02:3] (the slot name at $0447), [CUR:o2][06:2,0450] (the level), [CUR:o3][06:1,0452] and the end byte; the offsets are $2D4, $2E8 and $2F2 for slot 1, plus $C0 per slot."
+    }
+  },
+
+  "grass_valley/front_end/gv_prologue_texts.asm": {
+    "blockNote": [
+      "Story narration of the intro, 14 pages (file offsets 80773-82293, SNES $02:BB85-$C175, bank 02).",
+      "",
+      "=== MODEL ===",
+      "The intro actor (code_0066FC in gv_front_end, meta entry $56) prints the pages one after the other in address order, each on its own BG3 position (the [CUR:o] at the start of the page; $240, $280 or $300 depending on the line count). After the last page it warps to scene $0A of area 0, the Mode 7 scene (OQ-I011-4). The story: the Freil Empire under King Magridd, the inventor Dr. Leo, the deal with the king of evil Deathtoll that empties the world, and the Master sending the player to revive it as a Soul Blazer.",
+      "",
+      "=== NOTES ===",
+      "- The text is printed with the intro font: the period prints as '-' and the apostrophe as a blank (the extract shows 'Dr-Leo-'). Line breaks are [N][N][N].",
+      "- The walkthrough does not quote the story; names it shares (Magridd, Leo, Deathtoll, the Master) agree. 'Freil Empire' occurs nowhere else in the project."
+    ],
+    "partNotes": {
+      "IntroPage01Text": "Intro page 1: 'Wise men tell a tale late at night of a great King destroyed by the temptation of evil.'\n\nWhen: the intro actor, first page after the title.\nSees: four lines of narration.\nWhy: sets up the story before the first scene.\nIn: PrintTextString with Y = this string; pages 2-14 (IntroPage02Text-IntroPage14Text) follow in address order and are printed in turn.\nOut: [CUR:280] and four lines separated by [N][N][N]."
+    }
+  },
+
+  "grass_valley/front_end/gv_epilogue_texts.asm": {
+    "blockNote": [
+      "Ending narration, 7 pages, and 'THE END' (file offsets 82322-82863, SNES $02:C192-$C3AF, bank 02). The staff roll string asciistring_016264 in this file is not part of A7 and is unannotated (OQ-I029-5).",
+      "",
+      "=== MODEL ===",
+      "The ending actor (code_00729D in gv_front_end, meta entry $57) prints EndingPage1Text to EndingPage7Text with a scene change between the fourth and fifth page; TheEndText is printed by code_01B508 (gv_up_above_trial_room_and_lisa_turbo_actors). The story: Grass Valley at sunset, the creatures looking at the sunset, a light ray that nobody notices, and Lisa alone, who now finds the sunset beautiful and believes she can be happy as her father turned the impossible into the possible.",
+      "",
+      "=== NOTES ===",
+      "- The ending font prints the period as ':' and the comma as '¥' (the extract shows the glyph names).",
+      "- The pages are not quoted by the walkthrough; Grass Valley and Lisa agree with it."
+    ],
+    "partNotes": {
+      "EndingPage1Text": "Ending page 1: it begins 'Grass Valley at sunset' and ends 'The restored world was beautiful'.\n\nWhen: the ending actor (code_00729D in gv_front_end), first page.\nSees: four lines of narration.\nWhy: the first of the seven ending pages; EndingPage2Text to EndingPage7Text follow in address order.\nIn: PrintTextString with Y = this string.\nOut: [CUR:240] and the lines separated by [N][N][N].",
+      "TheEndText": "'THE END'.\n\nWhen: code_01B508 (gv_up_above_trial_room_and_lisa_turbo_actors), at the end of the game.\nSees: the words THE END in two-row glyphs.\nWhy: closes the game.\nIn: PrintTextString with Y = this string.\nOut: two-row glyphs at BG3 offset $358."
+    }
+  }
+}

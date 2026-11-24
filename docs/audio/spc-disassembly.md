@@ -3,7 +3,7 @@ Code range: $400-$f46 (2887 bytes)
 Labels: 192 (92 named + 100 auto)
 ytes)
 ; Execution entry: $0400
-; Disassembled from spc_0FF14E in chunk_0FAA49.asm
+; Disassembled from SpcEngineBlock in chunk_0FAA49.asm
 
 
 EngineEntry:

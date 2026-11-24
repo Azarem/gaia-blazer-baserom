@@ -1,0 +1,44 @@
+[
+  {
+    "op": "merge",
+    "blocks": ["ms_fairy_gems_return_prompt", "w3_actor_02220D"],
+    "into": "ms_multi_area_actors",
+    "row": "W4-MS01",
+    "note": "no scene (OQ-I020-5), bank 4: the Fairy Gem return prompt (wave 1, three parts) and w3_actor_02220D (entry in rewrites.json, offset 139912 .. 139913, keyed by offset). Both are placed in more than one area of world 3 or by no single area (132 lines). The prompt uses the return-address helper of shared_actor_helpers_bank4."
+  },
+  {
+    "op": "merge",
+    "blocks": ["ms_enemy_0FC72F", "ms_enemy_0FC845", "ms_enemy_0FC8FE", "ms_enemy_0FC9BC", "ms_enemy_0FCA35", "ms_enemy_0FCBDF", "ms_enemy_0FCDBA", "ms_enemy_0FD11B", "ms_enemy_0FD1E5"],
+    "into": "ms_multi_area_enemies",
+    "row": "W4-MS02",
+    "note": "no scene, bank 1F: the nine enemy scripts that are placed in both the Mountain of Souls dungeon (0B) and Snow Mountain (0C) (1,333 lines). ms_enemy_0FC9BC uses the return-address helper code_002D67 (bank 0). ms_enemy_0FD11B is one of the two COP [9B] jump files of placement-audit 4.7, which have three explicit targets and no fall-through."
+  },
+  {
+    "op": "merge",
+    "blocks": ["w3_actor_021D14", "w3_actor_021DF8", "w3_actor_021DF9", "w3_actor_021E8F", "w3_actor_02230A", "w3_actor_02237E", "w3_actor_022457"],
+    "into": "ms_dungeon_actors",
+    "row": "W4-MS03",
+    "note": "scene mountain_of_souls_dungeon, bank 4 (309 lines)."
+  },
+  {
+    "op": "merge",
+    "blocks": ["w3_actor_021F52", "w3_actor_022007"],
+    "into": "ms_snow_mountain_actors",
+    "row": "W4-MS04",
+    "note": "scene snow_mountain, bank 4 (404 lines)."
+  },
+  {
+    "op": "merge",
+    "blocks": ["w3_actor_020000", "w3_actor_0200F5", "w3_actor_020143", "w3_actor_0201D2", "w3_actor_020237", "w3_actor_0202BA", "w3_actor_02032B", "w3_actor_020452", "w3_actor_020563", "w3_actor_020C53", "w3_actor_020CC6", "w3_actor_020EE9", "w3_actor_020F9B"],
+    "into": "ms_soul_of_mountain_house_actors_020000",
+    "row": "W4-MS05",
+    "note": "scene soul_of_mountain_house, bank 4, first half (842 lines, ROM order 020000 .. 020F9B). The area has 27 blocks and 1,674 lines, so it is cut in two by ROM order; name = first block offset. Several actors use the return-address helper engine_003005 (bank 0)."
+  },
+  {
+    "op": "merge",
+    "blocks": ["w3_actor_02100B", "w3_actor_02108F", "w3_actor_021263", "w3_actor_0212FE", "w3_actor_021455", "w3_actor_0215B1", "w3_actor_021711", "w3_actor_0217D9", "w3_actor_0218BF", "w3_actor_02195F", "w3_actor_0219CE", "w3_actor_021A4B", "w3_actor_021ACA", "w3_actor_021CB0"],
+    "into": "ms_soul_of_mountain_house_actors_02100B",
+    "row": "W4-MS06",
+    "note": "scene soul_of_mountain_house, bank 4, second half (832 lines, 02100B .. 021CB0)."
+  }
+]

@@ -1,0 +1,4 @@
+[
+  { "address": 458752, "old": "EffectAnimsE", "new": "EffectAnims", "row": "I033-T14" },
+  { "address": 491520, "old": "EffectAnimsF", "new": "MagicAnims", "row": "I033-T14" }
+]

@@ -1,0 +1,15 @@
+{
+  "_note": "I047: two part-note corrections found while writing docs/code/collision-and-physics.md. (1) mc_deck_push_zone_records_02702B said 'data, 6-byte records'; the records are 8 bytes (four tile bytes x0, x1, y0, y1, then the words dx and dy, unk16 < #16, #19, #06, #0D, #$0000, #$0001 >), as ScanPushZones steps Y by 8 (ADC #$0008) and as the WRAM map says. (2) unk16_0FA5AE said the field meaning was 'not verified in the push code'; ScanPushZones was read in I047: it compares the tile span of the hero with x0, x1, y0, y1 and stores the words at +4 and +6 into push_dx and push_dy, so the layout is confirmed statically (the behaviour in the game is still the walkthrough's statement).",
+
+  "magridds_castle/airship_dock/mc_airship_dock_actors.asm": {
+    "partNotes": {
+      "mc_deck_push_zone_records_02702B": "The push zones of the airship deck: eight records.\n\nWhen: read by ScanPushZones via push_zone_list.\nSees: rectangles x $16-$19 / y $06-$0D, $15-$17 / $0D-$14, $18-$1A / $0D-$14, $17-$18 / $10-$14, $13-$1C / $14-$1E, $13-$16 / $1E-$23, $19-$1C / $1E-$23, $16-$19 / $23-$29, all with dx = 0, dy = +1.\nWhy: the hero is moved south on the deck.\nIn: n/a (data, 8-byte records: x0, x1, y0, y1 in tiles, then the words dx and dy).\nOut: n/a.\nClobbers: n/a."
+    }
+  },
+
+  "st_elles/seabed_of_st_elles/se_seabed_of_st_elles_actors.asm": {
+    "partNotes": {
+      "unk16_0FA5AE": "The two push zones of the current: records of (tile x from, tile x to, tile y from, tile y to, push x, push y) = ($32,$7B,$0B,$16,-4,0) and ($7B,$7D,$0E,$16,-4,0), the push being a word of -4 (west) with no vertical component. The layout is the one ScanPushZones reads (8-byte records: x0, x1, y0, y1 as half-open tile spans, then the words dx and dy stored in push_dx and push_dy; confirmed by static reading, not in the emulator). FinishPlayerMove adds the -4 after a wall test."
+    }
+  }
+}

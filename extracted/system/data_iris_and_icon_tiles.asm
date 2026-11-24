@@ -1,7 +1,7 @@
 ; Iris frames and the 2x2 icon tile records (file offsets 294912-295423 and 296960-297983, SNES $09:8000-$81FF and $09:8800-$8BFF, bank 04; 512 + 1024 bytes).
 ; 
 ; === WHAT IS HERE ===
-; IrisFrames: 32 frames of 16 bytes (an 8 x 8 tile mask in 2 bits per pixel each), written one per step by the iris transition into VRAM word $4000 (RunIrisTransition in lib_scene_change_init): the iris closes (frames $1E down to 0) and opens (0 up to $1F) over about a second. IconTileRecords: 128 records of 8 bytes, one per inventory icon: 4 words of BG tilemap entries (top-left, top-right, bottom-left, bottom-right) of a 2 x 2 icon, read by DrawInventoryIcon with the item id and $7F x 8.
+; IrisFrames: 32 frames of 16 bytes (an 8 x 8 tile mask in 2 bits per pixel each), written one per step by the iris transition into VRAM word $4000 (RunIrisTransition in lib_boot_and_scene_init): the iris closes (frames $1E down to 0) and opens (0 up to $1F) over about a second. IconTileRecords: 128 records of 8 bytes, one per inventory icon: 4 words of BG tilemap entries (top-left, top-right, bottom-left, bottom-right) of a 2 x 2 icon, read by DrawInventoryIcon with the item id and $7F x 8.
 ---------------------------------------------
 
 ---------------------------------------------
@@ -9,7 +9,7 @@
 ; The 32 tile masks of the iris transition.
 ; 
 ; When: PlayTransitionIn and PlayTransitionOut, once per step of the iris (transition types $80 and up: the return trips).
-; Sees: a circle that closes in on the screen and opens again.
+; Sees: a grid of squares over the whole screen that fills in and opens into holes again (frame $00 is solid, $1F empty; the same 8 x 8 mask in every cell of the BG3 page, not one circle).
 ; Why: the iris is a tile whose shape changes every step; the shapes are data.
 ; In: n/a (data): 16 bytes per frame (2 bits per pixel), offset ((2 x type + bit 4 of iris_frame) << 8) | ((iris_frame and $0F) << 4); the type's bit 7 drops out of the 8-bit add, so only these 512 bytes are used by the shipped game.
 ; Out: the frame is written to VRAM word $4000 and the two sub-frames run.
@@ -53,7 +53,7 @@ IrisFrames [
 
 ; The 128 icon records of 4 tilemap words.
 ; 
-; When: DrawInventoryIcon (the equipment and item pages) and code_012390 in lib_shared_012390.
+; When: DrawInventoryIcon (the equipment and item pages) and ExpandMenuTileGroups in lib_menu_screen_setup.
 ; Sees: the inventory icons.
 ; Why: every icon is four tiles; a record per icon makes the draw routine one loop.
 ; In: n/a (data): 8 bytes per record, index = item id and $7F: four words: top-left, top-right, bottom-left, bottom-right (BG2 tilemap entries).

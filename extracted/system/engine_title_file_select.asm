@@ -4,15 +4,15 @@
 ; HandleVBlank calls UpdateTitleMode7 on every NMI, after FlushVramWriteQueue (engine_vblank_nmi). It acts only when location_id is $10 and returns at once otherwise. The Mode 7 state lives in WRAM: centre m7x_shadow/m7y_shadow ($046A, $046C), scale m7_scale ($0480, written by gv_front_end) and angle m7_angle ($047E, an 8-bit table index; nothing in extracted/ writes it, so the angle is 0 unless a block copy sets it, OQ-I024-4). BuildRotationMatrix builds A = scale * cos, B = scale * sin, C = -scale * sin and D = scale * cos with the PPU multiplier (Mode7Multiply16x8: M7A, a 16-bit scale, times the signed table byte in M7B; the product's middle and high bytes MPYM/MPYH are the result); the tables are SineTableTail (cos) and SineTable (sin), $40 entries apart, a quarter turn of 256 steps. The results go to m7_matrix_a-d ($0476-$047C). WriteMode7Matrix then writes the shadows (m7a_shadow-m7d_shadow, m7x_shadow, m7y_shadow, $046E-$0474 and $046A-$046C) to M7A-M7D, M7X and M7Y (each write-twice register gets the low byte, then the high byte), and UpdateTitleMode7 copies the new matrix into the shadows, so the PPU always shows the matrix of the previous NMI. RefreshTitleMatrixAlt and BuildRotationMatrixAlt (an alternative matrix routine) have no caller (OQ-I006-6).
 ; 
 ; === FILE SELECT ===
-; EnterFileSelect is reached by BRL from gv_front_end. It calls lib_01232B.code_01232B, draws the menu and continues in HandleFileSelectChoice (COP 1B). DrawSaveSlotMenu prints the heading (gv_title_texts.SaveSlotMenuText), then checks the four slots at $700000 + n * $400: lib_save_system.ComputeSlotChecksum computes the checksum of the slot into dp$16/$18 and compares it with the words at +$3FA and +$3FC. A valid main block is copied over its backup mirror at +$1000 ($3FE bytes, MVN); an invalid one is restored from the backup and checked again; a slot that is valid in neither is not listed. For every listed slot the menu line is filled from the save block ($1B92 + offset: five fields into $0447-$044E, $1B6A + offset into $0450, $1B90 + offset into $0452) and printed with lib_text_render.PrintTextString. If no slot is valid the last-used slot word $701FFE is set to 0. HandleFileSelectChoice starts the cursor at $701FFE (slot 0-3, else 0), asks lib_0118FC_part2.ChooseMenuRowAtTable, and treats an answer of 4 as a second prompt (probably erase: it stores the slot offset into the first word of the main and backup blocks and switches the palette word $7F0006 from $7FFF to $03FF while it runs, OQ-I024-5). Any slot 0-3 is stored in save_slot, loaded with lib_save_system.LoadGameFromSlot and the game warps: scene_next = 1 when the load reports carry (inferred: no valid save, a new game) or the word at $1B90 of the loaded save otherwise, with warp_dest_anim = 1 and the player at x $70, y $60.
+; EnterFileSelect is reached by BRL from gv_obj_title_and_prologue_0066FC (gv_front_end) when the title scene has been reloaded after Start (gv_obj_title_start_button_006B61 sets file_select_request). It calls lib_menu_screen_setup.SetupMenuBg2Screen, draws the menu and continues in HandleFileSelectChoice (COP 1B). DrawSaveSlotMenu prints the heading (gv_title_texts.SaveSlotMenuText), then checks the four slots at $700000 + n * $400: lib_save_system.ComputeSlotChecksum computes the checksum of the slot into dp$16/$18 and compares it with the words at +$3FA and +$3FC. A valid main block is copied over its backup mirror at +$1000 ($3FE bytes, MVN); an invalid one is restored from the backup and checked again; a slot that is valid in neither is not listed. For every listed slot the menu line is filled from the save block ($1B92 + offset: five word loads into $0447-$044F (the last overlaps the fourth: eight letters and the terminator of a full name), $1B6A + offset into $0450, $1B90 + offset into $0452) and printed with lib_text_render.PrintTextString. If no slot is valid the last-used slot word $701FFE is set to 0. HandleFileSelectChoice starts the cursor at $701FFE (slot 0-3, else 0), asks lib_choice_menus.ChooseMenuRowAtTable, and treats an answer of 4, the fifth row 'Erase record' of SaveSlotMenuText (its cursor cell $05CA is TitleMenuCursorOffsets[4]), as a second prompt for the slot to erase: it stores the slot offset into the first word of the main and backup blocks, which makes both checksums fail so that the slot is no longer listed (the data stay in SRAM), and switches the palette word $7F0006 from $7FFF to $03FF while it runs (runtime check OQ-I024-5, OQ-I054-1). Any slot 0-3 is stored in save_slot, loaded with lib_save_system.LoadGameFromSlot and the game warps: scene_next = 1 when the load reports carry (no valid save: a new game; the walkthrough says 'Opt for an empty file to begin', runtime check OQ-I024-5) or the word at $1B90 of the loaded save otherwise, with warp_dest_anim = 1 and the player at x $70, y $60.
 ---------------------------------------------
 
 ?BANK 00
 
 ?INCLUDE 'data_engine_tables'
 ?INCLUDE 'gv_title_texts'
-?INCLUDE 'lib_0118FC_part2'
-?INCLUDE 'lib_01232B'
+?INCLUDE 'lib_choice_menus'
+?INCLUDE 'lib_menu_screen_setup'
 ?INCLUDE 'lib_save_system'
 ?INCLUDE 'lib_text_render'
 
@@ -241,15 +241,15 @@ Mode7Multiply16x8 {
 
 ; Opens the save-slot menu from the title.
 ; 
-; When: BRL from gv_front_end when the player chooses to load.
+; When: BRL from gv_obj_title_and_prologue_0066FC (gv_front_end) when the title scene was reloaded after Start (file_select_request = 1).
 ; Sees: the list of saved games.
 ; Why: the menu is one actor step; the choice is handled one frame later.
-; In: X = title actor. Out: lib_01232B.code_01232B, DrawSaveSlotMenu, then COP 1B continues at HandleFileSelectChoice after one frame.
+; In: X = title actor. Out: lib_menu_screen_setup.SetupMenuBg2Screen, DrawSaveSlotMenu, then COP 1B continues at HandleFileSelectChoice after one frame.
 ; Clobbers: A, Y; X restored.
 
   EnterFileSelect:
     PHX 
-    JSL $@lib_01232B.code_01232B
+    JSL $@lib_menu_screen_setup.SetupMenuBg2Screen
     JSR $&DrawSaveSlotMenu
     PLX 
     COP [1B] ( &HandleFileSelectChoice, #$0001 )
@@ -259,9 +259,9 @@ Mode7Multiply16x8 {
 ; Reads the slot choice and starts the game from the chosen slot.
 ; 
 ; When: one frame after EnterFileSelect, and again after each pass of the second prompt.
-; Sees: a cursor on the last used slot; picking a slot starts the game at the start position (x $70, y $60); the second prompt turns the palette word $7F0006 to $03FF.
+; Sees: a cursor on the last used slot; picking a slot starts the game on the arrival tile (x $70, y $60) of the saved world's shrine, or of the first shrine for an empty slot; the fifth row, Erase record, turns the palette word $7F0006 to $03FF (white to yellow) while it asks for the slot to erase.
 ; Why: slot loading and the second prompt are one routine so the menu can redraw between them.
-; In: $701FFE = last slot. Out: save_slot = choice, lib_save_system.LoadGameFromSlot loads it, scene_next = 1 (carry: inferred new game) or the word $1B90, warp_dest_anim = 1, warp_dest_x = $70, warp_dest_y = $60, $0445 = 0, $0454 + 1, COP 91. Prompt answer 4 (probably erase, OQ-I024-5): the slot offset is written to the first word of the main and backup blocks and the menu is redrawn.
+; In: $701FFE = last slot. Out: save_slot = choice, lib_save_system.LoadGameFromSlot loads it, scene_next = 1 (carry: no valid save, a new game) or the word $1B90, warp_dest_anim = 1, warp_dest_x = $70, warp_dest_y = $60, $0445 = 0, $0454 + 1, COP 91. Prompt answer 4 ('Erase record'): the next answer picks the slot whose first word, in the main and in the backup block, is overwritten with the slot offset; both checksums then fail, so the slot is not listed when the menu is redrawn (OQ-I024-5, OQ-I054-1).
 ; Clobbers: A, X, Y; X restored (PHX/PLX).
 
 HandleFileSelectChoice {
@@ -281,7 +281,7 @@ HandleFileSelectChoice {
     LDA #$0005
 
   loc_006CE7:
-    JSL $@lib_0118FC_part2.ChooseMenuRowAtTable ; Menu choice: carry set asks again from slot 0; an answer of 4 opens the second prompt (probably erase, OQ-I024-5)
+    JSL $@lib_choice_menus.ChooseMenuRowAtTable ; Menu choice: carry set asks again from slot 0; an answer of 4 (the row 'Erase record') opens the second prompt, the slot to erase
     BCS loc_006CE4
     AND #$00FF
     CMP #$0004
@@ -289,14 +289,14 @@ HandleFileSelectChoice {
     LDA #$03FF
     STA $7F0006           ; $7F0006 = cgram_buffer + 6 (colour 3) = $03FF while the second prompt runs, $7FFF again afterwards
     LDA #$0004
-    JSL $@lib_0118FC_part2.ChooseMenuRowAtTable
+    JSL $@lib_choice_menus.ChooseMenuRowAtTable
     BCS loc_006D14
     AND #$00FF
     XBA 
     ASL 
     ASL 
     TAX 
-    STA $700000, X        ; Slot offset (slot x $400) stored over the first word of the slot and of its backup at +$1000
+    STA $700000, X        ; Erase: the slot offset (slot x $400) is stored over the first word of the slot and of its backup at +$1000, so neither checksum matches any more
     STA $701000, X
 
   loc_006D14:
@@ -307,7 +307,7 @@ HandleFileSelectChoice {
 
   loc_006D20:
     STA $save_slot        ; Chosen slot 0-3
-    JSL $@lib_save_system.LoadGameFromSlot ; Load the chosen slot (lib_save_system); carry set is treated below as 'no valid save' (inferred)
+    JSL $@lib_save_system.LoadGameFromSlot ; Load the chosen slot (lib_save_system); carry set is treated below as 'no valid save', a new game
     PLX 
     LDA #$0001
     BCS loc_006D30        ; Carry set: scene_next = 1, else the word at $1B90 of the loaded save

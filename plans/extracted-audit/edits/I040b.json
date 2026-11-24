@@ -1,0 +1,67 @@
+{
+  "world_of_evil/evil_world/we_evil_world_actors.asm": {
+    "blockNote": [
+      "The scene scripts of the three outdoor areas of the World of Evil: the Phoenix-call scene, the Dazzling Space hazard and two BG2 scroll effects (file offsets 126573-126660 and 126666-127310, SNES $03:EE6D-$03:EEC4 and $03:EECA-$03:F14E, bank 03; asciistring_01EEC5 of w6_actor_01EC4B lies between the two ranges). Scenes A14S01 (location $79), A14S02 ($7A) and A14S03 ($7B, the 'Dazzling Space'). Walkthrough chapter: docs/walkthrough/08-world-of-evil.md ('Sorry, the game doesn't give any clever names for these areas except the \"Dazzling Space\" zone later on').",
+      "",
+      "=== WHAT RUNS HERE ===",
+      "Every script is a scene actor placed at tile (0,0) (MetaWorldOfEvil, rows of PlacementA14S01-03):",
+      "- Type $06 we_fx_bg2_hofs_wave_01EEF3, row ;05 of A14S01 and A14S02: a sine wave on BG2's horizontal scroll, HDMA register $0F, 4 groups of 64 lines (the BG2 parallax is half of BG1's scroll).",
+      "- Type $07 we_fx_bg2_vofs_wobble_01F063, row ;06 of A14S03: a small wobble on BG2's vertical scroll, HDMA register $10, 7 groups of 32 lines, and a constant diagonal drift of the BG2 offsets.",
+      "- Type $04 we_obj_dazzling_space_hazard_01EECA, row ;04 of A14S03 only: a palette-cycle actor (meta animation list $37 of PaletteAnimLists, then $4F) that also hurts the hero by 1 HP every 8 frames unless Soul Armor (item $10) is equipped or the Phoenix has been called (flag $0A01). The walkthrough's Soul Armor and Soul Blade advice for the final battle ('If you equip SoulBlade and Soul Armor the Phoenix will be able to help you', said by the King of the Soul of Mountain House) is the context.",
+      "- Type $14 we_obj_phoenix_call_scene_01EE6D, row ;15 of A14S03 (flags $01): the scene shown after the Phoenix is called in the Soul of Mountain House (the King sets $0A01 and sends the hero here at pixel ($00F8,$0128)); it moves the camera north, then returns the hero to the house.",
+      "- Types $01, $02, $03 and $05 of the same rows run the shared palette tick shared_actor_helpers_bank0.code_0029E8 (animation banks $03, $34, $35, $38) and are not in this file.",
+      "",
+      "=== THE HDMA EFFECTS ===",
+      "Both build their table in WRAM $7E7800 on the first frame (COP 91 then sets the re-entry point after the set-up) and queue it every frame through lib_system_helpers.QueueHdmaIndirect (A low = indirect bank $7E, A high = PPU register low byte, Y = $7800). Entries are repeat-mode groups ($C0 = 64 lines, $A0 = 32 lines) that all point at the same data row $7E7900, filled every frame with one word per scanline.",
+      "- Wave (type $06): word = scroll_bg1_x / 2 + we_data_bg2_hofs_wave_table_01EF63[((frame_counter / 4 + scroll_bg1_y / 2) & $3F) + line]. The table is two periods of a sine with amplitude $20 (128 words), so the window of 64 words never runs off its end.",
+      "- Wobble (type $07): word = scroll_bg2_y + we_data_bg2_vofs_wobble_table_01F0CF[((frame_counter / 4 + scroll_bg2_y) & $1F) + line], amplitude 4 (64 words, two periods of 32). Each frame it also does DEC bg2_offset_x and INC bg2_offset_y.",
+      "",
+      "=== OPEN ===",
+      "Which actors the Phoenix-call scene parks (slots $0C, $0D, $10 and $11 are the nearest Wall Tiles and pop-up turrets of A14S03 by the row numbers) and what appears while the camera moves north (the Master says 'the palace of Deathtoll will appear', the Phoenix says 'Deathtoll moved into position') are open (OQ-I040-5). What animations $37 and $4F draw is open (OQ-I033-11)."
+    ],
+    "partNotes": {
+      "we_obj_phoenix_call_scene_01EE6D": "The scene after the Phoenix call: the camera runs north while the hero is hidden.\n\nWhen: placement script (meta type $14, row ;15 of A14S03, flags $01); COP 07 with operand $0A01 (bit 15 clear) jumps when the flag is clear to we_obj_phoenix_call_not_called_01EEC2.\nSees: with flag $0A01 set: the pad is blocked ($FF80), the actor is put at pixel ($00F8,$0138), slots $0C, $0D, $10 and $11 are moved to tile (0,1) (COP 11), COP 34 hides the player actors, 3 frames, sound BRK $86, then 250 frames in which the actor's y and the hero's y both drop by 1 per frame (the camera follows the hero, so the view moves north by 250 px), 241 more frames, and COP 10 to the Soul of Mountain House A0AS01 at pixel ($0100,$0360).\nWhy: the Phoenix's voice says 'As soon as I was called, Deathtoll moved into position'; the Master says 'the palace of Deathtoll will appear in the World of Evil' (the pan is the shown part of that; OQ-I040-5). The King's farewell (flag $0A01 still set) follows in the house.\nIn: X = D = slot $15.\nOut: the scene change; the script never returns normally.\nClobbers: A, Y.",
+      "we_obj_phoenix_call_not_called_01EEC2": "The idle branch of the Phoenix-call actor.\n\nWhen: flag $0A01 is clear (every normal visit of A14S03).\nSees: COP 86.\nWhy: the scene exists only for the call.\nIn: X = D = slot $15.\nOut: the actor ends.\nClobbers: none.",
+      "we_obj_dazzling_space_hazard_01EECA": "The Dazzling Space: a palette cycle that hurts without Soul Armor.\n\nWhen: placement script (meta type $04, row ;04 of A14S03); runs from the scene load.\nSees: animation $37 of PaletteAnimLists started and ticked (COP 92 / COP 94), then a loop of 96 frames (COP 03 #60 / COP 04): flag $0A01 set (the Phoenix called) or item $10 (Soul Armor) equipped: nothing; otherwise we_obj_dazzling_space_hazard_damage_01EEDF. After the loop animation $4F is started and ticked and everything starts again.\nWhy: the walkthrough: you need the Soul Armor in the Dazzling Space; the type is the area's own hazard (the walkthrough does not describe the damage, OQ-I040-6).\nIn: X = D = slot $04.\nOut: loops for ever.\nClobbers: A.",
+      "we_obj_dazzling_space_hazard_damage_01EEDF": "The damage tick of the hazard.\n\nWhen: Soul Armor not equipped and flag $0A01 clear, once per frame of the 96-frame loop.\nSees: frame_counter & 7: only every 8th frame COP 39 with 1 (the hero loses 1 HP and gets the hit reaction).\nWhy: the cost of walking the Dazzling Space without the armor.\nIn: X = D = slot $04.\nOut: falls through to we_obj_dazzling_space_hazard_next_01EEEA.\nClobbers: A.",
+      "we_obj_dazzling_space_hazard_next_01EEEA": "The loop end of the hazard: COP 04, then the second animation.\n\nWhen: every frame of the loop (all branches land here).\nSees: COP 04 repeats the loop until its 96 counts are used; then COP 92 / COP 94 start animation $4F and the script restarts at we_obj_dazzling_space_hazard_01EECA.\nWhy: alternates the two palette-cycle lists every 96 frames.\nIn: X = D = slot $04.\nOut: yields (COP 04) or loops.\nClobbers: A.",
+      "we_fx_bg2_hofs_wave_01EEF3": "The BG2 horizontal wave of the first two areas.\n\nWhen: placement script (meta type $06, row ;05 of A14S01 and A14S02).\nSees: first frame: four HDMA entries ($C0 = 64 lines each, all pointing at $7E7900) and the end byte in $7E7800, then COP 91. Every frame: $16 = scroll_bg1_x / 2, $18 = scroll_bg1_y / 2, index = ((frame_counter / 4 + $18) & $3F) * 2 into we_data_bg2_hofs_wave_table_01EF63, 64 words are copied plus $16 into $7E7900, and QueueHdmaIndirect is called for register $0F (BG2HOFS).\nWhy: the rippling backdrop of the World of Evil; BG2 scrolls at half the speed of BG1.\nIn: X = D = the actor slot.\nOut: RTL each frame; $16, $18 and the HDMA table are written (DP $16 / $18 are scratch).\nClobbers: A, Y (X and the data bank are restored).",
+      "we_data_bg2_hofs_wave_table_01EF63": "128 signed words: two periods of a sine of amplitude 32 (0, 3, 6, ... $20 ... 0, -3 ... -$20 ... 0), added to the BG2 horizontal scroll per scanline by we_fx_bg2_hofs_wave_01EEF3.",
+      "we_fx_bg2_vofs_wobble_01F063": "The BG2 vertical wobble of the Dazzling Space.\n\nWhen: placement script (meta type $07, row ;06 of A14S03).\nSees: first frame: seven HDMA entries ($A0 = 32 lines each, all pointing at $7E7900), then COP 91. Every frame: DEC bg2_offset_x, INC bg2_offset_y (the BG2 offsets drift diagonally), index = ((frame_counter / 4 + scroll_bg2_y) & $1F) * 2 into we_data_bg2_vofs_wobble_table_01F0CF, 32 words plus scroll_bg2_y are copied into $7E7900 and QueueHdmaIndirect is called for register $10 (BG2VOFS).\nWhy: the shimmer of the Dazzling Space backdrop.\nIn: X = D = the actor slot.\nOut: RTL each frame; bg2_offset_x and bg2_offset_y change.\nClobbers: A, Y (X and the data bank are restored).",
+      "we_data_bg2_vofs_wobble_table_01F0CF": "64 signed words: two periods of a sine of amplitude 4 (0, 1, 2, 2, 3, 3, 4 ... -4 ... 0), added to the BG2 vertical scroll per scanline by we_fx_bg2_vofs_wobble_01F063."
+    },
+    "comments": {
+      "126573": { "text": "operand $0A01 has bit 15 clear: jumps when the Phoenix is NOT called, to the idle branch", "expect": "#$0A01" },
+      "126597": { "text": "moves slot $0C to tile (0,1); slots $0D, $10 and $11 follow: the four actors nearest the arrival point are parked", "expect": "COP [11] ( #0C" },
+      "126617": { "text": "hides the player actors; the camera still follows the hero's y", "expect": "COP [34]" },
+      "126626": { "text": "250 frames: the actor's y and the hero's y drop by 1 per frame, the view runs north", "expect": "COP [03] ( #FA )" },
+      "126649": { "text": "scene change to A0AS01 (Soul of Mountain House) at pixel ($0100,$0360); the King's farewell follows", "expect": "COP [10]" },
+      "126674": { "text": "bit 15 set: jumps when flag $0A01 is set: no damage while the Phoenix has been called", "expect": "#$8A01" },
+      "126680": { "text": "item $10 = Soul Armor: jumps to the damage tick when it is NOT equipped", "expect": "COP [19]" },
+      "126695": { "text": "1 HP of damage every 8th frame", "expect": "COP [39]" },
+      "126811": { "text": "register $0F = BG2HOFS, indirect table in bank $7E at $7800", "expect": "QueueHdmaIndirect" },
+      "127175": { "text": "register $10 = BG2VOFS, indirect table in bank $7E at $7800", "expect": "QueueHdmaIndirect" }
+    }
+  },
+  "world_of_evil/deathtolls_shrine/w6_actor_01F14F.asm": {
+    "blockNote": [
+      "The band shear of Deathtoll's final-battle room (file offsets 127311-127481, SNES $03:F14F-$03:F1F9, bank 03). MetaWorldOfEvil type $08, placed in A15S02 (location $7D) at tile (0,0), row ;01, next to the Demon (row ;02). Walkthrough chapter: docs/walkthrough/08-world-of-evil.md ('FINAL BOSS, PART TWO - Deathtoll the Demon').",
+      "",
+      "=== WHAT RUNS HERE ===",
+      "One actor, we_fx_battle_bg2_hofs_bands_01F14F. First frame: 12 direct HDMA bands at $7E7800 (3 bytes each: line count and a word), heights 6, 8, 10, 6, 9, $10, $10, $10, $11, $18, $20 and $10 lines (176 lines in all, end byte 0), then COP 91. Every frame: an accumulator starts at frame_counter * 8; for each band the previous accumulator, bytes swapped, becomes the band's BG2 horizontal scroll word and the accumulator grows by (frame_counter * 8) * band height, a product taken from the hardware multiplier (M7A = accumulator base, M7B = height, result MPYL). QueueHdmaDirect then sends the bands to register $0F (BG2HOFS) from bank $7E, table $7800.",
+      "The speed of a band grows with the summed height of the bands above it, so the lower bands slide faster, like a floor in perspective (inferred from the arithmetic; the picture was not checked, OQ-I040-8).",
+      "",
+      "=== OPEN ===",
+      "The swap puts the accumulator's low byte into the high byte of the scroll word, so its low two bits end up in the scroll's upper bits; whether that is intended is open (OQ-I040-8)."
+    ],
+    "partNotes": {
+      "we_fx_battle_bg2_hofs_bands_01F14F": "The BG2 band shear behind the final battle.\n\nWhen: placement script (meta type $08, row ;01 of A15S02); runs from the scene load.\nSees: the 12 band heights written to $7E7800 once, then COP 91; each frame the 12 band words are rebuilt from frame_counter * 8 with the multiplier (M7A / M7B / MPYL) and QueueHdmaDirect is called with register $0F (BG2HOFS), bank $7E, table $7800.\nWhy: the moving backdrop of Deathtoll's room.\nIn: X = D = slot $01 (X is saved and restored around the loops).\nOut: RTL each frame; DP $00 holds frame_counter * 8; M7A, M7B and the HDMA table are written.\nClobbers: A, Y."
+    },
+    "comments": {
+      "127318": { "text": "band heights in lines: 6, 8, 10, 6, 9, $10, $10, $10, $11, $18, $20, $10; the end byte 0 follows", "expect": "STA $7E7800, X" },
+      "127407": { "text": "the set-up above runs once; later frames resume after this COP 91", "expect": "COP [91]" },
+      "127410": { "text": "accumulator base = frame_counter * 8", "expect": "LDA $frame_counter" },
+      "127474": { "text": "register $0F = BG2HOFS, direct table in bank $7E at $7800", "expect": "QueueHdmaDirect" }
+    }
+  }
+}

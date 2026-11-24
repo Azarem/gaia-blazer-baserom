@@ -1,0 +1,18 @@
+[
+  { "address": 131072, "old": "code_020000", "new": "ms_npc_grandpa_room_invite_020000", "row": "I037-A1" },
+  { "address": 131317, "old": "code_0200F5", "new": "ms_npc_grandpa_wife_magic_0200F5", "row": "I037-A1" },
+  { "address": 131395, "old": "code_020143", "new": "ms_npc_grandma_magic_demo_020143", "row": "I037-A1" },
+  { "address": 131538, "old": "code_0201D2", "new": "ms_npc_boy_girlfriend_0201D2", "row": "I037-A1" },
+  { "address": 131639, "old": "code_020237", "new": "ms_npc_girl_new_love_020237", "row": "I037-A1" },
+  { "address": 131770, "old": "code_0202BA", "new": "ms_npc_grandpa_search_laynole_0202BA", "row": "I037-A1" },
+  { "address": 131883, "old": "code_02032B", "new": "ms_npc_grandma_phoenix_east_02032B", "row": "I037-A1" },
+  { "address": 132165, "old": "code_020445", "new": "ms_effect_phoenix_flame_020445", "row": "I037-A1" },
+  { "address": 132178, "old": "code_020452", "new": "ms_npc_grandma_phoenix_west_020452", "row": "I037-A1" },
+  { "address": 132451, "old": "code_020563", "new": "ms_npc_king_phoenix_020563", "row": "I037-A1" },
+  { "address": 132735, "old": "code_02067F", "new": "ms_obj_king_return_heal_02067F", "row": "I037-A1" },
+  { "address": 134227, "old": "code_020C53", "new": "ms_npc_mushroom_dream_secret_020C53", "row": "I037-A1" },
+  { "address": 134342, "old": "code_020CC6", "new": "ms_npc_boy_mushroom_shoes_020CC6", "row": "I037-A1" },
+  { "address": 134501, "old": "code_020D65", "new": "ms_obj_boy_hooray_scene_020D65", "row": "I037-A1" },
+  { "address": 134889, "old": "code_020EE9", "new": "ms_npc_snail_vehicle_020EE9", "row": "I037-A1" },
+  { "address": 135067, "old": "code_020F9B", "new": "ms_npc_mushroom_dream_rod_020F9B", "row": "I037-A1" }
+]

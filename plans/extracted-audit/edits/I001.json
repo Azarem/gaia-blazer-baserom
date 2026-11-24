@@ -1,0 +1,77 @@
+{
+  "_note": "Pass 4 iteration I001: the COP script system (dispatcher, tables, exit chain, flag/slot helpers). Facts come from the extracted asm; full reference in docs/cop/index.md.",
+  "system/engine_00561E.asm": {
+    "blockNote": [
+      "COP dispatcher and command tables.",
+      "",
+      "The COP instruction runs actor scripts. native_mode_cop_00561E takes the actor slot from X (TXY), builds the script pointer in DP $38/$3A from the pushed return address (bank byte from $04,S, address $02,S minus 1, so the pointer starts on the COP signature byte), reads the command id, advances $38 and jumps through the word table at code_list_005638 indexed by id*2.",
+      "",
+      "The table has three extracted parts: code_list_005638 (ids 00-3C), cop_junk (ids 3D-7F, filler words, no handlers) and code_list_005738 (ids 80-B2). The ids 0E, 0F, 2C and 2D have no handler (#$0000).",
+      "",
+      "Each handler is a Cop<ID>_<Name> label in extracted/cop_handlers; it ends by jumping into the exit chain in cop_handler_006473. Reference: docs/cop/index.md."
+    ],
+    "partNotes": {
+      "native_mode_cop_00561E": "Native-mode COP vector. In: X = actor slot (copied to Y), stack = return address of the COP instruction. Sets $3A (script bank) and $38 (script pointer at the command id), reads the id, advances $38 and dispatches through code_list_005638,X.",
+      "code_list_005638": "Handler words for command ids 00-3C, indexed id*2. Ids 0E, 0F, 2C and 2D are #$0000 (undefined).",
+      "cop_junk": "Filler words (#$0000 or #$FFFF) that cover command ids 3D-7F so that code_list_005738 starts at id 80 (code_list_005638 + $100). No handler.",
+      "code_list_005738": "Handler words for command ids 80-B2 (id = $80 + index)."
+    }
+  },
+  "cop_handlers/cop_handler_006473.asm": {
+    "blockNote": [
+      "CopB2_SpawnBeforeRelative and the exit chain shared by every COP handler.",
+      "",
+      "The chain (loc_0064B5 .. loc_0064C9) is entered by BRL from the other handlers: loc_0064B5 skips 5 operand bytes, loc_0064B7 skips 4, loc_0064B9 skips 3, loc_0064BB skips 2, loc_0064BD skips 1, loc_0064BF skips none. They fall through to loc_0064C1, which writes A over the return address on the stack ($02,S) and returns with RTI, so the script continues at A (for a jump, A is the target). loc_0064C4 stores $38 as the actor's resume pointer ($18,X) and falls into loc_0064C9, which pops the COP frame and returns with RTL (yield to the actor loop)."
+    ],
+    "partNotes": {
+      "loc_0064B5": "Skip 5 operand bytes (falls through the INC chain to loc_0064BF).",
+      "loc_0064B7": "Skip 4 operand bytes.",
+      "loc_0064B9": "Skip 3 operand bytes.",
+      "loc_0064BB": "Skip 2 operand bytes (a not-taken jump with one &Code operand).",
+      "loc_0064BD": "Skip 1 operand byte.",
+      "loc_0064BF": "Continue at the script pointer: A = $38.",
+      "loc_0064C1": "A = new script pointer (jump target or $38). Replaces the return address on the stack and returns with RTI.",
+      "loc_0064C4": "Save $38 as the actor's resume pointer ($18,X), then yield.",
+      "loc_0064C9": "Yield: PLA PLA RTL back to the actor loop. The script resumes next time from $18,X/$36,X."
+    }
+  },
+  "system/engine_0064F8.asm": {
+    "blockNote": [
+      "Event-flag and inventory lookups used by the COP flag, wait and inventory commands.",
+      "",
+      "Event flags are a bit array at $1A5E. A flag word has the bit number (0-7) in its low byte and the byte index in bits 8-14; bit 15 is a command-specific sense bit (Cop05_WaitFlag, Cop09_SetOrClearFlag). The inventory/progress bytes are at $1B1E (entry n at $1B1E + n - 1, bit 7 = flag, bits 0-6 = value)."
+    ],
+    "partNotes": {
+      "code_0064F8": "Test an event flag. In: A = flag word. Out: carry set when the flag bit is set, clear otherwise. Preserves X.",
+      "binary_006516": "Bit masks $01..$80 indexed by the low byte of a flag word.",
+      "code_00651E": "Look up an inventory/progress entry. In: A (8-bit) = entry number (1-based). Out: carry set and A preserved when the value bits (0-6) are zero; carry clear and A = the whole $1B1E byte when they are not."
+    }
+  },
+  "library/lib_0109D6_part3.asm": {
+    "partNotes": {
+      "code_0120F9": "Store an entry number into the inventory/progress table $1B1E (entry n at $1B1E + n - 1). In: A (8-bit) = entry number. Entries below $19: the byte is overwritten with n. Others: bit 7 of the old byte is kept and n is ORed in; when bit 7 is set the value goes to $1B64 too; when the old value was $38, $043B = $1B8A - $1B88 is recomputed. Called by Cop0A_SetInventoryIfEmpty."
+    }
+  },
+  "cop_handlers/cop_handler_005867_part2.asm": {
+    "partNotes": {
+      "code_0064CC": "Set or clear an event flag. In: A = flag word (low byte = bit number 0-7, bits 8-14 = byte index into $1A5E, bit 15 set = set the bit, clear = clear it). Preserves X."
+    }
+  },
+  "system/engine_0065A7.asm": {
+    "blockNote": [
+      "Actor-slot and collision helpers for the COP handlers.",
+      "",
+      "Actor slots are 0x40 bytes wide from $0800. Actors are in a doubly linked list ($3C = next, $3E = previous; heads $06A6 and $06A8). Free slots are kept on a stack addressed by $4A (word entries; a taken entry is zeroed). The spawn helpers link a new actor after (code_00663A) or before (code_006662) the caller and clone the caller's first $3C bytes into it (code_0066A3)."
+    ],
+    "partNotes": {
+      "code_0065A7": "Clear the collision footprint of the actor at X: for every tile under its box (widths $10/$12) the low byte of the entry in the collision buffer $7F8000 is zeroed. Uses lib_027462 to turn the position into a buffer offset. Counterpart of Cop15_BlockOwnTiles, which ORs $F0 into the same entries.",
+      "code_006617": "Convert a slot number to a slot address. In: A (8-bit) = slot number. Out: Y = $0800 + number * $40.",
+      "code_006628": "Tile number to pixel coordinate: A = A * 16.",
+      "code_00662D": "Register the actor X in the table $7F0483 at index A (word entries). Used by Cop14_JumpIfSwitchSet and Cop3B_JumpIfSwitchSetData. Preserves A and X.",
+      "code_00663A": "Spawn: take a free slot, link it AFTER the actor X, then initialise it (code_0066A3). Out: Y = new slot, carry set when no slot is free.",
+      "code_006662": "Spawn: take a free slot, link it BEFORE the actor X, then initialise it (code_0066A3). Out: Y = new slot, carry set when no slot is free.",
+      "code_00668A": "Pop a free slot from the stack at $4A. Out: Y = slot, carry clear; or carry set (Y = $06AA, a scratch slot) when the stack is empty.",
+      "code_0066A3": "Initialise a new actor Y from the caller X: copy $3C bytes (MVN), set $16 bit $2000 and clear bit $0010, zero $1A, $30 and $14."
+    }
+  }
+}

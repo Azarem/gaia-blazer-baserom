@@ -1,0 +1,218 @@
+[
+  {
+    "op": "set",
+    "blocks": [
+      "w0_actor_018000", "w0_actor_0180F7", "gv_tool_shop_woman_and_son", "w0_actor_01848A", "w0_actor_0185B9", "w0_actor_0186A2",
+      "w0_actor_01891A", "w0_actor_018A59", "w0_actor_018FF4", "w0_actor_01910C", "w0_actor_019365", "w0_actor_019475",
+      "w0_actor_019644", "w0_actor_019656", "w0_actor_019668", "w0_actor_0197DA", "w0_actor_0198A6", "w0_actor_019A2C",
+      "w0_actor_019CDE", "w0_actor_019EF4", "w0_actor_019F7A", "w0_actor_01A004", "w0_actor_01A098", "w0_actor_01A34B",
+      "w0_actor_01AA26", "w0_actor_01AB4F", "w0_actor_01AC06"
+    ],
+    "scene": "grass_valley_village",
+    "row": "W3-A01",
+    "note": "world 0, area 01: every scene that places the block and the lair location of its monster type lie in area 01 (placement-audit 5.5, recomputed on the I020 tree)."
+  },
+  {
+    "op": "set",
+    "blocks": ["w0_actor_01A440", "gv_fairy_gem_advice_return", "w0_actor_01ADF8", "w0_actor_01AE99", "w0_actor_01AF5C", "w0_actor_01B23D"],
+    "scene": "underground_castle",
+    "row": "W3-A02",
+    "note": "world 0, area 02."
+  },
+  {
+    "op": "set",
+    "blocks": ["w0_actor_01A3B0", "w0_actor_01B21A", "w0_actor_01B273"],
+    "scene": "leos_paintings",
+    "row": "W3-A03",
+    "note": "world 0, area 03."
+  },
+  {
+    "op": "set",
+    "blocks": ["w0_actor_01A7AC", "w0_actor_01B33A", "w0_actor_01B967"],
+    "scene": "up_above",
+    "row": "W3-A04",
+    "note": "world 0, area 00 (Trial Room 00/08 and the scene 00/0D with Lisa and Turbo; the area key is up_above). w0_actor_01B33A prints THE END (FM-A7), so it may belong with the ending: OQ-I020-3."
+  },
+
+  {
+    "op": "set",
+    "blocks": [
+      "w1_actor_01B98D", "w1_actor_01BB3F", "w1_actor_01BCEC", "w1_actor_01BDE5", "w1_actor_01BF32", "w1_actor_01C2F9",
+      "w1_actor_01C3CA", "w1_actor_01C57B", "w1_actor_01C8A4", "w1_actor_01C98A", "w1_actor_01CC61", "w1_actor_01CD3D",
+      "w1_actor_01CD55", "w1_actor_01CD6D", "w1_actor_01CF41", "w1_actor_01D045", "w1_actor_01D2F3", "w1_shared_01D49D",
+      "w1_actor_01D4F9", "w1_actor_01D614", "w1_actor_01D615", "w1_actor_01D6AB", "w1_actor_01D857", "w1_actor_01D8C8",
+      "w1_actor_01D98E", "w1_actor_01DB3F", "w1_actor_01DBE5", "w1_actor_01DDB7", "w1_actor_01DF73", "w1_actor_01E005",
+      "w1_actor_01E134", "w1_actor_01E1C0", "w1_actor_01E241", "w1_actor_01E2FB", "w1_actor_01E3E2", "w1_actor_01E9D3"
+    ],
+    "scene": "woods_of_greenwood",
+    "row": "W3-A05",
+    "note": "world 1, area 04. w1_shared_01D49D is a helper that no meta list names; its callers are all in area 04."
+  },
+  {
+    "op": "set",
+    "blocks": [
+      "w1_actor_01E47B", "gw_fairy_gem_return_prompt", "w1_actor_01E510", "w1_actor_01E540", "w1_actor_01E594", "w1_actor_01E5BA",
+      "w1_actor_01E62A", "gw_player_shift_north", "gw_player_shift_south", "gw_player_shift_west", "gw_player_shift_east",
+      "w1_actor_01E98D", "w1_actor_01E9C1", "w1_actor_01EAFB"
+    ],
+    "scene": "lostside_marsh",
+    "row": "W3-A06",
+    "note": "world 1, area 05. gw_player_shift_south has no placement row of its own (meta $3B is unused) but belongs to the four-block COP [27] ring and is called by COP [12] from w1_actor_01E5BA, which is placed in area 05."
+  },
+
+  {
+    "op": "set",
+    "blocks": [
+      "w2_actor_0F8000", "w2_actor_0F80A4", "w2_actor_0F8209", "w2_actor_0F82DD", "w2_actor_0F83AD", "w2_actor_0F8446",
+      "w2_actor_0F8577", "w2_actor_0F85E1", "w2_actor_0F873E", "w2_actor_0F87A9", "w2_actor_0F8850", "w2_actor_0F88CC",
+      "w2_actor_0F8941", "w2_actor_0F89CF", "w2_actor_0F8A0E", "w2_actor_0F8A7E", "w2_shared_0F8B27", "w2_actor_0F8B6A",
+      "w2_actor_0F8CCB", "w2_actor_0F8D58", "w2_actor_0F8E99", "w2_actor_0F8F45", "w2_actor_0F905C", "w2_actor_0F911E",
+      "w2_actor_0F961C", "w2_actor_0F96B9", "w2_actor_0F9793", "w2_actor_0F982F", "w2_actor_0F98F5", "w2_actor_0FA014",
+      "w2_actor_0FA7C4"
+    ],
+    "scene": "seabed_sanctuary",
+    "row": "W3-A07",
+    "note": "world 2, area 06."
+  },
+  {
+    "op": "set",
+    "blocks": [
+      "w2_actor_0F9AFD", "w2_actor_0F9B8B", "w2_actor_0F9DBE", "w2_actor_0F9ED4", "w2_actor_0F9F24", "w2_actor_0F9F74",
+      "w2_actor_0F9FC4", "w2_actor_0FA106", "w2_actor_0FA494", "w2_actor_0FA4C4", "w2_actor_0FA59C", "w2_actor_0FA64B",
+      "w2_actor_0FA874"
+    ],
+    "scene": "seabed_of_st_elles",
+    "row": "W3-A08",
+    "note": "world 2, area 07."
+  },
+  {
+    "op": "set",
+    "blocks": ["se_fairy_gem_return_prompt", "w2_actor_0FA4F4", "w2_actor_0FA5BF", "w2_actor_0FA5D6", "w2_actor_0FA7A1"],
+    "scene": "st_elles_coast",
+    "row": "W3-A09",
+    "note": "world 2, area 08."
+  },
+  {
+    "op": "set",
+    "blocks": ["w2_actor_0FA23B", "w2_actor_0FA3A5"],
+    "scene": "ghost_ship",
+    "row": "W3-A10",
+    "note": "world 2, area 09."
+  },
+
+  {
+    "op": "set",
+    "blocks": [
+      "w3_actor_020000", "w3_actor_0200F5", "w3_actor_020143", "w3_actor_0201D2", "w3_actor_020237", "w3_actor_0202BA",
+      "w3_actor_02032B", "w3_actor_020452", "w3_actor_020563", "w3_actor_020C53", "w3_actor_020CC6", "w3_actor_020EE9",
+      "w3_actor_020F9B", "w3_actor_02100B", "w3_actor_02108F", "w3_actor_021263", "w3_actor_0212FE", "w3_actor_021455",
+      "w3_actor_0215B1", "w3_actor_021711", "w3_actor_0217D9", "w3_actor_0218BF", "w3_actor_02195F", "w3_actor_0219CE",
+      "w3_actor_021A4B", "w3_actor_021ACA", "w3_actor_021CB0"
+    ],
+    "scene": "soul_of_mountain_house",
+    "row": "W3-A11",
+    "note": "world 3, area 0A."
+  },
+  {
+    "op": "set",
+    "blocks": ["w3_actor_021D14", "w3_actor_021DF8", "w3_actor_021DF9", "w3_actor_021E8F", "w3_actor_02230A", "w3_actor_02237E", "w3_actor_022457"],
+    "scene": "mountain_of_souls_dungeon",
+    "row": "W3-A12",
+    "note": "world 3, area 0B."
+  },
+  {
+    "op": "set",
+    "blocks": ["w3_actor_021F52", "w3_actor_022007"],
+    "scene": "snow_mountain",
+    "row": "W3-A13",
+    "note": "world 3, area 0C."
+  },
+
+  {
+    "op": "set",
+    "blocks": [
+      "w4_actor_022523", "w4_actor_0225C4", "w4_actor_02260D", "w4_actor_0226C0", "w4_actor_022794", "w4_actor_022886",
+      "w4_actor_02297C", "w4_actor_0229DF", "w4_actor_022AFB", "w4_actor_022B80", "w4_actor_022C7C", "w4_actor_022D05",
+      "w4_actor_022DC6", "w4_actor_022E10", "w4_actor_022F68", "w4_actor_02312F", "w4_actor_02317F", "w4_actor_023214",
+      "w4_actor_0232B3", "w4_actor_02345D", "w4_actor_0234EC", "w4_actor_0237A7", "w4_actor_02382D", "w4_actor_0238A7",
+      "w4_actor_0239BA", "w4_actor_0239F8", "w4_actor_023A36", "w4_actor_023B0B", "w4_actor_023D6B", "w4_actor_023D84"
+    ],
+    "scene": "leos_laboratory",
+    "row": "W3-A14",
+    "note": "world 4, area 0D."
+  },
+  {
+    "op": "set",
+    "blocks": ["ll_fairy_gem_return_prompt", "w4_actor_023E57", "w4_actor_023F17"],
+    "scene": "laboratory_dungeon",
+    "row": "W3-A15",
+    "note": "world 4, area 0E."
+  },
+  {
+    "op": "set",
+    "blocks": ["w4_actor_023E27", "w4_actor_023E87"],
+    "scene": "town_models",
+    "row": "W3-A16",
+    "note": "world 4, area 0F."
+  },
+
+  {
+    "op": "set",
+    "blocks": [
+      "w5_actor_023FA8", "w5_actor_024027", "w5_actor_0240E4", "w5_actor_0240E5", "w5_actor_024259", "w5_actor_024416",
+      "w5_actor_0244EF", "w5_actor_024597", "w5_actor_02488E", "w5_actor_02494A", "w5_actor_024AF4", "w5_actor_024BC8",
+      "w5_actor_024D59", "w5_actor_024E53", "w5_actor_024F4A", "w5_actor_024FD3", "w5_actor_025080", "w5_actor_02515B",
+      "w5_actor_0251DC", "w5_actor_025302", "w5_actor_0253E2", "w5_actor_0254A2", "w5_actor_025502", "w5_actor_025561",
+      "w5_actor_025AAA"
+    ],
+    "scene": "castle_of_magridd",
+    "row": "W3-A17",
+    "note": "world 5, area 10."
+  },
+  {
+    "op": "set",
+    "blocks": [
+      "w5_actor_025B1A", "w5_actor_025CA6", "mc_give_mobile_key_dr_leo", "w5_actor_026A4E", "w5_actor_026D61", "w5_actor_026D76",
+      "w5_actor_026D80", "w5_actor_026F48", "w5_actor_026F53", "w5_actor_026F57", "w5_actor_027019"
+    ],
+    "scene": "airship_dock",
+    "row": "W3-A18",
+    "note": "world 5, area 13."
+  },
+  {
+    "op": "set",
+    "blocks": ["w5_actor_0269F6", "w5_actor_026E9D", "w5_actor_026F30"],
+    "scene": "castle_dungeon",
+    "row": "W3-A19",
+    "note": "world 5, area 11."
+  },
+  {
+    "op": "set",
+    "blocks": ["w5_actor_026DD7", "w5_actor_026F44"],
+    "scene": "castle_towers",
+    "row": "W3-A20",
+    "note": "world 5, area 12."
+  },
+
+  {
+    "op": "set",
+    "blocks": ["w6_actor_01EC4B"],
+    "scene": "up_above",
+    "row": "W3-A21",
+    "note": "world 6, area 00 (scene 00/07, The Evil World Shrine; the area key is up_above)."
+  },
+  {
+    "op": "set",
+    "blocks": ["w6_actor_01EE6D", "w6_actor_01EECA", "w6_actor_01EEF3", "w6_actor_01F063"],
+    "scene": "evil_world",
+    "row": "W3-A22",
+    "note": "world 6, area 14."
+  },
+  {
+    "op": "set",
+    "blocks": ["w6_actor_01F14F"],
+    "scene": "deathtolls_shrine",
+    "row": "W3-A23",
+    "note": "world 6, area 15 (scene 15/02)."
+  }
+]

@@ -1,11 +1,11 @@
-; Hardware multiply and divide wrappers and packed BCD (file offsets 78289-78333 and 78357-78405, SNES $02:B1D1-$B1FD and $02:B215-$B245, bank 02; the neighbours code_0131FE, code_01320E and code_013246 up to file offset 78449 are not annotated yet and are outside batch A5).
+; Hardware multiply and divide wrappers and packed BCD (file offsets 78289-78333 and 78357-78405, SNES $02:B1D1-$B1FD and $02:B215-$B245, bank 02; the neighbours SignExtendByte, ArithmeticShiftRight and StepRandomState at 78334-78349, 78350-78356 and 78406-78449 have part notes of their own).
 ; 
 ; === MODEL ===
 ; Multiply8x8 and DivideWordByByte use the SNES multiplier ($4202/$4203) and divider ($4204-$4206): write the operands, wait the fixed time with NOPs and read the result. All three routines are entered by long call with M = 8 and X = 16 and have no side effects beyond A, B and the hardware registers. ByteToPackedBcd converts 0-255 to the packed BCD that the text control [06:n,addr] prints (digit bytes, least significant first).
 ; 
 ; === NOTES ===
 ; - Multiply8x8 has about 22 call sites (map streaming and sweep, scene loading, COP core, combat and spawn code, ChooseFacingAnim); DivideWordByByte only two: ChooseFacingAnim and shared_actor_helpers_bank0.
-; - docs/wram-memory-map.md names code_013246 as the generator of rng_state.
+; - docs/wram-memory-map.md names StepRandomState as the generator of rng_state.
 ---------------------------------------------
 
 ?BANK 02
@@ -73,7 +73,16 @@ DivideWordByByte {
 }
 ---------------------------------------------
 
-code_0131FE {
+; Sign-extends the byte in A.low into the 16-bit accumulator.
+; 
+; When: no call site in the extraction (OQ-I042-3).
+; Sees: n/a.
+; Why: signed bytes (velocities, offsets) are added to 16-bit positions, which needs $FF in the high byte for a negative value (inferred; no caller).
+; In: long call; any M; A.low = the byte.
+; Out: A.low unchanged, B = $FF when bit 7 of A.low is set, otherwise $00; P restored.
+; Clobbers: B.
+
+SignExtendByte {
     PHP 
     SEP #$20
     XBA 
@@ -91,7 +100,16 @@ code_0131FE {
 }
 ---------------------------------------------
 
-code_01320E {
+; Shifts A right by one bit and keeps the sign bit.
+; 
+; When: no call site in the extraction (OQ-I042-3).
+; Sees: n/a.
+; Why: LSR would turn a negative value positive; this halves a signed value (inferred; no caller).
+; In: long call; A in the current width. The routine tests the N flag as the caller left it (BMI), it does not reload A, so N must describe A.
+; Out: N set: SEC, ROR (the sign stays); N clear: LSR. Carry = the bit shifted out.
+; Clobbers: A, carry.
+
+ArithmeticShiftRight {
     BMI loc_013212
     LSR 
     RTL 
@@ -105,7 +123,7 @@ code_01320E {
 
 ; Converts a byte (0-255) to packed BCD in two bytes.
 ; 
-; When: ShowStatusAndSoulsScreen (HP and maximum HP) and the pause code (lib_027572).
+; When: ShowStatusAndSoulsScreen (HP and maximum HP) and the pause code (lib_main_loop_helpers).
 ; Sees: the status screen prints the result with [06:3,1B6C] and [06:3,1B6E], three BCD digits.
 ; Why: the text renderer prints digits from BCD bytes, not binary.
 ; In: long call; M = 8, X = 16; A = value, X = destination address (DBR-relative, WRAM).
@@ -143,7 +161,16 @@ ByteToPackedBcd {
 }
 ---------------------------------------------
 
-code_013246 {
+; Steps the 17-byte random generator and returns one random byte.
+; 
+; When: no call site in the extraction; Cop1F_StepRandom (cop_script_flow_flags) contains the same loops and is what the scripts use (OQ-I042-3).
+; Sees: n/a.
+; Why: an additive generator: it needs no multiplication and keeps its state in WRAM ($0301-$0311, rng_state).
+; In: long call; any M; X and Y are saved.
+; Out: M = 8, X = 16 inside: for X = 15 down to 1 rng_state[X] += rng_state[X+1] with the carry running through the bytes, then rng_state[$10] is incremented with the carry running up toward rng_state[1]; A (16-bit, high byte 0) = rng_state+1 ($0302); P, X and Y restored.
+; Clobbers: A.
+
+StepRandomState {
     PHX 
     PHY 
     PHP 

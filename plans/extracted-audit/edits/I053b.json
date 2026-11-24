@@ -1,0 +1,13 @@
+{
+  "_note": "I053 second spec (applied after I053.json, which is an edit spec and cannot be re-applied): the lib_player_helpers block note named ExitEquipmentMenu (the SEC/RTS return of RunEquipmentMenu) as the caller of ApplyPlayerWeaponPose; the call is in the tail of OpenEquipmentMenu.",
+  "library/lib_player_helpers.asm": {
+    "blockNote": {
+      "edit": [
+        {
+          "find": "and ExitEquipmentMenu in lib_menus, where a weapon change must show at once",
+          "with": "and the tail of OpenEquipmentMenu in lib_menus, where a weapon change must show at once"
+        }
+      ]
+    }
+  }
+}

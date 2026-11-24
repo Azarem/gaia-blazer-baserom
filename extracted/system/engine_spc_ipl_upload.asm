@@ -1,3 +1,15 @@
+; SPC700 upload code, the SPC engine block and a sine-moving actor (file offsets 1044134-1047708, SNES $1F:EEA6-$FC9C, bank 1F).
+; 
+; === SPC UPLOAD ===
+; UploadSpcDriver runs once at start-up (the boot actor of gv_front_end): it sends SpcEngineBlock with SendSpcIplBlocks (the IPL ROM boot protocol: after reset the SPC700 waits for $BBAA in APUIO0/1, then takes records of a length word, a destination word and the bytes, acknowledged by a counter in APUIO0; a record of length 0 ends the transfer and the IPL ROM jumps to its destination), waits two vblanks, writes $FF to APUIO0, sends data_spc_driver.SpcDriverBlock with UploadSpcStream and stores the SPC address after that block in $0320. UploadSpcStream is also the upload of every song (MusicLoadUpload in engine_spawn_lairs_death_drops, UploadSceneMusic in lib_scene_asset_loader): the pointer to the block list is in dp$29-$2B. The formats are decoded in docs/code/spc-interface.md: a block list is IPL records closed by a record of length 0 whose destination word is the sample count (low byte) and the first sample index (high byte), then one index byte per further sample; the samples are records of the 33-entry table at $07:8000 (OQ-I042-6).
+; 
+; === SINE WAVE MOVER ===
+; RunSineWaveMover and the labels up to StepSineSwayXMirrored (file offsets 1044134-1044411) are not upload code but an actor script that sits in front of it. CopA5_JumpByFlipState picks one of four variants by the sprite's flip bits (none, flip X, flip Y, both). Each variant waits until the actor is on screen (COP AD, operand $10), waits $78 frames, then runs seven passes of a loop (COP 03/04, one frame per pass): a trail actor (RunSineWaveMoverTrail, COP B0, flags $0200) is spawned, y moves by $30,X (plus for NoFlip and FlipY, minus for FlipX and FlipXY) and x by half of a sine sample minus 12 (StepSineSwayX; the mirrored step for FlipY and FlipXY), and $30,X grows by $10 each pass, so the actor accelerates; then the cycle starts again. The actor has no reference in the extraction (OQ-I042-5); the names describe the code only.
+; 
+; === NOTES ===
+; - SpcEngineBlock is the data part at the end: an IPL stream of one record (length $0B47 = 2887 bytes, destination $0400), the data and a closing record of length 0.
+---------------------------------------------
+
 ?BANK 1F
 
 ?INCLUDE 'data_engine_tables'
@@ -10,110 +22,259 @@
 
 ---------------------------------------------
 
-code_0FEEA6 {
-    COP [A5] ( &code_0FEEB0, &code_0FEEDF, &code_0FEF0E, &code_0FEF3D )
+; Four-way actor script: waits until on screen, then moves with growing speed and a sine sway while spawning a trail.
+; 
+; When: no reference in the extraction; it is not a meta entry script or a spawn target of any file (OQ-I042-5).
+; Sees: not located at run time.
+; Why: CopA5_JumpByFlipState picks the variant from the sprite's flip bits ($1C bits 14-15, cleared by the command): none, flip X, flip Y, both.
+; In: actor entry, X = actor slot.
+; Out: a jump to SineWaveMoverNoFlip, SineWaveMoverFlipX, SineWaveMoverFlipY or SineWaveMoverFlipXY.
+; Clobbers: A, Y.
+
+RunSineWaveMover {
+    COP [A5] ( &SineWaveMoverNoFlip, &SineWaveMoverFlipX, &SineWaveMoverFlipY, &SineWaveMoverFlipXY )
 }
 
-code_0FEEB0 {
+---------------------------------------------
+; Start of the no-flip variant: wait until on screen, then $78 frames.
+; 
+; When: RunSineWaveMover (no flip), and again at the end of every cycle (SineWaveMoverNoFlipNext).
+; Sees: n/a (see RunSineWaveMover).
+; Why: the object only moves once it can be seen.
+; In: actor entry, X = actor slot.
+; Out: COP AD (operand $10), then COP 1B to SineWaveMoverNoFlipStep after $78 frames.
+; Clobbers: A, Y.
+
+SineWaveMoverNoFlip {
     COP [AD] ( #10 )
-    COP [1B] ( &code_0FEEB9, #$0078 )
+    COP [1B] ( &SineWaveMoverNoFlipStep, #$0078 )
 }
 
-code_0FEEB9 {
+---------------------------------------------
+; One cycle of the no-flip variant: seven frames of motion, y plus.
+; 
+; When: $78 frames after SineWaveMoverNoFlip.
+; Sees: n/a (see RunSineWaveMover).
+; Why: each pass spawns a trail actor and moves the object; $30,X grows by $10 per pass.
+; In: actor entry, X = actor slot (Y holds the actor's field base, as the COP dispatch leaves it).
+; Out: $30,X = 0, BRK #$5D (a sound request), COP 03 for 7 passes: each pass spawns RunSineWaveMoverTrail (COP B0, flags $0200), y = y + $30,X, StepSineSwayX, then COP 1B to SineWaveMoverNoFlipNext after 1 frame.
+; Clobbers: A.
+
+SineWaveMoverNoFlipStep {
     STZ $0030, X
     BRK #$5D
     COP [03] ( #07 )
-    COP [B0] ( @code_0FEF6C, #$0200 )
+    COP [B0] ( @RunSineWaveMoverTrail, #$0200 )
     LDA $0030, X
     CLC 
     ADC $0002, Y
     STA $0002, Y
-    JSR $&code_0FEF74
-    COP [1B] ( &code_0FEEDB, #$0001 )
+    JSR $&StepSineSwayX
+    COP [1B] ( &SineWaveMoverNoFlipNext, #$0001 )
 }
 
-code_0FEEDB {
+---------------------------------------------
+; Loop end of the no-flip variant.
+; 
+; When: after every pass of SineWaveMoverNoFlipStep.
+; Sees: n/a.
+; Why: COP 04 repeats the pass until seven have run; then the cycle restarts.
+; In: actor entry, X = actor slot.
+; Out: COP 04 (loop next), then BRA SineWaveMoverNoFlip after the seventh pass.
+; Clobbers: A, Y.
+
+SineWaveMoverNoFlipNext {
     COP [04]
-    BRA code_0FEEB0
+    BRA SineWaveMoverNoFlip
 }
 
-code_0FEEDF {
+---------------------------------------------
+; Start of the flip-X variant: wait until on screen, then $78 frames.
+; 
+; When: RunSineWaveMover (flip X only), and again at the end of every cycle.
+; Sees: n/a (see RunSineWaveMover).
+; Why: as SineWaveMoverNoFlip.
+; In: actor entry, X = actor slot.
+; Out: COP AD (operand $10), then COP 1B to SineWaveMoverFlipXStep after $78 frames.
+; Clobbers: A, Y.
+
+SineWaveMoverFlipX {
     COP [AD] ( #10 )
-    COP [1B] ( &code_0FEEE8, #$0078 )
+    COP [1B] ( &SineWaveMoverFlipXStep, #$0078 )
 }
 
-code_0FEEE8 {
+---------------------------------------------
+; One cycle of the flip-X variant: seven frames of motion, y minus.
+; 
+; When: $78 frames after SineWaveMoverFlipX.
+; Sees: n/a (see RunSineWaveMover).
+; Why: as SineWaveMoverNoFlipStep, moving the other way.
+; In: actor entry, X = actor slot (Y holds the actor's field base, as the COP dispatch leaves it).
+; Out: $30,X = 0, BRK #$5D, COP 03 for 7 passes: trail spawn, y = y - $30,X, StepSineSwayX, COP 1B to SineWaveMoverFlipXNext after 1 frame.
+; Clobbers: A.
+
+SineWaveMoverFlipXStep {
     STZ $0030, X
     BRK #$5D
     COP [03] ( #07 )
-    COP [B0] ( @code_0FEF6C, #$0200 )
+    COP [B0] ( @RunSineWaveMoverTrail, #$0200 )
     LDA $0002, Y
     SEC 
     SBC $0030, X
     STA $0002, Y
-    JSR $&code_0FEF74
-    COP [1B] ( &code_0FEF0A, #$0001 )
+    JSR $&StepSineSwayX
+    COP [1B] ( &SineWaveMoverFlipXNext, #$0001 )
 }
 
-code_0FEF0A {
+---------------------------------------------
+; Loop end of the flip-X variant.
+; 
+; When: after every pass of SineWaveMoverFlipXStep.
+; Sees: n/a.
+; Why: as SineWaveMoverNoFlipNext.
+; In: actor entry, X = actor slot.
+; Out: COP 04, then BRA SineWaveMoverFlipX after the seventh pass.
+; Clobbers: A, Y.
+
+SineWaveMoverFlipXNext {
     COP [04]
-    BRA code_0FEEDF
+    BRA SineWaveMoverFlipX
 }
 
-code_0FEF0E {
+---------------------------------------------
+; Start of the flip-Y variant: wait until on screen, then $78 frames.
+; 
+; When: RunSineWaveMover (flip Y only), and again at the end of every cycle.
+; Sees: n/a (see RunSineWaveMover).
+; Why: as SineWaveMoverNoFlip.
+; In: actor entry, X = actor slot.
+; Out: COP AD (operand $10), then COP 1B to SineWaveMoverFlipYStep after $78 frames.
+; Clobbers: A, Y.
+
+SineWaveMoverFlipY {
     COP [AD] ( #10 )
-    COP [1B] ( &code_0FEF17, #$0078 )
+    COP [1B] ( &SineWaveMoverFlipYStep, #$0078 )
 }
 
-code_0FEF17 {
+---------------------------------------------
+; One cycle of the flip-Y variant: seven frames of motion, y plus, mirrored sway.
+; 
+; When: $78 frames after SineWaveMoverFlipY.
+; Sees: n/a (see RunSineWaveMover).
+; Why: as SineWaveMoverNoFlipStep with the sway mirrored.
+; In: actor entry, X = actor slot (Y holds the actor's field base, as the COP dispatch leaves it).
+; Out: $30,X = 0, BRK #$5D, COP 03 for 7 passes: trail spawn, y = y + $30,X, StepSineSwayXMirrored, COP 1B to SineWaveMoverFlipYNext after 1 frame.
+; Clobbers: A.
+
+SineWaveMoverFlipYStep {
     STZ $0030, X
     BRK #$5D
     COP [03] ( #07 )
-    COP [B0] ( @code_0FEF6C, #$0200 )
+    COP [B0] ( @RunSineWaveMoverTrail, #$0200 )
     LDA $0030, X
     CLC 
     ADC $0002, Y
     STA $0002, Y
-    JSR $&code_0FEF96
-    COP [1B] ( &code_0FEF39, #$0001 )
+    JSR $&StepSineSwayXMirrored
+    COP [1B] ( &SineWaveMoverFlipYNext, #$0001 )
 }
 
-code_0FEF39 {
+---------------------------------------------
+; Loop end of the flip-Y variant.
+; 
+; When: after every pass of SineWaveMoverFlipYStep.
+; Sees: n/a.
+; Why: as SineWaveMoverNoFlipNext.
+; In: actor entry, X = actor slot.
+; Out: COP 04, then BRA SineWaveMoverFlipY after the seventh pass.
+; Clobbers: A, Y.
+
+SineWaveMoverFlipYNext {
     COP [04]
-    BRA code_0FEF0E
+    BRA SineWaveMoverFlipY
 }
 
-code_0FEF3D {
+---------------------------------------------
+; Start of the flip-X-and-Y variant: wait until on screen, then $78 frames.
+; 
+; When: RunSineWaveMover (both flip bits), and again at the end of every cycle.
+; Sees: n/a (see RunSineWaveMover).
+; Why: as SineWaveMoverNoFlip.
+; In: actor entry, X = actor slot.
+; Out: COP AD (operand $10), then COP 1B to SineWaveMoverFlipXYStep after $78 frames.
+; Clobbers: A, Y.
+
+SineWaveMoverFlipXY {
     COP [AD] ( #10 )
-    COP [1B] ( &code_0FEF46, #$0078 )
+    COP [1B] ( &SineWaveMoverFlipXYStep, #$0078 )
 }
 
-code_0FEF46 {
+---------------------------------------------
+; One cycle of the flip-X-and-Y variant: seven frames of motion, y minus, mirrored sway.
+; 
+; When: $78 frames after SineWaveMoverFlipXY.
+; Sees: n/a (see RunSineWaveMover).
+; Why: as SineWaveMoverFlipXStep with the sway mirrored.
+; In: actor entry, X = actor slot (Y holds the actor's field base, as the COP dispatch leaves it).
+; Out: $30,X = 0, BRK #$5D, COP 03 for 7 passes: trail spawn, y = y - $30,X, StepSineSwayXMirrored, COP 1B to SineWaveMoverFlipXYNext after 1 frame.
+; Clobbers: A.
+
+SineWaveMoverFlipXYStep {
     STZ $0030, X
     BRK #$5D
     COP [03] ( #07 )
-    COP [B0] ( @code_0FEF6C, #$0200 )
+    COP [B0] ( @RunSineWaveMoverTrail, #$0200 )
     LDA $0002, Y
     SEC 
     SBC $0030, X
     STA $0002, Y
-    JSR $&code_0FEF96
-    COP [1B] ( &code_0FEF68, #$0001 )
+    JSR $&StepSineSwayXMirrored
+    COP [1B] ( &SineWaveMoverFlipXYNext, #$0001 )
 }
 
-code_0FEF68 {
+---------------------------------------------
+; Loop end of the flip-X-and-Y variant.
+; 
+; When: after every pass of SineWaveMoverFlipXYStep.
+; Sees: n/a.
+; Why: as SineWaveMoverNoFlipNext.
+; In: actor entry, X = actor slot.
+; Out: COP 04, then BRA SineWaveMoverFlipXY after the seventh pass.
+; Clobbers: A, Y.
+
+SineWaveMoverFlipXYNext {
     COP [04]
-    BRA code_0FEF3D
+    BRA SineWaveMoverFlipXY
 }
 
-code_0FEF6C {
+---------------------------------------------
+; Trail actor of the sine wave mover: plays animation $29 once and removes itself.
+; 
+; When: spawned by every pass of the Step labels with COP B0 (flags $0200).
+; Sees: a short effect at the mover's position.
+; Why: leaves an effect behind the moving object.
+; In: actor entry, X = actor slot.
+; Out: COP 80 (animation $29), COP 82 (wait until it ends), COP 86 (kill self), RTL.
+; Clobbers: A, Y.
+
+RunSineWaveMoverTrail {
     COP [80] ( #29 )
     COP [82]
     COP [86]
     RTL 
 }
 
-code_0FEF74 {
+---------------------------------------------
+; Moves the actor's x by a sine sample and advances the sway counter.
+; 
+; When: the Step labels of the no-flip and flip-X variants, once per pass.
+; Sees: the object sways sideways while it moves along y.
+; Why: the sample is half of a byte of data_engine_tables.SineTable at ($30,X + $10), minus 12, so the sway is centred.
+; In: near call (RTS); X = actor slot, Y = the actor's field base, $30,X = the counter.
+; Out: x ($0000,Y) += SineTable[$30,X + $10] / 2 - 12; $30,X += $10; Y preserved.
+; Clobbers: A.
+
+StepSineSwayX {
     PHY 
     LDY $0030, X
     LDA $&data_engine_tables.SineTable+10, Y
@@ -132,7 +293,17 @@ code_0FEF74 {
     RTS 
 }
 
-code_0FEF96 {
+---------------------------------------------
+; As StepSineSwayX with the sway mirrored.
+; 
+; When: the Step labels of the flip-Y and flip-X-and-Y variants, once per pass.
+; Sees: the object sways the other way.
+; Why: the mirrored variants of the mover.
+; In: near call (RTS); X = actor slot, Y = the actor's field base, $30,X = the counter.
+; Out: x ($0000,Y) += 12 - SineTable[$30,X + $10] / 2; $30,X += $10; Y preserved.
+; Clobbers: A.
+
+StepSineSwayXMirrored {
     PHY 
     LDY $0030, X
     LDA $&data_engine_tables.SineTable+10, Y
@@ -153,12 +324,22 @@ code_0FEF96 {
     RTS 
 }
 
-code_0FEFBC {
-    LDX #$&spc_0FF14E
+---------------------------------------------
+; Uploads the SPC engine and the driver block to the sound chip.
+; 
+; When: once at start-up, from the boot actor of gv_front_end (code_0066DE), after the SPC reset.
+; Sees: the sound chip starts running its program; music and sound effects work afterwards.
+; Why: the SPC700 has no program after reset; the CPU has to send it.
+; In: long call; M = 8, X = 16.
+; Out: dp$29-$2B = SpcEngineBlock sent with SendSpcIplBlocks; two vblanks; APUIO0 = $FF; dp$29-$2B = data_spc_driver.SpcDriverBlock, $0320 = $3000, sent with UploadSpcStream; $0320 = dp$02 + dp$08 (the SPC address after the last block).
+; Clobbers: A, X, dp$02 and the work cells of the two upload routines.
+
+UploadSpcDriver {
+    LDX #$&SpcEngineBlock
     STX $29
-    LDA #$^spc_0FF14E
+    LDA #$^SpcEngineBlock
     STA $2B
-    JSR $&code_0FF0E6
+    JSR $&SendSpcIplBlocks
     JSL $@lib_system_helpers.WaitVBlank
     JSL $@lib_system_helpers.WaitVBlank
     LDA #$FF
@@ -169,7 +350,7 @@ code_0FEFBC {
     STA $2B
     LDX #$3000
     STX $0320
-    JSL $@code_0FEFF5
+    JSL $@UploadSpcStream
     REP #$20
     LDA $02
     CLC 
@@ -179,10 +360,20 @@ code_0FEFBC {
     RTL 
 }
 
-code_0FEFF5 {
+---------------------------------------------
+; Sends the block list that dp$29-$2B points to into the SPC700.
+; 
+; When: UploadSpcDriver (the driver block), MusicLoadUpload (engine_spawn_lairs_death_drops, a song by track) and UploadSceneMusic (lib_scene_asset_loader, the song of a scene).
+; Sees: the sound chip receives new data; the music changes after the upload.
+; Why: songs and the driver are sent as data, not as part of the SPC program.
+; In: long call; M = 8 (set inside), dp$29-$2B = the list, $0320 = SPC destination base; NMI off (it waits for vblanks).
+; Out: SendSpcIplBlocks runs first on the list; then two vblanks, APUIO0 = $FF and the $BBAA handshake; then the destination word of the closing record is read again as the sample count (low byte) and the first sample index (high byte), and one more index byte follows for each further sample, the records are taken from a table that is walked through dp$2C-$2E starting at $07:8000 (record = a length word and its bytes, destination counting up from $0320), each record is sent with the counter protocol in APUIO0, and a record of length 0 is sent last; dp$2E = $7E at the end; P and Y restored. The record shapes of the driver and of the 21 songs are in docs/code/spc-interface.md (OQ-I042-6).
+; Clobbers: A, X, dp$00-$0E, $2C-$2E.
+
+UploadSpcStream {
     PHP 
     PHY 
-    JSR $&code_0FF0E6
+    JSR $&SendSpcIplBlocks
     DEY 
     DEY 
     SEP #$20
@@ -331,7 +522,17 @@ code_0FEFF5 {
     RTL 
 }
 
-code_0FF0E6 {
+---------------------------------------------
+; Sends records to the SPC700 IPL ROM with the boot protocol.
+; 
+; When: UploadSpcDriver (SpcEngineBlock) and the first step of UploadSpcStream.
+; Sees: n/a.
+; Why: after reset the SPC700 runs only its IPL ROM, which accepts records and jumps to the destination of a record of length 0; every call after the first talks to the engine's own copy of that loop (command $FF), which accepts the same records and returns at the record of length 0.
+; In: near call (RTS); dp$29-$2B = the list, Y = 0 at the start of the list; the routine sets 16-bit registers itself.
+; Out: waits for $BBAA in APUIO0/1, answers $CC; for every record (length word, destination word, bytes) sends the destination to APUIO2/3, 1 or 0 to APUIO1 (0 = start the program at the destination), the bytes in pairs with the counter in APUIO0; ends after the record of length 0 with APUIO2 = 0; X and P restored.
+; Clobbers: A, Y.
+
+SendSpcIplBlocks {
     PHP 
     PHX 
     REP #$30
@@ -409,7 +610,16 @@ code_0FF0E6 {
 }
 ---------------------------------------------
 
-spc_0FF14E [
+; The IPL stream with the SPC700 program that is sent first at start-up.
+; 
+; When: UploadSpcDriver, once.
+; Sees: nothing directly; the music and sound effects run on it.
+; Why: the SPC700 needs its program from the CPU.
+; In: n/a (data): 2895 bytes: the length word $0B47 (2887 bytes), the destination word $0400, the 2887 data bytes and a closing record (length 0, start address). The program is not disassembled here.
+; Out: n/a.
+; Clobbers: n/a.
+
+SpcEngineBlock [
   #470B000420CDCFBDE8005DAFC8F0D0FB   ;00
   #C5FF0FBC3FA909A248E8608D0C3FB805   ;01
   #8D1C3FB805E82C8D5D3FB805E830C4F1   ;02

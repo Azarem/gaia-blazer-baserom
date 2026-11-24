@@ -1,0 +1,25 @@
+{
+  "_note": "I045b: two corrections found while checking docs/code/cop-dispatch.md against the extracted code. Cop11_MoveActorToTile stores the new x and y into the other actor and only then calls ClearActorFootprint (cop_actor_fields_animation.asm, the STA $0000,Y / STA $0002,Y before the JSR), so the call comes after the move, as the Cop11 note and OQ-I025-8 already say; the ClearActorFootprint note said before. COP [86] is followed by RTL at 280 of its 283 sites (rg -U -A1 over extracted/ outside system/ and cop_handlers/); the other three are engine uses with X = the victim: KillAllOtherActors, KillAllProjectiles (BRA to the next actor) and ApplyGemPickup (PLY, PLP, RTL).",
+
+  "system/cop_core.asm": {
+    "partNotes": {
+      "ClearActorFootprint": { "edit": [
+        { "find": "When: Cop16_UnblockOwnTiles, and Cop11_MoveActorToTile before it moves an actor.",
+          "with": "When: Cop16_UnblockOwnTiles, and Cop11_MoveActorToTile, which calls it for the other actor after it has stored the new position (OQ-I025-8)." }
+      ] }
+    }
+  },
+
+  "cop_handlers/cop_tiles_spawn_kill.asm": {
+    "blockNote": { "edit": [
+      { "find": "The script keeps running after the COP, which is why every kill is followed by RTL.",
+        "with": "The script keeps running after the COP, which is why a kill in a script is followed by RTL (280 of the 283 sites; the other three are engine routines that issue COP [86] with X = the victim: KillAllOtherActors, KillAllProjectiles, ApplyGemPickup)." }
+    ] },
+    "partNotes": {
+      "Cop86_KillSelf": { "edit": [
+        { "find": "When: 283 scripts, always followed by RTL.",
+          "with": "When: 283 sites: 280 in scripts, each followed by RTL, and three engine routines (KillAllOtherActors, KillAllProjectiles, ApplyGemPickup)." }
+      ] }
+    }
+  }
+}

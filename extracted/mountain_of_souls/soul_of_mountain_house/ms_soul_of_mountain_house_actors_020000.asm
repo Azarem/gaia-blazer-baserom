@@ -3,7 +3,7 @@
 ; === WHAT RUNS HERE ===
 ; The house (location $3D, scene A0AS01) holds one NPC for each lair of the Mountain of Souls that frees somebody: the lair record (LairRecords) has home location $3D and the byte at +9 says who ($1E boy, $1F girl, $20 grandpa, $21 grandma, $22 snail, $23 the King, $24 mushroom, $25 Nome). PlacementA0AS01 rows $04-$1E are the NPCs; the row index is the actor slot and the last byte is the meta type ($12-$2C, MetaMountainOfSouls) that picks the script. The roots here are types $12-$1E.
 ; - COP 14 (switch, &code) roots ($12, $13, $15, $17, $18, $19, $1A, $1B, $1C): RTL every frame until the lair with that switch number is released; then the script continues at &code (appear puff, COP 15 blocks the NPC's tiles, COP 17 sets the talk handler, COP 91 keeps the entry).
-; - COP 3B (switch, &code) roots ($14, $16, $1D, $1E): the same, but before the release the actor is a captive: the talk handler is the shared plea shared_actor_helpers_bank4.cm_npc_captive_plea_02229E (one of three pleas picked by rng_state: 'Ouch---- it hurts! Somebody please help me!', 'I want to return to my real form-', ...) and the script ends in engine_003005.HoldActorUntilReleased.
+; - COP 3B (switch, &code) roots ($14, $16, $1D, $1E): the same, but before the release the actor is a captive: the talk handler is the shared plea shared_actor_helpers_bank4.cm_npc_captive_plea_02229E (one of three pleas picked by rng_state: 'Ouch---- it hurts! Somebody please help me!', 'I want to return to my real form-', ...) and the script ends in engine_player_death_and_actor_helpers.HoldActorUntilReleased.
 ; - COP 30 (switch, &code, $04) in the King $1A and the boy $1C: when the hero came home through that lair record (return_active and return_record) a one-shot actor is spawned at &code, then the normal script goes on.
 ; - Every text ends with [JMP] into shared_actor_helpers_bank4.asciistring_02251E, the common end of a dialogue. The ROM prints an apostrophe as a space and a full stop as a dash ('Master s', 'rare to see someone new-'); the notes quote the text as meant.
 ; 
@@ -30,7 +30,7 @@
 
 ?BANK 04
 
-?INCLUDE 'engine_003005'
+?INCLUDE 'engine_player_death_and_actor_helpers'
 ?INCLUDE 'engine_spawn_lairs_death_drops'
 ?INCLUDE 'shared_actor_helpers_bank4'
 
@@ -154,10 +154,10 @@ ms_npc_grandma_magic_demo_020143 {
     COP [3B] ( #$00EA, &code_020159 )
     COP [17] ( &shared_actor_helpers_bank4.cm_npc_captive_plea_02229E )
     SEP #$20
-    LDA #$^engine_003005.HoldActorUntilReleased
+    LDA #$^engine_player_death_and_actor_helpers.HoldActorUntilReleased
     PHA 
     REP #$20
-    LDA #$&engine_003005.HoldActorUntilReleased-1
+    LDA #$&engine_player_death_and_actor_helpers.HoldActorUntilReleased-1
     PHA 
     RTL 
 }
@@ -250,10 +250,10 @@ ms_npc_girl_new_love_020237 {
     COP [3B] ( #$00EB, &code_02024D )
     COP [17] ( &shared_actor_helpers_bank4.cm_npc_captive_plea_02229E )
     SEP #$20
-    LDA #$^engine_003005.HoldActorUntilReleased
+    LDA #$^engine_player_death_and_actor_helpers.HoldActorUntilReleased
     PHA 
     REP #$20
-    LDA #$&engine_003005.HoldActorUntilReleased-1
+    LDA #$&engine_player_death_and_actor_helpers.HoldActorUntilReleased-1
     PHA 
     RTL 
 }
@@ -547,7 +547,7 @@ code_02058F {
     COP [03] ( #3D )
     COP [04]
     COP [01] ( &asciistring_02092A )
-    COP [09] ( #$8A00 )   ; flag $0A00 is set here; no script that reads it was found (OQ-I037-4)
+    COP [09] ( #$8A00 )   ; flag $0A00 is set here; it is bit number $50 of three FlagMapPatchTable rows at location $7B that ApplyFlagMapPatches reads at scene load
     COP [09] ( #$8A01 )
     LDA #$0020
     STA $asset_skip_mask
@@ -891,10 +891,10 @@ ms_npc_snail_vehicle_020EE9 {
     COP [3B] ( #$00F7, &code_020EFF )
     COP [17] ( &shared_actor_helpers_bank4.cm_npc_captive_plea_02229E )
     SEP #$20
-    LDA #$^engine_003005.HoldActorUntilReleased
+    LDA #$^engine_player_death_and_actor_helpers.HoldActorUntilReleased
     PHA 
     REP #$20
-    LDA #$&engine_003005.HoldActorUntilReleased-1
+    LDA #$&engine_player_death_and_actor_helpers.HoldActorUntilReleased-1
     PHA 
     RTL 
 }
@@ -973,10 +973,10 @@ ms_npc_mushroom_dream_rod_020F9B {
     COP [3B] ( #$00DD, &code_020FB1 )
     COP [17] ( &shared_actor_helpers_bank4.cm_npc_captive_plea_02229E )
     SEP #$20
-    LDA #$^engine_003005.HoldActorUntilReleased
+    LDA #$^engine_player_death_and_actor_helpers.HoldActorUntilReleased
     PHA 
     REP #$20
-    LDA #$&engine_003005.HoldActorUntilReleased-1
+    LDA #$&engine_player_death_and_actor_helpers.HoldActorUntilReleased-1
     PHA 
     RTL 
 }

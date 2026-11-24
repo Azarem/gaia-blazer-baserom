@@ -22,6 +22,15 @@
  *       add `"create": { "group": "library", "scene": "...", "movable": true, "order": -1 }` (group required).
  *       A block cannot be emptied by it (merge it away instead). Re-appliable (a part already in `to` is unchanged).
  *
+ *   { "op": "split-part", "part": "HandleIrq", "at": 2612, "name": "DetectHitSourceCollisions", "to": "engine_combat" }
+ *       Cuts one part of blocks.json in two at the file offset `at` (the decimal `; {n}` tag of the first instruction of the
+ *       second half, strictly inside the part). The first half keeps the name and the old start; the second half is named
+ *       `name` (give it the label that the extraction prints at `at`: a different name would lose that label and the text check
+ *       fails) and copies the type of the part. `to` (optional) moves the second half into another block, with the rules and the
+ *       `create` option of `move-part`. Several cuts of one part are written as several operations, in any order. The tool
+ *       cannot see fall-through: the instruction before `at` must end the routine (RTS, RTL, RTI, JMP, BRA, BRL), otherwise the
+ *       CPU runs on into whatever the packer puts next. Re-appliable (a part `name` that starts at `at` is unchanged).
+ *
  *   { "op": "rename", "block": "lib_0100", "to": "text_renderer" }
  *       Renames a block: blocks.json key, transforms.json key, block-note key, and the whole-word mentions in notes/ text,
  *       docs/, baserom/ and us/*.json. If the old name is also a label of the code (a part with the same name as its block),
@@ -74,6 +83,7 @@ const PROP_ORDER = ['scene', 'movable', 'order', 'base', 'postProcess'];
 const ALLOWED: Record<string, string[]> = {
     'merge': ['op', 'blocks', 'into', 'group', 'scene', 'order', 'movable', 'notes', 'createGroup', 'row', 'note'],
     'move-part': ['op', 'part', 'parts', 'from', 'to', 'create', 'row', 'note'],
+    'split-part': ['op', 'part', 'at', 'name', 'to', 'create', 'row', 'note'],
     'rename': ['op', 'block', 'to', 'row', 'note'],
     'set': ['op', 'block', 'blocks', 'scene', 'group', 'order', 'movable', 'createGroup', 'row', 'note'],
 };
@@ -429,6 +439,40 @@ function opMovePart(w: Work, spec: Raw, where: string, errors: string[], warning
     w.log.push(`  move     ${parts.join(', ')} -> ${to}${created ? ' (new block)' : ''} from ${[...sources.keys()].join(', ')}`);
 }
 
+function opSplitPart(w: Work, spec: Raw, where: string, errors: string[], warnings: string[], fileNames: ReadonlySet<string>): void {
+    const part = spec.part, name = spec.name, at = spec.at;
+    if (typeof part !== 'string') { errors.push(`${where}: 'part' must be a part name`); return; }
+    if (typeof name !== 'string' || !IDENT.test(name)) { errors.push(`${where}: 'name' must be a valid identifier (the label at 'at')`); return; }
+    if (typeof at !== 'number' || !Number.isInteger(at)) { errors.push(`${where}: 'at' must be an integer file offset`); return; }
+    if (spec.create !== undefined && spec.to === undefined) { errors.push(`${where}: 'create' needs 'to'`); return; }
+    if (spec.to !== undefined && (typeof spec.to !== 'string' || !IDENT.test(spec.to))) { errors.push(`${where}: 'to' must be a block name`); return; }
+    const owners = partOwner(w);
+    const owner = owners.get(part);
+    if (owner === undefined) { errors.push(`${where}: part '${part}' does not exist`); return; }
+    const group = groupOf(w, owner)!;
+    const block = w.blocks[group][owner];
+    const p = block.parts[part];
+    const existing = owners.get(name);
+    if (existing !== undefined) {
+        const q = w.blocks[groupOf(w, existing)!][existing].parts[name];
+        if (q.start === at && p.end === at) w.log.push(`  =split    ${part} at ${at} -> ${name} (already done)`);
+        else { errors.push(`${where}: '${name}' is already a part (${q.start}..${q.end}) and does not start at ${at}`); return; }
+    } else {
+        if (groupOf(w, name) !== null) { errors.push(`${where}: '${name}' is already the name of a block`); return; }
+        if (fileNames.has(name)) { errors.push(`${where}: '${name}' is the name of a file in files.json`); return; }
+        if (!(at > p.start && at < p.end)) { errors.push(`${where}: 'at' (${at}) must lie strictly inside part '${part}' (${p.start}..${p.end})`); return; }
+        const second = { ...p, start: at };
+        p.end = at;
+        block.parts[name] = second;
+        block.parts = Object.fromEntries(Object.entries<any>(block.parts).sort((a, b) => (a[1].order ?? a[1].start) - (b[1].order ?? b[1].start)));
+        if (w.transforms[owner]?.length) warnings.push(`${where}: '${owner}' has transforms.json rules and now has one more part`);
+        w.touched.add(group);
+        w.changed = true;
+        w.log.push(`  split    ${part} (${p.start}..${at}) + ${name} (${at}..${second.end}) in ${owner}`);
+    }
+    if (spec.to !== undefined) opMovePart(w, { op: 'move-part', part: name, to: spec.to, ...(spec.create !== undefined ? { create: spec.create } : {}) }, where, errors, warnings, fileNames);
+}
+
 // ---------------------------------------------------------------------------------------------------------------- command
 
 export async function applyBlocks(projectRoot: string, specPath: string, options: BlocksOptions, db: DbGameRomModule): Promise<BlocksResult> {
@@ -440,7 +484,7 @@ export async function applyBlocks(projectRoot: string, specPath: string, options
     if (!existsSync(specAbs)) { errors.push(`spec file not found: ${specPath}`); return report(result, options); }
     let raw: unknown;
     try { raw = JSON.parse(readFileSync(specAbs, 'utf-8')); } catch (e) { errors.push(`spec is not valid JSON: ${e}`); return report(result, options); }
-    if (!Array.isArray(raw)) { errors.push('spec must be a JSON array of operations ({ "op": "merge" | "move-part" | "rename" | "set", ... })'); return report(result, options); }
+    if (!Array.isArray(raw)) { errors.push('spec must be a JSON array of operations ({ "op": "merge" | "move-part" | "split-part" | "rename" | "set", ... })'); return report(result, options); }
 
     // ------------------------------------------------------------------ current state
     const blocksPath = join(projectRoot, 'us', 'blocks.json');
@@ -487,6 +531,7 @@ export async function applyBlocks(projectRoot: string, specPath: string, options
             case 'rename': opRename(w, spec, where, errors, fileNames); break;
             case 'merge': opMerge(w, spec, where, errors, warnings, fileNames); break;
             case 'move-part': opMovePart(w, spec, where, errors, warnings, fileNames); break;
+            case 'split-part': opSplitPart(w, spec, where, errors, warnings, fileNames); break;
         }
     });
     console.log(`Blocks: ${raw.length} operation(s)`);

@@ -1,0 +1,99 @@
+{
+  "_note": "I057: note corrections found while writing docs/code/data-tables.md. (1) The formation lists have exactly as many rows as the record's +13 count in all 107 records that use one (the notes said 'at least'); five lists ($06, $0B, $0E, $29, $2B; 27 rows) are named by no record (OQ-I057-2). (2) LairRecords +A is the world index of the lair location in 403 of 420 records (0 in the 15 fillers and in $74, $75), ORed into lair_state by the release; no reader tests the low bits (OQ-I057-1). (3) Five dream rows have count 0, not three: $79 and $E7 carry RunLairRespawn but never spawn (OQ-I057-3). (4) The records are grouped by world. (5) The reader of CircleHalfWidths is BuildSoulOrbCircleWindow, the shape is the circular window of the four Soul effects (settles OQ-I033-9), and the table is mirrored about row 64. (6) The sine table is only close to 127 x sin and its negative half is not the exact negation. (7) The retype proposals of FM-A11 4.17 are now pointed to by OQ-I033-10 and the document.",
+
+  "system/data_lair_formations.asm": {
+    "blockNote": {
+      "edit": [
+        {
+          "find": "so every list must have at least as many rows as the lair has monsters.",
+          "with": "so every list must have at least as many rows as the lair has monsters (in all 107 records that use a formation the list has exactly as many rows as the record's +13)."
+        },
+        {
+          "find": "Check: 224 + 434 x 6 = 2828 bytes.",
+          "with": "Check: 224 + 434 x 6 = 2828 bytes. The 107 records use 107 different lists (407 rows); the other five (indices $06, $0B, $0E, $29 and $2B; 10, 3, 6, 4 and 4 rows) are named by no record (OQ-I057-2, docs/code/data-tables.md)."
+        }
+      ]
+    },
+    "partNotes": {
+      "FormationPointers": {
+        "edit": [
+          {
+            "find": "Out: 112 lists of 434 rows in all; no list terminator (the lair's monster count ends the walk).",
+            "with": "Out: 112 lists of 434 rows in all (107 used, five named by no record: OQ-I057-2); no list terminator (the lair's monster count ends the walk and equals the row count of every used list)."
+          }
+        ]
+      }
+    }
+  },
+
+  "system/data_lair_records.asm": {
+    "blockNote": {
+      "edit": [
+        {
+          "find": "The records are not sorted by location.",
+          "with": "The records are not sorted by location; they are grouped by the world of the lair location (world 0 $00-$34, world 1 $36-$76, world 2 $77-$C3, world 3 $C4-$103, world 4 $109-$155, world 5 $158-$195, world 6 $196-$1A3), with the 15 fillers in the gaps."
+        },
+        {
+          "find": "+A low bits of lair_state after the release ($80 path, $C0 NPC)",
+          "with": "+A world index of the lair location, ORed into lair_state as its low bits by the release ($80 path, $C0 NPC); it is the world in 403 of 420 records (0 in the 15 fillers and in $74 and $75) and no reader tests the low bits (OQ-I057-1)"
+        },
+        {
+          "find": "switches that no lair actor ever drives.",
+          "with": "switches that no lair actor ever drives. Two more dream rows have count 0 but carry RunLairRespawn with interval 1: $79 (2D, a dolphin's dream) and $E7 (43, a mushroom's dream); a state of 0 paints the green switch and never spawns the lair actor, so their script never runs (OQ-I057-3)."
+        },
+        {
+          "find": "(retype proposal in FM-A11 4.17)",
+          "with": "(retype decision: OQ-I033-10; the layouts are in docs/code/data-tables.md, section Row layouts)"
+        }
+      ]
+    }
+  },
+
+  "system/data_exit_lists.asm": {
+    "blockNote": {
+      "edit": [
+        {
+          "find": "(retype proposal in FM-A11 4.17)",
+          "with": "(retype decision: OQ-I033-10; the layouts are in docs/code/data-tables.md, section Row layouts)"
+        }
+      ]
+    }
+  },
+
+  "system/data_engine_tables.asm": {
+    "partNotes": {
+      "CircleHalfWidths": {
+        "edit": [
+          {
+            "find": "When: RunSoulOfLightEffect (lib_hdma_window_effects), the circle drawing routine (not yet annotated).",
+            "with": "When: BuildSoulOrbCircleWindow (lib_hdma_window_effects), every frame after a Soul effect (Light, Reality, Detection, Shield) has started (OQ-I033-9)."
+          },
+          {
+            "find": "Sees: a round shape, probably the iris or a circular window (inferred).",
+            "with": "Sees: the circular window of radius $40 pixels around the soul orb that the four Soul effects cut into the screen."
+          },
+          {
+            "find": "Out: the half-width in pixels.",
+            "with": "Out: the half-width in pixels; the table is mirrored about row 64 (C[i] = C[128 - i] for 125 of 127 rows; rows 1 and 127 hold 4 and 0) and peaks at $3F for rows 59 to 69."
+          }
+        ]
+      },
+      "SineTable": {
+        "edit": [
+          {
+            "find": "256 values of 127 x sin(2 pi x i / 256) and 64 more for the cosine.",
+            "with": "256 values close to 127 x sin(2 pi x i / 256) (largest deviation 1.9; none of six plain rounding rules reproduces them) and 64 more for the cosine."
+          }
+        ]
+      },
+      "SineTableTail": {
+        "edit": [
+          {
+            "find": "Out: the descending half and the negative half of the sine, then the 64 entries the cosine needs.",
+            "with": "Out: the descending half and the negative half of the sine, then the 64 entries the cosine needs. The negative half is not the exact negation of the positive one (12 of 128 entries match: the table rises 0, 3, 6, 9 ... and falls 0, -4, -7, -10 ...)."
+          }
+        ]
+      }
+    }
+  }
+}

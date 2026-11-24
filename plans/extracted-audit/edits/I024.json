@@ -1,0 +1,878 @@
+{
+  "_note": "I024: batch A2 (engine_* rest, native_mode_brk, engine_routines_*). Source of the routine table: plans/doc-audit/function-map/FM-A2.md; pose names follow FM-A10 section 1.3. Names applied first by plans/extracted-audit/renames/apply-I024_names.json; mnemonics added to us/mnemonics.json by hand. Comment addresses are the ; {n} tags of extract:lt; every comment carries an expect guard. Rows A3 (cop_core exit chain, code_0064CC, code_006537, code_002C9B-code_002D64) and A10 (player_core block note) are not touched.",
+
+  "system/cop_dispatch.asm": {
+    "blockNote": [
+      "COP and BRK dispatchers and the COP command tables (from file offset 22012, SNES $00:D5FC, bank 00).",
+      "",
+      "=== BRK (HandleBrk) ===",
+      "BRK #n is the sound request. HandleBrk reads the signature byte n after the BRK (return address minus 1, long pointer in DP $3B-$3D). When bit 6 ($40) of n is set, n and $BF is stored in $0399 (the high byte of the sound word); otherwise n is stored in $0398 (sound_request, the low byte). HandleVBlank writes the word to APUIO2 on even frames and clears it (engine_vblank_nmi, section SOUND). A is preserved; DP $3B-$3D are clobbered. What the two bytes mean to the sound driver is OQ-I024-1. us/config.json lists HandleBrk and HandleCop as the native BRK and COP vectors (nativeBrk, nativeCop).",
+      "",
+      "=== COP (HandleCop) ===",
+      "The COP instruction runs actor scripts. HandleCop takes the actor slot from X (TXY), builds the script pointer in DP $38/$3A from the pushed return address (bank byte from $04,S, address $02,S minus 1, so the pointer starts on the COP signature byte), reads the command id, advances $38 and jumps through the word table at CopHandlerTable_00_3C indexed by id*2.",
+      "",
+      "The table has three extracted parts: CopHandlerTable_00_3C (ids 00-3C), CopFillerTable_3D_7F (ids 3D-7F, filler words, no handlers) and CopHandlerTable_80_B2 (ids 80-B2). The ids 0E, 0F, 2C and 2D have no handler (#$0000).",
+      "",
+      "Each handler is a Cop<ID>_<Name> label in extracted/cop_handlers; it ends by jumping into the exit chain in cop_core. Reference: docs/cop/index.md."
+    ],
+    "partNotes": {
+      "HandleBrk": [
+        "Native-mode BRK vector: the sound request.",
+        "",
+        "When: every BRK #n in the game (about a hundred call sites: sword swings, spawns, pickups, deaths, scripts).",
+        "Sees: nothing itself; the sound driver plays the request one or two frames later.",
+        "Why: a two-byte instruction is the cheapest way for scripts and engine code to ask for a sound.",
+        "In: stack = return address of the BRK (the byte after the BRK opcode is n).",
+        "Out: bit 6 of n clear: sound_request ($0398) = n; bit 6 set: $0399 = n and $BF. The previous value of the byte is overwritten, so two requests in one frame lose the first.",
+        "Clobbers: DP $3B-$3D; A and P restored (PHA/PLA, RTI)."
+      ],
+      "HandleCop": [
+        "Native-mode COP vector: the command dispatcher of every actor script.",
+        "",
+        "When: every COP instruction in an actor script (thousands of call sites).",
+        "Sees: nothing itself; each command moves, animates, tests or spawns something.",
+        "Why: one 2-byte opcode plus a table lets scripts stay short; operand bytes follow the id and are read by the handler through $38.",
+        "In: X = actor slot (copied to Y), stack = return address of the COP instruction.",
+        "Out: $3A = script bank, $38 = pointer past the command id, Y = actor slot, X = id * 2; jumps through CopHandlerTable_00_3C,X. Every handler starts with TYX to get the actor slot back.",
+        "Clobbers: A, X; DP $38-$3A."
+      ]
+    },
+    "comments": {
+      "22028": { "text": "Bit 6 of the BRK signature byte: set = n and $BF goes to the high byte $0399 of the sound word, clear = n goes to sound_request ($0398)", "expect": "BIT" },
+      "22057": { "text": "Return address - 1 = the byte after COP, the command id; DP $38/$3A become the script read pointer", "expect": "DEC" },
+      "22069": { "text": "Handlers are words indexed by id * 2; ids 3D-7F are filler words so CopHandlerTable_80_B2 starts $100 bytes after CopHandlerTable_00_3C", "expect": "JMP" }
+    }
+  },
+
+  "system/cop_core.asm": {
+    "partNotes": {
+      "TestEventFlag": [
+        "Tests one event flag.",
+        "",
+        "When: from the COP flag handlers Cop05_WaitFlag, Cop07_JumpIfFlagClear and Cop08_JumpIfFlagSet.",
+        "Sees: scripts branch on story progress (a released NPC, an opened door, a talked-to villager).",
+        "Why: every flag lives in one bit array (event_flags, $1A5E) and is addressed by one flag word.",
+        "In: A = flag word: low byte = bit number 0-7 (index into BitMaskTable), bits 8-14 = byte index; bit 15 is a command-specific sense bit that this routine ignores.",
+        "Out: carry set when the flag bit is set, clear otherwise; M = 16 on return.",
+        "Clobbers: A, Y, dp$00-$01; X preserved (PHX/PLX)."
+      ],
+      "BitMaskTable": "Bit masks $01, $02, $04 ... $80, indexed by the low byte of a flag word (bit numbers 0-7). Read by TestEventFlag.",
+      "LookupInventoryEntry": [
+        "Reads one inventory/progress entry.",
+        "",
+        "When: from the COP inventory handlers Cop0A_SetInventoryIfEmpty, Cop0B_ClearInventoryEntry, Cop18_JumpIfInventoryZero and Cop19_JumpUnlessInventoryBit7.",
+        "Sees: shops, chests and the death check act on what the player owns and has equipped.",
+        "Why: inventory entry n sits at inventory + n - 1 (bit 7 = flag, bits 0-6 = value); all handlers share this read.",
+        "In: A (8-bit) = entry number, 1-based.",
+        "Out: carry set and A = the entry number when the value bits 0-6 are zero; carry clear and A = the whole byte when they are not; M = 16 on return.",
+        "Clobbers: A, Y."
+      ],
+      "ClearActorFootprint": [
+        "Clears the collision footprint of the actor at X.",
+        "",
+        "When: Cop16_UnblockOwnTiles, and Cop11_MoveActorToTile before it moves an actor.",
+        "Sees: the tiles the actor blocked become walkable again (a door or a statue that moves away).",
+        "Why: the tile map keeps one blocking entry per tile; an actor that moves or disappears must release its tiles. Counterpart of Cop15_BlockOwnTiles, which ORs $F0 into the same entries.",
+        "In: X = actor; position $00/$02, box width $10 and height $12.",
+        "Out: the low byte of every tile_type_map entry under the box is zeroed (the high byte stays). A box with width + height below $21 covers the one tile at (x, y - 16); a bigger box covers width / 16 columns by height / 16 rows.",
+        "Clobbers: A, Y, dp$0C, $0E, $16, $18 and the scratch of lib_map_index_helpers; X preserved."
+      ],
+      "SlotNumberToActor": [
+        "Converts a slot number to the address of the actor slot.",
+        "",
+        "When: COP handlers whose operand names another actor by slot number (Cop0C, Cop0D, Cop11, Cop12, Cop13, Cop2E).",
+        "Sees: nothing.",
+        "Why: scripts store 0-63 slot numbers (one byte) instead of $0800-based addresses.",
+        "In: A (8-bit) = slot number.",
+        "Out: Y = $0800 + number * $40 (product from lib_arithmetic.code_0131D1).",
+        "Clobbers: A, Y; M = 16 on return."
+      ],
+      "TileToPixel": [
+        "Converts a tile number to a pixel coordinate: A = A * 16.",
+        "",
+        "When: COP handlers with tile operands (Cop0C, Cop0D, Cop11).",
+        "Sees: nothing.",
+        "Why: map tiles are 16 pixels wide; scripts give positions in tiles.",
+        "In: A = tile number. Out: A = A * 16. Clobbers: A."
+      ],
+      "RegisterSwitchOwner": [
+        "Records which actor waits for a switch.",
+        "",
+        "When: Cop14_JumpIfSwitchSet and Cop3B_JumpIfSwitchSetData, when the script first tests a switch.",
+        "Sees: nothing at once; the actor later reacts when its switch is triggered (the walkthrough's green switch under a cleared lair).",
+        "Why: switch_owner_table ($7F0483, word entries, cleared at every scene load by lib_scene_change_init) maps a switch number to the actor that owns it. Its readers are not traced yet.",
+        "In: A = switch index, X = actor. Out: switch_owner_table[A] = X. Clobbers: none (A and X preserved)."
+      ],
+      "SpawnActorAfter": [
+        "Spawns an actor and links it after the actor X in the list.",
+        "",
+        "When: Cop84_SpawnActorAfter, CopAB, CopAF, CopB1 and other spawn handlers.",
+        "Sees: a monster, effect, projectile or pickup appears next to its spawner.",
+        "Why: one shared path for allocating, linking and initialising a new actor.",
+        "In: X = spawner.",
+        "Out: Y = new slot ($3E of the new actor = X, $3C = the old $3C of X; actor_list_tail updated when the new actor is last), then InitSpawnedActor; carry set and nothing linked when no slot is free (Y = $06AA). X preserved.",
+        "Clobbers: A, Y."
+      ],
+      "SpawnActorBefore": [
+        "Spawns an actor and links it before the actor X in the list.",
+        "",
+        "When: Cop85_SpawnActorBefore, CopAC, CopB0 and the lair code (SpawnLairMonster, SpawnLairActor).",
+        "Sees: a monster, effect, projectile or pickup appears; an actor linked before X runs earlier in the actor loop.",
+        "Why: one shared path for allocating, linking and initialising a new actor.",
+        "In: X = spawner.",
+        "Out: Y = new slot ($3C of the new actor = X, $3E = the old $3E of X; actor_list_head updated when the new actor is first), then InitSpawnedActor; carry set and nothing linked when no slot is free (Y = $06AA). X preserved.",
+        "Clobbers: A, Y."
+      ],
+      "PopFreeSlot": [
+        "Takes a slot from the free-slot stack.",
+        "",
+        "When: every spawn (SpawnActorAfter, SpawnActorBefore, SpawnPlacementList).",
+        "Sees: nothing; when the stack is empty the spawn silently fails (the 64-slot pool is full).",
+        "Why: slots are recycled through a stack so spawning is constant time.",
+        "In: dp$4A = top of the stack (word entries).",
+        "Out: Y = slot address, the entry zeroed, dp$4A += 2, carry clear; empty stack: carry set and Y = $06AA, a scratch slot. Called with JSL (ends in RTL).",
+        "Clobbers: A, Y; M = 16 on return."
+      ],
+      "InitSpawnedActor": [
+        "Turns the new slot Y into a copy of its spawner X.",
+        "",
+        "When: at the end of SpawnActorAfter and SpawnActorBefore.",
+        "Sees: the new actor starts at the spawner's position, animation and sprite attributes; callers then overwrite the script ($18) and flags ($16).",
+        "Why: inheriting the first $3C bytes saves every spawn from setting position and sprite fields by hand.",
+        "In: X = spawner, Y = new slot (list links already set by the caller).",
+        "Out: MVN copies $3C bytes (A = $003B) from X to Y; then $16 bit $2000 is set and bit $0010 cleared; $1A, $30 and $14 = 0. The links $3C/$3E at the end of the slot are not copied.",
+        "Clobbers: A; X and Y preserved."
+      ]
+    },
+    "comments": {
+      "25857": { "text": "Byte index = bits 8-14 of the flag word (bit 15 is not used here)", "expect": "007F" },
+      "26030": { "text": "Width + height below $21: the box covers one tile at (x, y - 16); otherwise width / 16 by height / 16 tiles", "expect": "0021" },
+      "26058": { "text": "Zero the low byte of the tile entry, keep the high byte", "expect": "FF00" },
+      "26271": { "text": "Stack empty: scratch slot $06AA, carry set (the caller must check it)", "expect": "06AA" },
+      "26277": { "text": "MVN below copies $3C bytes (A = $3B): position, animation and attributes of the spawner X into the new slot Y", "expect": "003B" }
+    }
+  },
+
+  "system/engine_spawn_lairs_death_drops.asm": {
+    "blockNote": {
+      "edit": [
+        {
+          "find": "the scripts from RunLairRespawn on belong to batch A2 and are not described here).",
+          "with": "the scripts from RunLairRespawn on are batch A2 (SNES $00:A6F3 on) and are described in the sections below; code_002C9B to code_002D64 inside this file are batch A3)."
+        },
+        {
+          "find": "- A Monster Lair in the walkthrough loses its shield when its monsters are dead and shows a green switch; the tile $FE written by the lair code is that switch (see lib_scene_map_patches).",
+          "with": [
+            "- A Monster Lair in the walkthrough loses its shield when its monsters are dead and shows a green switch; the tile $FE written by the lair code is that switch (see lib_scene_map_patches).",
+            "",
+            "=== LAIR SCRIPTS (A2) ===",
+            "A lair actor (SpawnLairActor) runs one of six scripts, chosen by the script word of its record (+$10 of data_00BA0D; the reference counts in OQ-I006-5). All six start with RequireLairTile (the script only runs while the map byte under the lair is $FD, an intact lair, OQ-I006-23), then repeat: COP 91 (entry), wait while the lair is off screen ($16 bit $8000, set by CullAndSortActors), wait while no free actor slot exists (COP 27 retries next frame), BRK #$53, SpawnLairMonster, DelayBetweenSpawns, and SyncLairCount (each frame it compares the monsters left, $2E, with the last value seen, $2F). When $2E reaches 0, SealLair writes tile $FE (the green switch), plays an effect and ends the lair actor.",
+            "  RunLairRespawn (156 records): one monster alive at a time; every death makes the lair spawn the next one until $2E is 0. The walkthrough's lairs that 'spit out one at a time'.",
+            "  RunLairSpawnAll (139 records): spawns all $2E monsters one after the other (counter in $2C), then only waits for the deaths.",
+            "  RunLairFormation (107 records): spawns all monsters at once from a formation list in data_00EE8E (index in $26: x, y and flip bits per monster); the monsters skip the appear puff.",
+            "  RunLairSpawnAllFlipping (7 records) and RunLairRespawnFlipping (no record, OQ-I006-5): the same patterns, but the lair's flip bits ($1C) step by $4000 after every monster so they alternate orientation.",
+            "  RunLairProximity (8 records): waits until the Cop0C test succeeds, spawns one monster, waits for its death, then waits again.",
+            "A monster made by SpawnLairMonster starts in RunMonsterAppearPuff (puff, then LoadMonsterFromMeta) and keeps the lair slot in $32; when it dies NotifyLairOfDeath decrements the lair's $2E. lair_state ($7F0203 + lair index) keeps the monster count between scene changes and is set to 0 only when the lair is cleared, so a half-cleared lair starts again with its full count (SyncLairCount).",
+            "",
+            "=== EFFECT PUFFS (A2) ===",
+            "RunAppearPuff is the generic 'actor appears' puff, spawned with COP 85 by about 150 scene actor scripts in 137 files; it centres itself on the spawner's box and plays animation 02 of the effects bank ($0E, set by COP A8 #$8000, #0E), or just ends when scene_active is 0. RunHazardPuff replaces the script of a hazard (DestroyHazardsNearOrb) by animation $10 and removal. RunMonsterAppearPuff is the lair monster's first script.",
+            "",
+            "=== ENEMY DEATH AND DROPS (A2) ===",
+            "KillTarget and KillOrSpareProjectileTarget (combat) give a killed actor the script RunEnemyDeath. The boss (boss_actor) is diverted to RunBossDeath. For anything else RunEnemyDeath plays the death puff (animation 03), spawns a Gem pickup before itself and shows the EXP earned:",
+            "  Drop: w = world_index (world 6 counts as $19). random_mod_result = a random number below $64. t1 = 2w + 1 and t2 = 4w + 4, both doubled when equipped_weapon is 4 (the Lucky Blade; the walkthrough says it yields more Gems than usual, OQ-I006-9). Below t1: RunLargeGemPickup (10 Gems); below t2: RunMediumGemPickup (5 Gems); otherwise RunSmallGemPickup (1 Gem). The pickup is spawned with $16 flags $4000; ApplyContactDamageOrPickup calls ApplyGemPickup when the player touches it.",
+            "  EXP number: the BCD word at +3 of the meta entry is drawn as 1-4 digit sprites (the value picks the digit count: below $10, $100, $1000, or more) in a sprite map reached through the pointer table at $7EF000 (slot number x 2); WriteHighNibbleDigit and WriteLowNibbleDigit write the digit tile (ExpDigitTiles) at $7EF005 + X in steps of 7, and the number's x is shifted by +5, +3, +1 or -1 so it stays centred. After $10 frames FinishEnemyDeath runs: with a lair ($32 non-zero) NotifyLairOfDeath counts the death and ends the actor; without one the A3 code at loc_002D40 kills the actor or, when $1A bit $1000 is set, respawns it after $0258 frames.",
+            "",
+            "=== BOSS DEATH AND ENDING (A2) ===",
+            "RunBossDeath: $16 = $0700, velocities cleared, contact_lock + 1, the boss box is stored in boss_box_x/y/w/h (position minus the left and upper extents, width and height = the sums of the extents). Then 32 RunBossExplosion actors are spawned, 3 frames apart (COP 03/04 loop); each is placed at a random point inside the box and about half of them play BRK #$85. KillAllOtherActors removes every actor whose $16 has none of the bits $24D0 (the player group and the dying actors stay). At location_id $7D the script jumps (RTS trick) into RunEnding; elsewhere Cop31 spawns the A3 sound handshake actor (code_002C9B) and the boss ends through FinishEnemyDeath.",
+            "RunEnding (SNES $00:D354): shows EndingTextDefeated, then EndingTextStaySingular when souls_flags and $1F is exactly 1 (only the Magician soul, OQ-I006-10) or EndingTextStayPlural otherwise (the singular text jumps into the plural one with [JMP]), clears souls_flags, waits, shows EndingTextWorldFades while RunEndingEffect runs, sets an event flag (COP 09 operand $9F02), writes $1B84 = 6 and $031E = 1 and warps with Cop10 to scene 7 of area 0 (OQ-I006-11). KillAllProjectiles is used by the menu code (lib_menus) when the equipped magic changed.",
+            "",
+            "=== PICKUPS (A2) ===",
+            "RunSmallGemPickup, RunMediumGemPickup and RunLargeGemPickup play animation 04, 05 or 06, then animation 09, 0A or 0B for a count of 4 (COP 81/83) and remove themselves, so an uncollected Gem disappears. ApplyGemPickup reads the current animation id ($1E): 06 and 0B give 10 Gems, 05 and 0A give 5, 04 and 09 give 1, any other id gives 10 (RunFixedGemPickup, a never-ending pickup with animation 07 spawned by w1_actor_01E4BB, OQ-I006-8). The Gems are added in BCD to gems_low and gems_high by lib_player_stats.code_0276A5 and BRK #$4D is requested."
+          ]
+        }
+      ]
+    },
+    "partNotes": {
+      "RunLairRespawn": [
+        "Lair script: one monster alive at a time, a new one whenever one dies.",
+        "",
+        "When: the lair actor starts here when its record's script word points here (156 of the 417 lair records).",
+        "Sees: a Monster Lair that spits out its monsters one by one (Grass Valley's lairs, walkthrough); when the last one dies the lair opens and a green switch appears.",
+        "Why: each lair record picks a pattern; this one keeps the fight small and sequential.",
+        "In: X = lair actor ($2E monsters left, $26 spawn interval, $34 lair index).",
+        "Out: ends in SealLair; between monsters it waits at COP 91 (SyncLairCount polls once per frame).",
+        "Clobbers: A, Y."
+      ],
+      "LairRespawnWaitSlot": "Re-entry point of RunLairRespawn after COP 91: yields while the lair is off screen ($16 bit $8000) and retries next frame while no actor slot is free (COP 27), then plays BRK #$53 and spawns.",
+      "RunLairSpawnAll": [
+        "Lair script: spawns all of the lair's monsters in a row, then waits for their deaths.",
+        "",
+        "When: lair records with this script word (139 records).",
+        "Sees: a lair that sends out a whole group, with the interval of $26 between monsters.",
+        "Why: used for lairs that should flood the area at once.",
+        "In: X = lair actor ($2E monsters, $26 interval). The counter $2C overwrites the tile offset cached by RequireLairTile.",
+        "Out: after the last spawn it polls SyncLairCount each frame and ends in SealLair when $2E reaches 0.",
+        "Clobbers: A, Y."
+      ],
+      "LairSpawnAllWaitSlot": "Re-entry point of RunLairSpawnAll: waits while off screen or while no actor slot is free, then spawns the next monster.",
+      "RunLairFormation": [
+        "Lair script: places all monsters at once at fixed positions from a formation list.",
+        "",
+        "When: lair records with this script word (107 records).",
+        "Sees: a group of monsters standing in a set pattern (some mirrored) the moment the lair is first run.",
+        "Why: formations in data_00EE8E give exact x, y and flip bits, which the timed scripts cannot.",
+        "In: X = lair actor ($2E = number of monsters, $26 = index of the formation in the pointer table data_00EE8E).",
+        "Out: for each entry (x, y, flip bits as three words): SpawnLairMonster, then the monster's script is LoadMonsterFromMeta (no puff), x and y are stored and the flip bits ORed into $1C; then it polls SyncLairCount and ends in SealLair.",
+        "Clobbers: A, Y, dp$00, $0C."
+      ],
+      "RunLairRespawnFlipping": [
+        "Lair script: like RunLairRespawn, with the monster orientation alternating.",
+        "",
+        "When: no lair record uses it (OQ-I006-5); dead or reached some other way.",
+        "Sees: monsters that come out mirrored every other time.",
+        "Why: unknown; the same pattern as RunLairSpawnAllFlipping.",
+        "In: X = lair actor. Out: as RunLairRespawn; after every monster $1C += $4000. Clobbers: A, Y."
+      ],
+      "LairRespawnFlippingWaitSlot": "Re-entry point of RunLairRespawnFlipping: waits while off screen or while no actor slot is free.",
+      "RunLairSpawnAllFlipping": [
+        "Lair script: like RunLairSpawnAll, with the monster orientation alternating.",
+        "",
+        "When: lair records with this script word (7 records).",
+        "Sees: a group whose monsters face alternating directions.",
+        "Why: mirrors the group so it does not march in one direction only.",
+        "In: X = lair actor ($2E monsters, counter in $2C). Out: as RunLairSpawnAll; after every monster $1C += $4000 (the two flip bits count through all four combinations). Clobbers: A, Y."
+      ],
+      "LairSpawnAllFlippingWaitSlot": "Re-entry point of RunLairSpawnAllFlipping: waits while off screen or while no actor slot is free.",
+      "RunLairProximity": [
+        "Lair script: spawns a monster only when the player is near.",
+        "",
+        "When: lair records with this script word (8 records).",
+        "Sees: a lair that stays quiet until the player steps into its box, then sends one monster, then waits again once it is dead.",
+        "Why: lets a room stay empty until the player walks in.",
+        "In: X = lair actor.",
+        "Out: waits at LairProximityPoll (RTL when off screen); Cop0C success continues at LairProximitySpawn.",
+        "Clobbers: A, Y."
+      ],
+      "LairProximityPoll": "Poll point of RunLairProximity (re-entered after COP 91 every frame): off screen = wait; otherwise Cop0C_JumpIfActorInBox continues at LairProximitySpawn when its test succeeds and falls into RTL when it does not.",
+      "LairProximitySpawn": [
+        "Spawns the monster of a proximity lair and loops back to the poll.",
+        "",
+        "When: Cop0C succeeded in RunLairProximity.",
+        "Sees: one monster comes out of the lair.",
+        "Why: the box test moved the spawn out of the main loop.",
+        "In: X = lair actor. Out: monster spawned (BRK #$53), COP 91; when SyncLairCount reports 0 left it ends in SealLair, otherwise it goes back to the poll. Clobbers: A, Y."
+      ],
+      "RequireLairTile": [
+        "Lets a lair script run only while its lair tile is intact.",
+        "",
+        "When: first call of every lair script.",
+        "Sees: a cleared lair stays quiet when the player returns.",
+        "Why: the scene reloads the lair actor from lair_state; the map tile is the second source of truth (tile $FD intact, $FE sealed, OQ-I006-23).",
+        "In: X = lair actor. $2C caches the map offset of the lair tile (0 = not looked up).",
+        "Out: returns (RTS) when the map byte at $7E8000 + offset is $FD; otherwise PLA drops the return address and RTL leaves the script, which is run again next frame.",
+        "Clobbers: A, Y (= X), dp$16, $18 and the scratch of lib_map_index_helpers; X preserved."
+      ],
+      "SealLair": [
+        "Opens a cleared lair: the green switch appears and the lair actor vanishes.",
+        "",
+        "When: the last monster of the lair died (SyncLairCount carry set).",
+        "Sees: the lair's shield disappears in a puff with a sound and the green switch tile shows (walkthrough: 'the switch beneath the lair'). The switch then releases the NPC or opens the path.",
+        "Why: lair_state is already 0, so the lair stays open after a scene change.",
+        "In: X = lair actor (position $00, $02 - 16, record index $34).",
+        "Out: waits until the VRAM write queue is empty; writes tile $FE at the lair position through lib_0109D6_part1.code_0107AC or code_0106F1 (chosen by record byte +8); $16 = $0310; effect animation 01 with BRK #$83; COP 86. Never returns to the caller (entered with JMP).",
+        "Clobbers: A, X, Y, dp$16, $18."
+      ],
+      "SyncLairCount": [
+        "Compares the monsters left in the lair with the last value seen.",
+        "",
+        "When: once per frame in every lair script, after each COP 91.",
+        "Sees: the moment the lair opens or spawns the next monster follows from it.",
+        "Why: monster deaths (NotifyLairOfDeath) only decrement $2E; this routine turns the change into script flow.",
+        "In: X = lair actor ($2E = left, $2F = last seen, $34 = lair index).",
+        "Out: unchanged: PLA drops the JSR return and RTL waits; changed: $2F = $2E; carry clear when $2E is still positive; carry set and lair_state[$34] = 0 when $2E is 0.",
+        "Clobbers: A, Y (= lair), X restored; M = 16 on return."
+      ],
+      "SpawnLairMonster": [
+        "Creates one monster for the lair.",
+        "",
+        "When: in the lair scripts, every time a monster is due.",
+        "Sees: a puff cloud appears at the lair, then the monster.",
+        "Why: all lair scripts share the spawn code.",
+        "In: X = lair actor ($38 = pointer to the meta entry of the monster).",
+        "Out: SpawnActorBefore; Y = new monster, $16 = meta +6 or $8000, script = RunMonsterAppearPuff, $32 = lair slot; position and $1C flip bits come from the lair (InitSpawnedActor).",
+        "Clobbers: A, Y; X preserved."
+      ],
+      "DelayBetweenSpawns": [
+        "Waits between two spawns of a lair.",
+        "",
+        "When: after each SpawnLairMonster.",
+        "Sees: monsters come out at a steady pace (longer for a bigger $26).",
+        "Why: the interval is data (record +$14), not code.",
+        "In: X = lair actor ($26 = interval; 0 = no wait).",
+        "Out: $14 = 3 * $26 - 1 and the resume point $18 = the instruction after the JSR; leaves the script with RTL, which continues there once $14 has counted down.",
+        "Clobbers: A."
+      ],
+      "RunMonsterAppearPuff": [
+        "First script of a lair monster: the appear puff.",
+        "",
+        "When: the frame after SpawnLairMonster.",
+        "Sees: a small cloud where the monster arrives (animation 00 of the effects bank), then the monster is standing there stunned for a moment.",
+        "Why: hides the pop-in and lets the monster arrive with its own graphics.",
+        "In: X = new monster ($38 = meta entry).",
+        "Out: $16 = $0300, flip bits saved in $30, $1C = $0372 while the puff plays; then flags = meta +6 or $8800, $26 = 60, and the shared half of LoadMonsterFromMeta (BRA loc_00296A) loads graphics and script.",
+        "Clobbers: A, Y."
+      ],
+      "LoadMonsterFromMeta": [
+        "Gives the actor X the animation, banks and script of its meta entry and starts that script in the same frame.",
+        "",
+        "When: after the appear puff (RunMonsterAppearPuff), or directly as the script of formation monsters (RunLairFormation).",
+        "Sees: the monster starts acting.",
+        "Why: lair monsters are created as generic actors; their behaviour comes from the meta table.",
+        "In: X = actor, $38 = meta entry pointer.",
+        "Out: $16 = meta +6 or $8000 (entry label only), $24 = bank (+A), $36 = script bank (+D), $1E = animation (+5), $20 = 0, $22 = animation table (+8), $18 = script (+B), SetActorAnimFrame, $04 = $06 = 0, then an RTS trick enters the script.",
+        "Clobbers: A, Y."
+      ],
+      "RunAppearPuff": [
+        "Generic puff for an actor that appears.",
+        "",
+        "When: spawned with COP 85 by about 150 scene scripts (NPCs, chests, switches, bridges) at the moment they appear.",
+        "Sees: a small cloud centred on the object that pops into the scene.",
+        "Why: one shared effect instead of per-scene animations.",
+        "In: X = the puff (a clone of its spawner: position and box come from it).",
+        "Out: when scene_active is 0 it ends at once; otherwise the puff is centred on the spawner's box, plays animation 02 of the effects bank and ends (COP 86).",
+        "Clobbers: A."
+      ],
+      "RunHazardPuff": [
+        "Turns a hazard into a puff that disappears.",
+        "",
+        "When: set as the script of every hazard in range by DestroyHazardsNearOrb.",
+        "Sees: the hazard bursts in a cloud (animation $10 of the effects bank).",
+        "Why: the Soul of Shield removes them without a kill routine of their own.",
+        "In: X = the hazard actor. Out: $36 = 0, $16 = $0300, animation $10, then COP 86. Clobbers: A."
+      ],
+      "RunEnemyDeath": [
+        "Death script of every enemy: puff, Gem drop and EXP number.",
+        "",
+        "When: KillTarget and KillOrSpareProjectileTarget put it in $18/$36 of a killed actor (HP 0, $16 bit $0400).",
+        "Sees: the enemy bursts in a cloud, a Gem may drop and the EXP earned floats up as a number.",
+        "Why: the same death sequence for every enemy; only the meta entry differs.",
+        "In: X = dying actor, $38 = its meta entry. The boss (boss_actor) branches to RunBossDeath instead.",
+        "Out: death puff (animation 03, centred like RunAppearPuff), a pickup actor spawned before this actor (see the block note for the drop odds), the EXP digits written into the sprite map, then COP 1B waits $10 frames and continues at FinishEnemyDeath.",
+        "Clobbers: A, X, Y (restored where noted), dp$00, $01, $16, $18."
+      ],
+      "WriteHighNibbleDigit": "Shifts the BCD byte in A right by four and falls into WriteLowNibbleDigit, so the high digit is written. In: A = BCD byte, X = offset into the EXP sprite map. Out: see WriteLowNibbleDigit.",
+      "WriteLowNibbleDigit": "Writes one EXP digit. In: A = BCD byte (low nibble used), X = offset into the sprite map. Out: the tile from ExpDigitTiles is stored at $7EF005 + X; X += 7 (the entries are 7 bytes apart). Clobbers: A; M = 16 on return.",
+      "ExpDigitTiles": "Tile ids of the digits 0-9 for the EXP number above a dying enemy (read by WriteLowNibbleDigit).",
+      "FinishEnemyDeath": [
+        "End of the death sequence.",
+        "",
+        "When: 16 frames after the EXP number appears (and after the boss explosions).",
+        "Sees: the number vanishes and the enemy is gone.",
+        "Why: lair monsters must report their death, others take the A3 path.",
+        "In: X = dying actor.",
+        "Out: $32 non-zero (lair monster): NotifyLairOfDeath; zero: BRL loc_002D40 (A3: kill, or respawn when $1A bit $1000)."
+      ],
+      "NotifyLairOfDeath": [
+        "Counts a lair monster's death in its lair.",
+        "",
+        "When: the death sequence of a monster that has a lair ($32).",
+        "Sees: when the last monster of a lair dies the lair opens (via SyncLairCount).",
+        "Why: the lair keeps the count; the monster only knows the lair's slot.",
+        "In: X = monster, Y = lair slot.",
+        "Out: lair $2E decremented unless already 0; the monster actor ends (COP 86).",
+        "Clobbers: A (M = 16)."
+      ],
+      "RunBossDeath": [
+        "Death script of a boss: a chain of explosions, then the next step of the game.",
+        "",
+        "When: RunEnemyDeath finds X = boss_actor.",
+        "Sees: the boss freezes and explodes in 32 bursts over its body; afterwards every other monster vanishes, then the ending (final boss) or the next scene.",
+        "Why: bosses end the area, so the stage is cleaned up here.",
+        "In: X = the boss ($08/$0A left and up extents, $0C/$0E right and down extents).",
+        "Out: boss_box_x/y/w/h set; 32 RunBossExplosion actors; KillAllOtherActors; location_id $7D: RunEnding by RTS trick; else Cop31 (A3 handshake actor) and FinishEnemyDeath.",
+        "Clobbers: A, Y."
+      ],
+      "RunBossExplosion": [
+        "One explosion of a boss's death.",
+        "",
+        "When: spawned 32 times by RunBossDeath.",
+        "Sees: a burst at a random spot on the boss's body, with a sound on about half of them.",
+        "Why: a chain of random bursts makes a big enemy fall apart.",
+        "In: X = explosion (clone of the boss), boss_box_x/y/w/h.",
+        "Out: x = boss_box_x + a random number below the box width (rng_state+1 and $7F reduced by repeated subtraction), y likewise from the height; animation 00 of the effects bank; BRK #$85 when the low bit of the random y offset is 0; COP 86.",
+        "Clobbers: A."
+      ],
+      "KillAllOtherActors": [
+        "Removes every actor except the player group and dying actors.",
+        "",
+        "When: RunBossDeath, after the 32 explosions.",
+        "Sees: all remaining monsters and projectiles disappear at once.",
+        "Why: the cleared stage must be safe while the boss ends.",
+        "In: none. Out: walks the actor list from actor_list_tail through $3E and kills (COP 86) every actor whose $16 has none of $24D0 ($2000, $0400, $0080, $0040, $0010).",
+        "Clobbers: A; X preserved (PHX/PLX)."
+      ],
+      "KillAllProjectiles": [
+        "Removes every projectile.",
+        "",
+        "When: lib_menus, when the menu closes with a different equipped magic than before.",
+        "Sees: the old magic's flying shots vanish.",
+        "Why: leftover projectiles of the unequipped magic would keep acting.",
+        "In: none (called with JSL). Out: kills every actor with $16 bit $0020 (COP 86).",
+        "Clobbers: A; X and P preserved."
+      ],
+      "RunFixedGemPickup": [
+        "A Gem that lies on the ground until it is taken.",
+        "",
+        "When: spawned with COP 85 by w1_actor_01E4BB (Greenwood).",
+        "Sees: a Gem that stays; touching it gives 10 Gems (OQ-I006-8).",
+        "Why: fixed rewards need a pickup that never times out.",
+        "In: X = the pickup. Out: $16 = $4000 (pickup), animation 07 forever; ApplyGemPickup removes it.",
+        "Clobbers: A."
+      ],
+      "RunSmallGemPickup": [
+        "A dropped 1-Gem pickup.",
+        "",
+        "When: dropped by RunEnemyDeath (COP B0, flags $4000).",
+        "Sees: a small Gem that animates, then blinks and disappears if left.",
+        "Why: drops are timed so the field does not fill up.",
+        "In: X = the pickup. Out: COP A4, animation 04, then animation 09 with count 4 (COP 81/83), COP 86. Touching it runs ApplyGemPickup (1 Gem).",
+        "Clobbers: A."
+      ],
+      "RunMediumGemPickup": [
+        "A dropped 5-Gem pickup.",
+        "",
+        "When: dropped by RunEnemyDeath.",
+        "Sees: a larger Gem that animates, then blinks and disappears if left.",
+        "Why: as RunSmallGemPickup.",
+        "In: X = the pickup. Out: COP A4, animation 05, then animation 0A with count 4, COP 86. ApplyGemPickup gives 5 Gems.",
+        "Clobbers: A."
+      ],
+      "RunLargeGemPickup": [
+        "A dropped 10-Gem pickup.",
+        "",
+        "When: dropped by RunEnemyDeath.",
+        "Sees: the biggest Gem, animates, then blinks and disappears if left.",
+        "Why: as RunSmallGemPickup.",
+        "In: X = the pickup. Out: COP A4, animation 06, then animation 0B with count 4, COP 86. ApplyGemPickup gives 10 Gems.",
+        "Clobbers: A."
+      ],
+      "ApplyGemPickup": [
+        "Gives the player the Gems of a pickup actor.",
+        "",
+        "When: ApplyContactDamageOrPickup, when the player touches an actor with $16 bit $4000.",
+        "Sees: a pickup sound and the Gem counter in the HUD rises; the pickup is gone.",
+        "Why: one routine for the three sizes, chosen by the pickup's current animation id ($1E).",
+        "In: X = pickup (called with JSL).",
+        "Out: BRK #$4D; amount = 10 for animation 06 and 0B and for any unknown id, 5 for 05 and 0A, 1 for 04 and 09; lib_player_stats.code_0276A5 adds it in BCD to gems_low and gems_high; hud_dirty_flags bit $0010 set; $16 bit $2000 set; COP 86.",
+        "Clobbers: A; P and Y restored."
+      ],
+      "RunEnding": [
+        "The ending after the last boss: the farewell text, the souls and the warp.",
+        "",
+        "When: RunBossDeath at location_id $7D, entered by RTS trick.",
+        "Sees: 'Finally ... defeated Deathtoll!', the speech of the souls (singular or plural text), 'The World of Evil began to disappear', an effect, then the next scene.",
+        "Why: the text depends on the souls recovered (OQ-I006-10).",
+        "In: X = the boss actor. Out: texts through COP 01, souls_flags cleared, event flag byte $1F bit 2 set, $1B84 = 6, $031E = 1, Cop10 warp to scene 7 (OQ-I006-11). The text fits the walkthrough ending in the Deathtoll chapter.",
+        "Clobbers: A."
+      ],
+      "EndingTextDefeated": "First ending text: the hero ([02:2], presumably the name from the name-entry strings) defeated Deathtoll and hears a small voice. Ends with [END].",
+      "EndingTextStaySingular": "Ending text when only one soul remains (the Magician): 'I decided to stay here and seal the World of Evil'. [JMP] continues in EndingTextStayPlural after its first sentence.",
+      "EndingTextStayPlural": "Ending text for several souls: 'we decided to stay here and seal the World of Evil', then the Master's message about the World of Evil, ending with [12][08:408][END] (OQ-I006-14).",
+      "EndingTextWorldFades": "Last ending text: 'The World of Evil began to disappear', then [12][08:408][END].",
+      "RunEndingEffect": [
+        "Visual effect of the ending.",
+        "",
+        "When: spawned with COP 85 by RunEnding after EndingTextWorldFades.",
+        "Sees: the effect while the world disappears (animation $4D of the bank $0D, started with COP 92).",
+        "Why: the text alone would not show the world fading.",
+        "In: X = the effect actor. Out: COP A8 (#$8000, #0D), COP 92 (#4D), COP 94, then COP 86.",
+        "Clobbers: A."
+      ]
+    },
+    "comments": {
+      "9974": { "text": "Entry point: from here on the script resumes at the next instruction every frame (until the next COP 91)", "expect": "COP [91]" },
+      "9979": { "text": "$16 bit $8000 = off screen (set by CullAndSortActors): the lair waits, so nothing spawns where the player cannot see", "expect": "BIT" },
+      "9985": { "text": "Free-slot stack top is 0: no free actor slot, retry next frame (COP 27)", "expect": "($4A)" },
+      "9993": { "text": "BRK #$53 has bit 6 set, so $0399 = $13: the sound played before each spawn (OQ-I024-1)", "expect": "BRK" },
+      "10014": { "text": "$2C = monsters still to spawn (= $2E); overwrites the tile offset RequireLairTile cached in $2C", "expect": "002E" },
+      "10050": { "text": "One monster spawned: the counter in $2C counts down to 0", "expect": "002C" },
+      "10082": { "text": "data_00EE8E is a pointer table indexed by the formation number $26 (x2); dp$00 reads the entries", "expect": "data_00EE8E" },
+      "10090": { "text": "Formation monsters skip the appear puff: they start directly in LoadMonsterFromMeta", "expect": "LoadMonsterFromMeta" },
+      "10096": { "text": "Formation entry (three words): x and y in pixels, then flip bits ORed into $1C", "expect": "($00)" },
+      "10175": { "text": "Adding $4000 steps the two flip bits of $1C through all four combinations: the next monster is mirrored", "expect": "ADC" },
+      "10234": { "text": "Same flip step as in RunLairRespawnFlipping", "expect": "ADC" },
+      "10273": { "text": "Cop0C_JumpIfActorInBox: continue at LairProximitySpawn when the test succeeds, otherwise RTL and poll again next frame", "expect": "COP [0C]" },
+      "10307": { "text": "$2C caches the map offset of the lair tile (0 = not looked up yet)", "expect": "002C" },
+      "10337": { "text": "Map byte under the lair: $FD = intact, the script runs only then (OQ-I006-23)", "expect": "7E8000" },
+      "10350": { "text": "Not $FD: PLA drops the JSR return address and RTL leaves the script; it is run again next frame", "expect": "PLA" },
+      "10355": { "text": "Wait until the VRAM write queue is empty before patching the map", "expect": "vram_write_queue" },
+      "10387": { "text": "Record byte +8 picks the map-patch routine (code_0107AC or code_0106F1); both write tile $FE", "expect": "data_00BA0D+8" },
+      "10428": { "text": "BRK #$83 (bit 6 clear: sound_request = $83) as the lair opens", "expect": "BRK" },
+      "10440": { "text": "$2E = monsters left (NotifyLairOfDeath decrements it), $2F = the value seen last time", "expect": "002E" },
+      "10450": { "text": "Unchanged: PLA drops the JSR return and RTL waits; the script resumes at its last COP 91", "expect": "PLA" },
+      "10469": { "text": "Count is 0: lair_state[$34] = 0 and carry set; the cleared state survives scene changes", "expect": "lair_state" },
+      "10485": { "text": "Monster flags = meta entry +6 or $8000 (off screen until the culling clears the bit)", "expect": "meta_tables_008000+6" },
+      "10494": { "text": "First script of the new monster: the appear puff, which then falls into LoadMonsterFromMeta", "expect": "RunMonsterAppearPuff" },
+      "10511": { "text": "$32 of the monster = lair slot; FinishEnemyDeath uses it to tell the lair", "expect": "0032" },
+      "10526": { "text": "$14 = 3 * interval - 1: the script sleeps this many frames (RunActorList counts $14 down)", "expect": "0014" },
+      "10531": { "text": "Resume point = return address of the JSR: after the wait the script continues behind the call", "expect": "0018" },
+      "10547": { "text": "Keep the monster's flip bits in $30 while the puff uses $0372 as its $1C", "expect": "001C" },
+      "10582": { "text": "Flags = meta +6 or $8800 (bit $0800 = hit stun); with $26 = $3C the new monster starts stunned for 60 frames", "expect": "8800" },
+      "10588": { "text": "Join LoadMonsterFromMeta after its flags store: banks, animation and script from the meta entry", "expect": "BRA" },
+      "10640": { "text": "RTS trick: with the bank and script - 1 pushed, the final RTL jumps straight into the monster's script", "expect": "DEC" },
+      "10653": { "text": "scene_active = 0: no puff, the actor just ends", "expect": "scene_active" },
+      "10690": { "text": "Centre the 16x16 puff on its spawner's box: x += (width - 16) / 2", "expect": "SBC" },
+      "10705": { "text": "y -= (height - 16) / 2", "expect": "SBC" },
+      "10768": { "text": "The boss goes to RunBossDeath instead", "expect": "boss_actor" },
+      "10800": { "text": "Centre the death puff on the dying actor (same offsets as RunAppearPuff)", "expect": "SBC" },
+      "10830": { "text": "w = world_index; world 6 counts as $19", "expect": "world_index" },
+      "10844": { "text": "$16 = 2w + 1: a random number below it drops the 10-Gem pickup", "expect": "STA" },
+      "10852": { "text": "$18 = 4w + 4: below it the 5-Gem pickup, otherwise the 1-Gem pickup", "expect": "STA" },
+      "10854": { "text": "Weapon 4 (Lucky Blade) doubles both thresholds, so bigger pickups drop more often", "expect": "equipped_weapon" },
+      "10868": { "text": "random_mod_result = random number below $64 (100)", "expect": "COP [35]" },
+      "10882": { "text": "Spawn the pickup before this actor with flags $4000 (the pickup bit ApplyContactDamageOrPickup tests)", "expect": "RunLargeGemPickup" },
+      "10930": { "text": "EXP of the monster as a BCD word (meta entry +3) into $00/$01", "expect": "meta_tables_008000+3" },
+      "10955": { "text": "Pointer table at $7EF000 (slot number x 2) leads to the popup's sprite map (layout not traced)", "expect": "7EF000" },
+      "10975": { "text": "Digit count from the BCD value: $1000 or more four digits, $100 three, $10 two, else one", "expect": "CMP" },
+      "11001": { "text": "Shift x to keep the number centred: +5 for one digit, +3 for two, +1 for three, -1 for four", "expect": "ADC" },
+      "11089": { "text": "Show the number for $10 frames, then continue at FinishEnemyDeath", "expect": "COP [1B]" },
+      "11104": { "text": "Digit 0-9 to tile id", "expect": "ExpDigitTiles" },
+      "11111": { "text": "Digit tile into the sprite map; entries are 7 bytes apart (X += 7 below)", "expect": "7EF005" },
+      "11139": { "text": "No lair ($32 = 0): continue in the A3 code at loc_002D40 (kill, or respawn when $1A bit $1000)", "expect": "BRL" },
+      "11144": { "text": "$2E = monsters left in the lair, never below 0", "expect": "002E" },
+      "11180": { "text": "Box of the boss: x and y minus the left and upper extents ($08, $0A), width and height = sums of the extents; the explosions use it", "expect": "boss_box_x" },
+      "11213": { "text": "Loop $20 = 32 times, one explosion actor per pass (COP 04 below)", "expect": "COP [03]" },
+      "11224": { "text": "3 frames between explosions", "expect": "0014" },
+      "11234": { "text": "All explosions are out: remove every other actor", "expect": "KillAllOtherActors" },
+      "11240": { "text": "location_id $7D: the last boss, the ending starts", "expect": "CMP" },
+      "11247": { "text": "RTS trick: bank and RunEnding - 1 are pushed and the RTL below jumps into RunEnding", "expect": "RunEnding" },
+      "11257": { "text": "Not the last boss: Cop31_SpawnEngineActor2C9B starts the A3 sound handshake actor (operand 2)", "expect": "COP [31]" },
+      "11288": { "text": "Random x inside the box: a number 0-$7F reduced modulo the box width by repeated subtraction, plus boss_box_x", "expect": "rng_state+1" },
+      "11319": { "text": "Random y the same way from the box height and boss_box_y", "expect": "rng_state+1" },
+      "11353": { "text": "BRK #$85 on about half of the explosions (low bit of the random y offset is 0)", "expect": "BRK" },
+      "11378": { "text": "Keep actors with any of $2000, $0400, $0080, $0040, $0010 in $16 (the player group, dying actors); kill the rest", "expect": "BIT" },
+      "11407": { "text": "$16 bit $0020 marks projectiles; each one is killed", "expect": "BIT" },
+      "12048": { "text": "$1E = current animation id of the pickup: 06 and 0B give 10 Gems, 05 and 0A give 5, 04 and 09 give 1, anything else 10", "expect": "001E" },
+      "12094": { "text": "A = Gems in BCD, added to gems_low and gems_high with a cap", "expect": "code_0276A5" },
+      "12101": { "text": "HUD bit $0010: Gems changed (OQ-I006-18)", "expect": "TSB" },
+      "21373": { "text": "$1F masks the five soul bits; exactly 1 = only the Magician (OQ-I006-10): singular text 'I decided', else plural 'we decided'", "expect": "souls_flags" },
+      "21394": { "text": "All souls cleared after the text", "expect": "souls_flags" },
+      "21418": { "text": "Cop09_SetOrClearFlag: set event flag byte $1F bit 2 (operand $9F02, bit 15 = set)", "expect": "COP [09]" },
+      "21425": { "text": "$1B84 = 6 (the role of $1B84 is not traced, OQ-I024-2)", "expect": "1B84" },
+      "21434": { "text": "Cop10_SetNextScene: scene_next = 7 (area 0), warp animation 1, x = $70, y = $60 (OQ-I006-11)", "expect": "COP [10]" }
+    }
+  },
+
+  "system/engine_003005.asm": {
+    "blockNote": [
+      "Player death check, held-until-released actors, the Soul of Shield sweep and the boss map patch (file offsets 12293-12716, SNES $00:B005-$B1AC, bank 00).",
+      "",
+      "=== DEATH CHECK ===",
+      "CheckPlayerDeath runs every frame from RunMainLoop. While the player actor is not yet dying ($16 bit $0400 clear) and player_hp and heal_pending are both 0 it tests three equipped items in this order (Cop19 reads the inventory entry id, bit 7 = equipped, OQ-I006-2): Medical Herb ($38): heal_pending = player_max_hp, the entry is removed (Cop0B) and the player lives. Strange Bottle ($39): the entry is removed and the player dies with his Gems. Magic Bell ($40): not removed, the player dies with his Gems (OQ-I006-1: the walkthrough says the Bottle keeps the Gems and says nothing about the Bell). No item: gems_low and gems_high = 0 and the player dies. 'Dies' is MarkPlayerDead: $16 bit $0400 set and $0800 cleared, joy_block_mask = $2080 (Select/X and A), player_died + 1; the player's own script then runs PlayPlayerDeath (player_core).",
+      "",
+      "=== HELD ACTORS ===",
+      "HoldActorUntilReleased is the tail of about a dozen NPC and object scripts (entered by an RTS trick pushed by the actor): the actor blocks its own tiles (COP 15), plays animation 0D and waits until the release switch of its lair record (+$1E of data_00BA0D, record index in $34, bit array at $1ADE) is set. Then it frees its tiles (COP 16), sets the bits in the arrays at $1A9E and $1ADE, clears bit $40 of lair_state[$34] and becomes the actor of its meta entry (animation, banks, flags, script, SetActorAnimFrame). The walkthrough's 'the switch beneath the lair releases the old woman / the tool shop owner' is this routine.",
+      "",
+      "=== SOUL OF SHIELD ===",
+      "DestroyHazardsNearOrb is spawned by lib_0116C3 (souls_flags bit $0004, the Soul of Shield per OQ-I006-10) with flags $2010 and runs every frame: every actor whose $16 is exactly $0301 inside a box of +-$30 pixels around soul_orb_actor gets the script RunHazardPuff and a $14 of 0, so it bursts. The walkthrough says the Shield soul protects from the magma bombs on Durean (the link between the $0301 actors and those bombs is inferred).",
+      "",
+      "=== BOSS MAP PATCH ===",
+      "RunBossMapPatch is spawned (COP 85) by five boss scripts (gv_boss_metal_mantis, gw_boss_light_water_fire_statues, ms_boss_poseidon, ll_boss_tin_doll, we_deathtolls_shrine_actors), which set the patch id (0-4) in $30 of the new actor. It blocks all buttons (joy_block_mask = $FFFF), waits one frame, then ApplyBossMapPatch waits for an empty VRAM write queue, plays BRK #$83, calls lib_0108BB.code_0108BB with the id and ReleaseInputAndKill clears the mask and ends the actor. Whether the patch closes or opens the boss room is OQ-I024-3."
+    ],
+    "partNotes": {
+      "CheckPlayerDeath": [
+        "Decides what happens when the player's HP hits zero.",
+        "",
+        "When: every frame in RunMainLoop (JSL after the hit and contact tests).",
+        "Sees: the Medical Herb is used up and the player is healed, or the player dies and the Gems are lost (or kept with the Strange Bottle and Magic Bell equipped).",
+        "Why: the death items need a single place that runs after all damage of the frame.",
+        "In: player_actor, player_hp, heal_pending. M becomes 16.",
+        "Out: see the block note: heal_pending, inventory entries, gems_low/high, player $16 bit $0400, joy_block_mask, player_died.",
+        "Clobbers: A, X; P restored."
+      ],
+      "TryStrangeBottle": "Second test of CheckPlayerDeath: with the Strange Bottle ($39) equipped (Cop19) the entry is removed (Cop0B) and the player dies with his Gems (BRA MarkPlayerDead); otherwise it goes on to TryMagicBell. OQ-I006-1.",
+      "TryMagicBell": "Third test of CheckPlayerDeath: with the Magic Bell ($40) equipped (Cop19) the player dies with his Gems and the Bell stays (BRA MarkPlayerDead); otherwise it falls into ZeroGemsAndDie. OQ-I006-1, OQ-I006-2.",
+      "ZeroGemsAndDie": [
+        "Death without protection: all Gems are lost.",
+        "",
+        "When: no Herb, Bottle or Bell equipped when HP reaches 0.",
+        "Sees: the Gem counter drops to 0 and the player dies.",
+        "Why: the game's death penalty.",
+        "In: X = player actor. Out: gems_low = gems_high = 0, then MarkPlayerDead. Clobbers: A."
+      ],
+      "MarkPlayerDead": "Puts the player actor X into the dying state: $16 bit $0800 cleared and bit $0400 set, joy_block_mask = $2080 (Select/X and A blocked) and player_died + 1. The player script reaches PlayPlayerDeath at its next main-loop pass. Ends with PLP and RTL.",
+      "HoldActorUntilReleased": [
+        "Keeps an NPC or object frozen until its release switch is set, then turns it into its real self.",
+        "",
+        "When: tail-jumped (RTS trick) by about a dozen scene actors after they tested that they are not yet free.",
+        "Sees: a shut-in villager, tulip or tool shop owner stands there; when the player clears the lair that frees it (the walkthrough: 'the switch beneath the lair will release ...') it starts its normal behaviour and dialogue.",
+        "Why: the same script holds every released-by-a-lair actor; the record in data_00BA0D says which switch frees it.",
+        "In: X = actor, $34 = lair record index, $38 = its meta entry.",
+        "Out: while held: animation 0D and the actor's own tiles blocked; when released: tiles freed, the switch bits stored, lair_state[$34] bit $40 cleared, and the meta entry (+5, +A, +D, +6 and $DFFF, +8, +B) applied; $30, $20, $14, $04, $06 = 0.",
+        "Clobbers: A, Y."
+      ],
+      "DestroyHazardsNearOrb": [
+        "Soul of Shield: bursts every hazard near the orb.",
+        "",
+        "When: spawned once by lib_0116C3 when souls_flags bit $0004 is set; runs every frame afterwards.",
+        "Sees: hazards near the player (the walkthrough names the magma bombs of Durean) pop in a puff instead of hurting him.",
+        "Why: the Shield soul's protection is implemented by removing the hazard.",
+        "In: soul_orb_actor. Box = orb position +-$30 (clamped at 0), $16/$18 = top left, $1A/$1C = size.",
+        "Out: every actor in the list with $16 = $0301 inside the box gets script RunHazardPuff (bank in $36) and $14 = 0.",
+        "Clobbers: A, dp$16-$1C; X preserved (PHX/PLX)."
+      ],
+      "RunBossMapPatch": [
+        "Blocks the buttons while a boss room's map is patched.",
+        "",
+        "When: spawned by five boss scripts at the start of the fight (OQ-I024-3).",
+        "Sees: the map around the boss room changes; the player cannot move during the change.",
+        "Why: the change needs the VRAM queue empty and no input.",
+        "In: X = the patch actor, $30 = patch id 0-4 (set by the boss). Out: joy_block_mask = $FFFF, then COP 1B waits one frame and continues at ApplyBossMapPatch.",
+        "Clobbers: A."
+      ],
+      "ApplyBossMapPatch": "Second step of RunBossMapPatch: waits (RTL) while the VRAM write queue is not empty, then BRK #$83 and lib_0108BB.code_0108BB with A = the patch id ($30); COP 27 continues at ReleaseInputAndKill.",
+      "ReleaseInputAndKill": "Last step of RunBossMapPatch: joy_block_mask = 0 (the player may move again) and the patch actor ends (COP 86)."
+    },
+    "comments": {
+      "12302": { "text": "$16 bit $0400 = already dying: do nothing", "expect": "BIT" },
+      "12307": { "text": "Dead only when player_hp is 0 and no healing is pending (heal_pending)", "expect": "player_hp" },
+      "12315": { "text": "Cop19: inventory entry $38 (Medical Herb) must be equipped (bit 7); if not, jump to TryStrangeBottle", "expect": "COP [19]" },
+      "12323": { "text": "Herb: heal_pending = player_max_hp (a full heal); Cop0B below removes the Herb", "expect": "heal_pending" },
+      "12336": { "text": "Strange Bottle is used up, but the player still dies (with his Gems, OQ-I006-1)", "expect": "COP [0B]" },
+      "12348": { "text": "No death item: all Gems lost", "expect": "gems_low" },
+      "12372": { "text": "$2080 = Select/X (menu) and A; these buttons are blocked while the player dies", "expect": "2080" },
+      "12418": { "text": "Block the actor's own tiles while it is held (Cop15_BlockOwnTiles)", "expect": "COP [15]" },
+      "12434": { "text": "Release switch word of the lair record $34 (bit index in the array at $1ADE)", "expect": "data_00BA0D+1E" },
+      "12440": { "text": "Test that bit: carry clear = not released yet, keep waiting at loc_003084", "expect": "code_0273A2" },
+      "12446": { "text": "Released: free the tiles (Cop16_UnblockOwnTiles)", "expect": "COP [16]" },
+      "12471": { "text": "Clear bit $40 of lair_state[$34] (16-bit access)", "expect": "FFBF" },
+      "12495": { "text": "The actor is rebuilt from its meta entry (+5 animation, +A bank, +D script bank, +6 flags, +8 table, +B script), like LoadMonsterFromMeta", "expect": "meta_tables_008000+5" },
+      "12560": { "text": "Box of +-$30 pixels around the orb (left and top clamped at 0): $16/$18 = top left, $1A/$1C = width and height", "expect": "soul_orb_actor" },
+      "12633": { "text": "Only actors whose $16 is exactly $0301 are hit", "expect": "CMP" },
+      "12667": { "text": "Replace the actor's script by RunHazardPuff; $14 = 0 below makes it run on the next frame", "expect": "RunHazardPuff" },
+      "12683": { "text": "All buttons blocked while the map changes", "expect": "joy_block_mask" },
+      "12686": { "text": "Wait one frame, then continue at ApplyBossMapPatch", "expect": "COP [1B]" },
+      "12692": { "text": "Wait for an empty VRAM write queue before the map patch", "expect": "vram_write_queue" },
+      "12700": { "text": "$30 = patch id 0-4 (written by the boss script right after the COP 85 spawn)", "expect": "0030" },
+      "12703": { "text": "Patch the map with id A (lib_0108BB)", "expect": "code_0108BB" }
+    }
+  },
+
+  "system/engine_title_file_select.asm": {
+    "blockNote": [
+      "Title-screen Mode 7 hook and the save-slot (file select) menu (file offsets 27519-28199, SNES $00:EB7F-$EE27, bank 00).",
+      "",
+      "=== MODE 7 (UpdateTitleMode7) ===",
+      "HandleVBlank calls UpdateTitleMode7 on every NMI, after FlushVramWriteQueue (engine_vblank_nmi). It acts only when location_id is $10 and returns at once otherwise. The Mode 7 state lives in WRAM: centre m7x_shadow/m7y_shadow ($046A, $046C), scale m7_scale ($0480, written by gv_front_end) and angle m7_angle ($047E, an 8-bit table index; nothing in extracted/ writes it, so the angle is 0 unless a block copy sets it, OQ-I024-4). BuildRotationMatrix builds A = scale * cos, B = scale * sin, C = -scale * sin and D = scale * cos with the PPU multiplier (Mode7Multiply16x8: M7A, a 16-bit scale, times the signed table byte in M7B; the product's middle and high bytes MPYM/MPYH are the result); the tables are binary_00FCC4 (cos) and binary_00FC84 (sin), $40 entries apart, a quarter turn of 256 steps. The results go to m7_matrix_a-d ($0476-$047C). WriteMode7Matrix then writes the shadows (m7a_shadow-m7d_shadow, m7x_shadow, m7y_shadow, $046E-$0474 and $046A-$046C) to M7A-M7D, M7X and M7Y (each write-twice register gets the low byte, then the high byte), and UpdateTitleMode7 copies the new matrix into the shadows, so the PPU always shows the matrix of the previous NMI. RefreshTitleMatrixAlt and BuildRotationMatrixAlt (an alternative matrix routine) have no caller (OQ-I006-6).",
+      "",
+      "=== FILE SELECT ===",
+      "EnterFileSelect is reached by BRL from gv_front_end. It calls lib_01232B.code_01232B, draws the menu and continues in HandleFileSelectChoice (COP 1B). DrawSaveSlotMenu prints the heading (gv_title_texts.asciistring_0143B0), then checks the four slots at $700000 + n * $400: lib_save_system.code_02716E computes the checksum of the slot into dp$16/$18 and compares it with the words at +$3FA and +$3FC. A valid main block is copied over its backup mirror at +$1000 ($3FE bytes, MVN); an invalid one is restored from the backup and checked again; a slot that is valid in neither is not listed. For every listed slot the menu line is filled from the save block ($1B92 + offset: five fields into $0447-$044E, $1B6A + offset into $0450, $1B90 + offset into $0452) and printed with lib_text_render.code_012769. If no slot is valid the last-used slot word $701FFE is set to 0. HandleFileSelectChoice starts the cursor at $701FFE (slot 0-3, else 0), asks lib_0118FC_part2.code_0121E8, and treats an answer of 4 as a second prompt (probably erase: it stores the slot offset into the first word of the main and backup blocks and switches the palette word $7F0006 from $7FFF to $03FF while it runs, OQ-I024-5). Any slot 0-3 is stored in save_slot, loaded with lib_save_system.code_027132 and the game warps: scene_next = 1 when the load reports carry (inferred: no valid save, a new game) or the word at $1B90 of the loaded save otherwise, with warp_dest_anim = 1 and the player at x $70, y $60."
+    ],
+    "partNotes": {
+      "UpdateTitleMode7": [
+        "NMI hook that drives the title screen's Mode 7 background.",
+        "",
+        "When: every NMI (HandleVBlank, JSL after FlushVramWriteQueue), but only does work when location_id = $10.",
+        "Sees: the zooming Mode 7 picture behind the title.",
+        "Why: the background must change in vblank, the only time the PPU registers can be written safely.",
+        "In: location_id, the Mode 7 variables ($046A-$0480).",
+        "Out: BuildRotationMatrix, WriteMode7Matrix (previous frame's matrix to the PPU), then m7_matrix_a-d copied into the shadows.",
+        "Clobbers: A, X, Y, dp$00-$02 (the NMI handler saves the registers)."
+      ],
+      "RefreshTitleMatrixAlt": "Unreferenced: runs BuildRotationMatrixAlt and falls through into WriteMode7Matrix (no RTS of its own). Probably an older title routine (OQ-I006-6).",
+      "WriteMode7Matrix": [
+        "Writes the Mode 7 shadows to the PPU.",
+        "",
+        "When: once per NMI from UpdateTitleMode7 (and from RefreshTitleMatrixAlt).",
+        "Sees: the title background takes the new matrix and centre.",
+        "Why: M7A-M7D and M7X/M7Y are write-twice registers, so each value needs two stores.",
+        "In: m7a_shadow-m7d_shadow ($046E-$0474), m7x_shadow, m7y_shadow. Out: M7A-M7D, M7X, M7Y written (low byte, then high byte). Clobbers: A (8-bit accesses, M = 16 saved by the caller)."
+      ],
+      "BuildRotationMatrix": [
+        "Computes the Mode 7 matrix from the angle and the scale.",
+        "",
+        "When: every NMI in location $10, from UpdateTitleMode7.",
+        "Sees: the title picture zooms (scale) and could rotate (angle, OQ-I024-4).",
+        "Why: the PPU needs A, B, C, D = scale * (cos, sin, -sin, cos).",
+        "In: m7_angle (8-bit table index), m7_scale (16-bit).",
+        "Out: m7_matrix_a = scale * binary_00FCC4[angle], m7_matrix_b = scale * binary_00FC84[angle], m7_matrix_c = scale * -binary_00FC84[angle], m7_matrix_d = m7_matrix_a's formula again; each is the middle and high byte of the 24-bit product.",
+        "Clobbers: A, X, Y, dp$00-$02; X and Y become 16-bit."
+      ],
+      "BuildRotationMatrixAlt": "Unreferenced alternative to BuildRotationMatrix: it scales (index/4 + $41) * 2 with the PPU multiplier into m7a_shadow and m7d_shadow, and builds the shadows B and C from the sine byte (C negated). Only RefreshTitleMatrixAlt calls it (OQ-I006-6).",
+      "Mode7Multiply16x8": [
+        "Multiplies a 16-bit value by a signed byte with the PPU multiplier.",
+        "",
+        "When: four times per BuildRotationMatrix.",
+        "Sees: nothing.",
+        "Why: the SNES multiplier at MPYL/MPYM/MPYH is the cheapest 16x8 multiply.",
+        "In: dp$00-$01 = 16-bit factor (written to M7A), dp$02 = signed byte (written twice to M7B).",
+        "Out: dp$00/$01 = low and middle byte of the product; the caller reads MPYM:MPYH from the PPU.",
+        "Clobbers: A; P preserved."
+      ],
+      "EnterFileSelect": [
+        "Opens the save-slot menu from the title.",
+        "",
+        "When: BRL from gv_front_end when the player chooses to load.",
+        "Sees: the list of saved games.",
+        "Why: the menu is one actor step; the choice is handled one frame later.",
+        "In: X = title actor. Out: lib_01232B.code_01232B, DrawSaveSlotMenu, then COP 1B continues at HandleFileSelectChoice after one frame.",
+        "Clobbers: A, Y; X restored."
+      ],
+      "HandleFileSelectChoice": [
+        "Reads the slot choice and starts the game from the chosen slot.",
+        "",
+        "When: one frame after EnterFileSelect, and again after each pass of the second prompt.",
+        "Sees: a cursor on the last used slot; picking a slot starts the game at the start position (x $70, y $60); the second prompt turns the palette word $7F0006 to $03FF.",
+        "Why: slot loading and the second prompt are one routine so the menu can redraw between them.",
+        "In: $701FFE = last slot. Out: save_slot = choice, lib_save_system.code_027132 loads it, scene_next = 1 (carry: inferred new game) or the word $1B90, warp_dest_anim = 1, warp_dest_x = $70, warp_dest_y = $60, $0445 = 0, $0454 + 1, COP 91. Prompt answer 4 (probably erase, OQ-I024-5): the slot offset is written to the first word of the main and backup blocks and the menu is redrawn.",
+        "Clobbers: A, X, Y; X restored (PHX/PLX)."
+      ],
+      "DrawSaveSlotMenu": [
+        "Draws the save-slot menu and repairs the slots it finds damaged.",
+        "",
+        "When: EnterFileSelect, and after the second prompt.",
+        "Sees: up to four saved games with their summary line; empty or damaged slots do not appear.",
+        "Why: the main block of each slot has a backup mirror (+$1000); opening the menu refreshes whichever is good.",
+        "In: none. Out: slot text printed through lib_text_render.code_012769; main and backup blocks synchronised; $701FFE = 0 when no slot is valid; save_slot = 0.",
+        "Clobbers: A, X, Y, dp$16, $18 and the callees' scratch."
+      ]
+    },
+    "comments": {
+      "27519": { "text": "Acts only while location_id = $10 (the title scene)", "expect": "location_id" },
+      "27529": { "text": "The registers get the shadows of the previous NMI; the new matrix is copied into them below, so the PPU lags one frame", "expect": "WriteMode7Matrix" },
+      "27566": { "text": "High byte of the shadow: M7A-M7D, M7X and M7Y are write-twice registers (low byte, then high byte)", "expect": "046F" },
+      "27646": { "text": "binary_00FCC4 = cosine table indexed by the angle; binary_00FC84 is the sine table, $40 entries (a quarter of 256) apart", "expect": "binary_00FCC4" },
+      "27655": { "text": "MPYM: the middle and high bytes of the 24-bit product ($2135-$2136) = scale * table byte / 256", "expect": "MPYM" },
+      "27692": { "text": "Negate the sine byte: matrix C = -scale * sin", "expect": "EOR" },
+      "27823": { "text": "The multiplier takes M7A (16-bit) times the last byte written to M7B (signed 8-bit)", "expect": "M7B" },
+      "27857": { "text": "Last used slot (0-3, anything else becomes 0): the cursor starts there", "expect": "701FFE" },
+      "27879": { "text": "Menu choice: carry set asks again from slot 0; an answer of 4 opens the second prompt (probably erase, OQ-I024-5)", "expect": "code_0121E8" },
+      "27896": { "text": "$7F0006 = cgram_buffer + 6 (colour 3) = $03FF while the second prompt runs, $7FFF again afterwards", "expect": "7F0006" },
+      "27916": { "text": "Slot offset (slot x $400) stored over the first word of the slot and of its backup at +$1000", "expect": "700000" },
+      "27936": { "text": "Chosen slot 0-3", "expect": "save_slot" },
+      "27939": { "text": "Load the chosen slot (lib_save_system); carry set is treated below as 'no valid save' (inferred)", "expect": "code_027132" },
+      "27947": { "text": "Carry set: scene_next = 1, else the word at $1B90 of the loaded save", "expect": "BCS" },
+      "28008": { "text": "Checksum words at +$3FA and +$3FC of the slot block ($700000 + slot x $400); code_02716E left the computed sum in $16/$18", "expect": "7003FA" },
+      "28035": { "text": "Main block is valid: copy $3FE bytes (A = $03FD) over the backup mirror at +$1000", "expect": "MVN" },
+      "28056": { "text": "Main block failed its checksum: copy the backup mirror (+$1000) over it, then check again", "expect": "MVN" },
+      "28181": { "text": "Four slots at $400 steps ($0000, $0400, $0800, $0C00)", "expect": "CPX" },
+      "28195": { "text": "No valid slot found: the last-used slot word is reset to 0", "expect": "701FFE" }
+    }
+  },
+
+  "system/engine_vblank_nmi.asm": {
+    "comments": {
+      "877": { "text": "Title Mode 7 hook: acts only when location_id = $10 (writes the Mode 7 matrix and centre to the PPU)", "expect": "UpdateTitleMode7" }
+    }
+  },
+
+  "system/engine_unreferenced_code.asm": {
+    "blockNote": {
+      "edit": [
+        {
+          "find": "An unreferenced actor script: it waits with COP 80 and COP 82 until $0482 = 4, repeats the wait, runs COP 80/82 for ids 08 and 09, increments $0482 and ends with COP 91. It is not part of batch A1 and is left unnamed.",
+          "with": "UnusedAnimWaitStep4 (SNES $00:F4B1) is an unreferenced actor script: it plays animation 07 (COP 80, COP 82) in a loop until $0482 = 4, plays 07 once more, then animations 08 and 09, increments $0482 and ends with COP 91. $0482 is the step counter of the gv_front_end sequence (written and read only there and here), and the routine lies between two of that file's INC $0482 sites, so it looks like an unused step of the title sequence (OQ-I006-7)."
+        }
+      ]
+    },
+    "partNotes": {
+      "UnusedAnimWaitStep4": [
+        "Unused step of the title sequence (inference, OQ-I006-7).",
+        "",
+        "When: never; no reference exists in the ROM.",
+        "Sees: nothing in the shipped game.",
+        "Why: probably left over from the title sequence of gv_front_end, which also steps $0482.",
+        "In: X = actor slot. Out: waits for $0482 = 4 with animation 07, plays 07, 08, 09, $0482 + 1, COP 91.",
+        "Clobbers: A."
+      ]
+    }
+  },
+
+  "system/player_core.asm": {
+    "partNotes": {
+      "StartIdleUp": [
+        "Starts the idle pose facing up; the first of the 28 pose handlers of the player state table (code_list_001B2B).",
+        "",
+        "When: the player script picks a handler from code_list_001B2B (44 rows of 6 words) whenever the pose must change; carry clear = no weapon drawn or L/R held (poses $00-$13), carry set = armed (poses $24-$2B). How a row is chosen is the subject of batch A10.",
+        "Sees: Blazer standing, walking or stepping with the matching animation.",
+        "Why: one tiny handler per pose keeps the 44-row table free of animation ids. Names follow FM-A10 section 1.3 (facing table binary_00FA7F: 0 up, 1 down, 2 right, 3 left); anim $01 unarmed or $2B armed here.",
+        "In: X = player actor, carry from the state table.",
+        "Out: PublishPlayerAnim, COP 80 and COP 82 (set and step the animation), then BRL loc_001A65 back into the common player loop.",
+        "Clobbers: A, Y."
+      ],
+      "StartIdleDown": "Idle pose facing down: anim $00 (carry clear) or $29 (carry set). Family note: StartIdleUp.",
+      "StartIdleLeft": "Idle pose facing left: anim $02 (carry clear) or $27 (carry set). Family note: StartIdleUp.",
+      "StartIdleRight": "Idle pose facing right: anim $03 (carry clear) or $24 (carry set). Family note: StartIdleUp.",
+      "StartWalkUp": "Walk pose up: anim $06 (carry clear) or $2A (carry set). Family note: StartIdleUp.",
+      "StartWalkDown": "Walk pose down: anim $04 (carry clear) or $28 (carry set). Family note: StartIdleUp.",
+      "StartWalkLeft": "Walk pose left: anim $08 (carry clear) or $26 (carry set). Family note: StartIdleUp.",
+      "StartWalkRight": "Walk pose right: anim $0A (carry clear) or $25 (carry set). Family note: StartIdleUp.",
+      "StartBackstepDown": "Pose for moving down backwards (facing locked by L/R): anim $05, no armed variant. Family note: StartIdleUp.",
+      "StartBackstepUp": "Pose for moving up backwards (facing locked): anim $07. Family note: StartIdleUp.",
+      "StartBackstepLeft": "Pose for moving left backwards (facing locked): anim $09. Family note: StartIdleUp.",
+      "StartBackstepRight": "Pose for moving right backwards (facing locked): anim $0B. Family note: StartIdleUp.",
+      "StartSidestepLeftUp": "Sidestep pose, facing left while moving up: anim $11. Names are facing, then direction of travel. Family note: StartIdleUp.",
+      "StartSidestepRightUp": "Sidestep pose, facing right while moving up: anim $12. Family note: StartIdleUp.",
+      "StartSidestepLeftDown": "Sidestep pose, facing left while moving down: anim $10. Family note: StartIdleUp.",
+      "StartSidestepRightDown": "Sidestep pose, facing right while moving down: anim $13. Family note: StartIdleUp.",
+      "StartSidestepUpLeft": "Sidestep pose, facing up while moving left: anim $0E. Family note: StartIdleUp.",
+      "StartSidestepDownLeft": "Sidestep pose, facing down while moving left: anim $0D. Family note: StartIdleUp.",
+      "StartSidestepUpRight": "Sidestep pose, facing up while moving right: anim $0F. Family note: StartIdleUp.",
+      "StartSidestepDownRight": "Sidestep pose, facing down while moving right: anim $0C. Family note: StartIdleUp.",
+      "PlayPlayerDeath": [
+        "The player's death animation and the return to the next scene.",
+        "",
+        "When: the player script finds $16 bit $0400 (set by MarkPlayerDead) at loc_001A65.",
+        "Sees: the death animation $1C with BRK #$84, then a scene change.",
+        "Why: the death items and Gem loss are decided in CheckPlayerDeath; this is the visible part.",
+        "In: X = player actor. Out: data bank $24 = $0B for the player and $0C for the weapon actor, animation $1C, scene_next = world_index + 1 (OQ-I006-22: whether that is the world's shrine), COP 91.",
+        "Clobbers: A, Y."
+      ],
+      "SwingUp": [
+        "Sword swing facing up (anim $21); fires the Phoenix shot when the Phoenix gear is complete.",
+        "",
+        "When: the attack button is pressed while facing up with a weapon.",
+        "Sees: the sword swing; with Soul Blade, Soul Armor and Phoenix magic equipped and 2 Gems paid, a Phoenix projectile flies up.",
+        "Why: the swing, the sound (BRK #$01) and the optional shot belong to one pose.",
+        "In: X = player actor. Out: PayPhoenixCost, COP 84 PhoenixProjectileUp when it succeeded, joy_release_latch bit $8000 cleared (a held button swings once), animation $21 through PublishPlayerAnim, BRL loc_001A65.",
+        "Clobbers: A, Y."
+      ],
+      "SwingDown": "Sword swing facing down (anim $20); same flow as SwingUp with PhoenixProjectileDown. Family note: SwingUp.",
+      "SwingLeft": "Sword swing facing left (anim $22); same flow as SwingUp with PhoenixProjectileLeft. Family note: SwingUp.",
+      "SwingRight": "Sword swing facing right (anim $23); same flow as SwingUp with PhoenixProjectileRight. Family note: SwingUp.",
+      "PayPhoenixCost": [
+        "Checks the Phoenix gear and takes 2 Gems.",
+        "",
+        "When: every sword swing (SwingUp, SwingDown, SwingLeft, SwingRight).",
+        "Sees: a flying Phoenix shot appears only for the complete set at the price of 2 Gems.",
+        "Why: the shot is a bonus of the full set; the cost keeps it from being free.",
+        "In: equipped_weapon, equipped_armor, equipped_magic. Needs weapon $08, armor $10 and magic $18.",
+        "Out: carry clear when the gear matches and Cop26 took 2 Gems; carry set otherwise (PhoenixCostFailed).",
+        "Clobbers: A."
+      ],
+      "PhoenixCostFailed": "Failure exit of PayPhoenixCost: SEC, RTS (also the jump target of Cop26 when the player has fewer than 2 Gems).",
+      "PublishPlayerAnim": [
+        "Shows an animation id to the weapon actor and refreshes the attack and defense values.",
+        "",
+        "When: at the start of every pose handler.",
+        "Sees: the weapon sprite follows the pose; sword hits use the swing's attack value.",
+        "Why: the weapon actor (the actor linked before the player, $3E) reads the id from its $1E, and the damage code reads attack_current and defense_current.",
+        "In: A = animation id, X = player actor.",
+        "Out: weapon $1E = A, $20 = 0, $14 = 0; attack_current = gear_power + level_power for animations $20-$23 (swings), else gear_power; defense_current = gear_defense + level_defense.",
+        "Clobbers: A, Y."
+      ],
+      "PhoenixProjectileUp": "Script of the Phoenix shot flying up: InitPhoenixProjectile, COP A0 (y -$10), animation $30, then animation $31 with count 8, COP 86. Spawned by SwingUp (OQ-I006-3).",
+      "PhoenixProjectileDown": "Script of the Phoenix shot flying down: as PhoenixProjectileUp with COP A0 (y +$10) and COP 98 (flip Y). Spawned by SwingDown.",
+      "PhoenixProjectileLeft": "Script of the Phoenix shot flying left: InitPhoenixProjectile, COP A0 (-$10), animations $2E and $2F, COP 86. Spawned by SwingLeft.",
+      "PhoenixProjectileRight": "Script of the Phoenix shot flying right: as PhoenixProjectileLeft with COP 96 (flip X). Spawned by SwingRight.",
+      "InitPhoenixProjectile": "Shared start of the four Phoenix shot scripts: $16 = $02A0, $30 = $0014 (OQ-I006-26), COP A3 and A2 (#30), COP A8 (#$8000, #0F) (animation bank $0F). Ends with RTS."
+    },
+    "comments": {
+      "7895": { "text": "Animation data bank $0B for the player; $0C for the weapon actor below (OQ-I006-22)", "expect": "0024" },
+      "7921": { "text": "scene_next = world_index + 1 (OQ-I006-22)", "expect": "world_index" },
+      "7946": { "text": "Clear the release latch of the B button (joypad bit $8000): a held button swings only once", "expect": "TRB" },
+      "8083": { "text": "Cop26: take 2 Gems, or jump to PhoenixCostFailed when the player has fewer", "expect": "COP [26]" },
+      "8103": { "text": "Animation $20-$23 = a sword swing: attack = gear_power + level_power, otherwise gear_power only", "expect": "CMP" }
+    }
+  }
+}

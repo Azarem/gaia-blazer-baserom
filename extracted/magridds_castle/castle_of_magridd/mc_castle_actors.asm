@@ -1,7 +1,7 @@
 ; The soldiers, maids, singers, the Queen and King Magridd of the castle town (file offsets 147368-154393, SNES $04:BFA8-$04:DB19): the actors of scene A10S01 (location $65, 'Castle of King Magridd'). Walkthrough chapter: docs/walkthrough/07-king-magridds-castle.md.
 ; 
 ; === WHAT RUNS HERE ===
-; Every actor here is placed by PlacementA10S01 (meta types $18-$30 of MetaMagriddsCastle; the last byte of each row; flags byte $41 = flip X, $01 = none) and is released by a lair of the castle's dungeon or towers: COP 14 / COP 3B on the switch = the LairRecords row with that number (+9 = who: $2F a soldier, $30 a maid, $31 a singer, $32 King Magridd, $34 the Queen; +B = the lair's location; +10 = its monsters). Until the lair is cleared the actor only RTLs (COP 14) or is frozen by shared_actor_helpers_bank4.cm_npc_captive_plea_02229E + engine_003005.HoldActorUntilReleased (COP 3B). Then: puff (RunAppearPuff), blocked tiles (COP 15), a talk handler (COP 17) and COP 91.
+; Every actor here is placed by PlacementA10S01 (meta types $18-$30 of MetaMagriddsCastle; the last byte of each row; flags byte $41 = flip X, $01 = none) and is released by a lair of the castle's dungeon or towers: COP 14 / COP 3B on the switch = the LairRecords row with that number (+9 = who: $2F a soldier, $30 a maid, $31 a singer, $32 King Magridd, $34 the Queen; +B = the lair's location; +10 = its monsters). Until the lair is cleared the actor only RTLs (COP 14) or is frozen by shared_actor_helpers_bank4.cm_npc_captive_plea_02229E + engine_player_death_and_actor_helpers.HoldActorUntilReleased (COP 3B). Then: puff (RunAppearPuff), blocked tiles (COP 15), a talk handler (COP 17) and COP 91.
 ; 
 ; === ROSTER (type, tile, switch = lair record: home, lair, monsters) ===
 ; - $18 ghost hint (23FA8): ($13,$06), $159: soldier, lair $66 tile ($0C,$07), 4 Skeleton Soldiers ($10).
@@ -44,7 +44,7 @@
 
 ?BANK 04
 
-?INCLUDE 'engine_003005'
+?INCLUDE 'engine_player_death_and_actor_helpers'
 ?INCLUDE 'engine_spawn_lairs_death_drops'
 ?INCLUDE 'mc_return_prompt_and_chest_hint_texts'
 ?INCLUDE 'shared_actor_helpers_bank4'
@@ -566,10 +566,10 @@ mc_npc_soldier_traitor_warning_02488E {
     COP [3B] ( #$0168, &code_0248A4 )
     COP [17] ( &shared_actor_helpers_bank4.cm_npc_captive_plea_02229E )
     SEP #$20
-    LDA #$^engine_003005.HoldActorUntilReleased
+    LDA #$^engine_player_death_and_actor_helpers.HoldActorUntilReleased
     PHA 
     REP #$20
-    LDA #$&engine_003005.HoldActorUntilReleased-1
+    LDA #$&engine_player_death_and_actor_helpers.HoldActorUntilReleased-1
     PHA 
     RTL 
 }
@@ -791,10 +791,10 @@ mc_npc_soldier_theater_guard_024BC8 {
     COP [3B] ( #$0170, &code_024BDE )
     COP [17] ( &shared_actor_helpers_bank4.cm_npc_captive_plea_02229E )
     SEP #$20
-    LDA #$^engine_003005.HoldActorUntilReleased
+    LDA #$^engine_player_death_and_actor_helpers.HoldActorUntilReleased
     PHA 
     REP #$20
-    LDA #$&engine_003005.HoldActorUntilReleased-1
+    LDA #$&engine_player_death_and_actor_helpers.HoldActorUntilReleased-1
     PHA 
     RTL 
 }
@@ -982,10 +982,10 @@ mc_npc_maid_music_listener_024F4A {
     COP [3B] ( #$017E, &code_024F60 )
     COP [17] ( &shared_actor_helpers_bank4.cm_npc_captive_plea_02229E )
     SEP #$20
-    LDA #$^engine_003005.HoldActorUntilReleased
+    LDA #$^engine_player_death_and_actor_helpers.HoldActorUntilReleased
     PHA 
     REP #$20
-    LDA #$&engine_003005.HoldActorUntilReleased-1
+    LDA #$&engine_player_death_and_actor_helpers.HoldActorUntilReleased-1
     PHA 
     RTL 
 }
@@ -1140,10 +1140,10 @@ mc_npc_soldier_shiny_hint_02515B {
     COP [3B] ( #$0186, &code_025171 )
     COP [17] ( &shared_actor_helpers_bank4.cm_npc_captive_plea_02229E )
     SEP #$20
-    LDA #$^engine_003005.HoldActorUntilReleased
+    LDA #$^engine_player_death_and_actor_helpers.HoldActorUntilReleased
     PHA 
     REP #$20
-    LDA #$&engine_003005.HoldActorUntilReleased-1
+    LDA #$&engine_player_death_and_actor_helpers.HoldActorUntilReleased-1
     PHA 
     RTL 
 }
@@ -1341,10 +1341,10 @@ mc_npc_soldier_herb_maid_fan_0254A2 {
     COP [3B] ( #$018F, &code_0254B8 )
     COP [17] ( &shared_actor_helpers_bank4.cm_npc_captive_plea_02229E )
     SEP #$20
-    LDA #$^engine_003005.HoldActorUntilReleased
+    LDA #$^engine_player_death_and_actor_helpers.HoldActorUntilReleased
     PHA 
     REP #$20
-    LDA #$&engine_003005.HoldActorUntilReleased-1
+    LDA #$&engine_player_death_and_actor_helpers.HoldActorUntilReleased-1
     PHA 
     RTL 
 }
@@ -1407,10 +1407,10 @@ mc_npc_king_magridd_025561 {
     COP [3B] ( #$0195, &code_025577 )
     COP [17] ( &shared_actor_helpers_bank4.cm_npc_captive_plea_02229E )
     SEP #$20
-    LDA #$^engine_003005.HoldActorUntilReleased
+    LDA #$^engine_player_death_and_actor_helpers.HoldActorUntilReleased
     PHA 
     REP #$20
-    LDA #$&engine_003005.HoldActorUntilReleased-1
+    LDA #$&engine_player_death_and_actor_helpers.HoldActorUntilReleased-1
     PHA 
     RTL 
 }
@@ -1498,10 +1498,10 @@ mc_npc_soldier_dust_in_eye_025AAA {
     COP [3B] ( #$0185, &code_025AC0 )
     COP [17] ( &shared_actor_helpers_bank4.cm_npc_captive_plea_02229E )
     SEP #$20
-    LDA #$^engine_003005.HoldActorUntilReleased
+    LDA #$^engine_player_death_and_actor_helpers.HoldActorUntilReleased
     PHA 
     REP #$20
-    LDA #$&engine_003005.HoldActorUntilReleased-1
+    LDA #$&engine_player_death_and_actor_helpers.HoldActorUntilReleased-1
     PHA 
     RTL 
 }

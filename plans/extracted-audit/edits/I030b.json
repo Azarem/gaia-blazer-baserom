@@ -1,0 +1,28 @@
+{
+  "_note": "I030b: follow-up to I030 after finding where the flag of the Master's 'Move' entry is set and that the walkthrough does mention moving on (01-in-the-beginning.md, 'Up Above... - Some Final Notes'). Only partial edits of two entries written by I030.",
+
+  "actor_shared/shared_choice_prompt_texts.asm": {
+    "blockNote": {
+      "edit": [
+        {
+          "find": "- 'Record' is the walkthrough's saving at the Master's Shrine ('go there to heal and save if wanted', 06-dr-leos-lab.md). The 'Move' entry of ChoiceRecordMoveQuitText is not described by the walkthrough (OQ-I030-1).",
+          "with": "- The Master's menu is the walkthrough's northern square of Up Above: 'The northern square will allow you to save your adventure, as well as move on later in the game' (01-in-the-beginning.md; also 'go there to heal and save if wanted', 06-dr-leos-lab.md). 'Record' is the saving; 'Move' is the later 'move on', added once the Grass Valley chief has handed over the Brown Stone (OQ-I030-1)."
+        }
+      ]
+    },
+    "partNotes": {
+      "ChoiceRecordMoveQuitText": {
+        "edit": [
+          {
+            "find": "reached when COP [07] ( #$9B00 ) finds event flag $1B00 set.",
+            "with": "reached when COP [07] ( #$9B00 ) finds event flag $1B00 set. Another script sets it: code_01A0C6 of gv_village_actors_019475 runs COP [09] ( #$9B00 ) right after the Master's voice says the Brown Stone is a key to the World of Evil (walkthrough 02-grass-valley.md: the chief hands over the Brown Stone)."
+          },
+          {
+            "find": "Why: the Master offers saving at any time; Move is the third entry that is added later in the game.",
+            "with": "Why: the Master offers saving at any time; Move is the third entry, which the walkthrough calls 'move on later in the game' (01-in-the-beginning.md)."
+          }
+        ]
+      }
+    }
+  }
+}

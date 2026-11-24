@@ -1,0 +1,9 @@
+[
+  {
+    "op": "merge",
+    "blocks": ["cop_handler_006075", "cop_handler_00608E", "cop_handler_0060B1", "cop_handler_0060CD"],
+    "into": "cop_animation",
+    "row": "R-2-fallback",
+    "note": "Fallback demonstration (dry-run only): file-level grouping of the four animation COP handlers into one pinned bank-0 block. COP handlers cannot be movable (2-byte & COP table, BRL into the bank-0 exit chain), so the merge keeps them pinned."
+  }
+]

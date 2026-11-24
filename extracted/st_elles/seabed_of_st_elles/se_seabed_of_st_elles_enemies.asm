@@ -1,4 +1,4 @@
-; The enemies of the seabed scenes (world 2, St. Elles; file offsets 1030943-1031032 and 1031075-1031973, SNES $1F:BB1F-$BB77 and $BBA3-$BF24): the Sea Urchin ($32), the Jellyfish ($34), the Hermit Crab ($35), the Manta Ray ($36) with its bolt and the Yellow Seahorse ($37). The unused type $33 sits between them in se_enemy_0FBB78.
+; The enemies of the seabed scenes (world 2, St. Elles; file offsets 1030943-1031032 and 1031075-1031973, SNES $1F:BB1F-$BB77 and $BBA3-$BF24): the Sea Urchin ($32), the Jellyfish ($34), the Hermit Crab ($35), the Manta Ray ($36) with its bolt and the Yellow Seahorse ($37). The unused type $33 sits between them in se_unused_enemy_drifting.
 ; 
 ; === ROSTER (meta type: attack / defence / HP / EXP; bestiary row) ===
 ; - $32 Sea Urchin: 9 / 2 / 36 / 20 (bestiary: 36 HP, 20 EXP, 'Moving around'). Not in any lair: placed directly.

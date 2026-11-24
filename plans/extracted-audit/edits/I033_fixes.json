@@ -1,0 +1,14 @@
+{
+  "_note": "I033 fixes: one sentence of an existing block note that became wrong when the LairRecords note was written (an edit entry: it cannot be re-applied, the spec is kept as the record).",
+
+  "library/lib_tile_triggers_and_lair_return.asm": {
+    "blockNote": {
+      "edit": [
+        {
+          "find": " The part note of LairRecords is not written yet.",
+          "with": " The block note of data_lair_records and the part note of LairRecords describe the whole record, its counts and the six boss lairs."
+        }
+      ]
+    }
+  }
+}

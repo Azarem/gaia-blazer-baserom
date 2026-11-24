@@ -9,7 +9,7 @@
 ; - se_npc_fairy_exp_300_0FA494 ($7F, flag $1D06) and se_npc_fairy_exp_250_0FA4C4 ($7A, flag $1D07): two fairy gems; they use the shared fairy setup of shared_actor_helpers_bank3 and pay 300 and 250 EXP once ('Fairy Gem' of the walkthrough). The third fairy (200 EXP) and the return prompt are in se_st_elles_coast_actors.
 ; - se_obj_water_current_0FA59C: registers the two push zones of the seabed current (table unk16_0FA5AE) and kills itself.
 ; - se_effect_underwater_breath_0FA64B: the oxygen rule of the seabed: without the Bubble Armor the hero loses 1 HP every 64 frames; with it a bubble dome (se_effect_air_bubble_dome_0FA6A9) follows him and a bubble rises every 256 frames (se_effect_air_bubble_rising_0FA6CB).
-; - se_effect_seabed_wave_hdma_0FA874: the water shimmer of the seabed (HDMA channels $0D and $0E).
+; - se_effect_seabed_wave_hdma_0FA874: the water shimmer of the seabed (HDMA on PPU registers $0D and $0E).
 ; 
 ; === EVENT FLAGS ===
 ; $0000 (Lue's friend) Lue has called for him, $0406 / $0407 / $0500 / $0501 passage flags of the four gates, $0506 the Big Pearl was given, $0601 the wall of Lue's alcove is open, $0903 a statue trip is running (set by the statues, cleared by the gates), $1D06 / $1D07 the 300 / 250 EXP fairy was paid.
@@ -20,12 +20,12 @@
 
 ?BANK 1F
 
-?INCLUDE 'engine_scheduler_sprites_combat_collision'
+?INCLUDE 'engine_actor_scheduler_and_sprites'
 ?INCLUDE 'engine_spawn_lairs_death_drops'
 ?INCLUDE 'lib_system_helpers'
 ?INCLUDE 'se_st_elles_coast_actors'
 ?INCLUDE 'shared_actor_helpers_bank3'
-?INCLUDE 'w2_shared_0FA945'
+?INCLUDE 'w2_obj_fairy_idle_loop'
 
 !frame_counter                  0312
 !joy_block_mask                 0326
@@ -92,11 +92,11 @@ code_0F9B38 {
     RTL 
 }
 
-asciistring_0F9B3D |[10]Zzzzz [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F9B3D |[10]Zzzzz [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 
-asciistring_0F9B47 |[10][02:2] touches [N]the dolphin with the [N]Dream Rod- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F9B47 |[10][02:2] touches [N]the dolphin with the [N]Dream Rod- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 
-asciistring_0F9B69 |[10]Hey, didn t I meet you[N]in my dream? [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F9B69 |[10]Hey, didn t I meet you[N]in my dream? [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 ---------------------------------------------
 
 ; Lue the dolphin (switch $8F).
@@ -188,11 +188,11 @@ code_0F9BF7 {
     RTL 
 }
 
-asciistring_0F9BFA |[10][0E:3C]Hey, somebody help me![JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F9BFA |[10][0E:3C]Hey, somebody help me![JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 
-asciistring_0F9C12 |[10]My name is Lue- [N]I used to live with [N]the inventor, Dr-Leo-[FIN]The Blue Stone I [N]received from him is [N]a strange jewel- [FIN]It attracts anyone who[N]looks at it and then [N]changes their [N]personality- [FIN]If that person has a [N]good mind, they will [N]become a great person-[FIN]If they have a evil [N]mind, they will become[N]a bad person- [FIN]One day, the Queen [N]found the jewel and [N]took it- Then she [N]placed me in prison- [FIN]Please save the Queen [N]and get the Blue Stone[N]back- [FIN]I know this ring will [N]help please take it- [FIN][02:2] received [N][03:24]the Thunder Ring- [03:20][JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F9C12 |[10]My name is Lue- [N]I used to live with [N]the inventor, Dr-Leo-[FIN]The Blue Stone I [N]received from him is [N]a strange jewel- [FIN]It attracts anyone who[N]looks at it and then [N]changes their [N]personality- [FIN]If that person has a [N]good mind, they will [N]become a great person-[FIN]If they have a evil [N]mind, they will become[N]a bad person- [FIN]One day, the Queen [N]found the jewel and [N]took it- Then she [N]placed me in prison- [FIN]Please save the Queen [N]and get the Blue Stone[N]back- [FIN]I know this ring will [N]help please take it- [FIN][02:2] received [N][03:24]the Thunder Ring- [03:20][JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 
-asciistring_0F9D86 |[10]I heard that Dr-Leo [N]was taken to the [N]Magridd Castle- [N]I wonder how he is- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F9D86 |[10]I heard that Dr-Leo [N]was taken to the [N]Magridd Castle- [N]I wonder how he is- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 ---------------------------------------------
 
 ; The dolphin who tried to rescue Lue (switch $8C).
@@ -228,7 +228,7 @@ code_0F9DD7 {
     COP [07] ( #$0000, &code_0F9E0D ) ; flag $0000 clear = Lue has not called yet; set by code_0F9E32 on the return trip of lair $8C
     LDA #$FFFF
     STA $return_active
-    COP [09] ( #$8601 )   ; flag $0601 = the wall of Lue's alcove is open (walkthrough); the map change itself was not traced
+    COP [09] ( #$8601 )   ; flag $0601 = the wall of Lue's alcove is open (walkthrough); the flag is bit number $31 of a FlagMapPatchTable row at location $2C that ApplyFlagMapPatches reads at scene load
     COP [81] ( #0E, #09 )
     COP [83]
     COP [81] ( #0C, #03 )
@@ -291,11 +291,11 @@ code_0F9E32 {
     RTL 
 }
 
-asciistring_0F9E3D |[10][0E:1E]Lue! I m coming! [0E:28][JMP:&w2_shared_0FA945.asciistring_0FAA44+M]|
+asciistring_0F9E3D |[10][0E:1E]Lue! I m coming! [0E:28][JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44+M]|
 
-asciistring_0F9E55 |[10]I tried hard to save [N]Lue but he is not [N]here- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F9E55 |[10]I tried hard to save [N]Lue but he is not [N]here- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 
-asciistring_0F9E7D |[10]Lue told me many [N]things about the [N]Queen- [FIN]I don t think she was [N]a bad person- She was [N]just attracted to the [N]jewel- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F9E7D |[10]Lue told me many [N]things about the [N]Queen- [FIN]I don t think she was [N]a bad person- She was [N]just attracted to the [N]jewel- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 ---------------------------------------------
 
 ; The gate at the Rockbird end of the seabed.
@@ -560,9 +560,9 @@ code_0FA17F {
     RTL 
 }
 
-asciistring_0FA184 |[10]I used to live [N]here- [FIN]I am trying to [N]remember something but[N]I cannot- [FIN]When I close my eyes, [N]I see something like [N]a ball, shiny and [N]black---- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0FA184 |[10]I used to live [N]here- [FIN]I am trying to [N]remember something but[N]I cannot- [FIN]When I close my eyes, [N]I see something like [N]a ball, shiny and [N]black---- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 
-asciistring_0FA1E9 |[10]That Pearl! [FIN]Yes, I was going to [N]present that Pearl- [FIN][::]This is the Coral [N]Reef- I have missed [N]this place- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0FA1E9 |[10]That Pearl! [FIN]Yes, I was going to [N]present that Pearl- [FIN][::]This is the Coral [N]Reef- I have missed [N]this place- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 
 asciistring_0FA237 |[10][JMP:&asciistring_0FA1E9+M]|
 ---------------------------------------------
@@ -570,7 +570,7 @@ asciistring_0FA237 |[10][JMP:&asciistring_0FA1E9+M]|
 ; A fairy gem that pays 300 EXP (switch $7F, flag $1D06).
 ; 
 ; When: placement script; COP 14 until the lair $7F is released.
-; Sees: JSL cm_npc_fairy_gem_setup_01B161 (the shared fairy setup), the talk handler code_0FA4AF, then the idle loop of w2_shared_0FA945 through a pushed return address.
+; Sees: JSL cm_npc_fairy_gem_setup_01B161 (the shared fairy setup), the talk handler code_0FA4AF, then the idle loop of w2_obj_fairy_idle_loop through a pushed return address.
 ; Why: the walkthrough lists the Yellow Seahorse lair that releases a Fairy Gem with 300 EXP.
 ; In: X = D = slot.
 ; Out: RTL into w2_obj_fairy_idle_loop_0FA945.
@@ -585,10 +585,10 @@ code_0FA49B {
     JSL $@shared_actor_helpers_bank3.cm_npc_fairy_gem_setup_01B161
     COP [17] ( &code_0FA4AF )
     SEP #$20
-    LDA #$^w2_shared_0FA945.w2_obj_fairy_idle_loop_0FA945
+    LDA #$^w2_obj_fairy_idle_loop.w2_obj_fairy_idle_loop_0FA945
     PHA 
     REP #$20
-    LDA #$&w2_shared_0FA945.w2_obj_fairy_idle_loop_0FA945-1
+    LDA #$&w2_obj_fairy_idle_loop.w2_obj_fairy_idle_loop_0FA945-1
     PHA 
     RTL 
 }
@@ -602,7 +602,7 @@ code_0FA49B {
 
 code_0FA4AF {
     COP [07] ( #$9D06, &se_st_elles_coast_actors.se_npc_fairy_return_prompt_0FA46D ) ; flag $1D06: the 300 EXP were already paid
-    COP [01] ( &w2_shared_0FA945.asciistring_0FA9C5 )
+    COP [01] ( &w2_obj_fairy_idle_loop.asciistring_0FA9C5 )
     COP [38] ( #$0300 )   ; 300 EXP in BCD
     COP [09] ( #$9D06 )
     BRL se_st_elles_coast_actors.se_npc_fairy_return_prompt_0FA46D
@@ -624,17 +624,17 @@ code_0FA4CB {
     JSL $@shared_actor_helpers_bank3.cm_npc_fairy_gem_setup_01B161
     COP [17] ( &code_0FA4DF )
     SEP #$20
-    LDA #$^w2_shared_0FA945.w2_obj_fairy_idle_loop_0FA945
+    LDA #$^w2_obj_fairy_idle_loop.w2_obj_fairy_idle_loop_0FA945
     PHA 
     REP #$20
-    LDA #$&w2_shared_0FA945.w2_obj_fairy_idle_loop_0FA945-1
+    LDA #$&w2_obj_fairy_idle_loop.w2_obj_fairy_idle_loop_0FA945-1
     PHA 
     RTL 
 }
 
 code_0FA4DF {
     COP [07] ( #$9D07, &se_st_elles_coast_actors.se_npc_fairy_return_prompt_0FA46D ) ; flag $1D07: the 250 EXP were already paid
-    COP [01] ( &w2_shared_0FA945.asciistring_0FA9C5 )
+    COP [01] ( &w2_obj_fairy_idle_loop.asciistring_0FA9C5 )
     COP [38] ( #$0250 )   ; 250 EXP in BCD
     COP [09] ( #$9D07 )
     BRL se_st_elles_coast_actors.se_npc_fairy_return_prompt_0FA46D
@@ -662,7 +662,7 @@ se_obj_water_current_0FA59C {
 }
 ---------------------------------------------
 
-; The two push zones of the current: records of (tile x from, tile x to, tile y from, tile y to, push x, push y) = ($32,$7B,$0B,$16,-4,0) and ($7B,$7D,$0E,$16,-4,0), the push being a word of -4 (west) with no vertical component. The field meaning is read from the current's behaviour and the walkthrough; not verified in the push code.
+; The two push zones of the current: records of (tile x from, tile x to, tile y from, tile y to, push x, push y) = ($32,$7B,$0B,$16,-4,0) and ($7B,$7D,$0E,$16,-4,0), the push being a word of -4 (west) with no vertical component. The layout is the one ScanPushZones reads (8-byte records: x0, x1, y0, y1 as half-open tile spans, then the words dx and dy stored in push_dx and push_dy; confirmed by static reading, not in the emulator). FinishPlayerMove adds the -4 after a wall test.
 
 unk16_0FA5AE [
   unk16 < #32, #7B, #0B, #16, #$FFFC, #$0000 >   ;00
@@ -747,7 +747,7 @@ se_effect_air_bubble_dome_0FA6A9 {
     LDA #$0024
     STA $001E, X
     STZ $0020, X
-    JSL $@engine_scheduler_sprites_combat_collision.SetActorAnimFrame
+    JSL $@engine_actor_scheduler_and_sprites.SetActorAnimFrame
     COP [A3]
     COP [91]
 
@@ -792,10 +792,10 @@ se_effect_air_bubble_rising_0FA6CB {
 }
 ---------------------------------------------
 
-; The water shimmer of the seabed: HDMA waves on BG1 and BG2 scroll.
+; The water shimmer of the seabed: HDMA waves on the scroll registers $0D and $0E (which layer they move depends on bg_scroll_swap, OQ-I051-7).
 ; 
 ; When: runs every frame while the actor lives.
-; Sees: builds two tables of 14 entries of $90 (16 lines) at $7E7000 and $7E7800 that point at $7E7100 and $7E7900; each frame fills 16 words in each from word_0FA905 (+1 / 0 / -1 / 0 wave, phase = frame / 4 + scroll_bg1_y / 2) plus scroll_bg1_x / 2 and scroll_bg1_y / 2 respectively, and queues the tables on channels $0D and $0E with QueueHdmaIndirect.
+; Sees: builds two tables of 14 entries of $90 (16 lines) at $7E7000 and $7E7800 that point at $7E7100 and $7E7900; each frame fills 16 words in each from word_0FA905 (+1 / 0 / -1 / 0 wave, phase = frame / 4 + scroll_bg1_y / 2) plus scroll_bg1_x / 2 and scroll_bg1_y / 2 respectively, and queues the tables for the PPU registers $0D and $0E (BG1HOFS and BG1VOFS; the HDMA channels are chosen by the queue) with QueueHdmaIndirect.
 ; In: X = D = slot; DP $16 and $18 are scratch.
 ; Out: RTL; X and DBR restored.
 ; Clobbers: A, Y, DP $16 / $18.

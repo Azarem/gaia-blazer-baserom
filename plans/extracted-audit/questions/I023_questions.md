@@ -1,0 +1,24 @@
+# I023 open questions (PC annotate, batch A1: boot, NMI, main loop, scheduler)
+
+IDs are scoped to this iteration. Nothing here is written into names, notes, comments or docs as fact (the notes that mention an ID say "unknown" or "candidate"). Mode: S = static read only, R+S = read, then confirm with a short Mesen2 run, R = needs a runtime run, D = needs a decision. Tag DISCREPANCY marks a mismatch between the ROM text, the walkthrough (`docs/walkthrough/`) or an earlier audit document.
+
+## Open
+
+| ID | Question or finding | Evidence | Proposed next step | Mode | Priority | Mesen2 tool | Tag |
+|----|---------------------|----------|--------------------|------|----------|-------------|-----|
+| OQ-I023-1 | Who sets a **positive** stun counter `$26`? `BuildActorSprites` skips drawing the actor on alternate frames when `$26` is positive (a blink) and flashes palette 7 when it is negative. The sword code writes `$26` = 180 (Psycho Sword freeze, OQ-I005-3) and the hit code writes other values; which of them are positive, and what does the player see (blink, flash, or both)? | `BuildActorSprites` (comment at offset 1939, `LDA $0026, X`); `ApplySwordHit` and `ApplyProjectileHit` write `$26` | Hit a Torch and a Metal Crawler, record 60 frames, read `$26` of the target every frame and take screenshots on even and odd frames | R+S | P3 | `read_memory` target `$26`, `step_scanline`, `take_screenshot` | - |
+| OQ-I023-2 | How long does the **enemy gauge** stay on screen? `SetEnemyGauge` stores `$80` into `enemy_gauge_timer` (`$0330`), and the HUD routine reads it; the static read suggests a countdown of about 63 frames that ends at `$FE`, but I did not run it. Also: the unit is not proven (frames or HUD updates). | `SetEnemyGauge` in both hit routines; HUD reader `lib_0118FC_part6.code_012659` and the gauge string `asciistring_01476F`. This answers the static half of OQ-I005-13 (readers found); the timing is the open half | Hit a monster once and read `$0330` on every frame until the gauge disappears | R | P3 | `read_memory` `$0330`, `advance_frame` | - |
+| OQ-I023-3 | **Mnemonics not applied** for lack of a single clear role: `$0372` (a sprite attribute base in `BuildActorSprites`, and the scene's sprite attribute in the scene loader; the two readings conflict), `$039A` (the "boss" actor tested by the sword code; seen only as a value compared with an actor id), `$1A02` and `$1A04` (scratch words of `BuildActorSprites`), and all direct-page scratch. Names for them would be guesses | Readers and writers listed in the notes of `BuildActorSprites`, `ApplySwordHit` | Trace the writers of `$0372` and `$039A` in a boss room and a normal room with `get_access_summary`; then decide the names | R+S | P3 | `get_access_summary`, `set_breakpoints` | - |
+| OQ-I023-4 | What are the marker bytes `02 01 AA` followed by a word of `$8000` or more that `DebugScanBank` looks for in the whole bank? It calls `code_012C27` with `$03F3` = `$040A` for each hit. The routine is in `engine_unreferenced_code` (no caller found), so a run cannot reach it without forcing the call | `DebugScanBank` and `DebugScanBanks` in `engine_unreferenced_code`; counts of the byte pattern per bank can be made with a read-only search of the ROM | Count the hits per bank with a read-only search, compare with the pointer tables of the text renderer (`code_012C27`) | S | P3 | - | - |
+| OQ-I023-5 | **Decision:** `OQ-I005-7` (wrong accumulator width decoded for `code_01185E` and `code_01010B`) is still open. The callers are `RunSubFrame*`, `RunReturnLoop` and `RunMainLoop` of this batch; the fix is two `M = 1` overrides, but `OQ-I022-1` (hand edits of `us/overrides.json`) has no answer yet, so I did not apply it | `OQ-I005-7`, `OQ-I022-1` | Answer `OQ-I022-1`, then add `"71774": {"M": 1}` and `"65803": {"M": 1}`; `extract:lt` and `rebuild`, SHA-1 must not change | D | P2 | - | - |
+
+## Status of earlier questions seen in this batch (not new)
+
+- `OQ-I005-13` (readers of `$0330`, `$0336`, `$0338`): readers found statically (the HUD routine `code_012659` and the gauge string); only the timing is open (`OQ-I023-2`).
+- `OQ-I005-5` (the stop of the bucket scan in `CullAndSortActors`) is answered by `OQ-I013-1`.
+- `OQ-I005-1`, `-2`, `-3` (Super Bracelet, Critical Sword, Psycho Sword; all DISCREPANCY), `-11` (`$16` bit 15 means off screen), `-17` (return path) and `-20` (NMI off at the callers of the S-relocating routines) stay open; the notes of this batch refer to them by ID and state the facts as the code shows them.
+
+## Method notes (not questions)
+
+- A merge comment on an instruction that has a sub-label before it needs the address of the instruction itself, not of the label (the `expect` guard caught one such case: address 2976 was `SEC`, the `SBC $00` is at 2977).
+- Mnemonics print only for absolute operands: immediates such as `#$0330` and the direct-page scratch (`dp$..`) never carry a name.

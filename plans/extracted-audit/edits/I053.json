@@ -1,0 +1,71 @@
+{
+  "_note": "I053 (docs/code/menus-inventory-status-hud.md): note corrections found while writing the document. (1) ExitEquipmentMenu is only the SEC/RTS return of RunEquipmentMenu; the restore of video state, graphics, palettes and pose is the tail of OpenEquipmentMenu, so two part notes named the wrong routine as the caller. (2) LoadEquippedMagicGfx runs after every menu close and scene load, not only when the magic changes: the menu's character data (VRAM $2000-$2FFF) overwrites the spell graphics at word $2600. (3) MagicPalettePointers has 3-byte entries like MagicGraphicsPointers (the code indexes both with 3 x n and reads only the word). (4) player_exp_next is the next level's EXP total (the LevelExpThresholds value that WatchForLevelUp compares with player_exp), not the EXP still needed. (5) A doubled library name in the lib_menus block note.",
+  "library/lib_menus.asm": {
+    "blockNote": {
+      "edit": [
+        {
+          "find": "the EXP still needed for the next level (player_exp_next, 8 digits)",
+          "with": "the EXP total of the next level (player_exp_next: the LevelExpThresholds value that WatchForLevelUp compares with player_exp, not a remainder; 8 digits)"
+        },
+        {
+          "find": "loads the menu graphics and palette (lib_menu_screen_setup, lib_menu_screen_setup)",
+          "with": "loads the menu graphics, palette and tile groups (LoadMenuBg2Graphics, LoadMenuPalette, ExpandMenuTileGroups in lib_menu_screen_setup)"
+        }
+      ]
+    },
+    "partNotes": {
+      "ShowStatusAndSoulsScreen": {
+        "edit": [
+          {
+            "find": "'Next level :' with the EXP still needed,",
+            "with": "'Next level :' with the EXP total of the next level (player_exp_next),"
+          }
+        ]
+      }
+    }
+  },
+  "library/lib_menu_screen_setup.asm": {
+    "blockNote": {
+      "edit": [
+        {
+          "find": "MagicPalettePointers a word per spell (palette_07D000 + $20 x n; the source bank is fixed to $0F)",
+          "with": "MagicPalettePointers also a 3-byte pointer per spell (palette_07D000 + $20 x n; LoadEquippedMagicGfx indexes both tables with 3 x n and reads only the word of the palette entry, the source bank is fixed to $0F)"
+        }
+      ]
+    },
+    "partNotes": {
+      "LoadEquippedMagicGfx": {
+        "edit": [
+          {
+            "find": "When: ExitEquipmentMenu and the scene change (lib_boot_and_scene_init).",
+            "with": "When: the tail of OpenEquipmentMenu (every menu close) and the scene change (lib_boot_and_scene_init)."
+          },
+          {
+            "find": "Why: only one spell's graphics fit; they are swapped in when the equipped magic changes.",
+            "with": "Why: only one spell's graphics fit at VRAM word $2600, and the menu's own character data ($2000-$2FFF) overwrites that area, so they are loaded again after every menu close and scene load, not only when the equipped magic changed."
+          }
+        ]
+      },
+      "RestoreSceneBgGfxAndPalette": {
+        "edit": [
+          {
+            "find": "When: ExitEquipmentMenu, code_0066DE of gv_front_end and the scene change (lib_boot_and_scene_init).",
+            "with": "When: the tail of OpenEquipmentMenu, code_0066DE of gv_front_end and the scene change (lib_boot_and_scene_init)."
+          }
+        ]
+      }
+    }
+  },
+  "system/data_engine_tables.asm": {
+    "partNotes": {
+      "MagicGraphicsPointers": {
+        "edit": [
+          {
+            "find": "When: LoadEquippedMagicGfx, when the equipped magic changes.",
+            "with": "When: LoadEquippedMagicGfx, after every menu close and scene load."
+          }
+        ]
+      }
+    }
+  }
+}

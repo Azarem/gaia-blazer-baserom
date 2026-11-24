@@ -1,0 +1,156 @@
+{
+  "_note": "I056: note corrections found while writing docs/code/spc-interface.md. (1) The two sound bytes of HandleBrk are the requests for SFX voice 7 (APUIO2, low byte) and voice 8 (APUIO3, high byte), bit 7 of the low byte means both voices, bits 0-5 are the sound id 1-$26 (settles OQ-I024-1). (2) $F1 is a fade-out (counter $31 from $7F to 0, then StopAllChannels and the port reads 0); the $01 answer replaces the command because the SPC dispatches a command of $F0 or more on every tick while the port holds it; the final $01 starts song 1 because the SPC leaves the transfer with last song 0 (settles OQ-I025-2). (3) $F2 freezes the sequence and sets bit 6 of SPC byte $48 while the port holds it; $01 resumes (OQ-I013-6). (4) The dog's 0 and 1: 0 is a song number different from the playing one (keys off, freezes), the later 1 restarts the tune (static half of OQ-I035-3). (5) The song and driver streams are decoded: records closed by a record of length 0 whose destination word is the sample count and the first sample index; the samples are named by index from the 33-entry table at $07:8000 (OQ-I042-6). (6) The later uploads do not use the SPC boot ROM: $FF enters the engine's own copy of the receive loop; the old wording said 'IPL boot handler'.",
+
+  "system/cop_dispatch.asm": {
+    "blockNote": {
+      "edit": [
+        {
+          "find": "What the two bytes mean to the sound driver is OQ-I024-1.",
+          "with": "The low byte (APUIO2) asks the SPC for a sound on voice 7, the high byte (APUIO3) on voice 8, bit 7 of the low byte on both; bits 0-5 are the sound id, 1-$26 (docs/code/spc-interface.md, OQ-I024-1)."
+        }
+      ]
+    }
+  },
+
+  "system/engine_spawn_lairs_death_drops.asm": {
+    "blockNote": {
+      "edit": [
+        {
+          "find": "The meaning of the $F1 / $01 / 0 sequence is inferred from the wait loops (OQ-I025-2);",
+          "with": "The $F1 / $01 / 0 sequence is explained from the SPC side in docs/code/spc-interface.md (OQ-I025-2): $F1 starts a fade-out, the echo $F1 confirms it, the $01 replaces the command because the SPC runs a command of $F0 or more on every tick, and the port reads 0 when the fade has ended;"
+        }
+      ]
+    },
+    "partNotes": {
+      "MusicLoadSendFade": {
+        "edit": [
+          {
+            "find": "the direction of the fade is not verified, OQ-I025-2)",
+            "with": "a fade-out: the SPC counts $31 down from $7F, scales the volume with it and stops at 0; docs/code/spc-interface.md)"
+          }
+        ]
+      },
+      "MusicLoadWaitFadeAck": {
+        "edit": [
+          {
+            "find": "handshake: the command is only taken as delivered when the SPC returns it.",
+            "with": "handshake: the command is only taken as delivered when the SPC returns it; the answer $01 is needed because the SPC runs a command of $F0 or more again on every tick while the port holds it, which would restart the fade each time."
+          }
+        ]
+      },
+      "MusicLoadWaitSilence": {
+        "edit": [
+          {
+            "find": "the port returns to 0 when the SPC has finished the fade (inferred, OQ-I025-2).",
+            "with": "at the end of the fade the SPC sets its current command to 0 and runs StopAllChannels, so the port reads 0 (docs/code/spc-interface.md)."
+          }
+        ]
+      },
+      "MusicLoadUpload": {
+        "edit": [
+          {
+            "find": "the SPC program and the song data are transferred through the IPL protocol (engine_spc_ipl_upload).",
+            "with": "the song records and samples go through the SPC's own copy of the IPL receive loop, entered by the $FF command (engine_spc_ipl_upload); the boot ROM is not used again."
+          }
+        ]
+      },
+      "MusicLoadFinish": {
+        "edit": [
+          {
+            "find": "the $01 byte lets the SPC leave its handshake;",
+            "with": "the SPC leaves the transfer with last song 0, so the $01 starts song 1, the song just uploaded;"
+          }
+        ]
+      }
+    },
+    "comments": {
+      "11446": {
+        "text": "Answer $01: the SPC runs a command of $F0 or more on every tick while the port holds it, so $F1 must not stay; the port reads 0 when the fade has ended",
+        "expect": "LDA #$01"
+      }
+    }
+  },
+
+  "system/engine_spc_ipl_upload.asm": {
+    "blockNote": {
+      "edit": [
+        {
+          "find": "The block formats are not decoded (OQ-I042-6).",
+          "with": "The formats are decoded in docs/code/spc-interface.md: a block list is IPL records closed by a record of length 0 whose destination word is the sample count (low byte) and the first sample index (high byte), then one index byte per further sample; the samples are records of the 33-entry table at $07:8000 (OQ-I042-6)."
+        }
+      ]
+    },
+    "partNotes": {
+      "UploadSpcStream": {
+        "edit": [
+          {
+            "find": "the list is read as a count byte and one skip byte per block",
+            "with": "the destination word of the closing record is read again as the sample count (low byte) and the first sample index (high byte), and one more index byte follows for each further sample"
+          },
+          {
+            "find": "Read from the code only; the formats are not decoded (OQ-I042-6).",
+            "with": "The record shapes of the driver and of the 21 songs are in docs/code/spc-interface.md (OQ-I042-6)."
+          }
+        ]
+      },
+      "SendSpcIplBlocks": {
+        "edit": [
+          {
+            "find": "which accepts records and jumps to the destination of a record of length 0.",
+            "with": "which accepts records and jumps to the destination of a record of length 0; every call after the first talks to the engine's own copy of that loop (command $FF), which accepts the same records and returns at the record of length 0."
+          }
+        ]
+      }
+    }
+  },
+
+  "system/data_spc_driver.asm": {
+    "blockNote": {
+      "edit": [
+        {
+          "find": "its contents were not disassembled in this audit (the sound engine is documented elsewhere), so the name rests on its place in the boot sequence.",
+          "with": "it holds five records (78 bytes of instrument definitions for ARAM $2E00, 24 bytes for $2F00, 1616 bytes of sound effect table and sequences for $2400, 52 bytes of sample directory for $2C00 and the byte $0D for $0FFF), then the count 13 and the sample indices $00 $01 $02 $03 $04 $05 $0C $06 $0B $1C $0D $07 $1D (docs/code/spc-interface.md)."
+        }
+      ]
+    }
+  },
+
+  "library/lib_main_loop_helpers.asm": {
+    "blockNote": {
+      "edit": [
+        {
+          "find": "writes $F2 to APUIO0 (a request to the sound driver, OQ-I013-6)",
+          "with": "writes $F2 to APUIO0 (the SPC freezes the sequence and sets mute bit 6 while the port holds it; the $01 at the end resumes it, docs/code/spc-interface.md)"
+        }
+      ]
+    },
+    "comments": {
+      "161155": {
+        "text": "APUIO0 = $F2: the SPC freezes the sequence and sets bit 6 of its byte $48 while the port holds it (docs/code/spc-interface.md)",
+        "expect": "LDA #$F2"
+      }
+    }
+  },
+
+  "library/lib_scene_asset_loader.asm": {
+    "partNotes": {
+      "UploadSceneMusic": {
+        "edit": [
+          {
+            "find": "the SPC must be taken out of its engine and into the IPL boot handler before a block can be sent.",
+            "with": "the SPC must be told to stop ($F0) and to enter its own copy of the IPL receive loop ($FF, BootHandshake) before a block can be sent; the boot ROM is not involved."
+          }
+        ]
+      }
+    }
+  },
+
+  "greenwood/woods_of_greenwood/gw_woods_actors_01B98D.asm": {
+    "comments": {
+      "113216": {
+        "text": "APUIO0 = 0: not the playing song 1, so the SPC keys off the music and freezes it; the later 1 restarts the tune (OQ-I035-3)",
+        "expect": "STA $APUIO0"
+      }
+    }
+  }
+}

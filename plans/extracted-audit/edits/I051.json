@@ -1,0 +1,75 @@
+{
+  "_note": "I051: note corrections found while writing docs/code/vram-dma-hdma-palettes.md. (1) The RunSoulOfLightEffect note put the dark place in 'Woods of GreenWood B1F and Lostside'; the walkthrough (items.md, 03-greenwood.md) gets the Soul of Light in the Woods of GreenWood and needs it on B1F of the Light Shrine, which is entered from the Lostside marsh (OQ-I051-1, DISCREPANCY). (2) BuildSoulOrbCircleWindow ends its tables with one line whose edges are both $FF (WH0 = WH1 = $FF, a window one pixel wide at x = 255), not a 'full-width' line (OQ-I051-3). (3) The seabed and sanctuary wave notes called the PPU registers $0D, $0E and $0F 'channels'; they are the registers passed to QueueHdmaIndirect, the channel is chosen by the queue (OQ-I051-7). (4) The iris notes described one circle; the iris rewrites BG3 tile 0 with a 2-bit 8 x 8 mask and the whole BG3 page is made of tile 0, so the screen shows a grid of squares that closes and opens (OQ-I051-11).",
+
+  "library/lib_hdma_window_effects.asm": {
+    "blockNote": {
+      "edit": [
+        { "find": "closed by a full-width line and a zero terminator", "with": "closed by one line with both edges $FF (WH0 = WH1 = $FF, a window one pixel wide at x = 255, OQ-I051-3) and a zero terminator" }
+      ]
+    },
+    "partNotes": {
+      "RunSoulOfLightEffect": {
+        "edit": [
+          { "find": "(the walkthrough says it lets the player see in the dark areas of Woods of GreenWood B1F and Lostside; what the window clips is OQ-I042-2)", "with": "(the walkthrough gets the soul in the Woods of GreenWood and needs it on B1F of the Light Shrine, which is entered from the Lostside marsh; the registers withhold colour math inside the circle, a reading of the bits that OQ-I051-2 asks to check; what the window clips is OQ-I042-2)" }
+        ]
+      },
+      "BuildSoulOrbCircleWindow": {
+        "edit": [
+          { "find": "closed by a one-line full-width entry and a zero)", "with": "closed by a one-line entry with both edges $FF, a window one pixel wide at x = 255 (OQ-I051-3), and a zero)" }
+        ]
+      }
+    }
+  },
+
+  "library/lib_boot_and_scene_init.asm": {
+    "partNotes": {
+      "RunIrisTransition": {
+        "edit": [
+          { "find": "Sees: a circle closes on the player (out) or opens (in).", "with": "Sees: a grid of small squares over the whole screen that fills in (out) or opens into holes (in); the same 8 x 8 mask is in every cell of the BG3 page, so it is not one circle around the player (OQ-I051-11 for the colour)." }
+        ]
+      }
+    }
+  },
+
+  "system/data_iris_and_icon_tiles.asm": {
+    "partNotes": {
+      "IrisFrames": {
+        "edit": [
+          { "find": "Sees: a circle that closes in on the screen and opens again.", "with": "Sees: a grid of squares over the whole screen that fills in and opens into holes again (frame $00 is solid, $1F empty; the same 8 x 8 mask in every cell of the BG3 page, not one circle)." }
+        ]
+      }
+    }
+  },
+
+  "st_elles/seabed_of_st_elles/se_seabed_of_st_elles_actors.asm": {
+    "blockNote": {
+      "edit": [
+        { "find": "(HDMA channels $0D and $0E)", "with": "(HDMA on PPU registers $0D and $0E)" }
+      ]
+    },
+    "partNotes": {
+      "se_effect_seabed_wave_hdma_0FA874": {
+        "edit": [
+          { "find": "HDMA waves on BG1 and BG2 scroll.", "with": "HDMA waves on the scroll registers $0D and $0E (which layer they move depends on bg_scroll_swap, OQ-I051-7)." },
+          { "find": "queues the tables on channels $0D and $0E with QueueHdmaIndirect.", "with": "queues the tables for the PPU registers $0D and $0E (BG1HOFS and BG1VOFS; the HDMA channels are chosen by the queue) with QueueHdmaIndirect." }
+        ]
+      }
+    }
+  },
+
+  "st_elles/seabed_sanctuary/se_seabed_sanctuary_actors_0F8D58.asm": {
+    "blockNote": {
+      "edit": [
+        { "find": "(HDMA channel $0F)", "with": "(HDMA on PPU register $0F)" }
+      ]
+    },
+    "partNotes": {
+      "se_effect_sanctuary_wave_hdma_0FA7C4": {
+        "edit": [
+          { "find": "an HDMA wave on BG1.", "with": "an HDMA wave on PPU register $0F (BG2HOFS; which layer it moves depends on bg_scroll_swap, OQ-I051-7)." },
+          { "find": "queues the table on channel $0F with QueueHdmaIndirect.", "with": "queues the table for PPU register $0F (the HDMA channel is chosen by the queue) with QueueHdmaIndirect." }
+        ]
+      }
+    }
+  }
+}

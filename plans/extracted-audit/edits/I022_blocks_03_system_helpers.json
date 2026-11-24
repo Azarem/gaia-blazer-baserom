@@ -1,0 +1,16 @@
+[
+  {
+    "op": "merge",
+    "blocks": ["lib_01185E", "lib_01186E", "lib_01318C", "lib_0118FC_part8", "lib_shared_0131B7"],
+    "into": "lib_system_helpers",
+    "row": "W5-11",
+    "note": "bank 2, five one-routine files of the 'system_helpers' proposal of FM-A5: the HDMA channel queue (code_01185E reset, code_01186E queue with binary_0118BC), force blank with NMI off (code_01318C), the NMI on and off pair (code_0131A2, code_0131AE) and the vblank wait (code_0131B7). Callers are in banks 0, 2, 3, 4 and 31, so no caller can absorb them; they keep one file."
+  },
+  {
+    "op": "merge",
+    "blocks": ["lib_shared_0131D1", "lib_0118FC_part9", "lib_0131FE", "lib_01320E", "lib_0118FC_part10", "lib_013246"],
+    "into": "lib_arithmetic",
+    "row": "W5-12",
+    "note": "bank 2, the contiguous run of file offsets 78289 to 78450 (0x131D1 to 0x13272): 8x8 multiply (code_0131D1), divide word by byte (code_0131E8), the two unreferenced word helpers (code_0131FE, code_01320E), byte to packed BCD (code_013215) and the random number routine (code_013246, FM-A9). FM-A5 proposed these as 'arithmetic'."
+  }
+]

@@ -1,0 +1,114 @@
+{
+  "_note": "I036d: st_elles actors, ghost_ship/se_ghost_ship_actors (1024571-1025088), st_elles_coast/se_st_elles_coast_actors (1025088-1025172, 1025268-1025436, 1025471-1025611, 1025953-1025988), w2_actor_0FA6F5 (1025781-1025953) and w2_shared_0FA945 (1026373-1026633). Light depth.",
+  "st_elles/ghost_ship/se_ghost_ship_actors.asm": {
+    "blockNote": [
+      "The two people of Servas's dream (file offsets 1024571-1025088, SNES $1F:A23B-$A43F): the father and the son (Servas) on the sinking ghost ship, in the dream scene A09S02 that the Dream Rod opens at the napping dolphin (se_npc_dolphin_servas_dream_0F8000). Both are plain placement scripts without a lair switch: they stand there for the dream.",
+      "",
+      "=== ROSTER ===",
+      "- se_npc_servas_father_0FA23B: walking onto tile ($04,$29) replays the overheard talk ('You can hear the conversation of a father and son. Daddy, how many days have passed since the ship sank? I am too hungry and cannot travel any farther. Are we going to die? Servas, my son, some people believe that human life does not end at death. They believe that they will be born into a new life. Lives, they feel, are everlasting.'); talking to him: 'Oh, I hear some voices ... maybe the Master is calling me.' and flag $0000 is set.",
+      "- se_npc_servas_son_0FA3A5: Servas. Before the father has spoken (flag $0000 clear) only '--------'. After: 'Someone is calling me. What is that? I just put one GEM in a treasure chest. I hope someone will find it. --------', then COP 10 to A06S01 at pixel ($C0,$40) (the dream ends at the doorstep of the dolphin's house) and flag $0704 is set (the dolphin of the first half then only says that he always has the same dream).",
+      "",
+      "=== EVENT FLAGS ===",
+      "$0000 the father has spoken, $0704 the dream was lived to the end.",
+      "",
+      "=== OPEN ===",
+      "The walkthrough (Boss Preparation) says Servas 'will note a 1-Gem treasure he placed'; the ROM text says he put one GEM in a treasure chest; the chest itself is not in this block."
+    ],
+    "partNotes": {
+      "se_npc_servas_father_0FA23B": "The father in Servas's dream.\n\nWhen: placement script of the dream scene; runs every frame (SetEntryHere).\nSees: tiles blocked (COP 15); the hero on tile ($04,$29) triggers code_0FA24B each frame he stands there; talk handler code_0FA252.\nWhy: the overheard talk is the story of the ghost ship (walkthrough: 'Servas and his father, prior to their reincarnation').\nIn: X = D = slot.\nOut: RTL.\nClobbers: A.",
+      "code_0FA24B": "The overheard conversation: shows the long text 'You can hear the conversation of a father and son ...' and re-enters (COP 91) so that it plays again the next time the hero steps on the tile.\n\nIn: X = D = slot.\nOut: RTL.\nClobbers: A.",
+      "code_0FA252": "Talk handler of the father: 'Oh, I hear some voices maybe the Master is calling me.' and flag $0000 is set.\n\nIn: X = D = slot.\nOut: RTL.\nClobbers: A.",
+      "se_npc_servas_son_0FA3A5": "Servas, the son, in the dream.\n\nWhen: placement script of the dream scene.\nSees: tiles blocked, talk handler code_0FA3AE.\nWhy: the end of the dream: the talk with the son takes the hero out of it and records the dream (flag $0704).\nIn: X = D = slot.\nOut: RTL.\nClobbers: A.",
+      "code_0FA3AE": "Talk handler of Servas in the dream.\n\nWhen: the hero talks to the son.\nSees: flag $0000 clear (the father has not spoken): '--------' only (code_0FA3C9). Set: 'Someone is calling me. What is that? I just put one GEM in a treasure chest. I hope someone will find it.', transition type 4, COP 10 to A06S01 at pixel ($C0,$40) and flag $0704 set.\nIn: X = D = slot.\nOut: RTL (the scene changes).\nClobbers: A."
+    },
+    "comments": {
+      "1024579": { "text": "the hero on tile ($04,$29) replays the overheard conversation", "expect": "COP [0D]" },
+      "1024942": { "text": "flag $0000 is set by the father's talk; clear, the son only answers with dashes", "expect": "COP [07]" },
+      "1024955": { "text": "A06S01 at pixel ($C0,$40): out of the dream", "expect": "COP [10]" },
+      "1024964": { "text": "flag $0704: Servas's dream is done (read by the dolphin se_npc_dolphin_servas_dream_0F8000)", "expect": "COP [09]" }
+    }
+  },
+  "st_elles/st_elles_coast/se_st_elles_coast_actors.asm": {
+    "blockNote": [
+      "The actors of the St. Elles coast scenes that stand apart from the seabed (file offsets 1025088-1025172, 1025268-1025436, 1025471-1025611 and 1025953-1025988, SNES $1F:A440-$A493, $A4F4-$A59B, $A5BF-$A64A and $A7A1-$A7C3): the 200 EXP fairy gem, the shared return prompt of all fairies, the pyramid hint fairy, the hot coals, the volcano of Durean with the spot where the Mermaid's Tears are poured, and the BG2 scroll follower.",
+      "",
+      "=== ROSTER ===",
+      "- se_npc_fairy_exp_200_0FA440: switch $A6, flag $1D00. A fairy gem that pays 200 EXP once ('I am watching over the world. Here, take this. [the hero] received EXP!'), then asks the return prompt.",
+      "- se_npc_fairy_return_prompt_0FA46D: shared tail of every fairy of the chapter (the 300 and 250 EXP fairies of se_seabed_of_st_elles_actors jump here too): 'Would you like to return to the Seabed Palace?' with a Stay / Go back menu: Go back: 'Allright, good luck.' and COP 10 to A06S01 at pixel ($1F8,$200); Stay: 'Visit me again when you are ready.'",
+      "- se_npc_fairy_pyramid_hint_0FA4F4: switch $B8 (meta type $54). The fairy of the lightning pyramids: 'The monuments on this island are lightning pyramids. If you wear the Thunder Ring and touch them, the Master will send down lightning to destroy the monsters.' then the return prompt.",
+      "- se_obj_durean_hot_coals_0FA5BF: meta type $55. The hot coals of the volcanic island: standing on metatile $47 costs 4 HP per check, with no armor test, until flag $0503 (the volcano is out) is set.",
+      "- se_obj_durean_volcano_0FA5D6: meta type $07. The crater of Durean: spawns the spot where the Tears are poured and animates the smoking crater until flag $0503; then it shows the extinguished frame and ends.",
+      "- se_obj_durean_tears_spot_0FA5FA: spawned by the volcano. When the hero stands on tile ($1F,$21) with the Mermaid's Tears (item $21) equipped: flag $0503 is set, the Tears are used up and '[the hero] poured out the mermaid's tears.' is shown (walkthrough: the Mermaid's Tears turn the magma of Durean to stone).",
+      "- se_effect_bg2_scroll_follow_0FA7A1: meta type $2F, a scroll actor for BG2.",
+      "",
+      "=== EVENT FLAGS ===",
+      "$1D00 the 200 EXP were paid, $0503 the volcano of Durean is out (read by Kanna, the Tears mermaid, the vents and the hot coals), $0001 the pour text has been shown (read by the volcano).",
+      "",
+      "=== OPEN ===",
+      "The tile $47 of the coals resolves part of OQ-I031-2: the scene is Durean and the walkthrough names the coals; see OQ-I036-6."
+    ],
+    "partNotes": {
+      "se_npc_fairy_exp_200_0FA440": "A fairy gem that pays 200 EXP (switch $A6, flag $1D00).\n\nWhen: placement script; COP 14 until the lair $A6 is released.\nSees: JSL code_01B161 (the shared fairy setup), talk handler code_0FA45B, then the idle loop of w2_shared_0FA945 through a pushed return address.\nIn: X = D = slot.\nOut: RTL into w2_obj_fairy_idle_loop_0FA945.\nClobbers: A, Y.",
+      "code_0FA45B": "Talk handler of the 200 EXP fairy: when flag $1D00 is clear the text 'I am watching over the world. Here, take this.' is shown, 200 EXP are queued (COP 38, BCD $0200) and the flag is set; the handler then runs on into se_npc_fairy_return_prompt_0FA46D.\n\nIn: X = D = slot.\nOut: falls into the return prompt.\nClobbers: A.",
+      "se_npc_fairy_return_prompt_0FA46D": "The return prompt that ends every fairy talk.\n\nWhen: after the EXP text of a fairy and on every later talk (the fairy handlers branch here when their flag is set).\nSees: 'Would you like to return to the Seabed Palace?' and the Stay / Go back menu (L_choice_result $03D0). Result 0 (or cancel): 'Visit me again when you are ready.' Otherwise: 'Allright, good luck.', contact_lock is incremented and COP 10 goes to A06S01 at pixel ($1F8,$200).\nWhy: the fairies are shortcuts back to the Sanctuary from the far dungeons (walkthrough: 'use the lair to make a shortcut back to the start').\nIn: X = D = slot of the fairy.\nOut: RTL.\nClobbers: A.",
+      "se_npc_fairy_pyramid_hint_0FA4F4": "The fairy of the lightning pyramids (switch $B8, meta type $54).\n\nWhen: placement script; COP 14 until the lair $B8 is released.\nSees: JSL code_01B161, talk handler code_0FA50F (the pyramid text, then the return prompt), then the idle loop of w2_shared_0FA945.\nWhy: tells the player how to use the pyramids: wear the Thunder Ring and touch them (se_obj_lightning_pyramid_0FBF25).\nIn: X = D = slot.\nOut: RTL into w2_obj_fairy_idle_loop_0FA945.\nClobbers: A, Y.",
+      "se_obj_durean_hot_coals_0FA5BF": "The hot coals of Durean (meta type $55).\n\nWhen: runs every frame in the Durean scene.\nSees: flag $0503 set: kills itself. Else IsPlayerOnMetatile for metatile $47; on a hit COP 39 takes 4 HP (no armor test, no hit-stun check beyond the helper's own).\nWhy: the coals hurt whatever armor is worn (walkthrough: 'Stand near but not on the coals').\nIn: X = D = slot.\nOut: RTL.\nClobbers: A, Y.",
+      "se_obj_durean_volcano_0FA5D6": "The crater of the volcano of Durean (meta type $07).\n\nWhen: placement script of the Durean scene.\nSees: flag $0503 set: kills itself. Else spawns the pour spot (COP B0 with flags $2240) and loops animation $19 with COP 94 while the flag is clear; once it is set it waits for flag $0001 (the pour text), starts animation $39 (the extinguished crater) and ends.\nIn: X = D = slot.\nOut: RTL.\nClobbers: A.",
+      "se_obj_durean_tears_spot_0FA5FA": "The spot on top of the volcanic island where the Mermaid's Tears are poured.\n\nWhen: spawned by the crater; runs every frame.\nSees: clears bit $0010 of its own $16 and waits (COP 91 and COP 0D) for the hero on tile ($1F,$21); code_0FA60D then requires the Tears (item $21) to be equipped.\nIn: X = D = slot.\nOut: RTL.\nClobbers: A.",
+      "code_0FA60D": "The pouring of the Mermaid's Tears.\n\nWhen: the hero stands on tile ($1F,$21).\nSees: item $21 not equipped: nothing. Equipped: flag $0503 is set, COP 0B uses the item up, '[the hero] poured out the mermaid's tears.' is shown, a sound (BRK #$86) plays, flag $0001 is set and the spot kills itself.\nIn: X = D = slot.\nOut: RTL.\nClobbers: A.",
+      "se_effect_bg2_scroll_follow_0FA7A1": "The BG2 scroller (meta type $2F).\n\nWhen: runs every frame.\nSees: moves its own position by (+2, -6) plus the camera delta (scroll_delta_x / scroll_delta_y) and writes it into scroll_bg2_x and scroll_bg2_y, so BG2 drifts diagonally by itself while following the camera. The scene using it is not named in the data (OQ-I036-7).\nIn: X = D = slot.\nOut: RTL.\nClobbers: A."
+    },
+    "comments": {
+      "1025115": { "text": "flag $1D00: the 200 EXP were already paid", "expect": "COP [07]" },
+      "1025125": { "text": "200 EXP in BCD", "expect": "COP [38]" },
+      "1025148": { "text": "menu result 0 (the first entry of ChoiceStayGoBackText, stay) or cancel: 'Visit me again'", "expect": "BEQ" },
+      "1025157": { "text": "A06S01 at pixel ($1F8,$200): back to the Sanctuary", "expect": "COP [10]" },
+      "1025477": { "text": "metatile $47 = the hot coals of Durean", "expect": "LDA #$0047" },
+      "1025487": { "text": "4 HP of damage per check; no armor is tested", "expect": "COP [39]" },
+      "1025500": { "text": "spawns the pour spot with flags $2240", "expect": "COP [B0]" },
+      "1025512": { "text": "loops back to the smoking animation while flag $0503 is clear", "expect": "COP [07]" },
+      "1025518": { "text": "waits for flag $0001, set by the pour spot after its text", "expect": "COP [05]" },
+      "1025554": { "text": "flag $0503 = the volcano is out; read by Kanna, the Tears mermaid, the vents and the coals", "expect": "COP [09]" },
+      "1025558": { "text": "the Mermaid's Tears are used up", "expect": "COP [0B]" },
+      "1025967": { "text": "the BG2 scroll is the actor's own position", "expect": "STA $scroll_bg2_x" }
+    }
+  },
+  "st_elles/w2_actor_0FA6F5.asm": {
+    "blockNote": [
+      "One actor of the world 2 shared code (file offsets 1025781-1025953, SNES $1F:A6F5-$A7A0): the player overlay (meta type $30, dynamic tile source $7E3800, the same buffer as the underwater breath actor, meta type $47). It spawns two helper actors and keeps them on the hero.",
+      "",
+      "=== OPEN ===",
+      "What the two overlay sprites draw (animations $20-$29 and $21-$2A of the helpers) is not identified; the rule that picks the animation from the hero's speed is traced (OQ-I036-5)."
+    ],
+    "partNotes": {
+      "w2_effect_player_overlay_0FA6F5": "The player overlay (meta type $30).\n\nWhen: placement script of the world 2 scenes that use it; runs every frame.\nSees: spawns the helpers b and a (COP 85), then each frame picks an animation number from the hero's state: subframe_active set: $20; otherwise by the hero's speeds ($04 = x, $06 = y): x negative $26, x positive $28, else y negative $24, y positive $22, still $20. It moves helper a (the previous actor link of this actor) onto the hero (x, y + 1) and helper b onto the hero (x, y), and restarts a helper's animation (step $14 = 0) only when its number changes; helper b uses the number + 1.\nIn: X = D = slot.\nOut: RTL; X restored (PHX / PLX).\nClobbers: A, Y, DP $00.",
+      "w2_effect_player_overlay_a_0FA777": "First helper of the player overlay: $16 = $0310 (drawn in front, not blocking), animation $20 and an endless animation loop; the overlay actor changes its animation number.\n\nIn: X = D = slot of the helper.\nOut: never returns (loop with COP 82).\nClobbers: A.",
+      "w2_effect_player_overlay_b_0FA78C": "Second helper of the player overlay: $16 = $0310, animation $21 and an endless animation loop.\n\nIn: X = D = slot of the helper.\nOut: never returns.\nClobbers: A."
+    },
+    "comments": {
+      "1025793": { "text": "subframe_active set: the first animation ($20) is used and the hero's direction is ignored", "expect": "LDA $subframe_active" },
+      "1025801": { "text": "$04 and $06 of the player actor are his x and y speeds (the pearl ride sets $06 to -1 and 1)", "expect": "LDA $0004, Y" }
+    }
+  },
+  "st_elles/w2_shared_0FA945.asm": {
+    "blockNote": [
+      "Scripts and texts shared by the world 2 actors (file offsets 1026373-1026633, SNES $1F:A945-$AA48): the idle loop of the fairies, the plea of the captive creatures and the common dialogue strings (the EXP gift of a fairy, the return prompt, the end of a dialogue). Included by the actor files of the Seabed Sanctuary, the seabed and the coast.",
+      "",
+      "=== ROSTER ===",
+      "- w2_obj_fairy_idle_loop_0FA945: the fairies look at the hero: when he is inside the box widened by $18 (COP 2E) animation $0C, else $07.",
+      "- w2_npc_caged_plea_0FA95A: the talk handler of a creature that is still held by its lair: one of three pleas chosen by the random generator ('Please somebody help me.', 'I want to return to myself!', 'Help! Somebody please.').",
+      "- asciistring_0FA9C5 ('I am watching over the world. Here, take this. [the hero] received EXP!'), asciistring_0FA9F0 ('Would you like to return to the Seabed Palace?'), asciistring_0FAA15 ('Allright, good luck.'), asciistring_0FAA29 ('Visit me again when you are ready.') and asciistring_0FAA44 (the common end of a dialogue, an engine control string).",
+      "",
+      "=== OPEN ===",
+      "'I want to return to myself!' (the captives are creatures that the evil changed; the walkthrough does not quote it)."
+    ],
+    "partNotes": {
+      "w2_obj_fairy_idle_loop_0FA945": "The idle loop of a fairy gem.\n\nWhen: entered by the fairies' root scripts through a pushed return address (RTL); loops every frame.\nSees: COP 2E: hero inside the actor's box widened by $18: code_0FA953 (animation $0C, 'looking up'); otherwise animation $07; each pass waits for the animation step (COP 82).\nIn: X = D = slot.\nOut: yields; never returns.\nClobbers: A.",
+      "w2_npc_caged_plea_0FA95A": "The plea of a captive creature (the talk handler of every COP 3B root of the world 2 actors).\n\nWhen: the hero talks to a creature whose lair is not released yet.\nSees: COP 1F advances the random generator and rng_state+1 AND 3 picks the text: 0 'I want to return to myself!', 1 'Help! Somebody please.', 2 or 3 'Please somebody help me.'\nIn: X = D = slot.\nOut: RTL.\nClobbers: A."
+    },
+    "comments": {
+      "1026373": { "text": "the hero inside the box widened by $18 makes the fairy look at him (animation $0C)", "expect": "COP [2E]" },
+      "1026399": { "text": "0: 'I want to return to myself!', 1: 'Help! Somebody please.', 2 and 3: 'Please somebody help me.'", "expect": "AND #$0003" }
+    }
+  }
+}

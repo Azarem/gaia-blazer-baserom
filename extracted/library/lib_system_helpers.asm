@@ -1,3 +1,7 @@
+; System helpers of bank 02: the HDMA channel queue, the NMI and vblank switches with the screen-on step, and the boot PPU layout (file offsets 71774-71931, 78198-78280 and 80602-80678, SNES $02:985E-$98FB, $02:B176-$B1C8 and $02:BADA-$BB26).
+; 
+; The parts are ResetHdmaQueue, QueueHdmaIndirect, QueueHdmaDirect, EnableDisplayAndNmi, ForceBlankNmiOff, EnableNmi, DisableNmi, WaitVBlank and ApplyBootPpuLayout. EnableDisplayAndNmi (called by lib_menus) joined the NMI and vblank switches it belongs with; ApplyBootPpuLayout (called by engine_boot_main_loop at boot, after InitHardwareAndClearWram) joined as the other PPU-setup routine (it was the one-routine file lib_013ADA; it could not stay in the loader file and InitHardwareAndClearWram could not leave it, OQ-I042-7). The sections below keep the notes of the parts: the queue and the switches, then the boot layout.
+; 
 ; HDMA channel queue and the NMI and vblank switches (file offsets 71774-71931 and 78220-78280, SNES $02:985E-$98FB and $02:B18C-$B1C8, bank 02).
 ; 
 ; === HDMA CHANNEL QUEUE ===
@@ -6,17 +10,41 @@
 ; There is no overflow guard: the fourth call shifts $80 out of dp$44 and the carry that ADC #$10 then adds (there is no CLC) makes dp$46 = $81; a fifth call per frame would write $4381-$4387, which is not a DMA channel (OQ-I009-9).
 ; 
 ; === NMI AND VBLANK ===
-; nmi_enabled ($03D2) is non-zero while the frame code runs with NMI on: EnableNmi increments it, EnableDisplayAndNmi (lib_menus) increments it, DisableNmi and ForceBlankNmiOff zero it. The text renderer's input wait (lib_text_render.WaitFrameReadButtons) tests it: with NMI on it waits for the vblank, with NMI off it runs a whole sub-frame instead (RunSubFrame). WaitVBlank is the only wait for a vblank; when NMI is on, HandleVBlank runs inside it.
+; nmi_enabled ($03D2) is non-zero while the frame code runs with NMI on: EnableNmi increments it, EnableDisplayAndNmi increments it, DisableNmi and ForceBlankNmiOff zero it. The text renderer's input wait (lib_text_render.WaitFrameReadButtons) tests it: with NMI on it waits for the vblank, with NMI off it runs a whole sub-frame instead (RunSubFrame). WaitVBlank is the only wait for a vblank; when NMI is on, HandleVBlank runs inside it.
 ; 
 ; === NOTES ===
 ; - The extractor decoded ResetHdmaQueue with M = 16 (LDA #$8510 and MVP) until the M override at 71774; the real code is the 16 bytes shown now (OQ-I005-7).
-; - ForceBlankNmiOff, EnableNmi and DisableNmi are the NMI switches of the main loop and the scene change; their call sites are in engine_boot_main_loop, lib_menus, lib_scene_change_init and engine_spawn_lairs_death_drops.
+; - ForceBlankNmiOff, EnableNmi and DisableNmi are the NMI switches of the main loop and the scene change; their call sites are in engine_boot_main_loop, lib_menus, lib_boot_and_scene_init and engine_spawn_lairs_death_drops.
+; 
+; Default PPU layout written at boot (file offsets 80602-80678, SNES $02:BADA-$BB26, bank 02).
+; 
+; === MODEL ===
+; ApplyBootPpuLayout runs once, right after InitHardwareAndClearWram (engine_boot_main_loop BootGame). InitHardwareAndClearWram zeroes every PPU register; this routine then sets the layout that the title screen and the first scenes expect before any scene profile is applied: Mode 1 with BG3 priority, BG1 map at VRAM word $6000 (BG1SC $63, 64x64), BG2 map at $7000 (BG2SC $73), BG3 map at $5800 (BG3SC $58), BG1 and BG2 characters at word 0, BG3 characters at $4000, windows 1 on every layer with the window spanning columns 0-255, CGWSEL = $82 and the main screen TM = $07 (BG1, BG2 and BG3).
+; 
+; === NOTES ===
+; - The values are the ones a scene profile computes later (ApplySceneProfile), so the boot layout only matters until the first scene is loaded.
 ---------------------------------------------
 
 ?BANK 02
 
 !nmi_enabled                    03D2
 !INIDISP                        2100
+!OBJSEL                         2101
+!BGMODE                         2105
+!BG1SC                          2107
+!BG2SC                          2108
+!BG3SC                          2109
+!BG12NBA                        210B
+!BG34NBA                        210C
+!W12SEL                         2123
+!W34SEL                         2124
+!WOBJSEL                        2125
+!WH0                            2126
+!WH1                            2127
+!WH2                            2128
+!WH3                            2129
+!TM                             212C
+!CGWSEL                         2130
 !NMITIMEN                       4200
 !RDNMI                          4210
 !DMAP0                          4300
@@ -29,7 +57,7 @@
 
 ; Empties the HDMA channel queue for the coming frame.
 ; 
-; When: once at the start of every work phase (RunMainLoop, RunReducedLoop, the two scene-change paths and the sub-frame wrapper: 6 call sites).
+; When: once at the start of every work phase (RunMainLoop, RunReducedLoop, RunReturnLoop and the three sub-frame runners: 6 call sites, all in engine_boot_main_loop).
 ; Sees: nothing by itself; HDMA effects stop unless an actor queues its channel again this frame.
 ; Why: HDMA is a per-frame effect: whoever wants a scanline effect queues a channel in every frame and the NMI enables exactly the queued channels (HDMAEN = dp$42).
 ; In: long call; M = 8, X = 16 (the M override at 71774 makes the extractor decode it that way).
@@ -78,7 +106,7 @@ QueueHdmaIndirect {
 ---------------------------------------------
 ; Programs the next free HDMA channel (4-7) for a direct table and enables it.
 ; 
-; When: 14 call sites (player and world actors, the soul code in lib_011695 and lib_0116C3); tables are ROM (gv_hdma_title_bgmode_006A86, gv_hdma_gradient_table_01B284) or WRAM.
+; When: 14 call sites (player and world actors, the soul code in lib_hdma_window_effects and lib_hdma_window_effects); tables are ROM (gv_hdma_title_bgmode_006A86, gv_hdma_gradient_table_01B284) or WRAM.
 ; Sees: as QueueHdmaIndirect.
 ; Why: same queue as the indirect entry; direct mode needs no data bank.
 ; In: as QueueHdmaIndirect (the bank is the table's bank).
@@ -140,6 +168,29 @@ QueueHdmaDirect {
 HdmaDmapByRegister #00000101020000000000000000020202020202020200010101010002020202020200020000000000000000000000000000000000808080808281818282828080
 ---------------------------------------------
 
+; Waits for a vblank, then turns on NMI and the screen at full brightness.
+; 
+; When: RunEquipmentMenu, after the first page is printed.
+; Sees: the menu appears.
+; Why: the screen stays blanked while VRAM is being filled and is switched on in a vblank.
+; In: long call; M = 8 is set inside.
+; Out: WaitVBlank, NMITIMEN = $A1, INIDISP = $0F, nmi_enabled += 1; P restored.
+; Clobbers: A.
+
+EnableDisplayAndNmi {
+    PHP 
+    SEP #$20
+    JSL $@WaitVBlank
+    LDA #$A1
+    STA $NMITIMEN
+    LDA #$0F
+    STA $INIDISP
+    INC $nmi_enabled
+    PLP 
+    RTL 
+}
+---------------------------------------------
+
 ; Blanks the screen and turns NMI off.
 ; 
 ; When: the scene-change code, before it rebuilds VRAM (counterpart of EnableDisplayAndNmi).
@@ -165,7 +216,7 @@ ForceBlankNmiOff {
 
 ; Turns NMI on and counts the section.
 ; 
-; When: 12 call sites: the end of every work phase in engine_boot_main_loop (8), RunEquipmentMenu, RunTalkInteraction, lib_scene_change_init and engine_spawn_lairs_death_drops.
+; When: 12 call sites: the end of every work phase in engine_boot_main_loop (8), RunEquipmentMenu, RunTalkInteraction, lib_boot_and_scene_init and engine_spawn_lairs_death_drops.
 ; Sees: the next vblank runs HandleVBlank, which uploads what the work phase prepared.
 ; Why: the work phase runs with NMI off (DisableNmi), so this call is what lets the frame's results reach the screen.
 ; In: long call; M = 8.
@@ -213,11 +264,55 @@ WaitVBlank {
     PHA 
     LDA $RDNMI            ; Discard a vblank flag left from an earlier frame, then wait for a new one
 
-  loc_0131BE:
+  WaitVBlankLoop:
     LDA $RDNMI
-    BPL loc_0131BE
+    BPL WaitVBlankLoop
     LDA $RDNMI
     PLA 
     PLP 
+    RTL 
+}
+---------------------------------------------
+
+; Writes the default PPU layout.
+; 
+; When: once at boot, after InitHardwareAndClearWram.
+; Sees: nothing yet; the screen is still in forced blank.
+; Why: the register reset leaves every layer off; this gives the title screen its layers and map bases.
+; In: JSL; M = 8.
+; Out: OBJSEL = $01, BGMODE = $09, BG1SC = $63, BG2SC = $73, BG3SC = $58, BG12NBA = 0, BG34NBA = 4, W12SEL = W34SEL = WOBJSEL = $33, WH0-WH3 (window 1 over columns 0-255), CGWSEL = $82, TM = $07.
+; Clobbers: A.
+
+ApplyBootPpuLayout {
+    SEP #$20
+    LDA #$01
+    STA $OBJSEL
+    LDA #$09
+    STA $BGMODE
+    LDA #$63
+    STA $BG1SC
+    LDA #$73
+    STA $BG2SC
+    LDA #$58
+    STA $BG3SC
+    LDA #$00
+    STA $BG12NBA
+    LDA #$04
+    STA $BG34NBA
+    LDA #$33
+    STA $W12SEL
+    STA $W34SEL
+    STA $WOBJSEL
+    LDA #$00
+    STA $WH0
+    LDA #$FF
+    STA $WH1
+    LDA #$00
+    STA $WH2
+    STA $WH3
+    LDA #$82
+    STA $CGWSEL
+    LDA #$07
+    STA $TM
     RTL 
 }

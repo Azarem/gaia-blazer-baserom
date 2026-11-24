@@ -1,0 +1,37 @@
+[
+  {
+    "op": "merge",
+    "blocks": ["lib_0270E4", "lib_027132", "lib_shared_02716E"],
+    "into": "lib_save_system",
+    "row": "W5-13",
+    "note": "bank 4, FM-A9 L001 to L003: save to SRAM, load from SRAM and the slot checksum both call. Callers are the save actor (shared_actor_helpers_bank0) and engine_title_file_select, both bank 0. Two references become internal."
+  },
+  {
+    "op": "merge",
+    "blocks": ["lib_027462", "lib_027462_part1", "lib_027462_part2", "lib_0272E6"],
+    "into": "lib_map_index_helpers",
+    "row": "W5-14",
+    "note": "bank 4, FM-A9 L008 to L011 and the metatile test: pixel to map index (code_0272B8, 18 calling files), pixel to BG1 VRAM address (code_0272E6), step east and south (code_02731A, code_027331) and the 'is the player on metatile id A' routine that calls both (nine references become internal)."
+  },
+  {
+    "op": "merge",
+    "blocks": ["lib_027348", "lib_027374", "lib_0273A2"],
+    "into": "lib_bit_array",
+    "row": "W5-15",
+    "note": "bank 4, FM-A9 L012 to L014: set, clear (unreferenced) and test a bit of a bit array. All three read the mask table binary_00FA77 of data_00F9F7 (bank 1) through a long reference; the table keeps its bank, so one ?INCLUDE of data_00F9F7 replaces three."
+  },
+  {
+    "op": "merge",
+    "blocks": ["lib_0273D4", "lib_0273EB"],
+    "into": "lib_player_facing",
+    "row": "W5-16",
+    "note": "bank 4, FM-A9: the player facing byte (code_0273D4) and the X flip (code_0273EB). Both are called from the menu code (lib_menus) and the tile triggers."
+  },
+  {
+    "op": "merge",
+    "blocks": ["lib_0275ED", "lib_027614", "lib_0276A5", "lib_0276C9"],
+    "into": "lib_player_stats",
+    "row": "W5-17",
+    "note": "bank 4, FM-A9: pending heal, pending EXP, add EXP, add and subtract Gems. Callers: cop_items_stats_text, engine_spawn_lairs_death_drops, engine_scheduler_sprites_combat_collision, lib_menus helpers and the tile triggers."
+  }
+]

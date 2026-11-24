@@ -1,0 +1,51 @@
+{
+  "_note": "I052 (docs/code/text-and-dialogue.md): three corrections found while writing the text document. (1) During a sub-frame only actors with $16 bit $0010 run (FilterSubFrameActor, engine_actor_scheduler_and_sprites), so 'actors keep running / animate' while the text waits was too general. (2) InitFixedState runs once from BootGame, so text_delay = 3 is set at boot, not by a new game.",
+  "library/lib_text_render.asm": {
+    "blockNote": {
+      "edit": [
+        {
+          "find": "set to 3 by a new game, other values by speech scenes",
+          "with": "set to 3 once at boot by InitFixedState, other values by speech scenes"
+        },
+        {
+          "find": "(WaitFrames, so actors keep running)",
+          "with": "(WaitFrames: the sub-frame runs only the actors with $16 bit $0010, the hero's among them)"
+        }
+      ]
+    },
+    "partNotes": {
+      "WaitFrames": {
+        "edit": [
+          {
+            "find": "Sees: the game keeps running (actors animate) while the caller waits.",
+            "with": "Sees: the frame work keeps running while the caller waits, but only the hero and the other actors with $16 bit $0010 run; every other actor stands still (FilterSubFrameActor)."
+          },
+          {
+            "find": "Why: a plain wait loop would freeze the actors.",
+            "with": "Why: with the NMI off a plain wait loop would not pass a frame; RunSubFrame runs the frame work and the vblank wait."
+          }
+        ]
+      }
+    }
+  },
+  "system/engine_boot_main_loop.asm": {
+    "partNotes": {
+      "RunSubFrame": {
+        "edit": [
+          {
+            "find": "Sees: actors keep animating while text prints or a return waits.",
+            "with": "Sees: while text prints or a return waits, the hero and the other actors with $16 bit $0010 keep running; every other actor is skipped (FilterSubFrameActor)."
+          }
+        ]
+      }
+    }
+  },
+  "system/engine_spawn_lairs_death_drops.asm": {
+    "comments": {
+      "21425": {
+        "text": "text_delay = 6: frames per printed glyph from now on (InitFixedState sets 3 once at boot, lib_boot_and_scene_init; OQ-I028-1)",
+        "expect": "STA"
+      }
+    }
+  }
+}

@@ -1,0 +1,31 @@
+[
+  { "address": 10728, "old": "code_0029E8", "new": "cm_fx_palette_cycle_loop_0029E8", "row": "I041-A1" },
+
+  { "address": 11623, "old": "code_002D67", "new": "cm_enemy_aimed_shot_body_002D67", "row": "I041-A2" },
+  { "address": 11651, "old": "loc_002D83", "new": "cm_enemy_aimed_shot_body_wait_002D83", "row": "I041-A2" },
+  { "address": 11667, "old": "loc_002D93", "new": "cm_enemy_aimed_shot_body_end_002D93", "row": "I041-A2" },
+
+  { "address": 11670, "old": "code_002D96", "new": "cm_enemy_aimed_shot_mover_002D96", "row": "I041-A3" },
+  { "address": 11704, "old": "loc_002DB8", "new": "cm_enemy_aimed_shot_mover_dy_up_002DB8", "row": "I041-A3" },
+  { "address": 11716, "old": "loc_002DC4", "new": "cm_enemy_aimed_shot_mover_dx_left_002DC4", "row": "I041-A3" },
+  { "address": 11739, "old": "loc_002DDB", "new": "cm_enemy_aimed_shot_mover_dx_left_dy_up_002DDB", "row": "I041-A3" },
+  { "address": 11752, "old": "loc_002DE8", "new": "cm_enemy_aimed_shot_mover_jump_major_left_minor_up_002DE8", "row": "I041-A3" },
+  { "address": 11754, "old": "loc_002DEA", "new": "cm_enemy_aimed_shot_mover_major_up_minor_right_002DEA", "row": "I041-A3" },
+  { "address": 11770, "old": "loc_002DFA", "new": "cm_enemy_aimed_shot_mover_minor_right_002DFA", "row": "I041-A3" },
+  { "address": 11775, "old": "loc_002DFF", "new": "cm_enemy_aimed_shot_mover_major_right_minor_up_002DFF", "row": "I041-A3" },
+  { "address": 11793, "old": "loc_002E11", "new": "cm_enemy_aimed_shot_mover_major_right_minor_down_002E11", "row": "I041-A3" },
+  { "address": 11811, "old": "loc_002E23", "new": "cm_enemy_aimed_shot_mover_major_down_minor_right_002E23", "row": "I041-A3" },
+  { "address": 11829, "old": "loc_002E35", "new": "cm_enemy_aimed_shot_mover_major_down_minor_left_002E35", "row": "I041-A3" },
+  { "address": 11847, "old": "loc_002E47", "new": "cm_enemy_aimed_shot_mover_major_left_minor_down_002E47", "row": "I041-A3" },
+  { "address": 11865, "old": "loc_002E59", "new": "cm_enemy_aimed_shot_mover_major_left_minor_up_002E59", "row": "I041-A3" },
+  { "address": 11883, "old": "loc_002E6B", "new": "cm_enemy_aimed_shot_mover_major_up_minor_left_002E6B", "row": "I041-A3" },
+  { "address": 11901, "old": "loc_002E7D", "new": "cm_enemy_aimed_shot_mover_reload_002E7D", "row": "I041-A3" },
+  { "address": 11907, "old": "loc_002E83", "new": "cm_enemy_aimed_shot_mover_follow_002E83", "row": "I041-A3" },
+  { "address": 11929, "old": "loc_002E99", "new": "cm_enemy_aimed_shot_mover_end_002E99", "row": "I041-A3" },
+
+  { "address": 11932, "old": "code_002E9C", "new": "cm_enemy_aimed_shot_ratio_y_major_002E9C", "row": "I041-A4" },
+  { "address": 11940, "old": "code_002EA4", "new": "cm_enemy_aimed_shot_ratio_x_major_002EA4", "row": "I041-A4" },
+  { "address": 11946, "old": "loc_002EAA", "new": "cm_enemy_aimed_shot_ratio_divisor_002EAA", "row": "I041-A4" },
+  { "address": 11949, "old": "loc_002EAD", "new": "cm_enemy_aimed_shot_ratio_divide_002EAD", "row": "I041-A4" },
+  { "address": 11961, "old": "loc_002EB9", "new": "cm_enemy_aimed_shot_ratio_store_002EB9", "row": "I041-A4" }
+]

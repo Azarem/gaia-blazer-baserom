@@ -1,0 +1,54 @@
+{
+  "_note": "I050: note corrections found while writing docs/code/sprites-oam-animation.md. (1) DmaDynamicSpriteTiles named bosses and large monsters as candidates for the dynamic-tile bit (OQ-I005-6); CopA9_SetDynamicTileSource is the only code that sets $1A bit $8000 and its only call is InitPlayerActor, so only the hero is a dynamic-tile sprite; the scheduler block note says so too. (2) The w2_effect_player_overlay block note called $7E3800 a dynamic tile source; meta rows $30 and $47 of MetaStElles carry $7E3800 in the animation-table column (+8), the scene spritemap, and no script of the file uses COP A9. (3) Three part notes and two comments wrote 'default attribute $0372' as if $0372 were a constant; $0372 is the address of scene_sprite_attr, a variable whose high byte ApplySceneProfile writes (profile byte 4, bits 4-5) and whose low byte is never written, so the ORed value is the scene's sprite priority.",
+
+  "system/engine_vblank_nmi.asm": {
+    "partNotes": {
+      "DmaDynamicSpriteTiles": {
+        "edit": [
+          { "find": "(candidates: bosses and large monsters, OQ-I005-6)", "with": "(only the hero: CopA9_SetDynamicTileSource in InitPlayerActor is the one place that sets the bit, OQ-I050-1)" },
+          { "find": "There is no count limit (OQ-I005-6).", "with": "There is no count limit in the code (OQ-I005-6); the hero's frames have three entries each, so three records per frame and OAM tiles 0-5 and 16-21." }
+        ]
+      }
+    }
+  },
+
+  "system/engine_actor_scheduler_and_sprites.asm": {
+    "blockNote": {
+      "edit": [
+        { "find": "Dynamic-tile actors ($1A bit $8000) copy tile blocks", "with": "Dynamic-tile actors ($1A bit $8000; only the hero, set by CopA9 in InitPlayerActor) copy tile blocks" }
+      ]
+    }
+  },
+
+  "st_elles/w2_effect_player_overlay.asm": {
+    "blockNote": {
+      "edit": [
+        { "find": "dynamic tile source $7E3800, the same buffer as the underwater breath actor, meta type $47", "with": "animation table $7E3800, the scene spritemap that every enemy and NPC uses, as for the underwater breath actor, meta type $47; no COP A9, so its sprites are static tiles" }
+      ]
+    }
+  },
+
+  "system/engine_spawn_lairs_death_drops.asm": {
+    "partNotes": {
+      "InitActorFromPlacement": {
+        "edit": [
+          { "find": "$1C = record bits $C100 or $0372;", "with": "$1C = record bits ($C100) or scene_sprite_attr (the word stored at $0372: the scene's sprite priority);" }
+        ]
+      },
+      "SpawnLairActor": {
+        "edit": [
+          { "find": "$1C and $30 = (+$16 or $0100 or $0372)", "with": "$1C and $30 = (+$16 or $0100 or scene_sprite_attr, the word stored at $0372)" }
+        ]
+      },
+      "RunMonsterAppearPuff": {
+        "edit": [
+          { "find": "$1C = $0372 while the puff plays", "with": "$1C = scene_sprite_attr (the word stored at $0372) while the puff plays" }
+        ]
+      }
+    },
+    "comments": {
+      "5073": { "text": "Flags word: $C000 (flips) and $0100 pass to $1C; scene_sprite_attr (the word at $0372, the scene's sprite priority) is ORed in", "expect": "C100" },
+      "10547": { "text": "Keep the monster's flip bits in $30 while the puff uses scene_sprite_attr (the word at $0372) as its $1C", "expect": "001C" }
+    }
+  }
+}

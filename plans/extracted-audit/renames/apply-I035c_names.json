@@ -1,0 +1,17 @@
+[
+  { "address": 13254, "old": "code_0033C6", "new": "gw_boss_light_water_fire_statues_0033C6", "row": "I035-C1" },
+  { "address": 1028341, "old": "code_0FB0F5", "new": "gw_enemy_water_lizard_0FB0F5", "row": "I035-C1" },
+  { "address": 1028866, "old": "code_0FB302", "new": "gw_enemy_mud_man_0FB302", "row": "I035-C1" },
+  { "address": 1028936, "old": "code_0FB348", "new": "gw_enemy_walking_plant_0FB348", "row": "I035-C1" },
+  { "address": 1029171, "old": "code_0FB433", "new": "gw_enemy_stone_statue_0FB433", "row": "I035-C1" },
+  { "address": 1029473, "old": "code_0FB561", "new": "gw_enemy_purple_flower_0FB561", "row": "I035-C1" },
+  { "address": 1029532, "old": "code_0FB59C", "new": "gw_enemy_floor_spears_0FB59C", "row": "I035-C1" },
+  { "address": 1029603, "old": "code_0FB5E3", "new": "gw_enemy_spirit_ball_0FB5E3", "row": "I035-C1" },
+  { "address": 1029760, "old": "code_0FB680", "new": "gw_unused_enemy_still_0FB680", "row": "I035-C1" },
+  { "address": 1029781, "old": "code_0FB695", "new": "gw_enemy_ghost_head_0FB695", "row": "I035-C1" },
+  { "address": 1029880, "old": "code_0FB6F8", "new": "gw_unused_enemy_turret_0FB6F8", "row": "I035-C1" },
+  { "address": 1030296, "old": "code_0FB898", "new": "gw_enemy_lizard_man_chaser_0FB898", "row": "I035-C1" },
+  { "address": 1030366, "old": "code_0FB8DE", "new": "gw_enemy_lizard_man_wanderer_0FB8DE", "row": "I035-C1" },
+  { "address": 1030614, "old": "code_0FB9D6", "new": "gw_enemy_fire_man_0FB9D6", "row": "I035-C1" },
+  { "address": 1030844, "old": "code_0FBABC", "new": "gw_enemy_metal_scorpion_0FBABC", "row": "I035-C1" }
+]

@@ -1,0 +1,44 @@
+[
+  {
+    "op": "merge",
+    "blocks": ["w1_actor_01E47B", "gw_fairy_gem_return_prompt", "w1_actor_01E510", "w1_actor_01E540", "w1_actor_01E594", "w1_actor_01E5BA", "w1_actor_01E62A", "gw_player_shift_north", "gw_player_shift_south", "gw_player_shift_west", "gw_player_shift_east", "w1_actor_01E98D", "w1_actor_01E9C1", "w1_actor_01EAFB"],
+    "into": "gw_lostside_marsh_actors",
+    "row": "W4-GW01",
+    "note": "scene lostside_marsh, bank 3, 706 lines. The three BRL callers of gw_fairy_gem_return_prompt (w1_actor_01E510, 01E540, 01E594) and the COP [27] / COP [12] ring of the four gw_player_shift_* blocks (called from w1_actor_01E5BA and 01E62A) now sit in one file (placement-audit 3.5 families). The wave 0 blocks keep their internal part order (actor first, tail second), which the merge does not touch."
+  },
+  {
+    "op": "merge",
+    "blocks": ["gw_enemy_0FB0F5", "gw_enemy_0FB302", "gw_enemy_0FB348", "gw_enemy_0FB433", "gw_enemy_0FB561", "gw_enemy_0FB59C", "gw_enemy_0FB5E3", "gw_enemy_0FB695", "gw_enemy_0FB898", "gw_enemy_0FB8DE", "gw_enemy_0FB9D6", "gw_enemy_0FBABC"],
+    "into": "gw_lostside_marsh_enemies",
+    "row": "W4-GW02",
+    "note": "scene lostside_marsh, bank 1F: twelve enemy actor scripts (1,151 lines). gw_enemy_0FB9D6 uses the return-address helper code_002D67 of shared_actor_helpers_bank0 (bank 0); gw_enemy_0FB0F5 reads the meta table base-relative with DBR 1 (R-2, meta_tables_008000 stays pinned in bank 1)."
+  },
+  {
+    "op": "merge",
+    "blocks": ["w1_actor_01B98D", "w1_actor_01BB3F", "w1_actor_01BCEC", "w1_actor_01BDE5", "w1_actor_01BF32", "w1_actor_01C2F9", "w1_actor_01C3CA", "w1_actor_01C57B", "w1_actor_01C8A4", "w1_actor_01C98A", "w1_actor_01CC61", "w1_actor_01CD3D", "w1_actor_01CD55", "w1_actor_01CD6D", "w1_actor_01CF41"],
+    "into": "gw_woods_actors_01B98D",
+    "row": "W4-GW03",
+    "note": "scene woods_of_greenwood, bank 3, first half (1,353 lines, ROM order 01B98D .. 01CF41). The area has 36 blocks and 2,595 lines, so it is cut in two by ROM order; name = first block offset."
+  },
+  {
+    "op": "merge",
+    "blocks": ["w1_actor_01D045", "w1_actor_01D2F3", "w1_shared_01D49D", "w1_actor_01D4F9", "w1_actor_01D614", "w1_actor_01D615", "w1_actor_01D6AB", "w1_actor_01D857", "w1_actor_01D8C8", "w1_actor_01D98E", "w1_actor_01DB3F", "w1_actor_01DBE5", "w1_actor_01DDB7", "w1_actor_01DF73", "w1_actor_01E005", "w1_actor_01E134", "w1_actor_01E1C0", "w1_actor_01E241", "w1_actor_01E2FB", "w1_actor_01E3E2", "w1_actor_01E9D3"],
+    "into": "gw_woods_actors_01D045",
+    "row": "W4-GW04",
+    "note": "scene woods_of_greenwood, bank 3, second half (1,242 lines, 01D045 .. 01E3E2 plus w1_actor_01E9D3, whose ROM position is after the lostside actors). w1_shared_01D49D is a helper with 8 references from 3 files of this area; w1_actor_01D045 and 01D2F3 use the return-address helper engine_003005 (bank 0)."
+  },
+  {
+    "op": "merge",
+    "blocks": ["gw_enemy_0FB680", "gw_enemy_0FB6F8"],
+    "into": "gw_enemies_without_placement",
+    "row": "W4-GW05",
+    "note": "no scene (OQ-I020-5): two enemy scripts in bank 1F whose meta entries (w1:34, w1:36) are used by no placement or lair record (placement-audit 5.4)."
+  },
+  {
+    "op": "rename",
+    "block": "w1_shared_01EBC2",
+    "to": "gw_watching_over_world_return_prompt_texts",
+    "row": "W4-GW06",
+    "note": "four strings: 'I am watching over the world- Please take this- [name] received EXP!', 'Would you like to return to GreenWood?', the two answers, and the 5-byte tail asciistring_01EC46 that 37 files jump to (101 references). Named from the ROM text."
+  }
+]

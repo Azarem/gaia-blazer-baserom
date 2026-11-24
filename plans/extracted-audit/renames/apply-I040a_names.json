@@ -1,0 +1,21 @@
+[
+  { "address": 126027, "old": "code_01EC4B", "new": "we_obj_master_shrine_event_01EC4B", "row": "I040-A1" },
+  { "address": 126037, "old": "code_01EC55", "new": "we_obj_master_shrine_stones_scene_01EC55", "row": "I040-A1" },
+  { "address": 126120, "old": "code_01ECA8", "new": "we_obj_master_shrine_gate_check_01ECA8", "row": "I040-A1" },
+  { "address": 126129, "old": "code_01ECB1", "new": "we_obj_master_shrine_gate_open_speech_01ECB1", "row": "I040-A1" },
+  { "address": 126157, "old": "code_01ECCD", "new": "we_fx_master_shrine_stone_effect_a_01ECCD", "row": "I040-A1" },
+  { "address": 126170, "old": "code_01ECDA", "new": "we_fx_master_shrine_stone_effect_b_01ECDA", "row": "I040-A1" },
+  { "address": 126183, "old": "code_01ECE7", "new": "we_obj_master_shrine_farewell_01ECE7", "row": "I040-A1" },
+
+  { "address": 126573, "old": "code_01EE6D", "new": "we_obj_phoenix_call_scene_01EE6D", "row": "I040-A2" },
+  { "address": 126658, "old": "code_01EEC2", "new": "we_obj_phoenix_call_not_called_01EEC2", "row": "I040-A2" },
+  { "address": 126666, "old": "code_01EECA", "new": "we_obj_dazzling_space_hazard_01EECA", "row": "I040-A2" },
+  { "address": 126687, "old": "code_01EEDF", "new": "we_obj_dazzling_space_hazard_damage_01EEDF", "row": "I040-A2" },
+  { "address": 126698, "old": "code_01EEEA", "new": "we_obj_dazzling_space_hazard_next_01EEEA", "row": "I040-A2" },
+  { "address": 126707, "old": "code_01EEF3", "new": "we_fx_bg2_hofs_wave_01EEF3", "row": "I040-A2" },
+  { "address": 126819, "old": "word_01EF63", "new": "we_data_bg2_hofs_wave_table_01EF63", "row": "I040-A2" },
+  { "address": 127075, "old": "code_01F063", "new": "we_fx_bg2_vofs_wobble_01F063", "row": "I040-A2" },
+  { "address": 127183, "old": "word_01F0CF", "new": "we_data_bg2_vofs_wobble_table_01F0CF", "row": "I040-A2" },
+
+  { "address": 127311, "old": "code_01F14F", "new": "we_fx_battle_bg2_hofs_bands_01F14F", "row": "I040-A3" }
+]

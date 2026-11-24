@@ -1,0 +1,23 @@
+[
+  { "address": 22037, "old": "loc_005615", "new": "BrkStoreHighByte", "row": "R-I045-1", "note": "HandleBrk: bit 6 of the BRK signature set, n and $BF goes to $0399" },
+  { "address": 22042, "old": "loc_00561A", "new": "BrkReturn", "row": "R-I045-2", "note": "HandleBrk: restore A and RTI" },
+  { "address": 22548, "old": "loc_005814", "new": "Cop04LoopAgain", "row": "R-I045-3", "note": "Cop04: counter not zero, resume at the loop start and yield" },
+  { "address": 22569, "old": "loc_005829", "new": "Cop05SenseSet", "row": "R-I045-4", "note": "Cop05: sense bit set, wait while the flag is set" },
+  { "address": 22574, "old": "loc_00582E", "new": "Cop05Wait", "row": "R-I045-5", "note": "Cop05: rewind dp$38 to the COP instruction, save the resume pointer, yield" },
+  { "address": 22581, "old": "loc_005835", "new": "Cop05Skip", "row": "R-I045-6", "note": "Cop05: the wait is over, skip the flag word" },
+  { "address": 22754, "old": "loc_0058E2", "new": "CopBoxTestY", "row": "R-I045-7", "note": "CopActorBoxTest: the x test passed, test y" },
+  { "address": 22788, "old": "loc_005904", "new": "CopBoxInside", "row": "R-I045-8", "note": "CopActorBoxTest: both tests passed, take the jump" },
+  { "address": 24250, "old": "loc_005EBA", "new": "Cop82Yield", "row": "R-I045-9", "note": "Cop82: a step was loaded, yield for its duration" },
+  { "address": 24254, "old": "loc_005EBE", "new": "Cop83Step", "row": "R-I045-10", "note": "Cop83: load the next animation step (also the restart after a finished run)" },
+  { "address": 24268, "old": "loc_005ECC", "new": "Cop83Yield", "row": "R-I045-11", "note": "Cop83: a step was loaded, yield for its duration" },
+  { "address": 24913, "old": "loc_006151", "new": "Cop9ARight", "row": "R-I045-12", "note": "Cop9A: the player is right of the actor (d > 0)" },
+  { "address": 24920, "old": "loc_006158", "new": "Cop9APick", "row": "R-I045-13", "note": "Cop9A: read the target word at offset Y and jump" },
+  { "address": 24952, "old": "loc_006178", "new": "Cop9BBelow", "row": "R-I045-14", "note": "Cop9B: the player is below the actor (d > 0)" },
+  { "address": 24959, "old": "loc_00617F", "new": "Cop9BPick", "row": "R-I045-15", "note": "Cop9B: read the target word at offset Y and jump" },
+  { "address": 25222, "old": "loc_006286", "new": "CopA5Pick", "row": "R-I045-16", "note": "CopA5: read the target word at offset Y and jump" },
+  { "address": 25471, "old": "loc_00637F", "new": "CopADTestMapX", "row": "R-I045-17", "note": "CopAD: the actor is off screen, test x against the map width" },
+  { "address": 25482, "old": "loc_00638A", "new": "CopADTestMapY", "row": "R-I045-18", "note": "CopAD: x inside the map, test y against the map height" },
+  { "address": 25493, "old": "loc_006395", "new": "CopADWait", "row": "R-I045-19", "note": "CopAD: set the resume pointer to this command, $14 = operand, yield" },
+  { "address": 25955, "old": "loc_006563", "new": "BlockFootprintMultiTile", "row": "R-I045-20", "note": "BlockActorFootprint: box of width + height >= $21, rows of columns" },
+  { "address": 26067, "old": "loc_0065D3", "new": "ClearFootprintMultiTile", "row": "R-I045-21", "note": "ClearActorFootprint: box of width + height >= $21, rows of columns" }
+]

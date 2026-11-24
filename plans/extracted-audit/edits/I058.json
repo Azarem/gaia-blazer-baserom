@@ -1,0 +1,11 @@
+{
+  "_note": "I058: one comment correction found while writing docs/worlds/st_elles.md. The dolphin's COP [07] comment named the label 0FA23B, which is the father (se_npc_servas_father_0FA23B). Flag $0704 is set by the son, se_npc_servas_son_0FA3A5 (COP [09] #$8704 in se_ghost_ship_actors).",
+  "st_elles/seabed_sanctuary/se_seabed_sanctuary_actors_0F8000.asm": {
+    "comments": {
+      "1015849": {
+        "text": "flag $0704 is set by the son in Servas's dream (se_npc_servas_son_0FA3A5): afterwards the dolphin only repeats that he always has the same dream",
+        "expect": "COP [07]"
+      }
+    }
+  }
+}

@@ -27,9 +27,10 @@
 ?BANK 00
 
 ?INCLUDE 'data_engine_tables'
-?INCLUDE 'engine_scheduler_sprites_combat_collision'
-?INCLUDE 'lib_010000'
+?INCLUDE 'engine_actor_scheduler_and_sprites'
+?INCLUDE 'engine_tile_collision'
 ?INCLUDE 'lib_map_index_helpers'
+?INCLUDE 'lib_map_scroll_and_redraw'
 ?INCLUDE 'lib_menus'
 ?INCLUDE 'player_spells_level_up'
 
@@ -234,7 +235,7 @@ FinishPlayerMove {
     STA $0004, X
     LDA $push_dy
     STA $0006, X
-    JSL $@engine_scheduler_sprites_combat_collision.MoveActorWithTileCollision ; tile collision clips the zone speed; the clipped value goes back into push_dx and push_dy and is added to the position
+    JSL $@engine_tile_collision.MoveActorWithTileCollision ; tile collision clips the zone speed; the clipped value goes back into push_dx and push_dy and is added to the position
     LDA $0004, X
     STA $push_dx
     CLC 
@@ -301,7 +302,7 @@ FinishPlayerMove {
     CLC 
     ADC $0002, Y
     STA $0002, Y
-    JSL $@lib_010000.AimCameraAtPlayer
+    JSL $@lib_map_scroll_and_redraw.AimCameraAtPlayer
     PLX 
     RTL 
 }
@@ -930,7 +931,7 @@ FacePlayerTowardReturnTarget {
   ReturnApplyFacing:
     STA $001E, X
     STZ $0020, X
-    JSL $@engine_scheduler_sprites_combat_collision.SetActorAnimFrame
+    JSL $@engine_actor_scheduler_and_sprites.SetActorAnimFrame
     STZ $0014, X
     COP [91]
     RTL 
@@ -1402,9 +1403,9 @@ PlayerActionTable [
 
 ; Starts the idle pose facing up; the first of the 28 pose handlers of the player state table (PlayerActionTable).
 ; 
-; When: the player script picks a handler from PlayerActionTable (44 rows of 6 words) whenever the pose must change; carry clear = no weapon drawn or L/R held (poses $00-$13), carry set = armed (poses $24-$2B). ChoosePlayerAction chooses the row (see the block note of player_core).
-; Sees: Blazer standing, walking or stepping with the matching animation.
-; Why: one tiny handler per pose keeps the 44-row table free of animation ids. Names follow FM-A10 section 1.3 (facing table PlayerFacingByAnim: 0 up, 1 down, 2 right, 3 left); anim $01 unarmed or $2B armed here.
+; When: the player script picks a handler from PlayerActionTable (44 rows of 6 words) whenever the pose must change; carry clear = no weapon drawn or L/R held (poses $00-$13), carry set = armed without L/R (poses $24-$2B). ChoosePlayerAction chooses the row (see the block note of player_core).
+; Sees: the hero standing, walking or stepping with the matching animation.
+; Why: one tiny handler per pose keeps the 44-row table free of animation ids. Names: Start + pose + facing (PlayerFacingByAnim: 0 up, 1 down, 2 right, 3 left); the sidestep names give the facing, then the direction of travel, and a backstep keeps the facing in its name while it moves the other way; anim $01 unarmed or $2B armed here.
 ; In: X = player actor, carry from the state table.
 ; Out: PublishPlayerAnim, COP 80 and COP 82 (set and step the animation), then BRL ChoosePlayerAction back into the common player loop.
 ; Clobbers: A, Y.
@@ -1559,7 +1560,7 @@ StartWalkRight {
 }
 
 ---------------------------------------------
-; Pose for moving down backwards (facing locked by L/R): anim $05, no armed variant. Family note: StartIdleUp.
+; Backstep pose: the hero faces down and walks up (anim $05, no armed variant; PlayerFacingByAnim 1, PlayerMoveDirByAnim 0, step velocity dy = -2). Reached from the down-facing rows of PlayerActionTable with the Up key while L or R is held. Family note: StartIdleUp.
 
 StartBackstepDown {
     LDA #$0005
@@ -1592,7 +1593,7 @@ StartSidestepRightUp {
 }
 
 ---------------------------------------------
-; Pose for moving up backwards (facing locked): anim $07. Family note: StartIdleUp.
+; Backstep pose: the hero faces up and walks down (anim $07, no armed variant; PlayerFacingByAnim 0, PlayerMoveDirByAnim 1). Reached from the up-facing rows of PlayerActionTable with the Down key while L or R is held. Family note: StartIdleUp.
 
 StartBackstepUp {
     LDA #$0007
@@ -1647,7 +1648,7 @@ StartSidestepDownLeft {
 }
 
 ---------------------------------------------
-; Pose for moving right backwards (facing locked): anim $0B. Family note: StartIdleUp.
+; Backstep pose: the hero faces right and walks left (anim $0B, no armed variant; PlayerFacingByAnim 2, PlayerMoveDirByAnim 3). Reached from the right-facing rows of PlayerActionTable with the Left key while L or R is held. Family note: StartIdleUp.
 
 StartBackstepRight {
     LDA #$000B
@@ -1680,7 +1681,7 @@ StartSidestepDownRight {
 }
 
 ---------------------------------------------
-; Pose for moving left backwards (facing locked): anim $09. Family note: StartIdleUp.
+; Backstep pose: the hero faces left and walks right (anim $09, no armed variant; PlayerFacingByAnim 3, PlayerMoveDirByAnim 2). Reached from the left-facing rows of PlayerActionTable with the Right key while L or R is held. Family note: StartIdleUp.
 
 StartBackstepLeft {
     LDA #$0009

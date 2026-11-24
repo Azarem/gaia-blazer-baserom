@@ -1,0 +1,14 @@
+[
+  { "address": 98304, "old": "code_018000", "new": "gv_npc_old_man_crab_walk_018000", "row": "I034-A1" },
+  { "address": 98551, "old": "code_0180F7", "new": "gv_npc_old_woman_0180F7", "row": "I034-A1" },
+  { "address": 99155, "old": "code_018353", "new": "gv_npc_tool_shop_owner_018353", "row": "I034-A1" },
+  { "address": 99466, "old": "code_01848A", "new": "gv_npc_tulip_water_mill_01848A", "row": "I034-A1" },
+  { "address": 99769, "old": "code_0185B9", "new": "gv_npc_bridge_guard_0185B9", "row": "I034-A1" },
+  { "address": 100002, "old": "code_0186A2", "new": "gv_npc_water_mill_keeper_0186A2", "row": "I034-A1" },
+  { "address": 100634, "old": "code_01891A", "new": "gv_npc_goat_pen_01891A", "row": "I034-A1" },
+  { "address": 100953, "old": "code_018A59", "new": "gv_npc_lisa_018A59", "row": "I034-A1" },
+  { "address": 102388, "old": "code_018FF4", "new": "gv_npc_tulip_dream_rod_018FF4", "row": "I034-A1" },
+  { "address": 102668, "old": "code_01910C", "new": "gv_npc_architect_gaudi_01910C", "row": "I034-A1" },
+  { "address": 102866, "old": "code_0191D2", "new": "gv_npc_tool_shop_son_0191D2", "row": "I034-A1" },
+  { "address": 103269, "old": "code_019365", "new": "gv_npc_tulip_dream_boundary_019365", "row": "I034-A1" }
+]

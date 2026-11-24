@@ -17,7 +17,7 @@
 
 ?BANK 04
 
-?INCLUDE 'engine_scheduler_sprites_combat_collision'
+?INCLUDE 'engine_actor_scheduler_and_sprites'
 ?INCLUDE 'engine_spawn_lairs_death_drops'
 ?INCLUDE 'mc_return_prompt_and_chest_hint_texts'
 ?INCLUDE 'shared_choice_prompt_texts'
@@ -416,7 +416,7 @@ mc_dock_dr_leo_hostage_scene_025E98 {
     LDA #$0003
     STA $001E, X
     STZ $0020, X
-    JSL $@engine_scheduler_sprites_combat_collision.SetActorAnimFrame
+    JSL $@engine_actor_scheduler_and_sprites.SetActorAnimFrame
     PLX 
     COP [05] ( #$0005 )   ; waits for flag $0005 (set at the end of the outburst script)
     COP [16]
@@ -1153,7 +1153,7 @@ mc_deck_push_zones_027019 {
 ; When: read by ScanPushZones via push_zone_list.
 ; Sees: rectangles x $16-$19 / y $06-$0D, $15-$17 / $0D-$14, $18-$1A / $0D-$14, $17-$18 / $10-$14, $13-$1C / $14-$1E, $13-$16 / $1E-$23, $19-$1C / $1E-$23, $16-$19 / $23-$29, all with dx = 0, dy = +1.
 ; Why: the hero is moved south on the deck.
-; In: n/a (data, 6-byte records).
+; In: n/a (data, 8-byte records: x0, x1, y0, y1 in tiles, then the words dx and dy).
 ; Out: n/a.
 ; Clobbers: n/a.
 

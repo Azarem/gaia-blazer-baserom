@@ -100,6 +100,9 @@ async function build(projectRoot: string, db: DbGameRomModule, s: Snapshot, dir:
     return { tree, assets, rom, failure };
 }
 
+const SUB_LINE = /^\s{2}(\w+):\s*(?:;.*)?$/;
+const BARE_HEADER = /^\w+\s+[{\[]\s*$/;
+
 function sample(list: string[], n = SHOW): string {
     return list.slice(0, n).join('; ') + (list.length > n ? `; ... (+${list.length - n})` : '');
 }
@@ -149,9 +152,25 @@ export async function verifyRegroup(projectRoot: string, db: DbGameRomModule, be
 
         const names = new Set<string>([...b.tree.files.keys(), ...a.tree.files.keys()]);
         const none = new Map<string, string>();
+        // One entry per label, top-level or sub-label: the lines up to the next label of either kind. Braces are cosmetic
+        // (the flat namespace ignores them), and a `split-part` may cut at a sub-label, which then opens a unit of its own.
         const textOf = (tree: AsmTree) => {
             const m = new Map<string, string>();
-            for (const f of tree.files.values()) for (const u of f.units) m.set(u.label, canonicalUnitText(u, names, none));
+            for (const f of tree.files.values()) for (const u of f.units) {
+                let label = u.label;
+                let buf: string[] = [];
+                const flush = () => {
+                    while (buf.length > 0 && /^[}\]]\s*$/.test(buf[buf.length - 1])) buf.pop();
+                    m.set(label, buf.join('\n'));
+                };
+                canonicalUnitText(u, names, none).split('\n').forEach((line, i) => {
+                    if (i === 0 && BARE_HEADER.test(line)) return;
+                    const sub = i > 0 ? line.match(SUB_LINE) : null;
+                    if (sub) { flush(); label = sub[1]; buf = []; return; }
+                    buf.push(line);
+                });
+                flush();
+            }
             return m;
         };
         const tb = textOf(b.tree), ta = textOf(a.tree);
@@ -173,7 +192,7 @@ export async function verifyRegroup(projectRoot: string, db: DbGameRomModule, be
             }
         }
         if (different.length) report.errors.push(`the text of ${different.length} label(s) changes: ${sample(different)}; ${firstDiff}`);
-        report.info.push(`text: ${compared} top-level labels compared, ${compared - different.length} identical; ${b.tree.labels.size} labels before, ${a.tree.labels.size} after`);
+        report.info.push(`text: ${compared} labels compared, ${compared - different.length} identical; ${b.tree.labels.size} labels before, ${a.tree.labels.size} after`);
 
         // ---------------------------------------------------------------- includes and qualifiers
         const dangling = new Set<string>();

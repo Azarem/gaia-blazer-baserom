@@ -1,0 +1,219 @@
+[
+  {
+    "op": "merge",
+    "blocks": ["common_actor_001A28_part2", "common_actor_001A28_part3", "common_actor_001A28_part4"],
+    "into": "player_spells_level_up",
+    "row": "W1-01",
+    "note": "Player script, second half (placement 6.1 player_magic): part2 = weapon layer actor, soul orb actor and controller, spell dispatcher, the seven spells (FM-A10); part3 = 'release the Y latch, clear the spell counter, kill self', reached by 7 BRL/COP [26] from part2; part4 = level-up watcher and 'LEVEL UP !' blink, spawned by COP [84] from part1. Same group, bank 0. Part1 stays apart (player_core waits for the common to system group move of wave 3)."
+  },
+  {
+    "op": "merge",
+    "blocks": ["common_actor_005043", "common_actor_005043_part2"],
+    "into": "we_boss_deathtoll_demon",
+    "row": "W1-02",
+    "note": "Deathtoll the Demon (crosswalk section 3: meta w6 type 11, placed in scene 15/02, HP 100): code_005043 spawns code_0055C6 (part2, one COP [85]). Bank 0, group common."
+  },
+  {
+    "op": "merge",
+    "blocks": ["common_actor_006E28", "common_actor_006E28_part2"],
+    "into": "common_actor_006E28",
+    "row": "W1-03",
+    "note": "Up Above scripted actor (scene 00, placement audit 5.3): code_006E28 spawns code_007141 by COP [85] and tests flags 9F05 and 9F04 (the second one jumps into code_007264, part2). Name kept: the actor is not identified in the walkthrough crosswalk."
+  },
+  {
+    "op": "merge",
+    "blocks": ["common_actor_00729D", "common_actor_00729D_part2"],
+    "into": "ending_sequence",
+    "row": "W1-04",
+    "note": "Ending actor (meta entry 57 of world 0): the seven ending story pages (FM-A7 D24-D31), the staff roll via code_007638 (FM-A6 ST01) and the spawn of actor 0D00; part2 holds the child scripts that code_00729D spawns by COP [85]/[B0]. FM-A6, FM-A7 and FM-A8 read this actor as the ending; placement-audit 5.3 calls it 'file select' (OQ-I018-1)."
+  },
+  {
+    "op": "merge",
+    "blocks": ["cop_handler_005867", "cop_handler_005867_part2"],
+    "into": "cop_set_or_clear_event_flag",
+    "row": "W1-05",
+    "note": "COP [09] (Cop09_SetOrClearFlag) and its only callee code_0064CC (flag write); JSR $& from the handler. Bank 0, in the COP table. Wave 2 may move code_0064CC next to engine_0064F8 with move-part (placement 4.8)."
+  },
+  {
+    "op": "merge",
+    "blocks": ["cop_handler_0059F4", "cop_handler_0059F4_part2"],
+    "into": "cop_block_own_tiles",
+    "row": "W1-06",
+    "note": "COP [15] (Cop15_BlockOwnTiles) and its only callee code_006537 (the actor footprint writer); JSR $& from the handler. Bank 0, in the COP table. Wave 2 may move code_006537 next to engine_0065A7 with move-part (placement 4.8)."
+  },
+  {
+    "op": "merge",
+    "blocks": ["cop_handler_005C81", "cop_handler_0058A9"],
+    "into": "cop_jump_if_actor_in_box",
+    "row": "W1-07",
+    "note": "COP [2E] (Cop2E_JumpIfActorInBoxWord) ends with BRL into the middle of COP [0C] (Cop0C_JumpIfActorInBox, loc_0058C0); both stay in the COP table (bank 0)."
+  },
+  {
+    "op": "merge",
+    "blocks": ["cop_handler_005CD6", "cop_handler_005EEE"],
+    "into": "cop_conditional_spawn",
+    "row": "W1-08",
+    "note": "COP [30] (Cop30_ConditionalSpawn) ends with BRL into COP [85] (Cop85_SpawnActorBefore); both stay in the COP table (bank 0)."
+  },
+  {
+    "op": "merge",
+    "blocks": ["w0_actor_0191D2", "w0_actor_0191D2_part2", "w0_actor_018353"],
+    "into": "gv_tool_shop_woman_and_son",
+    "row": "W1-09",
+    "note": "Grass Valley tool shop (crosswalk: w0_actor_018353 woman, Medical Herb; w0_actor_0191D2 boy, Goat's Food). code_0191D2 spawns the woman's script (code_018353) with COP [12] and the 10-byte string asciistring_018480 (part2). Bank 3. 018353 is also a meta entry (long reference), unaffected."
+  },
+  {
+    "op": "merge",
+    "blocks": ["w0_actor_01A440", "w0_actor_01A440_part2"],
+    "into": "w0_actor_01A440",
+    "row": "W1-10",
+    "note": "Dream sequence actor with six dialogue strings (part2, six COP [01] references), COP [10] warps to area 01 scene 01 (Grass Valley highlands). Name kept: the speaker is not identified in the crosswalk."
+  },
+  {
+    "op": "merge",
+    "blocks": ["w0_actor_01A3B0", "w0_actor_01A3B0_part2"],
+    "into": "w0_actor_01A3B0",
+    "row": "W1-11",
+    "note": "Dream actor ('In my dreams I can do anything I like') that conjures the jewel script code_01AD42 (COP [AC], part2); part2 holds the jewel's advice text and branches into gv_fairy_gem_advice_return (BRL). Name kept: the speaker is not identified in the crosswalk."
+  },
+  {
+    "op": "merge",
+    "blocks": ["gv_fairy_gem_advice_return", "w0_shared_01B2AB"],
+    "into": "gv_fairy_gem_advice_return",
+    "row": "W1-12",
+    "note": "The gem's advice text (three strings, COP [01] from code_01AC32 and its tail). Bank 3."
+  },
+  {
+    "op": "merge",
+    "blocks": ["ms_fairy_gem_return_prompt", "w3_actor_021F22"],
+    "into": "ms_fairy_gems_return_prompt",
+    "row": "W1-13",
+    "note": "After wave 0 the prompt has one referrer, w3_actor_021F22: a second Mountain of Souls Fairy Gem actor (same entry code and text as the first; flag 9D05, COP [38] amount 0400) that tests its flag, shows the text and BRLs into the prompt shared with the first gem (flag 9E00, COP [38] amount 0300). Bank 4. Both gems stay meta entries (long references)."
+  },
+  {
+    "op": "merge",
+    "blocks": ["w5_actor_025E61", "w5_actor_025E61_part2"],
+    "into": "mc_give_mobile_key_dr_leo",
+    "row": "W1-14",
+    "note": "Dr. Leo in Magridd's Castle (crosswalk: item 'A Mobile Key', 'Castle of King Magridd - Boss Preparations'): the actor entry plus 30 strings and child scripts (part2, 18 references from the actor). Bank 4."
+  },
+  {
+    "op": "merge",
+    "blocks": ["w6_actor_01EC4B", "w6_actor_01EC4B_part2"],
+    "into": "w6_actor_01EC4B",
+    "row": "W1-15",
+    "note": "Story event actor of world 6 (six stones and aurora text, gate to the World of Evil, COP [10] warp to area 00 scene 09); part2 is the 5-byte shared string tail that three strings JMP into. Name kept: not identified in the crosswalk."
+  },
+  {
+    "op": "merge",
+    "blocks": ["engine_routines_001D3B", "engine_routines_002678"],
+    "into": "player_attack_animation_handlers",
+    "row": "W1-16",
+    "note": "The 28 player attack and animation-start handlers (code_list_001B2B table targets) and the four Phoenix projectile scripts that the sword swing spawns with COP [84] (FM-A2 sections 2.3 and 2.4). Bank 0, group system. Part1 of the player stays in common until wave 3."
+  },
+  {
+    "op": "merge",
+    "blocks": ["engine_0029EC", "engine_005354"],
+    "into": "engine_death_drops_ending",
+    "row": "W1-17",
+    "note": "Enemy death, gem drop, EXP popup and boss death (engine_0029EC), with the ending sequence RunEnding (engine_005354) that RunBossDeath pushes as a return address when the location is 7D (LDA #$&code_005354-1, PHA). Both bank 0, rewrites.json entry 21331 is a byte offset and unaffected."
+  },
+  {
+    "op": "merge",
+    "blocks": ["lib_01010B", "lib_01010B_part2", "lib_01010B_part3"],
+    "into": "lib_map_strip_request",
+    "row": "W1-18",
+    "note": "Strip request dispatcher (lib_01010B) -> row strip buffer fill (part2, JSR from the dispatcher) -> 16 metatiles as a tile row (part3, JSR from part2). Bank 2."
+  },
+  {
+    "op": "merge",
+    "blocks": ["lib_shared_01032F", "lib_shared_010419"],
+    "into": "lib_map_column_strip_fill",
+    "row": "W1-19",
+    "note": "Column strip buffer fill (lib_shared_01032F) and its only callee, 16 metatiles as a tile column (lib_shared_010419, four JSR). Bank 2."
+  },
+  {
+    "op": "merge",
+    "blocks": ["lib_0118FC", "lib_0118FC_part3", "lib_0118FC_part4", "lib_0118FC_part7", "lib_0118FC_part11"],
+    "into": "lib_menus",
+    "row": "W1-20",
+    "note": "Field button dispatch, status and souls screen, talk probe, equipment menu, list choosers (lib_0118FC, FM-A5) with its single-caller helpers: part3 clear the BG3 text page, part4 CGRAM backup and restore, part7 vblank wait and screen on, part11 status screen strings. Bank 2. About 1,350 lines. Part13 stays a data file (W1-21); parts 2, 5, 6, 8, 9, 10, 12 have several callers and are not wave 1."
+  },
+  {
+    "op": "rename",
+    "block": "lib_0118FC_part13",
+    "to": "lib_menu_item_data",
+    "row": "W1-21",
+    "note": "Item description headers, description pointer list and 65 strings, name-index cells and the gear stat table (FM-A5); 3,216 bytes, 285 lines, one caller (lib_0118FC, 10 references). Kept as its own data file (placement 6.3) because lib_menus would pass 1,600 lines. Bank 2."
+  },
+  {
+    "op": "merge",
+    "blocks": ["lib_0124EE", "lib_0124EE_part2"],
+    "into": "lib_name_entry",
+    "row": "W1-22",
+    "note": "Name entry screen (COP [3A], FM-A6) with its three strings (LDY #$& from the screen code). Bank 2."
+  },
+  {
+    "op": "merge",
+    "blocks": ["lib_shared_012769", "lib_shared_014789"],
+    "into": "lib_text_render",
+    "row": "W1-23",
+    "note": "The text renderer and dialogue renderer (FM-A6, 82 references from 18 files) with the inline text insert list binary_list_014789 that only the renderer reads (LDA $&label, Y and #$^label for the bank). Bank 2. About 1,710 lines, over the 1,500 guide because the renderer was already 1,682: accepted, a split needs split-part (OQ-I015-8)."
+  },
+  {
+    "op": "merge",
+    "blocks": ["lib_014536", "lib_014536_part2"],
+    "into": "lib_location_banner_names",
+    "row": "W1-24",
+    "note": "The pause location banner string and the 128-entry location name list asciistring_list_0147C2 that it indexes with [TBL:&...]. Bank 2, read with DBR 02."
+  },
+  {
+    "op": "merge",
+    "blocks": ["lib_010EA9_part1", "lib_010EA9_part3", "lib_010EA9_part2"],
+    "into": "lib_lair_return_mode",
+    "row": "W1-25",
+    "note": "Return-mode frame: RunReturnModeFrame / RevealReleasedHome (part1, FM-A4 L026 L027), the release and recall messages (part3) and the NPC name list they print with [TBL:&...] (part2). Chain part1 -> part3 -> part2, one caller each. Bank 2."
+  },
+  {
+    "op": "merge",
+    "blocks": ["lib_0109D6", "lib_0109D6_part4", "lib_0109D6_part5"],
+    "into": "lib_tile_triggers",
+    "row": "W1-26",
+    "note": "Per-frame tile triggers (lair switch, plates, chests, exits; FM-A4) with the chest messages (part4) and the location id to (area, scene) table word_01762C (part5, long reads). lib_0109D6_part1 and part3 have several callers and are not wave 1. Bank 2."
+  },
+  {
+    "op": "merge",
+    "blocks": ["lib_0133A6_part3", "lib_0133A6_part2"],
+    "into": "lib_scene_asset_loader",
+    "row": "W1-27",
+    "note": "The scene asset loader (Quintet LZ decompressor, record walker, eight command handlers, boot hardware reset; FM-A7) and the 8-byte wait-N-vblanks helper that only it calls (three JSL). Bank 2. About 1,465 lines."
+  },
+  {
+    "op": "rename",
+    "block": "lib_0133A6_part4",
+    "to": "lib_scene_profile_data",
+    "row": "W1-28",
+    "note": "Scene profile list (128 words) and the 97 twelve-byte profile records (FM-A7); data, 1,420 bytes, read by the loader through binary_list_0168A1 (one short reference plus 16 long). Kept as its own data file (placement 6.3) because lib_scene_asset_loader would pass 1,790 lines. Bank 2."
+  },
+  {
+    "op": "merge",
+    "blocks": ["lib_0133A6_part1", "lib_0133A6_part5"],
+    "into": "lib_scene_lair_map_patches",
+    "row": "W1-29",
+    "note": "Lair states, flag-driven map patches and the scene-variant lookup that run right after the loader (part1, FM-A7) with their 70 nine-byte patch rows unk13_01728D (part5, long reads). Bank 2."
+  },
+  {
+    "op": "merge",
+    "blocks": ["lib_010EEA", "lib_010EEA_part2"],
+    "into": "lib_map_sweep_redraw",
+    "row": "W1-30",
+    "note": "Cross-shaped sweep redraw, one step per sub-frame (lib_010EEA) and its 35 x 32 byte step table binary_016E2D (part2, long reads). Bank 2."
+  },
+  {
+    "op": "merge",
+    "blocks": ["lib_027781_part2", "lib_027781_part3"],
+    "into": "lib_scene_change_init",
+    "row": "W1-31",
+    "note": "Scene change, fade out and in, iris (part2, BRL/BMI into loc_02787C stay inside it) and the scene initialisation code_0279B5 that part2 calls with one JSL (part3). Bank 4. lib_027781_part1 is the player weapon pose, a different routine, and stays apart."
+  }
+]

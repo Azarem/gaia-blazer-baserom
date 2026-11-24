@@ -2,7 +2,7 @@
 
 _Full reverse-engineering of the Soul Blazer N-SPC engine, with systematic comparison to the Illusion of Gaia variant._
 
-**Engine binary:** 2,887 bytes uploaded to ARAM at boot from `spc_0FF14E` in `chunk_0FAA49.asm`.
+**Engine binary:** 2,887 bytes uploaded to ARAM at boot from `SpcEngineBlock` in `extracted/system/engine_spc_ipl_upload.asm` (`UploadSpcDriver`). The CPU side of the ports, the driver block and the song format are in [../code/spc-interface.md](../code/spc-interface.md).
 **ARAM range:** `$0400`–`$0F46` (vs IoG: `$0400`–`$0FC9`, 3,018 bytes).
 **Variant:** N-SPC (Nintendo SPC, Quintet-customized). Soul Blazer is the earliest of the Soul Blazer trilogy.
 
@@ -49,11 +49,11 @@ The Soul Blazer and Illusion of Gaia SPC engines are the **same N-SPC variant** 
 | SPC slot table | — | `$0FE0` (6 bytes) | IoG only |
 | Song base pointer | `$0FFE`+X (indexed) | `$0FFC` (fixed) | Different mechanism |
 | Sample end pointer | `$0FFD`–`$0FFE` | `$0FFE`–`$0FFF` | −1 |
-| Instrument definitions | `$2E54` | `$1254` | +$1C00 |
+| Instrument definitions | `$2E00` (slots 0-12 from the driver; a song's from `$2E4E`) | `$1254` | Different |
 | Duration/velocity table | `$2F00` | `$1300` | +$1C00 |
-| Song sequence data | `$2400` (SFX/ext) | `$1400` (ext) / `$5532` (std) | Different |
-| Standard sample directory | TBD | `$1038` (6×4) | TBD |
-| Extended sample directory | TBD | `$1000` (14×4) | TBD |
+| Song sequence data | `$1000` (every song; first word `$1002`); `$2400` is the sound effect table and sequences | `$1400` (ext) / `$5532` (std) | Different |
+| Sample directory | `$2C00` (13 entries from the driver; a song's from `$2C34`) | `$1038` (6×4, std) | Different |
+| Extended sample directory | none (one directory) | `$1000` (14×4) | — |
 | Handler address table | `$0A54` (54 bytes) | `$0B49` (64 bytes) | Different |
 | Param count table | `$0A8A` (32 bytes) | `$0B89` (32 bytes) | Different |
 | Frequency table | `$0D72` (26 bytes) | `$0E59` (26 bytes) | −$E7 |
@@ -91,7 +91,7 @@ The `+$1C00` offset for instrument definitions and DV table suggests Blazer uses
 
 - Blazer starts with audible master volume ($60); IoG starts silent and fades in
 - Blazer uses only hardware Timer 0; IoG uses both Timer 0 and Timer 1
-- Blazer stores instrument base offset to $0FFF during init (always 0 at boot)
+- Blazer stores instrument base offset to $0FFF during init (0 at that moment); the driver block then sets it to `$0D` (13), so a song's instrument n is slot 13 + n (the driver owns slots 0-12)
 
 ---
 
@@ -461,10 +461,10 @@ For each BGM file block, remap the ARAM target addresses:
 
 | IoG Block Target | Blazer Target | Contents |
 |-----------------|---------------|----------|
-| `$1254` | `$2E54` | Instrument definitions (N × 6 bytes) |
+| `$1254` | `$2E4E` | Instrument definitions (N × 6 bytes); the 21 Blazer songs all write them from `$2E4E` (slot 13), so the `+$1C00` shift of the table above is not exact for this row |
 | `$1300` | `$2F00` | Duration/velocity table (24 bytes) |
-| `$1400` or `$5532` | TBD per song | Sequence data |
-| `$1038` | TBD | Sample directory |
+| `$1400` or `$5532` | `$1000` | Sequence data |
+| `$1038` | `$2C34` | Sample directory entries (13 and up; 0-12 belong to the driver) |
 | `$0FFC` | Song pointer table | Song base pointer |
 | `$0FFE` | `$0FFD`–`$0FFE` | Sample end pointer |
 | `$0FE0` | `$0FFF` (1 byte) | Instrument slot mapping → base offset |

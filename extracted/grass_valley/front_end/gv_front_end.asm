@@ -22,10 +22,9 @@
 ?INCLUDE 'gv_epilogue_texts'
 ?INCLUDE 'gv_prologue_texts'
 ?INCLUDE 'gv_title_texts'
-?INCLUDE 'lib_0118FC_part5'
-?INCLUDE 'lib_0126CF'
-?INCLUDE 'lib_02719F'
-?INCLUDE 'lib_scene_change_init'
+?INCLUDE 'lib_boot_and_scene_init'
+?INCLUDE 'lib_menu_screen_setup'
+?INCLUDE 'lib_name_entry_and_staff_roll'
 ?INCLUDE 'lib_system_helpers'
 ?INCLUDE 'lib_text_render'
 
@@ -58,7 +57,7 @@
 ; Sees: TileBlockText on BG3 (a 4x5 block of tiles, OQ-I011-9) for one frame, then the title.
 ; Why: the SPC engine and the boot graphics are loaded here before any scene needs them.
 ; In: actor script, X = own slot.
-; Out: joy_block_mask |= $3080, player_actor = X; after 1 frame code_0066DE uploads the SPC engine (engine_spc_ipl_upload.code_0FEFBC), restores the scene gfx and palette and loads the boot graphics buffers, then COP 10 starts the title (area 0 scene $0A, arrival animation 1).
+; Out: joy_block_mask |= $3080, player_actor = X; after 1 frame code_0066DE uploads the SPC engine (engine_spc_ipl_upload.UploadSpcDriver), restores the scene gfx and palette and loads the boot graphics buffers, then COP 10 starts the title (area 0 scene $0A, arrival animation 1).
 ; Clobbers: A, Y.
 
 gv_obj_boot_loader_0066C6 {
@@ -85,9 +84,9 @@ gv_obj_boot_loader_0066C6 {
 code_0066DE {
     SEP #$20
     PHX 
-    JSL $@engine_spc_ipl_upload.code_0FEFBC
-    JSL $@lib_0118FC_part5.RestoreSceneBgGfxAndPalette
-    JSL $@lib_02719F.LoadBootGraphicsBuffers
+    JSL $@engine_spc_ipl_upload.UploadSpcDriver
+    JSL $@lib_menu_screen_setup.RestoreSceneBgGfxAndPalette
+    JSL $@lib_boot_and_scene_init.LoadBootGraphicsBuffers
     PLX 
     REP #$20
     COP [10] ( #$0A00, #01, #$0000, #$0000 )
@@ -198,7 +197,7 @@ gv_obj_title_and_prologue_0066FC {
     COP [03] ( #79 )
     COP [04]
     PHX 
-    JSL $@lib_scene_change_init.ClearBg3Buffer
+    JSL $@lib_boot_and_scene_init.ClearBg3Buffer
     LDY #$&gv_prologue_texts.IntroPage01Text
     JSL $@lib_text_render.PrintTextString
     PLX 
@@ -211,7 +210,7 @@ gv_obj_title_and_prologue_0066FC {
     COP [03] ( #21 )
     COP [04]
     PHX 
-    JSL $@lib_scene_change_init.ClearBg3Buffer
+    JSL $@lib_boot_and_scene_init.ClearBg3Buffer
     LDY #$&gv_prologue_texts.IntroPage02Text
     JSL $@lib_text_render.PrintTextString
     PLX 
@@ -224,7 +223,7 @@ gv_obj_title_and_prologue_0066FC {
     COP [03] ( #21 )
     COP [04]
     PHX 
-    JSL $@lib_scene_change_init.ClearBg3Buffer
+    JSL $@lib_boot_and_scene_init.ClearBg3Buffer
     LDY #$&gv_prologue_texts.IntroPage03Text
     JSL $@lib_text_render.PrintTextString
     PLX 
@@ -237,7 +236,7 @@ gv_obj_title_and_prologue_0066FC {
     COP [03] ( #21 )
     COP [04]
     PHX 
-    JSL $@lib_scene_change_init.ClearBg3Buffer
+    JSL $@lib_boot_and_scene_init.ClearBg3Buffer
     LDY #$&gv_prologue_texts.IntroPage04Text
     JSL $@lib_text_render.PrintTextString
     PLX 
@@ -250,7 +249,7 @@ gv_obj_title_and_prologue_0066FC {
     COP [03] ( #21 )
     COP [04]
     PHX 
-    JSL $@lib_scene_change_init.ClearBg3Buffer
+    JSL $@lib_boot_and_scene_init.ClearBg3Buffer
     LDY #$&gv_prologue_texts.IntroPage05Text
     JSL $@lib_text_render.PrintTextString
     PLX 
@@ -263,7 +262,7 @@ gv_obj_title_and_prologue_0066FC {
     COP [03] ( #21 )
     COP [04]
     PHX 
-    JSL $@lib_scene_change_init.ClearBg3Buffer
+    JSL $@lib_boot_and_scene_init.ClearBg3Buffer
     LDY #$&gv_prologue_texts.IntroPage06Text
     JSL $@lib_text_render.PrintTextString
     PLX 
@@ -276,7 +275,7 @@ gv_obj_title_and_prologue_0066FC {
     COP [03] ( #21 )
     COP [04]
     PHX 
-    JSL $@lib_scene_change_init.ClearBg3Buffer
+    JSL $@lib_boot_and_scene_init.ClearBg3Buffer
     LDY #$&gv_prologue_texts.IntroPage07Text
     JSL $@lib_text_render.PrintTextString
     PLX 
@@ -289,7 +288,7 @@ gv_obj_title_and_prologue_0066FC {
     COP [03] ( #21 )
     COP [04]
     PHX 
-    JSL $@lib_scene_change_init.ClearBg3Buffer
+    JSL $@lib_boot_and_scene_init.ClearBg3Buffer
     LDY #$&gv_prologue_texts.IntroPage08Text
     JSL $@lib_text_render.PrintTextString
     PLX 
@@ -302,7 +301,7 @@ gv_obj_title_and_prologue_0066FC {
     COP [03] ( #21 )
     COP [04]
     PHX 
-    JSL $@lib_scene_change_init.ClearBg3Buffer
+    JSL $@lib_boot_and_scene_init.ClearBg3Buffer
     LDY #$&gv_prologue_texts.IntroPage09Text
     JSL $@lib_text_render.PrintTextString
     PLX 
@@ -315,7 +314,7 @@ gv_obj_title_and_prologue_0066FC {
     COP [03] ( #21 )
     COP [04]
     PHX 
-    JSL $@lib_scene_change_init.ClearBg3Buffer
+    JSL $@lib_boot_and_scene_init.ClearBg3Buffer
     LDY #$&gv_prologue_texts.IntroPage10Text
     JSL $@lib_text_render.PrintTextString
     PLX 
@@ -328,7 +327,7 @@ gv_obj_title_and_prologue_0066FC {
     COP [03] ( #21 )
     COP [04]
     PHX 
-    JSL $@lib_scene_change_init.ClearBg3Buffer
+    JSL $@lib_boot_and_scene_init.ClearBg3Buffer
     LDY #$&gv_prologue_texts.IntroPage11Text
     JSL $@lib_text_render.PrintTextString
     PLX 
@@ -341,7 +340,7 @@ gv_obj_title_and_prologue_0066FC {
     COP [03] ( #21 )
     COP [04]
     PHX 
-    JSL $@lib_scene_change_init.ClearBg3Buffer
+    JSL $@lib_boot_and_scene_init.ClearBg3Buffer
     LDY #$&gv_prologue_texts.IntroPage12Text
     JSL $@lib_text_render.PrintTextString
     PLX 
@@ -354,7 +353,7 @@ gv_obj_title_and_prologue_0066FC {
     COP [03] ( #21 )
     COP [04]
     PHX 
-    JSL $@lib_scene_change_init.ClearBg3Buffer
+    JSL $@lib_boot_and_scene_init.ClearBg3Buffer
     LDY #$&gv_prologue_texts.IntroPage13Text
     JSL $@lib_text_render.PrintTextString
     PLX 
@@ -367,7 +366,7 @@ gv_obj_title_and_prologue_0066FC {
     COP [03] ( #21 )
     COP [04]
     PHX 
-    JSL $@lib_scene_change_init.ClearBg3Buffer
+    JSL $@lib_boot_and_scene_init.ClearBg3Buffer
     LDY #$&gv_prologue_texts.IntroPage14Text
     JSL $@lib_text_render.PrintTextString
     PLX 
@@ -381,7 +380,7 @@ gv_obj_title_and_prologue_0066FC {
     COP [85] ( @gv_fx_coldata_ramp_up_006A25 )
     COP [03] ( #21 )
     COP [04]
-    JSL $@lib_scene_change_init.ClearBg3Buffer
+    JSL $@lib_boot_and_scene_init.ClearBg3Buffer
     COP [03] ( #1F )
     COP [04]
     STZ $front_end_step   ; front_end_step = 0 again, then $FFFF below: the title sprites end and the title restarts
@@ -761,7 +760,7 @@ code_007307 {
 
 code_007319 {
     STZ $0466
-    JSL $@lib_scene_change_init.ClearBg3Buffer
+    JSL $@lib_boot_and_scene_init.ClearBg3Buffer
     COP [1B] ( &code_007326, #$0070 )
 }
 
@@ -776,7 +775,7 @@ code_007326 {
 
 code_007338 {
     STZ $0466
-    JSL $@lib_scene_change_init.ClearBg3Buffer
+    JSL $@lib_boot_and_scene_init.ClearBg3Buffer
     COP [1B] ( &code_007345, #$0070 )
 }
 
@@ -791,7 +790,7 @@ code_007345 {
 
 code_007357 {
     STZ $0466
-    JSL $@lib_scene_change_init.ClearBg3Buffer
+    JSL $@lib_boot_and_scene_init.ClearBg3Buffer
     COP [1B] ( &code_007364, #$0070 )
 }
 
@@ -806,7 +805,7 @@ code_007364 {
 
 code_007376 {
     STZ $0466
-    JSL $@lib_scene_change_init.ClearBg3Buffer
+    JSL $@lib_boot_and_scene_init.ClearBg3Buffer
     COP [1B] ( &code_007383, #$0070 )
 }
 
@@ -848,7 +847,7 @@ code_0073B4 {
 
 code_0073C6 {
     STZ $0466
-    JSL $@lib_scene_change_init.ClearBg3Buffer
+    JSL $@lib_boot_and_scene_init.ClearBg3Buffer
     COP [1B] ( &code_0073D3, #$0070 )
 }
 
@@ -863,7 +862,7 @@ code_0073D3 {
 
 code_0073E5 {
     STZ $0466
-    JSL $@lib_scene_change_init.ClearBg3Buffer
+    JSL $@lib_boot_and_scene_init.ClearBg3Buffer
     COP [1B] ( &code_0073F2, #$0070 )
 }
 
@@ -878,7 +877,7 @@ code_0073F2 {
 
 code_007404 {
     STZ $0466
-    JSL $@lib_scene_change_init.ClearBg3Buffer
+    JSL $@lib_boot_and_scene_init.ClearBg3Buffer
     COP [1B] ( &code_007411, #$0070 )
 }
 
@@ -1224,7 +1223,7 @@ gv_fx_ending_queue_wipe_0075E7 {
 ; The staff roll.
 ; 
 ; When: spawned by code_007431.
-; Sees: the staff roll text (gv_epilogue_texts.StaffRollText); after lib_0126CF.ScrollStaffRollText returns there are 240 frames, COP 31 and another 240 frames.
+; Sees: the staff roll text (gv_epilogue_texts.StaffRollText); after lib_name_entry_and_staff_roll.ScrollStaffRollText returns there are 240 frames, COP 31 and another 240 frames.
 ; Why: the scrolling itself is in ScrollStaffRollText.
 ; In: actor script, X = own slot (saved with PHX / PLX).
 ; Out: code_007650 starts COP 10 to area 0 scene $0D (arrival animation 2, x 0, y 0), clears souls_flags, sets asset_skip_mask = $20 and reload_menu_gfx + 1.
@@ -1233,7 +1232,7 @@ gv_fx_ending_queue_wipe_0075E7 {
 gv_obj_staff_roll_007638 {
     PHX 
     LDY #$&gv_epilogue_texts.StaffRollText
-    JSL $@lib_0126CF.ScrollStaffRollText
+    JSL $@lib_name_entry_and_staff_roll.ScrollStaffRollText
     PLX 
     COP [1B] ( &code_007647, #$00F0 )
 }

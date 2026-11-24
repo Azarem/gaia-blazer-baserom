@@ -1,0 +1,9 @@
+[
+  { "address": 146899, "old": "code_023DD3", "new": "ll_npc_fairy_exp_300_023DD3", "row": "I038-B1" },
+  { "address": 146944, "old": "code_023E00", "new": "ll_fairy_return_prompt_023E00", "row": "I038-B1" },
+  { "address": 147031, "old": "code_023E57", "new": "ll_npc_fairy_exp_300_023E57", "row": "I038-B1" },
+  { "address": 147223, "old": "code_023F17", "new": "ll_obj_fire_pit_023F17", "row": "I038-B1" },
+  { "address": 146983, "old": "code_023E27", "new": "ll_npc_fairy_exp_300_023E27", "row": "I038-B2" },
+  { "address": 147079, "old": "code_023E87", "new": "ll_effect_model_release_023E87", "row": "I038-B2" },
+  { "address": 147187, "old": "code_023EF3", "new": "ll_effect_model_release_piece_023EF3", "row": "I038-B2" }
+]

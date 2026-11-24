@@ -12,7 +12,7 @@
 
 ?BANK 03
 
-?INCLUDE 'engine_scheduler_sprites_combat_collision'
+?INCLUDE 'engine_actor_scheduler_and_sprites'
 
 !rng_state                      0301
 !scene_sprite_attr              0372
@@ -33,7 +33,7 @@ cm_npc_fairy_gem_setup_01B161 {
     LDA #$0007
     STA $001E, X
     STZ $0020, X
-    JSL $@engine_scheduler_sprites_combat_collision.SetActorAnimFrame
+    JSL $@engine_actor_scheduler_and_sprites.SetActorAnimFrame
     LDA $scene_sprite_attr
     STA $001C, X
     COP [15]

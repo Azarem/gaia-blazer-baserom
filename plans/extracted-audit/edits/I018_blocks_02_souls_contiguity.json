@@ -1,0 +1,9 @@
+[
+  {
+    "op": "merge",
+    "blocks": ["lib_menus", "lib_01464B", "lib_014660", "lib_014675", "lib_01468A", "lib_0118FC_part12"],
+    "into": "lib_menus",
+    "row": "W1-32",
+    "note": "Souls page strings. code_0119B7 walks the five 21-byte soul lines with one stride (LDY #asciistring_014636, ADC #$0015, CPY #asciistring_01469F, BNE) and ends only when Y equals the end label exactly, so the lines and the end label must be one contiguous run in this order: asciistring_014636 (last item of lib_menus), then 01464B, 014660, 014675, 01468A, then asciistring_01469F (first string of lib_0118FC_part12). Their separate files let the packer scatter them, so the loop ran for tens of thousands of iterations (a different count in every layout) and printed the wrong lines. One caller, bank 2."
+  }
+]

@@ -1,0 +1,19 @@
+[
+  { "address": 1036917, "old": "code_0FD275", "new": "ll_enemy_mini_race_car_0FD275", "row": "I038-C1" },
+  { "address": 1037125, "old": "code_0FD345", "new": "ll_enemy_mini_bulldozer_0FD345", "row": "I038-C1" },
+  { "address": 1037314, "old": "code_0FD402", "new": "ll_enemy_mini_helicopter_0FD402", "row": "I038-C1" },
+  { "address": 1037570, "old": "code_0FD502", "new": "ll_enemy_ball_worm_0FD502", "row": "I038-C1" },
+  { "address": 1038060, "old": "code_0FD6EC", "new": "ll_enemy_flail_0FD6EC", "row": "I038-C1" },
+  { "address": 1038162, "old": "code_0FD752", "new": "ll_enemy_sweeper_bot_0FD752", "row": "I038-C1" },
+  { "address": 1038428, "old": "code_0FD85C", "new": "ll_enemy_sweeper_bot_contact_0FD85C", "row": "I038-C1" },
+  { "address": 1038435, "old": "code_0FD863", "new": "ll_enemy_sweeper_bot_burst_0FD863", "row": "I038-C1" },
+  { "address": 1038505, "old": "code_0FD8A9", "new": "ll_enemy_sweeper_bot_burst_wave2_0FD8A9", "row": "I038-C1" },
+  { "address": 1038568, "old": "code_0FD8E8", "new": "ll_enemy_sweeper_bot_burst_piece_0FD8E8", "row": "I038-C1" },
+  { "address": 1038578, "old": "code_0FD8F2", "new": "ll_enemy_sweeper_bot_burst_piece_0FD8F2", "row": "I038-C1" },
+  { "address": 1038590, "old": "code_0FD8FE", "new": "ll_enemy_sweeper_bot_burst_piece_0FD8FE", "row": "I038-C1" },
+  { "address": 1038602, "old": "code_0FD90A", "new": "ll_enemy_sweeper_bot_burst_piece_0FD90A", "row": "I038-C1" },
+  { "address": 1038614, "old": "code_0FD916", "new": "ll_enemy_sweeper_bot_burst_piece_0FD916", "row": "I038-C1" },
+  { "address": 1038624, "old": "code_0FD920", "new": "ll_enemy_sweeper_bot_burst_piece_0FD920", "row": "I038-C1" },
+  { "address": 1038634, "old": "code_0FD92A", "new": "ll_enemy_sweeper_bot_burst_piece_0FD92A", "row": "I038-C1" },
+  { "address": 1038644, "old": "code_0FD934", "new": "ll_enemy_sweeper_bot_burst_piece_0FD934", "row": "I038-C1" }
+]

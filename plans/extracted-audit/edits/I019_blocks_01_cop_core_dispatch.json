@@ -1,0 +1,34 @@
+[
+  {
+    "op": "move-part",
+    "part": "code_0064CC",
+    "from": "cop_set_or_clear_event_flag",
+    "to": "cop_handler_006473",
+    "row": "W2-01",
+    "note": "WriteEventFlag (FM-A3 H022): the event-flag writer whose only caller is Cop09 (JSR $&). It belongs next to code_0064F8, the flag reader (FM-A3 section 6, placement 4.8). Both blocks are bank 0 and pinned, so the JSR $& stays legal. The target block becomes cop_core in W2-03."
+  },
+  {
+    "op": "move-part",
+    "part": "code_006537",
+    "from": "cop_block_own_tiles",
+    "to": "cop_handler_006473",
+    "row": "W2-02",
+    "note": "BlockActorFootprint (FM-A3 H099): marks the tiles under an actor; its only caller is Cop15 (JSR $&). It belongs next to code_0065A7, which clears the footprint again (FM-A3 section 6, placement 4.8). Bank 0, pinned."
+  },
+  {
+    "op": "merge",
+    "blocks": ["cop_handler_006473", "engine_0064F8", "engine_0065A7"],
+    "into": "cop_core",
+    "group": "system",
+    "notes": "join",
+    "row": "W2-03",
+    "note": "cop_core (placement 6.1): the helpers every COP handler shares, in their original ROM order (25715 to 26310, contiguous): CopB2 with the exit chain loc_0064B5 .. loc_0064C9 (entered by BRL from all other handlers, 124 BRL pairs stay cross-file by design), WriteEventFlag, the flag and inventory lookups, BlockActorFootprint, and the slot, footprint and spawn helpers (code_0065A7 .. code_0066A3). Bank 0, group system, pinned. Three block notes are joined (cop_handler_006473, engine_0064F8, engine_0065A7); PC rewrites them as one."
+  },
+  {
+    "op": "merge",
+    "blocks": ["native_mode_brk_0055FC", "engine_00561E"],
+    "into": "cop_dispatch",
+    "row": "W2-04",
+    "note": "cop_dispatch (placement 6.1): the BRK vector handler (config nativeBrk, 22012) and the COP dispatcher with its three word tables (code_list_005638 ids 00-3C, cop_junk 3D-7F, code_list_005738 ids 80-B2), contiguous in ROM (22012 to 22430). The tables hold &Code words and are indexed by id*2 from one base, so they stay in one block in this order. Bank 0, group system, pinned. The block note of engine_00561E is kept."
+  }
+]

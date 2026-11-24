@@ -1,7 +1,7 @@
 ; Scene variant rules: 23 rows of 4 bytes and a terminator (file offsets 63898-63990, SNES $01:F99A-$F9F6, bank 00; 93 bytes).
 ; 
 ; === MODEL ===
-; LookupSceneVariant (lib_scene_map_patches) is called by ApplySceneProfile when scene_variant is still 0. It walks this table for a row of the current location whose switch bit is set in the switch array $1ADE and, if there is one, stores the row's variant in scene_variant ($031E). The variant picks the music of the scene (the music commands of the asset list carry a variant byte).
+; LookupSceneVariant (lib_map_tile_patches) is called by ApplySceneProfile when scene_variant is still 0. It walks this table for a row of the current location whose switch bit is set in the switch array $1ADE and, if there is one, stores the row's variant in scene_variant ($031E). The variant picks the music of the scene (the music commands of the asset list carry a variant byte).
 ; Row (4 bytes): +0 location_id (a first byte of $80 or more ends the table), +1 word switch number (a bit of $1ADE), +3 variant. The switch numbers are lair record indices (LairRecords): the six values are the boss lairs, one per world: $0009 the Metal Mantis (world 0), $0050 the Elemental Statues (1), $00B6 the Floating Skull (2), $0103 Poseidon (3), $012F the Tin Doll (4) and $0195 the Demon Falcon (5). The record of each switch has the world's boss as its monster (meta type $1F, $3D, $41, $38, $1E, $09).
 ; 
 ; === ROWS ===

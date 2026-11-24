@@ -24,7 +24,7 @@
 ?BANK 00
 
 ?INCLUDE 'engine_title_file_select'
-?INCLUDE 'lib_map_streaming'
+?INCLUDE 'lib_map_scroll_and_redraw'
 
 !frame_counter                  0312
 !joy_pressed                    0322
@@ -228,25 +228,25 @@ DmaCgramAndFixedColor {
 
 DmaBg3TilemapPage {
     LDA $1C7C
-    BEQ loc_000427
+    BEQ Bg3PageCheckFlags
     RTS 
 
-  loc_000427:
+  Bg3PageCheckFlags:
     LDA $vram_upload_flags
-    BNE loc_00042D
+    BNE Bg3PageSelect
     RTS 
 
-  loc_00042D:
+  Bg3PageSelect:
     BIT #$02
-    BNE loc_000442
+    BNE Bg3PageSecond
     LDX #$5800
     STX $VMADDL
     LDX #$7000
     STX $A1T2L
     STZ $vram_upload_flags
-    BRA loc_000453
+    BRA Bg3PageStartDma
 
-  loc_000442:
+  Bg3PageSecond:
     LDX #$5C00
     STX $VMADDL
     LDX #$7800
@@ -254,7 +254,7 @@ DmaBg3TilemapPage {
     LDA #$02
     TRB $vram_upload_flags
 
-  loc_000453:
+  Bg3PageStartDma:
     LDA #$01
     STA $DMAP2
     LDA #$18
@@ -284,7 +284,7 @@ WriteScrollRegisters {
     STA $BG3VOFS
     STZ $BG3VOFS
     LDA $bg_scroll_swap   ; bg_scroll_swap non-zero: BG1 takes the BG2 scroll pair and BG2 the BG1 pair
-    BNE loc_000498
+    BNE WriteScrollSwapped
     LDX #$0000
     LDY #$0000
     JSR $&WriteScrollPair
@@ -293,7 +293,7 @@ WriteScrollRegisters {
     JSR $&WriteScrollPair
     RTS 
 
-  loc_000498:
+  WriteScrollSwapped:
     LDX #$0004
     LDY #$0000
     JSR $&WriteScrollPair
@@ -338,29 +338,29 @@ UploadMapStripBuffers {
     STX $32
     LDX #$3102
     STX $35
-    JSL $@lib_map_streaming.UploadScrollStrips
+    JSL $@lib_map_scroll_and_redraw.UploadScrollStrips
     LDX #$3204
     STX $32
     LDX #$3306
     STX $35
-    JSL $@lib_map_streaming.UploadScrollStrips
+    JSL $@lib_map_scroll_and_redraw.UploadScrollStrips
     RTS 
 }
 
 ---------------------------------------------
 ; Copies the tiles of dynamic-tile sprites into VRAM in two passes (top and bottom tile rows).
 ; 
-; When: every NMI with tile_dma_pending non-zero (set by BuildActorSprites). Sees: actors flagged $1A bit $8000 (candidates: bosses and large monsters, OQ-I005-6) show their frames from streamed tiles. Why: those frames are copied into VRAM every frame.
+; When: every NMI with tile_dma_pending non-zero (set by BuildActorSprites). Sees: actors flagged $1A bit $8000 (only the hero: CopA9_SetDynamicTileSource in InitPlayerActor is the one place that sets the bit, OQ-I050-1) show their frames from streamed tiles. Why: those frames are copied into VRAM every frame.
 ; In: tile_dma_list at $1A06: 3-byte records (source word, bank byte), 0 ends.
-; Out: pass 1 to VRAM $2000 upward (0x40 bytes per record); pass 2 adds $0200 to each record's source and uploads to $2100 upward; tile_dma_pending cleared. There is no count limit (OQ-I005-6).
+; Out: pass 1 to VRAM $2000 upward (0x40 bytes per record); pass 2 adds $0200 to each record's source and uploads to $2100 upward; tile_dma_pending cleared. There is no count limit in the code (OQ-I005-6); the hero's frames have three entries each, so three records per frame and OAM tiles 0-5 and 16-21.
 ; Clobbers: A, X, Y.
 
 DmaDynamicSpriteTiles {
     LDA $tile_dma_pending
-    BNE loc_0004EB
+    BNE DynamicTilesPass1
     RTS 
 
-  loc_0004EB:
+  DynamicTilesPass1:
     LDA #$18
     STA $BBAD2
     LDA #$01
@@ -371,17 +371,17 @@ DmaDynamicSpriteTiles {
     JSR $&DmaSpriteTileRecords
     LDX #$0000
 
-  loc_000504:
+  DynamicTilesBumpSource:
     LDY $tile_dma_list, X
-    BEQ loc_000514
+    BEQ DynamicTilesPass2
     INC $1A07, X          ; Second pass: the source address high byte is incremented twice (+$0200), the bottom tile row of the 16x16 sprites
     INC $1A07, X
     INX 
     INX 
     INX 
-    BRA loc_000504
+    BRA DynamicTilesBumpSource
 
-  loc_000514:
+  DynamicTilesPass2:
     LDY #$0000
     LDX #$2100
     STX $VMADDL
@@ -400,7 +400,7 @@ DmaDynamicSpriteTiles {
 
 DmaSpriteTileRecords {
     LDX $tile_dma_list, Y
-    BEQ loc_000542
+    BEQ SpriteTileRecordsDone
     STX $A1T2L
     LDA $1A08, Y
     STA $A1B2
@@ -413,7 +413,7 @@ DmaSpriteTileRecords {
     INY 
     BRA DmaSpriteTileRecords
 
-  loc_000542:
+  SpriteTileRecordsDone:
     RTS 
 }
 
@@ -429,10 +429,10 @@ DmaSpriteTileRecords {
 
 DmaAnimatedTileStrip {
     LDA $vram_strip_pending
-    BNE loc_000549
+    BNE AnimatedStripStart
     RTS 
 
-  loc_000549:
+  AnimatedStripStart:
     LDA #$01
     STA $DMAP2
     LDA #$18
@@ -474,15 +474,15 @@ FlushVramWriteQueue {
     LDA #$1C7A            ; S points just below the queue at $1C7B so PLA pulls (VRAM address, data) pairs; a zero address ends it
     TCS 
 
-  loc_000592:
+  FlushQueueLoop:
     PLA 
-    BEQ loc_00059E
+    BEQ FlushQueueDone
     STA $VMADDL
     PLA 
     STA $VMDATAL
-    BRA loc_000592
+    BRA FlushQueueLoop
 
-  loc_00059E:
+  FlushQueueDone:
     TXS 
     STZ $vram_write_queue
     SEP #$20

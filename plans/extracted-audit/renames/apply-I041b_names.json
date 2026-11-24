@@ -1,0 +1,18 @@
+[
+  { "address": 30316, "old": "code_00766C", "new": "cm_npc_master_shrine_menu_00766C", "row": "I041-B1" },
+  { "address": 30318, "old": "code_00766E", "new": "cm_npc_master_shrine_poll_00766E", "row": "I041-B1" },
+  { "address": 30335, "old": "code_00767F", "new": "cm_npc_master_greeting_00767F", "row": "I041-B2" },
+  { "address": 30361, "old": "loc_007699", "new": "cm_npc_master_greeting_quit_007699", "row": "I041-B2" },
+  { "address": 30364, "old": "code_00769C", "new": "cm_npc_master_greeting_with_move_00769C", "row": "I041-B2" },
+  { "address": 30380, "old": "loc_0076AC", "new": "cm_npc_master_greeting_move_or_quit_0076AC", "row": "I041-B2" },
+  { "address": 30386, "old": "loc_0076B2", "new": "cm_npc_master_move_to_hub_0076B2", "row": "I041-B2" },
+  { "address": 30419, "old": "data_0076D3", "new": "cm_data_master_move_hub_positions_0076D3", "row": "I041-B2" },
+  { "address": 30447, "old": "code_0076EF", "new": "cm_npc_master_record_0076EF", "row": "I041-B3" },
+  { "address": 30548, "old": "code_007754", "new": "cm_npc_master_farewell_007754", "row": "I041-B4" },
+  { "address": 30564, "old": "code_007764", "new": "cm_npc_master_farewell_wait_007764", "row": "I041-B4" },
+  { "address": 30565, "old": "code_007765", "new": "cm_npc_master_arrival_007765", "row": "I041-B5" },
+  { "address": 30579, "old": "code_007773", "new": "cm_npc_master_death_comfort_007773", "row": "I041-B5" },
+  { "address": 30587, "old": "loc_00777B", "new": "cm_npc_master_stone_hint_00777B", "row": "I041-B5" },
+  { "address": 30612, "old": "code_007794", "new": "cm_npc_master_poll_again_007794", "row": "I041-B5" },
+  { "address": 30616, "old": "code_007798", "new": "cm_fx_master_hero_puff_007798", "row": "I041-B3" }
+]

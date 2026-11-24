@@ -126,7 +126,7 @@ RunSoulOrb {
 ---------------------------------------------
 ; Steers the orb's centre and circles the orb around it.
 ; 
-; When: spawned by RunSoulOrb (COP 85, so it runs just before the orb); every frame, also in sub-frames ($16 bit $0010).
+; When: spawned by RunSoulOrb (COP 85, so it runs right after the orb in the same frame); every frame, also in sub-frames ($16 bit $0010).
 ; Sees: the d-pad moves the orb around the hero independently of him; it trails behind and circles (walkthrough items.md: a soul reveals hidden passages 'as your orb of light circles over them').
 ; Why: the orb can be parked in front of enemies, and the spells start at the orb.
 ; In: actor script, X = own slot (PHX / PLX around the body); reads joy_pressed, player_x, player_y, soul_orbit_phase, SineTable and SineTableTail.

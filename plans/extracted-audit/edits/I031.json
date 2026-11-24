@@ -1,0 +1,371 @@
+{
+  "_note": "I031: PC annotate batch A9 (library 0270-0279): save slots and checksum, boot graphics buffers, animated tile strip, sort buckets, sine tables (dead), map index helpers and the metatile hazard test, bit arrays, player facing and weapon pose, pause banner, heal/EXP/Gem counters, BG3 clear, tile type map, scene change with the transitions and the iris, fixed boot state and scene init. Names applied first by plans/extracted-audit/renames/apply-I031_names.json; WRAM mnemonics (wave_amplitude, wave_request, wave_phase_step, iris_frame, iris_step, reload_menu_gfx, player_exp+2, saved_scene) in us/mnemonics.json and docs/wram-memory-map.md by hand. No actor is in this batch, so the light actor depth does not apply. Sources: plans/doc-audit/function-map/FM-A9.md re-read against the code, walkthrough items.md, level-up.md, 01-in-the-beginning.md, 06-dr-leos-lab.md, 07-king-magridds-castle.md.",
+
+  "library/lib_save_system.asm": {
+    "blockNote": [
+      "Save and load of the four save slots in SRAM, with the checksum that guards them (file offsets 159972-160158, SNES $04:F0E4-$F19E, bank 04).",
+      "",
+      "=== MODEL ===",
+      "A slot is a $400-byte block at $70:slot x $400 (slot 0-3). The same image is kept a second time at +$1000, the backup mirror, and the word $70:1FFE is the last used slot.",
+      "Layout of one slot: +$000 lair_state ($200 bytes, copied from $7F:0203); +$200 the progress image $1A5E-$1C57 ($1FA bytes: event_flags, Gems, level, EXP, HP, equipment, inventory, the player name at $1B92 = slot offset $334, saved_scene at $1B90); +$3FA the checksum sum word; +$3FC the checksum xor word.",
+      "Checksum: both words start at $3652; for each of the first $1FD words of the slot the sum word adds it (16-bit wrap) and the xor word xors it. So the two stored words are not part of the checksum. A slot is valid when both stored words equal the recomputed ones.",
+      "Save order: SaveGameToSlot first stores saved_scene ($1B90) = world_index + 1 into the live image (so it is saved too), then save_slot into $70:1FFE, copies lair_state and the image, stores the checksum and mirrors the slot ($3FE bytes, which include the checksum words) to +$1000. LoadGameFromSlot validates the main copy only: repairing a damaged main copy from the mirror is the job of the file select (DrawSaveSlotMenu in engine_title_file_select), which also refreshes the mirror.",
+      "",
+      "=== NOTES ===",
+      "- Callers: the Master's record question (code_0076EF in shared_actor_helpers_bank0, after the answer Yes) calls SaveGameToSlot; the file select (engine_title_file_select) calls LoadGameFromSlot and ComputeSlotChecksum.",
+      "- saved_scene = world_index + 1 is the scene of area 0 the file select loads after Continue: scene 1 to 7 of Up Above are the shrines of the worlds in world order (docs/areas-and-scenes.md). The walkthrough describes saving at the Master's Shrine (06-dr-leos-lab.md, 'go there to heal and save').",
+      "- All three routines are JSL and need 16-bit index registers (LDX #$0203); X is preserved, DBR and P are restored."
+    ],
+    "partNotes": {
+      "SaveGameToSlot": "Writes the live game state into slot save_slot of SRAM, with checksum and backup copy.\n\nWhen: after the player answers Yes to the Master's record question (code_0076EF in shared_actor_helpers_bank0, which plays BRK #$66 first); the only caller.\nSees: nothing is drawn here; the Master's script goes on with its farewell. The saved game restarts in the shrine of the current world (saved_scene).\nWhy: one routine owns the slot format, the checksum and the mirror, so a half-written slot can be recognised and repaired.\nIn: JSL; X = 16-bit; save_slot ($03A4) = 0-3; world_index ($03BA, read as a word).\nOut: saved_scene ($1B90) = world_index + 1; $70:1FFE = save_slot; slot offset +$000 = lair_state ($200 bytes), +$200 = $1A5E-$1C57 ($1FA bytes), +$3FA / +$3FC = the checksum words; the whole slot (+$000 to +$3FD) copied to +$1000. X, DBR and P restored.\nClobbers: A, Y; dp$0C, $16, $18 (ComputeSlotChecksum).",
+      "LoadGameFromSlot": "Copies a validated slot back into the live state.\n\nWhen: HandleFileSelectChoice (engine_title_file_select) after the player picks a slot; the only caller.\nSees: the saved game starts: the file select goes on to scene_next = saved_scene. Carry set means no valid save (the file select then starts a new game, which is inferred, OQ-I024-5).\nWhy: the checksum is tested before anything is written, so a damaged slot never overwrites the running state.\nIn: JSL; X = 16-bit; save_slot = 0-3.\nOut: carry clear: lair_state ($200 bytes at $7F:0203) and $1A5E-$1C57 ($1FA bytes) replaced from the main copy of the slot. Carry set: sum or xor word differs, nothing changed. X, DBR and P restored (apart from carry).\nClobbers: A, Y; dp$0C, $16, $18.",
+      "ComputeSlotChecksum": "Computes the sum and xor checksum of a slot.\n\nWhen: SaveGameToSlot and LoadGameFromSlot, and twice in the file select (DrawSaveSlotMenu and its repair path).\nSees: nothing; a slot whose stored words differ from these is not listed in the file select.\nWhy: detects a slot that is damaged or never written (the empty SRAM does not give $3652-based words).\nIn: JSL; save_slot = 0-3.\nOut: dp$16 = $3652 + the sum of the first $1FD words of the slot (16-bit wrap), dp$18 = $3652 xor each of those words. The words at +$3FA and +$3FC are not included. X, Y and P restored.\nClobbers: A; dp$0C (loop counter), $16, $18."
+    },
+    "comments": {
+      "159981": { "text": "saved_scene: the scene the file select loads after Continue (scene world_index + 1 of area 0, the shrine); stored first so it is part of the image", "expect": "saved_scene" },
+      "159987": { "text": "last used slot, read back by the file select to place the cursor", "expect": "701FFE" },
+      "160002": { "text": "slot offset +$000: lair_state, $200 bytes from $7F:0203", "expect": "MVN #$70, #$7F" },
+      "160011": { "text": "slot offset +$200: $1A5E-$1C57, $1FA bytes (event flags to inventory and name)", "expect": "MVN #$70, #$01" },
+      "160022": { "text": "sum word at slot offset +$3FA", "expect": "7003FA" },
+      "160028": { "text": "xor word at slot offset +$3FC", "expect": "7003FC" },
+      "160043": { "text": "backup mirror: $3FE bytes (checksum words included) to slot offset + $1000", "expect": "MVN #$70, #$70" },
+      "160068": { "text": "stored sum word against the computed one in dp$16", "expect": "7003FA" },
+      "160088": { "text": "lair_state back from the slot", "expect": "MVN #$7F, #$70" },
+      "160097": { "text": "$1A5E-$1C57 back from the slot", "expect": "MVN #$01, #$70" },
+      "160122": { "text": "start value of both running words", "expect": "#$3652" },
+      "160129": { "text": "$1FD words = $3FA bytes: everything before the two checksum words", "expect": "#$01FD" }
+    }
+  },
+
+  "library/lib_02719F.asm": {
+    "blockNote": [
+      "Boot-time expansion of three graphics blocks into fixed WRAM buffers (file offsets 160159-160290, SNES $04:F19F-$F222, bank 04).",
+      "",
+      "=== MODEL ===",
+      "LoadBootGraphicsBuffers decompresses graphics_054000 ($4000 bytes), graphics_05C000 and graphics_04D000 ($2000 bytes each) with DecompressQuintetLz into the scratch area $7E:8000 and moves each result with MVN #$7F,#$7E to its buffer: $7F:3000, $7F:1000 and $7F:C000. The source pointer in dp$29-$2B skips the 2-byte length header of each block (+2); dp$23 is the output length and dp$25 the destination offset. It ends with ResetSortBuckets, so the actor sort buckets start empty.",
+      "",
+      "=== NOTES ===",
+      "- The only caller is the boot actor of the front end (code_0066DE in gv_front_end), once per start-up, after the SPC upload and RestoreSceneBgGfxAndPalette; it then jumps to the title scene with COP [10].",
+      "- The consumers are elsewhere: QueueAnimatedTileStrip reads its strips from $7F:1000 (frame x $80), the equipment menu copies $7F:C000 to VRAM word $2000 (RestoreSceneBgGfxAndPalette), and the engine's initial dynamic-tile pointer $1A02/$1A04 is $7F:3000 (InitFixedState; BuildDynamicTileSprites overwrites it before reading it, static reading). What graphics_054000 holds is open; this routine only places it.",
+      "- $7E:8000 is also the BG1 id map of the field; the buffer is free at boot and rebuilt by the first scene load."
+    ],
+    "partNotes": {
+      "LoadBootGraphicsBuffers": "Expands the three boot graphics blocks into their WRAM buffers and resets the sort buckets.\n\nWhen: once per start-up, from the boot actor of the front end (code_0066DE in gv_front_end).\nSees: nothing directly (the boot actor printed TileBlockText before this).\nWhy: later scenes and the equipment menu take these blocks from WRAM, so they are decompressed once instead of at every scene load (inferred from the readers named in the block note).\nIn: JSL; M and X as the caller (REP #$20 inside; X = 16-bit); the three LZ blocks in ROM.\nOut: $7F:3000-$6FFF = graphics_054000, $7F:1000-$2FFF = graphics_05C000, $7F:C000-$DFFF = graphics_04D000; $7E:8000-$9FFF holds the last block; $0100-$02FF cleared and $0300 = $FFFF (ResetSortBuckets). DBR and P restored.\nClobbers: A, X, Y; dp$23, $25, $29, $2B and the decompressor's scratch (DecompressQuintetLz)."
+    },
+    "comments": {
+      "160162": { "text": "source = block + 2: skips the 2-byte length header", "expect": "graphics_054000+2" },
+      "160199": { "text": "$4000 bytes to $7F:3000", "expect": "MVN" },
+      "160240": { "text": "$2000 bytes to $7F:1000 (animated tile strips)", "expect": "MVN" },
+      "160281": { "text": "$2000 bytes to $7F:C000", "expect": "MVN" }
+    }
+  },
+
+  "library/lib_027223.asm": {
+    "blockNote": [
+      "Request of the animated background tile strip and its four VRAM destinations (file offsets 160291-160351, SNES $04:F223-$F25F, bank 04).",
+      "",
+      "=== MODEL ===",
+      "Once per frame QueueAnimatedTileStrip prepares one strip for the NMI: vram_strip_src = $1000 + (frame_counter & $1F) x $80 (a source frame in the buffer at $7F:1000, 32 frames of $80 bytes), vram_strip_dest = AnimatedStripVramDests[frame_counter & 3] and vram_strip_pending is incremented. DmaAnimatedTileStrip (engine_vblank_nmi) then copies $40 bytes to the destination and the next $40 bytes to the destination + $100 words.",
+      "So each of the four VRAM slots is refreshed every 4 frames, and each slot cycles through 8 of the 32 source frames. The destinations $2060, $2080, $20A0, $20C0 are 16-word (4bpp) tiles $206, $208, $20A, $20C; the second half lands one tile row (16 tiles) lower, so a slot is a 2 x 2 tile block (OQ-I013-14: which tiles the maps use).",
+      "",
+      "=== NOTES ===",
+      "- Skipped in locations $0F-$12 (location_id - $0F below 4), the same locations that have no HUD.",
+      "- It has no loop guard: it overwrites the three variables on every call, so five calls in one frame (the main loop and four wait loops of the front end) change nothing."
+    ],
+    "partNotes": {
+      "QueueAnimatedTileStrip": "Queues one animated background tile strip for the next NMI.\n\nWhen: once per frame from the end of the main loop and from the wait loops of the front end (5 call sites in engine_boot_main_loop).\nSees: water, lava and similar background tiles move (the strips cycle through 32 source frames, one VRAM slot per frame).\nWhy: the work phase never touches VRAM, so it only sets the source, the destination and a pending counter for the NMI.\nIn: JSL; any M (PHP, REP inside); frame_counter, location_id.\nOut: unless location_id - $0F < 4: vram_strip_src ($03DD) = $1000 + (frame_counter & $1F) x $80, vram_strip_dest ($03DF) = AnimatedStripVramDests[frame_counter & 3], vram_strip_pending ($03E1) + 1. P restored.\nClobbers: A, X.",
+      "AnimatedStripVramDests": "The four VRAM word destinations of the animated strips.\n\nWhen: read by QueueAnimatedTileStrip with X = (frame_counter & 3) x 2.\nSees: four 2-tile slots at VRAM tiles $206, $208, $20A and $20C (second halves at $216-$21C).\nWhy: spreads the animation over four slots so only $80 bytes are copied per frame.\nIn: n/a (data).\nOut: n/a. Four words $2060, $2080, $20A0, $20C0, spaced $20 words (two 4bpp tiles).\nClobbers: n/a."
+    },
+    "comments": {
+      "160298": { "text": "locations $0F-$12 are skipped (location_id - $0F below 4)", "expect": "SBC #$000F" },
+      "160316": { "text": "(frame_counter & $1F) x $80: one source frame of $80 bytes", "expect": "LSR" },
+      "160332": { "text": "destination slot = frame_counter & 3", "expect": "AnimatedStripVramDests" }
+    }
+  },
+
+  "library/lib_shared_027260.asm": {
+    "blockNote": [
+      "Reset of the actor sort buckets (file offsets 160352-160374, SNES $04:F260-$F276, bank 04).",
+      "",
+      "=== MODEL ===",
+      "ResetSortBuckets zeroes $0100-$02FF (256 bucket words) and writes the end marker $FFFF at $0300. The page is the bucket table of the actor sort (FillSortBuckets and FlattenSortBuckets in engine_scheduler_sprites_combat_collision); an empty table with the marker is the start state.",
+      "",
+      "=== NOTES ===",
+      "- Callers: the end of LoadBootGraphicsBuffers and the end of InitSceneState.",
+      "- BuildTileTypeMap builds its metatile mask table in the same page ($0200-$02FF, FillTileTypeMap) during the scene load; ResetSortBuckets at the end of InitSceneState wipes it again.",
+      "- The writes are DBR-relative ($0100,X): they hit WRAM $0100 with the engine's DBR $01."
+    ],
+    "partNotes": {
+      "ResetSortBuckets": "Empties the actor sort buckets.\n\nWhen: at the end of LoadBootGraphicsBuffers and at the end of InitSceneState.\nSees: nothing; the first frame of a scene starts with no actors in the sort order.\nWhy: leftover bucket entries or the mask table of BuildTileTypeMap in the page would be read as actors.\nIn: JSL; any M (PHP, REP inside); DBR in $00-$3F (the engine's $01).\nOut: $0100-$02FF = 0, $0300 = $FFFF (end marker). P restored.\nClobbers: A, X."
+    },
+    "comments": {}
+  },
+
+  "library/lib_027277.asm": {
+    "blockNote": [
+      "Sine wave tables for an HDMA effect, unused (file offsets 160375-160439, SNES $04:F277-$F2B7, bank 04).",
+      "",
+      "=== MODEL ===",
+      "FillSineWaveTables is a request-driven table builder: when wave_request ($03CD) is non-zero it clears it and writes 256 words amplitude x sin(phase), using the hardware multiplier (M7A, M7B, MPYM), twice, to $7E:7900 and $7E:7B00. The sine byte comes from binary_00FC84 (a signed table in data_00F9F7); the phase starts at 0 and advances by wave_phase_step ($03CE) per word; wave_amplitude ($03CC) is the multiplier (one byte, M7A written twice with its second write 0).",
+      "",
+      "=== NOTES ===",
+      "- Dead code: no routine calls it (OQ-I013-12) and the three parameter cells $03CC-$03CE have no other user (searched in the extracted sources). The tables $7E:7900 and $7E:7B00 sit in the area the HDMA staging uses ($7E:7000-$7BFF, left unnamed in docs/wram-memory-map.md); no other reader of the two addresses was checked here.",
+      "- The mnemonics wave_amplitude, wave_request and wave_phase_step name the cells from this routine only (confidence C)."
+    ],
+    "partNotes": {
+      "FillSineWaveTables": "Builds two 256-word sine tables when a request flag is set (dead code).\n\nWhen: never called; if it were, once per request (wave_request non-zero).\nSees: nothing in the shipped game.\nWhy: probably left over from a wave distortion effect; the parameters, the tables and the multiplier fit an HDMA scroll wave (inferred).\nIn: JSL; any M (SEP #$20 inside; X = 16-bit); wave_request ($03CD), wave_amplitude ($03CC), wave_phase_step ($03CE).\nOut: wave_request = 0; $7E:7900-$7AFF and $7E:7B00-$7CFF = amplitude x sine(phase) as 256 words each (the signed 16-bit product MPYM/MPYH). X and P restored.\nClobbers: A, Y; the multiplier registers."
+    },
+    "comments": {
+      "160379": { "text": "request flag: non-zero starts a refill and is cleared at once", "expect": "wave_request" },
+      "160426": { "text": "the phase advances by wave_phase_step per word, 256 words in all", "expect": "wave_phase_step" }
+    }
+  },
+
+  "library/lib_map_index_helpers.asm": {
+    "blockNote": [
+      "Pixel position to map index conversion, the two index steppers and the metatile hazard test (file offsets 160440-160583 and 160866-161137, SNES $04:F2B8-$F347 and $F462-$F571, bank 04).",
+      "",
+      "=== MODEL ===",
+      "The field maps are stored as 256-byte pages of 16 x 16 metatiles (one byte per 16 x 16 pixel metatile), pages in rows of map_width_pages. PixelToMapIndex turns the pixel position in dp$16 (x) and dp$18 (y) into the byte index: index = ((map_width_pages x (y >> 8) + (x >> 8)) << 8) + y_low + ((x >> 4) & $0F), with 8-bit adds for the page byte and the low byte; an index of $4000 or more (a map of at most 64 pages) returns 0. The index is the same for every map-sized array: the BG1 id map $7E:8000, the BG2 map $7E:C000 and tile_type_map ($7F:8000).",
+      "y_low is added as it is, without masking its low nibble: the exact row-major index needs y with a low nibble of 0, otherwise the low nibble is added to the column (OQ-I031-1). IsPlayerOnMetatile masks y before it calls.",
+      "StepMapIndexEast moves the index one metatile to the east (+1, or +$F1 in the last column of a page to reach column 0 of the next page); StepMapIndexSouth one metatile to the south (+$10 on the low byte; at the end of a page the carry adds map_width_px, the next page row). PixelToBg1VramAddr is different: it turns the pixel position into the VRAM word address of the 8 x 8 tile in the BG1 tilemap at $6000, a 64 x 64 tile map made of four 32 x 32 screens (x bit 8 adds $400, y bit 8 adds $800).",
+      "IsPlayerOnMetatile tests whether the BG1 id at the player's feet row (y - $10: y is the bottom edge of the actor) is a given id, over the 1, 2 or 4 metatiles the player's 16-pixel box covers: x and y multiples of 16 = 1 cell, only x = 2 cells one below the other, only y = 2 cells side by side, neither = 4 cells (walked east, south, east). It returns carry set at once for a cell that matches, and carry clear at once when the player's flags have $0C00 (hit stun $0800 or dying $0400).",
+      "",
+      "=== NOTES ===",
+      "- PixelToMapIndex has about 40 callers (player_core, cop_core, cop_tiles_spawn_kill, lib_scene_map_patches, lib_0108BB, lib_0109D6_part1, lib_tile_triggers_and_lair_return, lib_menus, engine_spawn_lairs_death_drops and four actor files); it needs M = 16 on entry and returns with M = 16 (it ends with REP #$20). It relies on B holding the high byte of dp$18 after LDA $18 at M = 16 (the page row for Multiply8x8).",
+      "- IsPlayerOnMetatile is the floor hazard of four scenes. Each script first tests an inventory entry with Cop19 and only checks the tile while the item is not worn, then hurts the player with Cop39: Lostside Marsh id $80, 1 damage (guarded by item entry $0A; walkthrough items.md: Ice Armor protects from the fiery floors in Lostside), Leo's Laboratory dungeon ids $F3 and $E1, 4 damage (item entry $0A; 06-dr-leos-lab.md: equip the Ice Armor for the flaming bridges), Magridd's Castle dungeon id $88, 3 damage (item entry $0F; walkthrough items.md: Elemental Mail prevents spike damage), and the St. Elles coast id $47, 4 damage (after a COP [07] flag test; what the tile is is open, OQ-I031-2).",
+      "- The routine never saves P: M = 16 is an input and kept on return."
+    ],
+    "partNotes": {
+      "PixelToMapIndex": "Turns a pixel position into the byte index of its 16 x 16 metatile.\n\nWhen: about 40 call sites (collision, tile COP commands, map patches, chests, switches, the equipment menu, enemy spawns).\nSees: nothing; it is the lookup behind every tile test.\nWhy: one routine owns the page layout, so all maps and all overlays (id map, tile_type_map) use the same index.\nIn: JSL; M = 16; dp$16 = x in pixels, dp$18 = y in pixels (low nibble of y 0 for an exact index, OQ-I031-1); map_width_pages ($0343).\nOut: X = ((map_width_pages x (y >> 8) + (x >> 8)) << 8) + y_low + ((x >> 4) & $0F), or 0 when that is $4000 or more; M = 16 on return.\nClobbers: A, X (the result); B; flags. dp$16 and $18 are kept. The hardware multiplier is used through Multiply8x8.",
+      "PixelToBg1VramAddr": "Turns a pixel position into the VRAM word address of its 8 x 8 BG1 tile.\n\nWhen: SetMetatileBg1 and SetMetatileBg1Bg2 (lib_0109D6_part1, 2 sites) and the scene map patcher (lib_0108BB) when they queue VRAM writes.\nSees: nothing directly; the address says where the changed tile is drawn.\nWhy: BG1 uses a 64 x 64 tile map made of four 32 x 32 screens, so the address is not a plain row-major index.\nIn: JSL; M = 16; dp$16 = x, dp$18 = y (pixels).\nOut: A = $6000 + ((y & $F8) << 2) + ((x & $F8) >> 3) + ((x & $100) << 2) + ((y & $100) << 3). Ends with RTL without PHP/PLP.\nClobbers: A; the stack is balanced.",
+      "StepMapIndexEast": "Moves a map index one metatile east.\n\nWhen: 13 sites that walk over 2 x 2 or wider metatile areas (hazard test, footprint tests of the player and actors, map patches).\nSees: nothing.\nWhy: the index is not linear across pages, so a step needs the page wrap rule.\nIn: JSL; X = map index.\nOut: X + 1, or X + $F1 when X & $0F is $0F (column 0 of the next page); M as the caller.\nClobbers: A (TXA). P restored.",
+      "StepMapIndexSouth": "Moves a map index one metatile south.\n\nWhen: 10 sites, with StepMapIndexEast.\nSees: nothing.\nWhy: same page layout rule as the east step.\nIn: JSL; X = map index.\nOut: X + $10 on the low byte; when that wraps (last row of a page), the carry makes the code add map_width_px, which is one row of pages; M as the caller.\nClobbers: A. P restored.",
+      "IsPlayerOnMetatile": "Tests whether the player stands on a metatile with a given BG1 id.\n\nWhen: the hazard scripts of Lostside Marsh, Leo's Laboratory dungeon, Magridd's Castle dungeon and the St. Elles coast (5 call sites).\nSees: stepping on the tile hurts the player when the script then calls Cop39_DamagePlayer.\nWhy: the player's box can cover one to four metatiles, and the test is true if any of them has the id.\nIn: JSL; M = 16, X = 16-bit; A = metatile id (low byte used, stored in dp$00); player_x, player_y.\nOut: carry set: one of the metatiles at row y - $10 under the player has the id. Carry clear: none has, or at once when the player's flags $16 have $0C00 (hit stun or dying). X restored; M = 16 kept (P is not saved).\nClobbers: A; dp$00, $16, $18."
+    },
+    "comments": {
+      "160445": { "text": "width in pages x page row; B still holds the high byte of dp$18 (page row) from LDA $18", "expect": "map_width_pages" },
+      "160460": { "text": "column inside the page; the row comes from y_low unmasked (OQ-I031-1)", "expect": "AND #$0F" },
+      "160477": { "text": "index of $4000 or more (outside 64 pages): return 0", "expect": "CPX #$4000" },
+      "160534": { "text": "BG1 tilemap base; x bit 8 added $400, y bit 8 added $800 above", "expect": "ADC #$6000" },
+      "160555": { "text": "last column of a page: +$100 to the next page and back to column 0", "expect": "ADC #$00F1" },
+      "160578": { "text": "last row of a page: one row of pages (map_width_px) further", "expect": "map_width_px" },
+      "160874": { "text": "hit stun $0800 or dying $0400: no hazard hit", "expect": "BIT #$0C00" },
+      "160882": { "text": "cells to test: x and y aligned 1, only x 2 (one below the other), only y 2 (side by side), neither 4", "expect": "player_x" },
+      "160918": { "text": "y is the bottom edge: y - $10 is the row the feet stand on", "expect": "SBC #$0010" },
+      "160927": { "text": "BG1 metatile id map, one byte per 16 x 16 metatile", "expect": "7E8000" }
+    }
+  },
+
+  "library/lib_bit_array.asm": {
+    "blockNote": [
+      "Set, clear and test of one bit in a bit array (file offsets 160584-160723, SNES $04:F348-$F3D3, bank 04).",
+      "",
+      "=== MODEL ===",
+      "Three routines share one addressing rule: A = bit number (& $3FF, at most 1024 bits), Y = address of the array. The byte is Y + ((A & $3F8) >> 3) and the mask comes from binary_00FA77 (01 02 04 08 10 20 40 80) indexed by A & 7. All three save A, X, Y and P; TestBitInArray returns the result in the carry (set = the bit is set).",
+      "The arrays the callers pass in Y: $1A7E chests opened (bit = chest id & $7F), $1A9E lairs released (bit = lair index), $1ADE switches set (bit = switch id); $1A5E is event_flags, and the arrays at $1A7E, $1A9E and $1ADE lie inside the range that holds the event flags and the saved progress image ($1A5E-$1C57).",
+      "",
+      "=== NOTES ===",
+      "- Callers: SetBitInArray 7 sites (lib_tile_triggers_and_lair_return 5, engine_003005 2), TestBitInArray 11 sites (lib_scene_map_patches 5, cop_script_flow_flags 3, lib_tile_triggers_and_lair_return 2, engine_003005 1).",
+      "- ClearBitInArray has no caller (OQ-I013-12)."
+    ],
+    "partNotes": {
+      "SetBitInArray": "Sets one bit of a bit array.\n\nWhen: when a lair is released, a switch is pressed or a chest is opened (lib_tile_triggers_and_lair_return 5 sites, engine_003005 2 sites).\nSees: nothing directly; the bit is what later keeps the lair open, the switch pressed and the chest empty.\nWhy: lets the progress arrays use one bit per object, so a save slot stays small.\nIn: JSL; A = bit number (& $3FF), Y = array address.\nOut: bit (A & 7) of byte Y + (A >> 3) set; A, X, Y and P restored.\nClobbers: none.",
+      "ClearBitInArray": "Clears one bit of a bit array (dead code).\n\nWhen: never called (OQ-I013-12).\nSees: nothing in the shipped game.\nWhy: the counterpart of SetBitInArray, left unused: the game never takes a lair, switch or chest bit back.\nIn: as SetBitInArray.\nOut: the bit cleared; A, X, Y and P restored.\nClobbers: none.",
+      "TestBitInArray": "Tests one bit of a bit array.\n\nWhen: 11 sites: map patches that depend on lair, switch and chest state, tile triggers, the COP switch commands and the chest code.\nSees: a chest stays open, a released lair stays gone, a pressed switch stays pressed after the scene is entered again.\nWhy: one test serves all arrays, and the carry is the result.\nIn: JSL; A = bit number (& $3FF), Y = array address.\nOut: carry set when the bit is set, clear otherwise; A, X, Y restored (P restored apart from the carry).\nClobbers: none."
+    },
+    "comments": {
+      "160592": { "text": "byte index = (bit number & $3F8) >> 3, added to the array address on the stack", "expect": "AND #$03F8" },
+      "160611": { "text": "mask 01 02 04 ... 80 indexed by bit & 7", "expect": "binary_00FA77" },
+      "160710": { "text": "bit set: carry set on return", "expect": "BNE TestBitInArraySet" }
+    }
+  },
+
+  "library/lib_player_facing.asm": {
+    "blockNote": [
+      "Facing code of the player and the horizontal flip of an actor (file offsets 160724-160760, SNES $04:F3D4-$F3F8, bank 04).",
+      "",
+      "=== MODEL ===",
+      "GetPlayerFacing reads the player's animation id (actor $1E) and returns the facing code binary_00FA7F[id] (a 44-byte table in data_00F9F7, ids $00-$2B): 0 up, 1 down, 2 right, 3 left (the probe points of RunTalkInteraction, OQ-I009-7). Animation ids of $2C or more have no facing: carry set. The animation id is read as a word, so $1F must be 0.",
+      "FlipActorX toggles bit $4000 of the actor's $1C word, the horizontal flip flag.",
+      "",
+      "=== NOTES ===",
+      "- Callers: RunTalkInteraction (lib_menus) for the probe point of the talk button and TryOpenChest (lib_tile_triggers_and_lair_return); ChooseFacingAnim (lib_menus) calls FlipActorX to show an NPC's side view mirrored.",
+      "- ApplyPlayerWeaponPose reads the same table and xors the code with 1 to get the standing animation id of the unarmed set."
+    ],
+    "partNotes": {
+      "GetPlayerFacing": "Gives the direction the player faces as a code 0-3.\n\nWhen: RunTalkInteraction (the B button) and TryOpenChest.\nSees: the player talks to or opens what is in front of him, and in no direction while an animation of the $2C or higher ids plays (no talk, no chest).\nWhy: the facing is derived from the animation id, so every walking, standing and attack animation maps to one of four directions.\nIn: JSL; M = 8, X = 16-bit; player_actor ($039C).\nOut: carry clear and A = binary_00FA7F[$1E of the player actor] (0 up, 1 down, 2 right, 3 left); carry set when $1E >= $2C (A not valid). P restored apart from the carry.\nClobbers: A, X, Y.",
+      "FlipActorX": "Mirrors an actor horizontally.\n\nWhen: ChooseFacingAnim (lib_menus) when an actor turns toward the player and needs the side view the other way round.\nSees: the actor's sprite is drawn flipped.\nWhy: the side animations exist only once; the flip bit makes the second direction.\nIn: JSL; X = actor.\nOut: bit $4000 of the actor's $1C word toggled. P restored.\nClobbers: A."
+    },
+    "comments": {
+      "160733": { "text": "animation ids of $2C or more have no facing: carry set", "expect": "CPX #$002C" },
+      "160753": { "text": "bit $4000 of $1C is the horizontal flip flag", "expect": "EOR #$4000" }
+    }
+  },
+
+  "library/lib_027781_part1.asm": {
+    "blockNote": [
+      "Player pose after a scene load or the equipment menu (file offsets 160761-160865, SNES $04:F3F9-$F461, bank 04).",
+      "",
+      "=== MODEL ===",
+      "ApplyPlayerWeaponPose chooses between two animation sets of the player: the unarmed one when no_combat_scene ($0439) is non-zero or no weapon is equipped (equipped_weapon $1B5E = 0), the armed one otherwise. Actor field $24 is the animation data bank of an actor (lib_animation): the unarmed pose sets it to $0A, the armed one to $0B (the normal player bank, the comment in the player code says $0B).",
+      "Unarmed: $1E = binary_00FA7F[old $1E] xor 1 (the standing animation id for the current facing), $20 = 0, SetActorAnimFrame, and the weapon actor ($039E) gets bit $2000 of $16 set (hidden). Armed: $20 = 0, SetActorAnimFrame, weapon actor bit $2000 cleared; $1E is kept.",
+      "It does nothing in locations $0F-$12 (location_id - $0F below 4).",
+      "",
+      "=== NOTES ===",
+      "- Callers: the end of InitSceneState (after the two RunActors passes) and ExitEquipmentMenu in lib_menus, where a weapon change must show at once.",
+      "- What bank $0A contains (a sword-less set?) is not verified (OQ-I031-3)."
+    ],
+    "partNotes": {
+      "ApplyPlayerWeaponPose": "Puts the player into the armed or unarmed standing pose.\n\nWhen: at the end of InitSceneState and after the equipment menu closes (lib_menus).\nSees: in towns and without a sword the player stands without a weapon and the sword actor is hidden; with a sword in a normal scene the weapon is shown.\nWhy: scene entry and a weapon change both must show the right pose before the first frame, without waiting for the player's own script.\nIn: JSL; M = 8, X = 16-bit; location_id, no_combat_scene ($0439), equipped_weapon ($1B5E), player_actor ($039C), player_weapon_actor ($039E).\nOut: skipped in locations $0F-$12. Unarmed: player $24 = $0A, $1E = binary_00FA7F[$1E] xor 1, $20 = 0, SetActorAnimFrame, weapon actor $16 |= $2000. Armed: $24 = $0B, $20 = 0, SetActorAnimFrame, weapon actor $16 &= $DFFF. X and P restored.\nClobbers: A, Y."
+    },
+    "comments": {
+      "160771": { "text": "locations $0F-$12 keep their pose", "expect": "CMP #$04" },
+      "160791": { "text": "animation data bank $0A: the unarmed set (OQ-I031-3)", "expect": "LDA #$0A" },
+      "160802": { "text": "facing code xor 1 = standing animation id of the unarmed set", "expect": "EOR #$01" },
+      "160822": { "text": "hide the weapon actor", "expect": "ORA #$2000" },
+      "160835": { "text": "animation data bank $0B: the normal player set", "expect": "LDA #$0B" },
+      "160855": { "text": "show the weapon actor", "expect": "AND #$DFFF" }
+    }
+  },
+
+  "library/lib_027572.asm": {
+    "blockNote": [
+      "Pause with the location banner (file offsets 161138-161260, SNES $04:F572-$F5EC, bank 04).",
+      "",
+      "=== MODEL ===",
+      "HandlePauseBanner is called once per frame from RunMainLoop (after the field buttons). It is a latch: pause_latch ($03A2) negative = return; non-zero = Start was already handled, return while Start is still held and clear the latch when it is released; zero and Start newly pressed (joy_pressed+1 bit $10) = pause.",
+      "A pause runs inside the routine: it sets the latch, writes $F2 to APUIO0 (a request to the sound driver, OQ-I013-6), prints the location name (LocationBannerText) and, when no_combat_scene is clear, the lair counter (lairs_left as two BCD digits at $1B80 through ByteToPackedBcd, then LairCounterText), flushes the text with vram_upload_flags = 1, waits until Start is released and then pressed again (WaitFrameForStart each frame), prints PauseCloseText to erase the text (OQ-I013-10), writes $01 to APUIO0 and returns. The banner is skipped when the A button is held at the moment of pausing (JOY1L bit 7, OQ-I013-7): the game still pauses, without text.",
+      "WaitFrameForStart decrements frame_counter before it waits one vblank. The NMI increments it every frame, so the net change is 0: the game clock stands still during the pause.",
+      "",
+      "=== NOTES ===",
+      "- Walkthrough 01-in-the-beginning.md: the number of lairs in the area is shown by pressing Start.",
+      "- pause_latch stays 1 after the resume until Start is let go, so the Start that ends the pause does not start a new one."
+    ],
+    "partNotes": {
+      "HandlePauseBanner": "Pauses the game on Start and shows the location banner.\n\nWhen: once per frame from RunMainLoop.\nSees: Start freezes the game and prints the location name and, in combat scenes, the number of monster lairs left; the second Start removes the text and resumes. Holding A while pressing Start pauses without the banner.\nWhy: the pause needs no menu, only a text and a wait, so it runs as one routine inside the main loop.\nIn: JSL, once per frame; M = 8, X = 16-bit; pause_latch ($03A2), joy_pressed+1 ($0323), no_combat_scene ($0439), lairs_left ($0456), JOY1L.\nOut: returns at once when nothing is to do; after a pause: APUIO0 = $F2 at the start and $01 at the end, the text drawn and erased, vram_upload_flags = 1, pause_latch = 1 (cleared later when Start is released), $1B80-$1B81 = the lair count in BCD.\nClobbers: A, X, Y.",
+      "WaitFrameForStart": "Waits one frame while the game is paused and tests Start.\n\nWhen: the two wait loops of HandlePauseBanner (Start release and Start press).\nSees: nothing; the screen stays as it was.\nWhy: the frame counter must not advance during the pause, so it is decremented to cancel the increment of the NMI.\nIn: JSR; M = 8, X = 16-bit.\nOut: frame_counter - 1 (before the NMI adds 1 again), one vblank waited; Z clear while Start (joy_pressed+1 bit $10) is down.\nClobbers: A, X."
+    },
+    "comments": {
+      "161152": { "text": "latch = 1: the pause runs inside this routine", "expect": "INC $pause_latch" },
+      "161155": { "text": "APUIO0 = $F2: pause request to the sound driver (OQ-I013-6)", "expect": "LDA #$F2" },
+      "161163": { "text": "A held (JOY1L bit 7): no banner (OQ-I013-7)", "expect": "BIT #$80" },
+      "161179": { "text": "lairs left, printed as two BCD digits at $1B80 for LairCounterText", "expect": "lairs_left" },
+      "161225": { "text": "APUIO0 = 1: resume", "expect": "APUIO0" },
+      "161248": { "text": "cancels the INC of the NMI: the game clock stops during the pause", "expect": "STX $frame_counter" }
+    }
+  },
+
+  "library/lib_player_stats.asm": {
+    "blockNote": [
+      "Pay-out of pending heal and EXP, and the EXP and Gem counters (file offsets 161261-161517, SNES $04:F5ED-$F6ED, bank 04).",
+      "",
+      "=== MODEL ===",
+      "heal_pending ($043B) and exp_pending ($043D) are queues that Cop37_HealPlayerToFull and Cop38_QueueExp fill; UpdateHud calls DrainPendingHeal and DrainPendingExp once per frame (not in locations $0F-$12) and the drains pay them out slowly so the HUD animates. All counters are BCD (decimal mode).",
+      "DrainPendingHeal: every 4th frame (frame_counter & 3 = 0) heal_pending - 1 and player_hp + 1 with BRK #$48 (OQ-I013-5); when HP is already at player_max_hp the rest of heal_pending is dropped. hud_dirty_flags bit $04 redraws the HP bar.",
+      "DrainPendingExp: every 8th frame, with BRK #$48, it takes one unit of the lowest non-zero BCD digit of exp_pending (ones, then tens, then hundreds, then thousands), subtracts it from exp_pending and calls AddExp with it; hud_dirty_flags bit $02 redraws the EXP. A pending 0132 pays 1, 1, 10, 10, 10, 100 in six steps.",
+      "AddExp: player_exp ($1B78, low word) and player_exp+2 ($1B7A, high word) are one eight-digit BCD number; on a carry out of the high word both words are set to $9999, so EXP maxes at 99,999,999 (walkthrough level-up.md agrees). AddGems: gems_low ($1B66) + A with the carry into gems_high ($1B68); gems_high can be at most $0099, so a carry ($0100, >= $009A) caps both at 999,999 (OQ-I013-8: the walkthrough gives no Gem cap). SubtractGems takes A from the Gems and returns carry set when there are not enough (nothing is taken).",
+      "",
+      "=== NOTES ===",
+      "- Callers: AddExp from DrainPendingExp and from the two kill paths of engine_scheduler_sprites_combat_collision (KillTarget and the second kill path at loc_000CFC: the EXP of the meta entry, +3, is added at once, not through exp_pending). Cop36_AddExp (0 uses) does its own decimal add and does not call AddExp. AddGems: ApplyGemPickup, the chest code (TryOpenChest) and Cop25_AddGems (0 uses). SubtractGems: Cop26_PayGemsOrJump.",
+      "- DrainPendingHeal and DrainPendingExp run with M = 8; AddExp, AddGems and SubtractGems with M = 16. All routines leave the decimal flag clear.",
+      "- docs/wram-memory-map.md said player_exp is 24-bit BCD; the code and the walkthrough make it eight digits (four bytes $1B78-$1B7B, followed by player_exp_next at $1B7C), corrected in the same step (OQ-I031-4)."
+    ],
+    "partNotes": {
+      "DrainPendingHeal": "Pays out the queued healing one HP at a time.\n\nWhen: once per frame from UpdateHud (not in locations $0F-$12).\nSees: after Cop37_HealPlayerToFull (the healing scenes) the HP bar fills one point every 4 frames with a sound.\nWhy: the command only queues the amount, so the heal is spread over frames and the sound and HUD follow.\nIn: JSL; M = 8; heal_pending ($043B), frame_counter, player_hp ($1B88), player_max_hp ($1B8A).\nOut: on frames with frame_counter & 3 = 0 and heal_pending non-zero: heal_pending - 1, player_hp + 1 (BRK #$48), hud_dirty_flags |= $04; when HP is already at the maximum heal_pending = 0.\nClobbers: A.",
+      "DrainPendingExp": "Pays out the queued EXP in digit steps.\n\nWhen: once per frame from UpdateHud (not in locations $0F-$12).\nSees: the EXP counter climbs in steps with a sound after a Cop38 reward.\nWhy: one unit of the lowest non-zero BCD digit per step keeps the number of steps at most the digit sum, and the HUD redraws only on a step.\nIn: JSL; M = 8; exp_pending ($043D, a word of 4 BCD digits), frame_counter.\nOut: on frames with frame_counter & 7 = 0 and exp_pending non-zero: BRK #$48, exp_pending - one unit (1, 10, 100 or 1000), AddExp with that unit, hud_dirty_flags |= $02; decimal flag clear and M = 8 on return.\nClobbers: A (the step is added through AddExp).",
+      "AddExp": "Adds a BCD amount to the player's EXP with a cap.\n\nWhen: DrainPendingExp and the two enemy kill paths in engine_scheduler_sprites_combat_collision (the meta entry's EXP at once).\nSees: the EXP counter and, once the next level's threshold is reached, the level-up; the walkthrough says EXP maxes at 99,999,999.\nWhy: EXP is eight BCD digits in two words, so the add carries from the low into the high word and a carry out is capped.\nIn: JSL; M = 16; A = BCD amount.\nOut: player_exp ($1B78) + A, with the carry into player_exp+2 ($1B7A); a carry out of the high word sets both words to $9999; the decimal flag is cleared (CLD) on return even if the caller had set it.\nClobbers: A.",
+      "AddGems": "Adds a BCD amount to the Gems with a cap.\n\nWhen: ApplyGemPickup (Gem pickups), TryOpenChest (Gems in a chest) and Cop25_AddGems (no script).\nSees: the Gem counter rises; it never shows more than 999999.\nWhy: the Gems are six BCD digits in two words, so the add carries into the high word and a result of 1,000,000 or more is capped.\nIn: JSL; M = 16; A = BCD amount.\nOut: gems_low ($1B66) + A with the carry into gems_high ($1B68); when gems_high is $009A or more both words are set to $9999 and $0099; decimal flag cleared.\nClobbers: A.",
+      "SubtractGems": "Takes a price from the Gems if there are enough.\n\nWhen: Cop26_PayGemsOrJump (8 scripts).\nSees: the Gem counter drops by the price, or the script's 'not enough' branch runs.\nWhy: the test and the payment are one operation so no Gems are taken when the price is too high.\nIn: JSL; M = 16; A = BCD price.\nOut: carry clear: gems_low and gems_high reduced by the price. Carry set: not enough Gems, nothing changed. Decimal flag cleared.\nClobbers: A; dp$00, $02, $04."
+    },
+    "comments": {
+      "161282": { "text": "HP already full: the rest of heal_pending is dropped", "expect": "BCS DrainHealCapped" },
+      "161287": { "text": "sound request $48 for every healed HP (OQ-I013-5)", "expect": "BRK #$48" },
+      "161317": { "text": "sound request $48 for every EXP step (OQ-I013-5)", "expect": "BRK #$48" },
+      "161319": { "text": "decimal mode: the digit tests and the subtraction are BCD", "expect": "SED" },
+      "161323": { "text": "pays one unit of the lowest non-zero digit: ones first, then tens, hundreds, thousands", "expect": "AND #$000F" },
+      "161432": { "text": "carry out of the high word: more than 99,999,999, cap both words", "expect": "BCC AddExpDone" },
+      "161462": { "text": "gems_high is at most $0099; a carry makes it $0100: cap at 999,999", "expect": "CMP #$009A" },
+      "161500": { "text": "carry set = no borrow: enough Gems", "expect": "BCS SubtractGemsStore" }
+    }
+  },
+
+  "library/lib_scene_change_init.asm": {
+    "blockNote": [
+      "Scene change: the loader, the transitions, the iris, the tile type map and the scene state init (file offsets 161518-162065 and 162229-162514, SNES $04:F6EE-$F911 and $F9B5-$FAD2, bank 04).",
+      "",
+      "=== MODEL ===",
+      "ChangeSceneIfRequested is the scene loader called from RunMainLoop (and once at boot). It acts only when the low byte of scene_next ($0318) is non-zero. With scene_active set it first plays PlayTransitionOut with iris_frame = $1E and iris_step = $FF (the out direction of the iris); then it clears scene_active and dp$42, forces blank with the NMI off, copies scene_next and area_next into scene_current and area_current, clears scene_next, runs InitSceneState and one RunSubFrameLoader, enables the NMI, sets iris_frame = 0 and iris_step = 1, plays PlayTransitionIn, sets scene_active, clears transition_type and scene_loading and runs one more sub-frame. At boot scene_active is 0 and the out transition is skipped.",
+      "transition_type ($03E3, set by Cop3C_SetTransitionType; RunReturnLoop writes $80) selects the effect. Out: 0 and 1 fade, 2 and 3 instant, 4 and 5 mosaic, 6 and 7 instant, 8-$7F fade, $80 and above iris. In: 0 fade, 1 instant, 2 fade, 3 instant, 4 mosaic, 5 instant, 6 mosaic, 7 instant, 8-$7F fade, $80 and above iris. The type is cleared only after the in transition, so one type drives both halves of a scene change. The values in use are few: 0 (the default, fade out and fade in), 4 (set by 23 scripts through Cop3C, always just before a Cop10: mosaic out and mosaic in) and $80 (return trips: iris out and iris in); the other ladder entries are never selected by a script (static, OQ-I031-6). Fade = INIDISP brightness $0F down to 0 (out) or 0 up to $0F (in), one sub-frame per step; instant = one sub-frame, then INIDISP 0 or $0F; mosaic = two sub-frames per brightness step with MOSAIC = ((brightness xor $0F) << 4) | 3 (BG1 and BG2), 16 steps.",
+      "The iris (RunIrisTransition) writes one 16-byte frame of binary_048000 to VRAM word $4000 per step (the mask tile) and runs two sub-frames. The frame offset is ((2 x type + bit 4 of iris_frame) << 8) | ((iris_frame & $0F) << 4), the type's bit 7 drops out of the 8-bit add. iris_step is $FF for out (frames $1E down to 0, 31 steps = 62 sub-frames) and 1 for in (frames 0 up to $1F, 32 steps = 64 sub-frames). Out sets scene_loading, clears the BG3 buffer and sets vram_upload_flags bit 0 first.",
+      "BuildTileTypeMap fills tile_type_map ($7F:8000, one byte per metatile, OQ-I013-2) when a scene loads: FillTileTypeMap first builds a mask table at $0200-$02FF from the metatile definitions at $7E:2000 (8 bytes per metatile id = four tile words TL, TR, BL, BR): mask = TL + 2 TR + 4 BL + 8 BR where each term is bit 9 of the tile word (the solid flag; the same rule SetMetatileBg1 uses); then it replaces every id byte of the BG1 id map ($7E:8000) by mask[id]. The byte count is map_width_pages x map_height_pages x $100; the XBA/TAY that makes it is right only while the product fits one byte, and the largest header is 64 pages.",
+      "InitSceneState runs with the screen blanked and the NMI off. In order: zero player_x and player_y, the scroll deltas, joy_pressed, $03D4-$03D8, the BG2 offsets, joy_block_mask, $0433 (stored twice, OQ-I013-13), boss_fight_active, player_hidden_count and joy_override; weapon actor, soul orb actor and boss actor = $06AA (none); clear event_flags byte 0 (flags $00-$07 are scene-local), contact_lock, no_combat_scene, the PPU shadows and the colour buffer; LoadSceneAssets; if reload_menu_gfx is set, clear it and call RestoreSceneBgGfxAndPalette and LoadEquippedMagicGfx; BuildTileTypeMap; the map size in pages from MapPatchRectsAndMapSizes+$28/+$29 by location_id; InitActorPool; SpawnSceneActors; the map patches (code_011395, code_0112F5, ApplyLairStatesToScene, code_011445, code_0114D0, code_0114E4, ApplyFlagMapPatches); ClearBg3Buffer; ClearSwitchOwnersOnReturn; two RunActors passes; ApplyPlayerWeaponPose; RedrawBackgroundsAtEntry unless location_id is $10; vram_upload_flags bit 0; scene_variant and asset_skip_mask = 0; rng_state+1 = frame_counter (OQ-I013-1); joy_release_latch = $FFFF; frame_counter = $FFFF; window registers WH0 = 0 and WH1 = $FF; ResetSortBuckets; hud_dirty_flags = $1F unless event flag $FA ($1A7D bit 2).",
+      "",
+      "=== NOTES ===",
+      "- ClearBg3Buffer (25 call sites: the front end, the scene init, the iris out) fills bg3_tilemap_buffer ($7F:7000, $1000 bytes) with $2000; the upload flag is the caller's business. ClearSwitchOwnersOnReturn zeroes switch_owner_table ($7F:0483, $400 bytes) only on a return trip (return_active non-zero).",
+      "- The transition and iris routines are JSR targets of ChangeSceneIfRequested and must stay in this block in this order: RunIrisTransition is reached by BRL from PlayTransitionOut and BMI from PlayTransitionIn, and ends with the RTS of the iris loop.",
+      "- Locations $0F-$12 have no HUD, no animated strip and no weapon pose; location $10 also skips the background redraw. $10-$12 run the reduced loop (OQ-I027-2)."
+    ],
+    "partNotes": {
+      "ClearBg3Buffer": "Fills the BG3 tilemap buffer with the blank word.\n\nWhen: 25 call sites: the front end sequence (about 22), the boot, InitSceneState and the iris out.\nSees: the text layer is empty at the next upload (nothing is shown by this call alone).\nWhy: BG3 carries the text; clearing the buffer is how a text screen is erased.\nIn: JSL; any M.\nOut: bg3_tilemap_buffer ($7F:7000-$7FFF) = $2000 in every word (priority bit, tile 0); the upload flag is not set. X and P restored.\nClobbers: A.",
+      "ClearSwitchOwnersOnReturn": "Clears the switch owner table after a return trip.\n\nWhen: InitSceneState, once per scene.\nSees: after a return trip (RunReturnLoop) no switch of the old scene keeps an owner actor.\nWhy: the table maps switch ids to actor slots; a return trip rebuilds all actors, so the old slots are stale.\nIn: JSL; M = 8, X = 16-bit; return_active ($03FB).\nOut: when return_active is non-zero: switch_owner_table ($7F:0483-$7F:0882) zeroed; DBR restored.\nClobbers: A, X.",
+      "BuildTileTypeMap": "Builds the tile type map of the new scene.\n\nWhen: InitSceneState, once per scene, after LoadSceneAssets.\nSees: nothing directly; it is what makes walls, water and holes solid for the collision tests.\nWhy: the collision tests read one byte per 16 x 16 metatile, so the per-tile solid flags are folded into one byte once at load time.\nIn: JSL; M = 8, X = 16-bit; map_width_pages, map_height_pages (the loader's header values); DBR in $00-$3F.\nOut: dp$2A = 2; Y = pages x $100; when Y is not 0 FillTileTypeMap runs with X = $8000. XBA/TAY gives pages x $100 only while width x height fits one byte (at most 64 pages).\nClobbers: A, X, Y; dp$0C, $0E, $29, $2A.",
+      "FillTileTypeMap": "Converts the BG1 id map into the tile type map.\n\nWhen: BuildTileTypeMap, by JSR.\nSees: nothing.\nWhy: the type nibble of each metatile is the solid flags of its four tiles, which only change per metatile id, so a 256-entry mask table is built once and looked up per cell.\nIn: JSR; M = 8, X = 16-bit; X = $8000, Y = byte count, dp$2A = 2, DBR in $00-$3F; the metatile definitions at $7E:2000.\nOut: mask table $0200-$02FF (mask = TL + 2 TR + 4 BL + 8 BR from bit 9 of the four tile words of each id); tile_type_map ($7F:8000 + n) = mask[id of the BG1 map byte $7E:8000 + n] for the whole count.\nClobbers: A, X, Y; dp$0C, $0E, $29.",
+      "ChangeSceneIfRequested": "Changes the scene when scene_next is set.\n\nWhen: RunMainLoop every frame and once at boot (engine_boot_main_loop).\nSees: the screen fades out (or mosaics, or irises), the new scene appears, and the screen fades in.\nWhy: one routine owns the order: out transition, forced blank, scene init, in transition, so no actor ever runs on a half-loaded scene.\nIn: JSL; M = 8, X = 16-bit; scene_next ($0318, the scene, area in $0319), scene_active, transition_type ($03E3).\nOut: nothing when scene_next is 0. Otherwise scene_current and area_current = next, scene_next = 0, scene state rebuilt (InitSceneState), scene_active = 1, transition_type = 0, scene_loading = 0; iris_frame and iris_step are set for each direction ($1E and $FF going out, 0 and 1 coming in).\nClobbers: A, X, Y; dp$42 (cleared); nothing is saved or restored.",
+      "PlayTransitionOut": "Plays the screen-out effect selected by transition_type.\n\nWhen: ChangeSceneIfRequested, only when a scene is already running.\nSees: a fade to black, a mosaic that grows while the screen darkens, an instant black, or an iris closing (type $80 and above, used for return trips).\nWhy: the effect is data (transition_type), so scripts choose it with Cop3C_SetTransitionType.\nIn: JSR; M = 8; transition_type. 0 and 1 fade, 2 and 3 instant, 4 and 5 mosaic, 6 and 7 instant, 8-$7F fade, $80 and above iris. Only 0, 4 (23 scripts) and $80 (return trips) occur in the scripts.\nOut: INIDISP = 0 (screen off) and MOSAIC as left by the effect; RunSubFrameLoader runs inside, so the game keeps running.\nClobbers: A.",
+      "PlayTransitionIn": "Plays the screen-in effect selected by transition_type.\n\nWhen: ChangeSceneIfRequested after InitSceneState.\nSees: a fade in from black, a mosaic that sharpens, an instant cut, or an iris opening.\nWhy: same data-driven choice as PlayTransitionOut, with its own ladder; the type is still the one that was set for the way out (it is cleared after this call).\nIn: JSR; M = 8; transition_type. 0 fade, 1 instant, 2 fade, 3 instant, 4 mosaic, 5 instant, 6 mosaic, 7 instant, 8-$7F fade, $80 and above iris.\nOut: INIDISP = $0F (full brightness); MOSAIC = 3 after a mosaic.\nClobbers: A.",
+      "RunIrisTransition": "Plays the iris wipe in either direction (transition type $80 and above).\n\nWhen: PlayTransitionOut (BRL) and PlayTransitionIn (BMI); the type is $80 for return trips (RunReturnLoop and the trip to a freed NPC's home in lib_tile_triggers_and_lair_return).\nSees: a circle closes on the player (out) or opens (in).\nWhy: the iris is a mask tile rewritten every step instead of an HDMA effect, so it needs no table setup.\nIn: entered by branch; M = 8; iris_step ($03E7) = $FF (out) or 1 (in), iris_frame ($03E5) = first frame ($1E out, 0 in), transition_type with bit 7.\nOut: each step two RunSubFrameLoader calls and 16 bytes of binary_048000 (offset ((2 x type + frame bit 4) << 8) | ((frame & $0F) << 4)) to VRAM word $4000; out ends at frame < 0, in at frame $20. Out also sets scene_loading, clears the BG3 buffer and sets vram_upload_flags bit 0 first; in sets INIDISP = $0F. It leaves through the RTS of the caller's JSR.\nClobbers: A, X.",
+      "InitSceneState": "Rebuilds all per-scene state for the scene in scene_current and area_current.\n\nWhen: ChangeSceneIfRequested, once per scene change, with the screen blanked and the NMI off.\nSees: nothing during the call; afterwards the scene's actors, map patches and background are in place for the in transition.\nWhy: every scene starts from the same cleared state, so scripts of the old scene cannot leak into the new one.\nIn: JSL; M = 8, X = 16-bit; area_current and scene_current set.\nOut: see the block note for the order: player position, scrolls, input latches, the scene-local event flags ($00-$07), PPU shadows and colour buffer zeroed; assets, tile type map, map size, actor pool, actors, map patches, BG3 clear, two actor passes, the weapon pose and the background redraw done; rng_state+1 = frame_counter, joy_release_latch = $FFFF, frame_counter = $FFFF, windows WH0 = 0 / WH1 = $FF, sort buckets reset; hud_dirty_flags = $1F unless event flag $FA is set.\nClobbers: A, X, Y; dp scratch of its callees."
+    },
+    "comments": {
+      "161522": { "text": "blank word: tile 0 with the priority bit", "expect": "LDA #$2000" },
+      "161573": { "text": "dp$2A = 2: high byte of the pointer $29/$2A = $0200 + id used by FillTileTypeMap", "expect": "STA $2A" },
+      "161586": { "text": "Y = pages x $100: right only while width x height fits one byte (at most 64 pages)", "expect": "XBA" },
+      "161611": { "text": "high byte of a tile word & $02 = bit 9 (solid flag); four words per metatile id at $7E:2000", "expect": "7E2001" },
+      "161634": { "text": "mask = TL + 2 TR + 4 BL + 8 BR", "expect": "LSR" },
+      "161635": { "text": "mask table in the sort bucket page ($0200-$02FF), wiped by ResetSortBuckets at the end of InitSceneState", "expect": "$0200" },
+      "161656": { "text": "X runs from $8000: this writes tile_type_map ($7F:8000+), not the colour buffer", "expect": "cgram_buffer" },
+      "161677": { "text": "out iris starts at frame $1E and counts down (iris_step $FF below)", "expect": "iris_frame" },
+      "161735": { "text": "the scene counts as running from here", "expect": "scene_active" },
+      "161757": { "text": "out ladder: 0 and 1 fade, 2 and 3 instant, 4 and 5 mosaic, 6 and 7 instant, 8-$7F fade, $80+ iris", "expect": "BEQ TransitionOutFade" },
+      "161821": { "text": "MOSAIC: size in bits 7-4 (grows as brightness falls), BG1 and BG2 in bits 1-0", "expect": "ORA #$03" },
+      "161836": { "text": "in ladder: 0 fade, 1 instant, 2 fade, 3 instant, 4 mosaic, 5 instant, 6 mosaic, 7 instant, 8-$7F fade", "expect": "BEQ TransitionInFade" },
+      "161916": { "text": "iris_step: bit 7 set = out ($FF), else in (1)", "expect": "iris_step" },
+      "161959": { "text": "the carry of the fourth ASL is bit 4 of the frame: A = 2 x type + frame bit 4 (the type's bit 7 drops out)", "expect": "ADC $transition_type" },
+      "161966": { "text": "VRAM word $4000: the iris mask tile, 8 words from binary_048000 per step", "expect": "LDA #$4000" },
+      "162058": { "text": "in ends at frame $20 (frames 0-$1F, 32 steps)", "expect": "CMP #$20" },
+      "162292": { "text": "clears event flags $00-$07: scene-local flags", "expect": "event_flags" },
+      "162353": { "text": "one-shot flag from the front end and Up Above scripts: reload the menu graphics, palette and magic graphics after this load", "expect": "reload_menu_gfx" },
+      "162382": { "text": "map size in pages of this location: table + $28 (width) and + $29 (height)", "expect": "MapPatchRectsAndMapSizes" },
+      "162455": { "text": "location $10 skips the background redraw", "expect": "CMP #$10" },
+      "162477": { "text": "random state seeded from frame_counter before it is set to $FFFF (OQ-I013-1)", "expect": "rng_state" },
+      "162483": { "text": "$FFFF: every button must be released before it counts again", "expect": "joy_release_latch" },
+      "162486": { "text": "$FFFF: the first NMI makes it 0", "expect": "frame_counter" },
+      "162505": { "text": "event flag $FA (bit 2 of $1A7D): when set the HUD is not marked dirty at scene start", "expect": "BIT #$04" }
+    }
+  },
+
+  "library/lib_027912.asm": {
+    "blockNote": [
+      "Fixed engine state and new-game starting values, set once at reset (file offsets 162066-162228, SNES $04:F912-$F9B4, bank 04).",
+      "",
+      "=== MODEL ===",
+      "InitFixedState stores the layer parameters the loaders and the streaming code read (map bases $8000 and $C000, tilemap VRAM $6000 and $7000, tile definitions $2000 and $2800, strip work areas $3000, $3102, $3204, $3306), the bank bytes $7E of the strip pointers in dp$34, $37 and $2E, the RAM copy stub at $1C5C, text_delay = 3, a dynamic-tile source pointer, and the starting game values: event flag $FF set (the word $1A7D = $0080), HP and max HP 8, level 1 (also the BCD level), and the initial lair_state of every lair from the 32-byte records of data_00BA0D (byte +$13).",
+      "The RAM stub is PHB, MVN src,dst, PLB, RTS (8B 54 xx xx AB 60) at $1C5C; CopyFrameData patches the two bank operands and jumps to it (wram_copy_stub), because MVN has its banks in the instruction.",
+      "",
+      "=== NOTES ===",
+      "- Called once from BootGame in engine_boot_main_loop, before the first scene loads, so a loaded save overwrites the starting values and a new game keeps them.",
+      "- Event flag $FF (bit 7 of $1A7D) is set here at every start-up and travels with the save image. This is the writer OQ-I011-13 looked for: the 13 unk13 map-patch rows that test flag $00FF see it set (answers the 'who sets it' part; whether it is ever cleared is open).",
+      "- $1A02/$1A04 are the long pointer of the dynamic-tile sprite code (BuildDynamicTileSprites builds it from actor $34/$2C before it reads it); the initial $7F:3000 is the buffer LoadBootGraphicsBuffers fills with graphics_054000. A read before the first write was not found."
+    ],
+    "partNotes": {
+      "InitFixedState": "Sets the engine variables that never change and the starting state of a new game.\n\nWhen: once, from the reset code (BootGame), before the first scene loads.\nSees: nothing directly; a new game starts with HP 8 and level 1 from here, and a loaded save overwrites them.\nWhy: these values are the initial memory the engine and a new game rely on.\nIn: JSL; M = 8, X = 16-bit.\nOut: map_base_bg1 $8000, map_base_bg2 $C000, tilemap_vram_bg1 $6000, tilemap_vram_bg2 $7000, tile_defs_bg1 $2000, tile_defs_bg2 $2800, strip_col_bg1 $3000, strip_row_bg1 $3102, strip_col_bg2 $3204, strip_row_bg2 $3306; dp$34, $37 and $2E = $7E; the RAM stub wram_copy_stub ($1C5C) = PHB, MVN, PLB, RTS (8B 54 xx xx AB 60, the MVN banks are patched by CopyFrameData); text_delay = 3; $1A02/$1A04 = $7F:3000 (initial dynamic-tile source, overwritten before its first read by BuildDynamicTileSprites, static reading); the word $1A7D = $0080 (event flag $FF set, $1A7E = 0); player_hp and player_max_hp = 8; player_level and player_level_bcd = 1; lair_state[i] = byte +$13 of every 32-byte record of data_00BA0D (until a first byte $FF).\nClobbers: A, X, Y."
+    },
+    "comments": {
+      "162137": { "text": "RAM stub at $1C5C: PHB (8B), MVN (54) with two patched bank bytes, PLB (AB), RTS (60)", "expect": "wram_copy_stub" },
+      "162163": { "text": "long pointer $7F:3000, the dynamic-tile source; rewritten before use (static)", "expect": "1A02" },
+      "162176": { "text": "word $0080: sets event flag $FF (bit 7 of $1A7D) and clears $1A7E (chests opened)", "expect": "$1A7D" },
+      "162208": { "text": "byte +$13 of each 32-byte lair record is the initial lair_state", "expect": "data_00BA0D+13" }
+    }
+  }
+}

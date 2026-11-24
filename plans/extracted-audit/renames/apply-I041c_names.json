@@ -1,0 +1,14 @@
+[
+  { "address": 110945, "old": "code_01B161", "new": "cm_npc_fairy_gem_setup_01B161", "row": "I041-C1" },
+  { "address": 110972, "old": "code_01B17C", "new": "cm_npc_fairy_gem_idle_01B17C", "row": "I041-C1" },
+  { "address": 110986, "old": "code_01B18A", "new": "cm_npc_fairy_gem_idle_near_01B18A", "row": "I041-C1" },
+  { "address": 110993, "old": "code_01B191", "new": "cm_npc_captive_plea_01B191", "row": "I041-C2" },
+  { "address": 111011, "old": "loc_01B1A3", "new": "cm_npc_captive_plea_release_01B1A3", "row": "I041-C2" },
+  { "address": 111016, "old": "loc_01B1A8", "new": "cm_npc_captive_plea_short_01B1A8", "row": "I041-C2" },
+
+  { "address": 139913, "old": "code_022289", "new": "cm_npc_fairy_gem_idle_022289", "row": "I041-C3" },
+  { "address": 139927, "old": "code_022297", "new": "cm_npc_fairy_gem_idle_near_022297", "row": "I041-C3" },
+  { "address": 139934, "old": "code_02229E", "new": "cm_npc_captive_plea_02229E", "row": "I041-C4" },
+  { "address": 139952, "old": "loc_0222B0", "new": "cm_npc_captive_plea_real_form_0222B0", "row": "I041-C4" },
+  { "address": 139957, "old": "loc_0222B5", "new": "cm_npc_captive_plea_ow_0222B5", "row": "I041-C4" }
+]

@@ -1,0 +1,17 @@
+[
+  { "address": 17049, "old": "code_004299", "new": "ms_boss_poseidon_004299", "row": "I037-E1" },
+  { "address": 17543, "old": "code_004487", "new": "ms_boss_poseidon_spear_left_004487", "row": "I037-E1" },
+  { "address": 17551, "old": "code_00448F", "new": "ms_boss_poseidon_spear_right_00448F", "row": "I037-E1" },
+  { "address": 17559, "old": "code_004497", "new": "ms_boss_poseidon_fireball_triple_004497", "row": "I037-E1" },
+  { "address": 17599, "old": "code_0044BF", "new": "ms_boss_poseidon_fireball_side_flipped_0044BF", "row": "I037-E1" },
+  { "address": 17601, "old": "code_0044C1", "new": "ms_boss_poseidon_fireball_side_0044C1", "row": "I037-E1" },
+  { "address": 17619, "old": "code_0044D3", "new": "ms_boss_poseidon_dive_splash_0044D3", "row": "I037-E1" },
+  { "address": 17663, "old": "code_0044FF", "new": "ms_boss_poseidon_dive_splash_0044FF", "row": "I037-E1" },
+  { "address": 17704, "old": "code_004528", "new": "ms_boss_poseidon_rise_splash_004528", "row": "I037-E1" },
+  { "address": 17714, "old": "code_004532", "new": "ms_boss_poseidon_fireball_homing_004532", "row": "I037-E1" },
+  { "address": 17734, "old": "code_004546", "new": "ms_boss_poseidon_fireball_homing_004546", "row": "I037-E1" },
+  { "address": 17909, "old": "code_0045F5", "new": "ms_boss_poseidon_spray_spawner_0045F5", "row": "I037-E1" },
+  { "address": 17943, "old": "code_004617", "new": "ms_boss_poseidon_spray_a_004617", "row": "I037-E1" },
+  { "address": 17954, "old": "code_004622", "new": "ms_boss_poseidon_spray_b_004622", "row": "I037-E1" },
+  { "address": 17965, "old": "code_00462D", "new": "ms_boss_poseidon_random_near_boss_00462D", "row": "I037-E1" }
+]

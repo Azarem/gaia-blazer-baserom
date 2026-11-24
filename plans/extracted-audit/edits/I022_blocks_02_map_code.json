@@ -1,0 +1,16 @@
+[
+  {
+    "op": "merge",
+    "blocks": ["lib_010069", "lib_shared_0104AF", "lib_01020E", "lib_01020E_part2", "lib_map_strip_request", "lib_map_column_strip_fill"],
+    "into": "lib_map_streaming",
+    "row": "W5-09",
+    "note": "bank 2, FM-A4 rows L002 to L012: apply the camera delta to BG1 and request strips (lib_010069), strip request dispatcher, column and row buffer fills (lib_map_strip_request, lib_map_column_strip_fill), full redraw at scene entry (lib_01020E), ratio scaler for the BG2 parallax (lib_shared_0104AF) and the strip buffers to VRAM (lib_01020E_part2). Seven references between these files become internal (010069 and 01020E to 0104AF, 01020E to its part 2 and to the column fill, the strip request to the column fill)."
+  },
+  {
+    "op": "merge",
+    "blocks": ["lib_0112F5", "lib_011395", "lib_0114D0", "lib_0114E4", "lib_scene_lair_map_patches", "lib_shared_01112A"],
+    "into": "lib_scene_map_patches",
+    "row": "W5-10",
+    "note": "bank 2, the scene-entry map patches that lib_scene_change_init (bank 4) calls with JSL: lair and variant slabs (lib_0112F5, lib_011395), the per-location list pointers (lib_0114D0, lib_0114E4), the patch rows with their 631-byte table (lib_scene_lair_map_patches) and the rectangle copy they all call (lib_shared_01112A, 5 calling files). Five references become internal."
+  }
+]

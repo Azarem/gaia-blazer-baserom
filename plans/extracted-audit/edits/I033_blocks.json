@@ -1,0 +1,21 @@
+[
+  { "op": "rename", "block": "ScenePlacementIndex", "to": "data_scene_placements", "row": "I033-B02" },
+  { "op": "rename", "block": "ChestListPointers", "to": "data_chest_lists", "row": "I033-B03" },
+  { "op": "rename", "block": "ExitListPointers", "to": "data_exit_lists", "row": "I033-B04" },
+  { "op": "rename", "block": "PlateListPointers", "to": "data_plate_lists", "row": "I033-B05" },
+  { "op": "rename", "block": "LairRecords", "to": "data_lair_records", "row": "I033-B06" },
+  { "op": "rename", "block": "FormationPointers", "to": "data_lair_formations", "row": "I033-B07" },
+  { "op": "rename", "block": "SceneVariantRules", "to": "data_scene_variant_rules", "row": "I033-B08" },
+  { "op": "rename", "block": "data_00F9F7", "to": "data_engine_tables", "row": "I033-B09" },
+  { "op": "rename", "block": "SceneAssetLists", "to": "data_scene_asset_lists", "row": "I033-B10" },
+  { "op": "rename", "block": "SpcDriverBlock", "to": "data_spc_driver", "row": "I033-B11" },
+  { "op": "rename", "block": "data_048000", "to": "data_iris_and_icon_tiles", "row": "I033-B12" },
+  { "op": "rename", "block": "data_04F000", "to": "data_menu_palettes_and_groups", "row": "I033-B13" },
+  { "op": "rename", "block": "PlayerUnarmedAnims", "to": "data_anim_player_unarmed", "row": "I033-B14" },
+  { "op": "rename", "block": "PlayerAnims", "to": "data_anim_player", "row": "I033-B14" },
+  { "op": "rename", "block": "WeaponOverlayAnims", "to": "data_anim_weapon_overlay", "row": "I033-B14" },
+  { "op": "rename", "block": "PaletteAnimLists", "to": "data_anim_palette_cycles", "row": "I033-B14" },
+  { "op": "rename", "block": "EffectAnimsE", "to": "data_anim_effects_e", "row": "I033-B14" },
+  { "op": "rename", "block": "EffectAnimsF", "to": "data_anim_effects_f", "row": "I033-B14" },
+  { "op": "rename", "block": "string_lookup_080000", "to": "data_dictionary", "row": "I033-B15" }
+]

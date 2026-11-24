@@ -256,7 +256,7 @@ GaugeColorLadder [
 ; Sees: the music of a scene or a boss after a change.
 ; Why: the songs are uploaded to the sound chip one at a time, so the game only needs the address of each.
 ; In: n/a (data): 3-byte pointers, index = track number 0-20.
-; Out: the long address copied to dp$29-$2B for the IPL upload (engine_spc_ipl_upload.code_0FEFF5).
+; Out: the long address copied to dp$29-$2B for the IPL upload (engine_spc_ipl_upload.UploadSpcStream).
 ; Clobbers: n/a (data).
 
 MusicPointerTable [
@@ -286,7 +286,7 @@ MusicPointerTable [
 
 ; The graphics source of each of the 8 spells.
 ; 
-; When: LoadEquippedMagicGfx, when the equipped magic changes.
+; When: LoadEquippedMagicGfx, after every menu close and scene load.
 ; Sees: the effect tiles of the equipped spell.
 ; Why: only one spell's graphics fit in VRAM, so they are swapped.
 ; In: n/a (data): 8 long pointers, index = equipped_magic - $11.
@@ -441,7 +441,7 @@ LevelExpThresholds [
 ]
 ---------------------------------------------
 
-; The start of the 320-byte signed sine: 256 values of 127 x sin(2 pi x i / 256) and 64 more for the cosine.
+; The start of the 320-byte signed sine: 256 values close to 127 x sin(2 pi x i / 256) (largest deviation 1.9; none of six plain rounding rules reproduces them) and 64 more for the cosine.
 ; 
 ; When: RunSoulOrbController (the orb's orbit), BuildRotationMatrix and BuildRotationMatrixAlt (the Mode 7 rotation), FillSineWaveTables (dead code) and a few boss scripts of the World of Evil.
 ; Sees: the soul orb circling the hero, the rotating Mode 7 maps.
@@ -459,7 +459,7 @@ SineTable #000306090C0F1215181C1F2225282B2E303336393C3F414447494C4E515355585A5C5
 ; Sees: as SineTable.
 ; Why: the extraction splits the table at this label; it is one table with SineTable.
 ; In: n/a (data): signed bytes; entry 64 is $7F, the peak.
-; Out: the descending half and the negative half of the sine, then the 64 entries the cosine needs.
+; Out: the descending half and the negative half of the sine, then the 64 entries the cosine needs. The negative half is not the exact negation of the positive one (12 of 128 entries match: the table rises 0, 3, 6, 9 ... and falls 0, -4, -7, -10 ...).
 ; Clobbers: n/a (data).
 
 SineTableTail #7F7F7F7F7F7F7E7E7D7C7C7B7A79787776757372706F6D6C6A68666462605E5C5A585553514E4C494744413F3C393633302E2B2825221F1C1815120F0C09060300FCF9F6F3F0EDEAE7E3E0DDDAD7D4D1CFCCC9C6C3C0BEBBB8B6B3B1AEACAAA7A5A3A19F9D9B9997959392908F8D8C8A8988878685848383828181818181818181818181818181818283838485868788898A8C8D8F9092939597999B9D9FA1A3A5A7AAACAEB1B3B6B8BBBEC0C3C6C9CCCFD1D4D7DADDE0E3E7EAEDF0F3F6F9FC000306090C0F1215181C1F2225282B2E303336393C3F414447494C4E515355585A5C5E60626466686A6C6D6F70727375767778797A7B7C7C7D7E7E7F7F7F7F7F
@@ -467,11 +467,11 @@ SineTableTail #7F7F7F7F7F7F7E7E7D7C7C7B7A79787776757372706F6D6C6A68666462605E5C5
 
 ; The half-width of a circle for each of its 128 rows.
 ; 
-; When: code_0116C3 (lib_0116C3), the circle drawing routine (not yet annotated).
-; Sees: a round shape, probably the iris or a circular window (inferred).
+; When: BuildSoulOrbCircleWindow (lib_hdma_window_effects), every frame after a Soul effect (Light, Reality, Detection, Shield) has started (OQ-I033-9).
+; Sees: the circular window of radius $40 pixels around the soul orb that the four Soul effects cut into the screen.
 ; Why: the width of each row of a circle is data, so no square root is needed.
 ; In: n/a (data): 128 bytes, index = row; the first values are $00, $04, $0A, $0F, $12, $15, $18, $1A.
-; Out: the half-width in pixels.
+; Out: the half-width in pixels; the table is mirrored about row 64 (C[i] = C[128 - i] for 125 of 127 rows; rows 1 and 127 hold 4 and 0) and peaks at $3F for rows 59 to 69.
 ; Clobbers: n/a (data).
 
 CircleHalfWidths #00040A0F1215181A1C1E202223252627292A2B2C2D2E2F303031323334343535363737383839393A3A3A3B3B3C3C3C3C3D3D3D3D3E3E3E3E3E3E3E3F3F3F3F3F3F3F3F3F3F3F3E3E3E3E3E3E3E3D3D3D3D3C3C3C3C3B3B3A3A3A393938383737363535343433323130302F2E2D2C2B2A292726252322201E1C1A1815120F0A00

@@ -1,0 +1,4 @@
+[
+  { "op": "rename", "block": "data_anim_effects_e", "to": "data_anim_effects", "row": "I033-B14" },
+  { "op": "rename", "block": "data_anim_effects_f", "to": "data_anim_magic", "row": "I033-B14" }
+]

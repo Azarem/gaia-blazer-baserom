@@ -1,0 +1,9 @@
+[
+  { "address": 68344, "old": "loc_010AF8", "new": "TestExitRow", "row": "R-I046-1", "note": "CheckExitRegions: loop head, end of list ($FF) or tile test of one 11-byte row" },
+  { "address": 68375, "old": "loc_010B17", "new": "AdvanceExitRow", "row": "R-I046-2", "note": "CheckExitRegions: the tile test failed, next row (+$0B)" },
+  { "address": 68387, "old": "loc_010B23", "new": "NoExitHit", "row": "R-I046-3", "note": "CheckExitRegions: no region matched, restore P and return with carry clear" },
+  { "address": 68390, "old": "loc_010B26", "new": "TestExitPixels", "row": "R-I046-4", "note": "CheckExitRegions: the tile test passed, pixel test against the region shrunk by 15 pixels" },
+  { "address": 68736, "old": "loc_010C80", "new": "ReleaseLairPathCase", "row": "R-I046-5", "note": "ReleaseLairAtSwitch: record +E/+F non-zero, a path opens (lair_state +A or $80)" },
+  { "address": 68888, "old": "loc_010D18", "new": "ReleaseLairNpcCase", "row": "R-I046-6", "note": "ReleaseLairAtSwitch: record +E/+F both zero, the lair frees an NPC (lair_state +A or $C0)" },
+  { "address": 68948, "old": "loc_010D54", "new": "StartLairReturnTrip", "row": "R-I046-7", "note": "ReleaseLairAtSwitch: the NPC's home is in another scene, save the return point and warp there" }
+]

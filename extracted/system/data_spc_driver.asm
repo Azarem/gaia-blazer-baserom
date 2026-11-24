@@ -1,18 +1,18 @@
 ; SPC700 sound driver block as uploaded at boot (file offsets 196608-198414, SNES $06:8000-$870E, bank 03; 1807 bytes).
 ; 
 ; === MODEL ===
-; engine_spc_ipl_upload (code_0FEFBC) first uploads spc_0FF14E, writes $FF to APUIO0 and then uploads this block through the same upload routine (code_0FEFF5) with $0320 = $3000. The song data of MusicPointerTable is uploaded by the same routine later, one song at a time (MusicLoadUpload). The block is an IPL transfer stream: it starts with the length word $004E and the destination word $2E00 and continues with the data; its contents were not disassembled in this audit (the sound engine is documented elsewhere), so the name rests on its place in the boot sequence.
+; engine_spc_ipl_upload (UploadSpcDriver) first uploads SpcEngineBlock, writes $FF to APUIO0 and then uploads this block through the same upload routine (UploadSpcStream) with $0320 = $3000. The song data of MusicPointerTable is uploaded by the same routine later, one song at a time (MusicLoadUpload). The block is an IPL transfer stream: it starts with the length word $004E and the destination word $2E00 and continues with the data; it holds five records (78 bytes of instrument definitions for ARAM $2E00, 24 bytes for $2F00, 1616 bytes of sound effect table and sequences for $2400, 52 bytes of sample directory for $2C00 and the byte $0D for $0FFF), then the count 13 and the sample indices $00 $01 $02 $03 $04 $05 $0C $06 $0B $1C $0D $07 $1D (docs/code/spc-interface.md).
 ---------------------------------------------
 
 ---------------------------------------------
 
 ; The block uploaded to the sound chip at boot after the loader.
 ; 
-; When: code_0FEFBC in engine_spc_ipl_upload, once, at the start of the game.
+; When: UploadSpcDriver in engine_spc_ipl_upload, once, at the start of the game.
 ; Sees: nothing directly; the game's music and sound effects depend on it.
 ; Why: the SPC700 runs its own program, so the CPU has to send it.
 ; In: n/a (data): 1807 bytes, an upload stream whose first words are $004E (a length) and $2E00 (a destination).
-; Out: read by code_0FEFF5 with dp$29-$2B = this address and $0320 = $3000.
+; Out: read by UploadSpcStream with dp$29-$2B = this address and $0320 = $3000.
 ; Clobbers: n/a (data).
 
 SpcDriverBlock [

@@ -1,0 +1,14 @@
+[
+  { "address": 1044144, "old": "SineWaveMoverDown", "new": "SineWaveMoverNoFlip", "row": "I042-E40" },
+  { "address": 1044153, "old": "SineWaveMoverDownStep", "new": "SineWaveMoverNoFlipStep", "row": "I042-E40" },
+  { "address": 1044187, "old": "SineWaveMoverDownNext", "new": "SineWaveMoverNoFlipNext", "row": "I042-E40" },
+  { "address": 1044191, "old": "SineWaveMoverUp", "new": "SineWaveMoverFlipX", "row": "I042-E41" },
+  { "address": 1044200, "old": "SineWaveMoverUpStep", "new": "SineWaveMoverFlipXStep", "row": "I042-E41" },
+  { "address": 1044234, "old": "SineWaveMoverUpNext", "new": "SineWaveMoverFlipXNext", "row": "I042-E41" },
+  { "address": 1044238, "old": "SineWaveMoverDownMirrored", "new": "SineWaveMoverFlipY", "row": "I042-E42" },
+  { "address": 1044247, "old": "SineWaveMoverDownMirroredStep", "new": "SineWaveMoverFlipYStep", "row": "I042-E42" },
+  { "address": 1044281, "old": "SineWaveMoverDownMirroredNext", "new": "SineWaveMoverFlipYNext", "row": "I042-E42" },
+  { "address": 1044285, "old": "SineWaveMoverUpMirrored", "new": "SineWaveMoverFlipXY", "row": "I042-E43" },
+  { "address": 1044294, "old": "SineWaveMoverUpMirroredStep", "new": "SineWaveMoverFlipXYStep", "row": "I042-E43" },
+  { "address": 1044328, "old": "SineWaveMoverUpMirroredNext", "new": "SineWaveMoverFlipXYNext", "row": "I042-E43" }
+]

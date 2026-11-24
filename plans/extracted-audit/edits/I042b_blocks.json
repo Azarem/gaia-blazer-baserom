@@ -1,0 +1,6 @@
+[
+    { "op": "merge", "blocks": ["lib_scene_change_init", "lib_02719F", "lib_shared_027260", "lib_027912"], "into": "lib_boot_and_scene_init", "notes": "join", "row": "I042-B1" },
+    { "op": "merge", "blocks": ["lib_027223", "lib_027572"], "into": "lib_main_loop_helpers", "notes": "join", "row": "I042-B2" },
+    { "op": "merge", "blocks": ["lib_player_facing", "lib_027781_part1", "lib_player_stats"], "into": "lib_player_helpers", "notes": "join", "row": "I042-B3" },
+    { "op": "rename", "block": "lib_027277", "to": "lib_unused_sine_wave_tables", "row": "I042-B4" }
+]

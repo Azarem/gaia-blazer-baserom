@@ -4,7 +4,7 @@
 ; gv_obj_name_entry_voice_00797B (type $54, placed in A00S01): once (event flag $1F06), 'A voice came from above. "My follower, since you will be able to speak with all living things, you should have a name. Please choose a name for yourself."', the name entry screen (COP 3A) and '<name>,------- What an interesting name. Allright, go and save the world for all creatures.' The walkthrough: 'You'll begin by speaking with "the Master" ... You will then get to pick a name for yourself.'
 ; 
 ; === THE HUB (A00S09) ===
-; gv_obj_up_above_map_walker_006E28 (type $53) is the player actor of the hub: it walks a path of seven stops with the pad (walk animations $01-$03, $1E-$2F); on stop k (k = 0 ... 6) B (joy_pressed $8000) plays BRK $98 and starts COP 10 to area 0 scene k+1 (A00S01-A00S07, the shrine scenes of areas-and-scenes.md) at ($70,$50). The stops are linked Down / Right / Up as the path bends: 0 Down to 1, 1 Right to 2, 2 Up to 3, 3 Right to 4, 4 Up to 5, 5 Up to 6, and the opposite pad direction goes back (6 goes back with Right). Every forward step is a gate, opened by the event flag $1B00 ... $1B05 of the same number; gv_obj_up_above_path_markers_007141 draws a pair of marker sprites for every gate flag that is set. gv_obj_up_above_camera_follow_00708E copies the walker's position to the player variables and aims the camera at it. The walker is replaced by the post-ending cut scene gv_obj_up_above_post_ending_007264 when event flag $1F04 is set and $1F05 is clear ($1F04 is set by w6_actor_01EC4B in the World of Evil, $1F05 at the end of that cut scene).
+; gv_obj_up_above_map_walker_006E28 (type $53) is the player actor of the hub: it walks a path of seven stops with the pad (walk animations $01-$03, $1E-$2F); on stop k (k = 0 ... 6) B (joy_pressed $8000) plays BRK $98 and starts COP 10 to area 0 scene k+1 (A00S01-A00S07, the shrine scenes of areas-and-scenes.md) at ($70,$50). The stops are linked Down / Right / Up as the path bends: 0 Down to 1, 1 Right to 2, 2 Up to 3, 3 Right to 4, 4 Up to 5, 5 Up to 6, and the opposite pad direction goes back (6 goes back with Right). Every forward step is a gate, opened by the event flag $1B00 ... $1B05 of the same number; gv_obj_up_above_path_markers_007141 draws a pair of marker sprites for every gate flag that is set. gv_obj_up_above_camera_follow_00708E copies the walker's position to the player variables and aims the camera at it. The walker is replaced by the post-ending cut scene gv_obj_up_above_post_ending_007264 when event flag $1F04 is set and $1F05 is clear ($1F04 is set by we_obj_master_shrine_event in the World of Evil, $1F05 at the end of that cut scene).
 ; The scenery actors are the meta types $40-$52 (19 entries) and the backdrop type $3D. Types $40, $43 and $46 (gv_obj_up_above_scenery_gated_0070B3) stay while event flag $1F05 is set or neither flag is, and disappear while $1F04 alone is set; types $41, $42, $44, $45, $4A, $4B and $4E have no script of their own (RTL only, $42 draws in front), types $47-$49 and $50-$52 play one fixed animation ($04, $05, $30 and $31, $32, $33), and the three boss markers ($4C, $4D, $4F) play an animation once a lair switch is set: $4C switch $00B6 (animation $18), $4D switch $0009 (the Metal Mantis lair, animation $14), $4F switch $012F (animation $12).
 ; 
 ; === NOTES ===
@@ -14,7 +14,7 @@
 
 ?BANK 00
 
-?INCLUDE 'lib_010000'
+?INCLUDE 'lib_map_scroll_and_redraw'
 ?INCLUDE 'shared_actor_helpers_bank0'
 
 !joy_pressed                    0322
@@ -41,7 +41,7 @@
 
 gv_obj_up_above_map_walker_006E28 {
     COP [07] ( #$9F05, &code_006E34 ) ; event flag $1F05: set by code_007279 at the end of the post-ending step
-    COP [07] ( #$9F04, &gv_obj_up_above_post_ending_007264 ) ; event flag $1F04: set by w6_actor_01EC4B in the World of Evil; the post-ending cut scene replaces the walker
+    COP [07] ( #$9F04, &gv_obj_up_above_post_ending_007264 ) ; event flag $1F04: set by we_obj_master_shrine_event in the World of Evil; the post-ending cut scene replaces the walker
 }
 
 code_006E34 {
@@ -327,7 +327,7 @@ code_006E34 {
 ; Sees: the camera follows the walker.
 ; Why: the engine's player variables (player_x / y, player_tile_x / y) are read from the player actor, which here is the walker.
 ; In: actor script, X = own slot; player_actor = the walker.
-; Out: player_x = X, player_tile_x = X / 16, player_y = Y, player_tile_y = Y / 16 - 1; lib_010000.AimCameraAtPlayer; X is saved with PHX / PLX.
+; Out: player_x = X, player_tile_x = X / 16, player_y = Y, player_tile_y = Y / 16 - 1; lib_map_scroll_and_redraw.AimCameraAtPlayer; X is saved with PHX / PLX.
 ; Clobbers: A, Y.
 
 gv_obj_up_above_camera_follow_00708E {
@@ -348,7 +348,7 @@ gv_obj_up_above_camera_follow_00708E {
     DEC 
     STA $player_tile_y
     PHX 
-    JSL $@lib_010000.AimCameraAtPlayer
+    JSL $@lib_map_scroll_and_redraw.AimCameraAtPlayer
     PLX 
     RTL 
 }

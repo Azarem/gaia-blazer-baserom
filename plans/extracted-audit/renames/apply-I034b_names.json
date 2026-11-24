@@ -1,0 +1,18 @@
+[
+  { "address": 103541, "old": "code_019475", "new": "gv_obj_leos_painting_019475", "row": "I034-B1" },
+  { "address": 104004, "old": "code_019644", "new": "gv_obj_water_mill_anim_1C_019644", "row": "I034-B1" },
+  { "address": 104022, "old": "code_019656", "new": "gv_obj_water_mill_anim_1D_019656", "row": "I034-B1" },
+  { "address": 104040, "old": "code_019668", "new": "gv_npc_boy_secret_hut_019668", "row": "I034-B1" },
+  { "address": 104410, "old": "code_0197DA", "new": "gv_npc_tulip_clubhouse_pass_0197DA", "row": "I034-B1" },
+  { "address": 104614, "old": "code_0198A6", "new": "gv_npc_boy_secret_passage_0198A6", "row": "I034-B1" },
+  { "address": 105004, "old": "code_019A2C", "new": "gv_npc_lonely_goat_guide_019A2C", "row": "I034-B1" },
+  { "address": 105694, "old": "code_019CDE", "new": "gv_npc_gourmet_goat_019CDE", "row": "I034-B1" },
+  { "address": 106228, "old": "code_019EF4", "new": "gv_npc_old_man_pet_goat_019EF4", "row": "I034-B1" },
+  { "address": 106362, "old": "code_019F7A", "new": "gv_npc_goat_reincarnation_019F7A", "row": "I034-B1" },
+  { "address": 106500, "old": "code_01A004", "new": "gv_npc_tulip_hidden_item_hint_01A004", "row": "I034-B1" },
+  { "address": 106648, "old": "code_01A098", "new": "gv_npc_village_chief_01A098", "row": "I034-B1" },
+  { "address": 107339, "old": "code_01A34B", "new": "gv_obj_chief_rocking_chair_01A34B", "row": "I034-B1" },
+  { "address": 109094, "old": "code_01AA26", "new": "gv_npc_castle_entrance_voice_01AA26", "row": "I034-B1" },
+  { "address": 109391, "old": "code_01AB4F", "new": "gv_npc_fairy_recover_sword_01AB4F", "row": "I034-B1" },
+  { "address": 109574, "old": "code_01AC06", "new": "gv_npc_fairy_exp_80_01AC06", "row": "I034-B1" }
+]

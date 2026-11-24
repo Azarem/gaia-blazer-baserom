@@ -1,0 +1,86 @@
+[
+  {
+    "op": "merge",
+    "blocks": ["gv_front_end_boot", "gv_front_end_title_intro", "ending_sequence"],
+    "into": "gv_front_end",
+    "row": "W4-GV01",
+    "note": "scene front_end, bank 0: boot actor (36 lines), title actor (508) and ending actor (473). All three are meta entries of world 0 and are pinned to bank 0 by their parts; the title actor branches (BRL) into engine_title_file_select in bank 0. Placement-audit 6.4 target gv_front_end."
+  },
+  {
+    "op": "merge",
+    "blocks": ["gv_up_above_actor_006E28", "gv_up_above_actor_0070B3", "gv_up_above_actor_0070D5", "gv_up_above_actor_0070DB", "gv_up_above_actor_0070E1", "gv_up_above_actor_0070E2", "gv_up_above_actor_0070E3", "gv_up_above_actor_0070F4", "gv_up_above_actor_007103", "gv_up_above_actor_007104", "gv_up_above_actor_007115", "gv_up_above_actor_00711B", "gv_up_above_actor_007121", "gv_up_above_actor_007127", "gv_up_above_name_entry_voice"],
+    "into": "gv_up_above_actors_and_name_entry",
+    "row": "W4-GV02",
+    "note": "scene up_above, bank 0: 14 small actors of scene 00/09 (1 to 1,141 bytes) and the name entry voice (scene 00/01), 688 lines in all. Bank 0 because the parts started there; nothing moves across banks."
+  },
+  {
+    "op": "merge",
+    "blocks": ["w0_actor_01A7AC", "w0_actor_01B33A", "w0_actor_01B967"],
+    "into": "gv_up_above_trial_room_and_lisa_turbo_actors",
+    "row": "W4-GV03",
+    "note": "scene up_above, bank 3: the Soul of Magician actor of the Trial Room (scene 00/08, crosswalk), the Lisa and Turbo scene (00/0D, the ROM text 'I am Lisa, and the goat behind me is Turbo') and the small 01B967 actor of 00/0D. 303 lines."
+  },
+  {
+    "op": "merge",
+    "blocks": ["w0_actor_018000", "w0_actor_0180F7", "gv_tool_shop_woman_and_son", "w0_actor_01848A", "w0_actor_0185B9", "w0_actor_0186A2", "w0_actor_01891A", "w0_actor_018A59", "w0_actor_018FF4", "w0_actor_01910C", "w0_actor_019365"],
+    "into": "gv_village_actors_018000",
+    "row": "W4-GV04",
+    "note": "scene grass_valley_village, bank 3, first half (943 lines, ROM order 018000 .. 019365). The village has 27 blocks and 1,919 lines; the guide is about 1,500 lines per file, so it is cut in two at the middle by ROM order (no behaviour or area evidence cuts it better; name = first block offset)."
+  },
+  {
+    "op": "merge",
+    "blocks": ["w0_actor_019475", "w0_actor_019644", "w0_actor_019656", "w0_actor_019668", "w0_actor_0197DA", "w0_actor_0198A6", "w0_actor_019A2C", "w0_actor_019CDE", "w0_actor_019EF4", "w0_actor_019F7A", "w0_actor_01A004", "w0_actor_01A098", "w0_actor_01A34B", "w0_actor_01AA26", "w0_actor_01AB4F", "w0_actor_01AC06"],
+    "into": "gv_village_actors_019475",
+    "row": "W4-GV05",
+    "note": "scene grass_valley_village, bank 3, second half (976 lines, 019475 .. 01AC06)."
+  },
+  {
+    "op": "merge",
+    "blocks": ["w0_actor_01A3B0", "w0_actor_01B21A", "w0_actor_01B273"],
+    "into": "gv_leos_paintings_actors",
+    "row": "W4-GV06",
+    "note": "scene leos_paintings, bank 3 (106 lines; w0_actor_01A3B0 is 2,632 bytes of mostly data)."
+  },
+  {
+    "op": "merge",
+    "blocks": ["gv_enemy_0FAD2A", "gv_enemy_0FAEE5", "gv_enemy_0FAF44", "gv_enemy_0FAFAD", "gv_enemy_0FB04F", "gv_enemy_0FB0D6"],
+    "into": "gv_leos_paintings_enemies",
+    "row": "W4-GV07",
+    "note": "scene leos_paintings, bank 1F: six enemy actor scripts, each reached by its own 3-byte meta entry of world 0 (531 lines)."
+  },
+  {
+    "op": "merge",
+    "blocks": ["w0_actor_01A440", "gv_fairy_gem_advice_return", "w0_actor_01ADF8", "w0_actor_01AE99", "w0_actor_01AF5C", "w0_actor_01B23D"],
+    "into": "gv_underground_castle_actors",
+    "row": "W4-GV08",
+    "note": "scene underground_castle, bank 3 (392 lines). gv_fairy_gem_advice_return is the BRL target of w0_actor_01ADF8 (same file now) and of w0_actor_01A3B0 (file gv_leos_paintings_actors, still a cross-file BRL in bank 3)."
+  },
+  {
+    "op": "merge",
+    "blocks": ["gv_enemy_0FAA8F", "gv_enemy_0FAB9A", "gv_enemy_0FAC31", "gv_enemy_0FAC7A", "gv_enemy_0FACF2"],
+    "into": "gv_underground_castle_enemies",
+    "row": "W4-GV09",
+    "note": "scene underground_castle, bank 1F: five enemy actor scripts (403 lines). gv_enemy_0FACF2 uses the return-address helper code_002D67 of shared_actor_helpers_bank0 (bank 0)."
+  },
+  {
+    "op": "merge",
+    "blocks": ["w0_actor_01AFFD", "w0_actor_01B1F7"],
+    "into": "gv_multi_area_actors",
+    "row": "W4-GV10",
+    "note": "no scene (OQ-I020-5): two actors placed in more than one area of world 0 (123 lines in all). The helper w0_shared_01ABB9 is a text block and is renamed instead of merged."
+  },
+  {
+    "op": "rename",
+    "block": "w0_shared_01ABB9",
+    "to": "gv_watching_over_world_texts",
+    "row": "W4-GV11",
+    "note": "two strings ('I am watching over the world- Please take this- [name] received EXP!' and 'Alright, continue on- Good luck!') that jump to the 5-byte tail asciistring_01B988 of shared_actor_helpers_bank3. Named from the ROM text."
+  },
+  {
+    "op": "rename",
+    "block": "w0_shared_01A4F9",
+    "to": "gv_unreferenced_string_stub_01A4F9",
+    "row": "W4-GV12",
+    "note": "one string, 'I am dreaming-', that jumps to the shared tail. No reference to asciistring_01A4F9 in the extraction (placement-audit 4.8); kept as a block of its own in bank 3 because gathering one block with nothing needs no merge. Static statement only (OQ-I021-2)."
+  }
+]

@@ -8,7 +8,7 @@
 ; 
 ; === NOTES ===
 ; - Callers: the Master's record question (cm_npc_master_record_0076EF in shared_actor_helpers_bank0, after the answer Yes) calls SaveGameToSlot; the file select (engine_title_file_select) calls LoadGameFromSlot and ComputeSlotChecksum.
-; - saved_scene = world_index + 1 is the scene of area 0 the file select loads after Continue: scene 1 to 7 of Up Above are the shrines of the worlds in world order (docs/areas-and-scenes.md). The walkthrough describes saving at the Master's Shrine (06-dr-leos-lab.md, 'go there to heal and save').
+; - saved_scene = world_index + 1 is the scene of area 0 the file select loads when a slot is chosen: scene 1 to 7 of Up Above are the shrines of the worlds in world order (docs/areas-and-scenes.md). The walkthrough describes saving at the Master's Shrine (06-dr-leos-lab.md, 'go there to heal and save').
 ; - All three routines are JSL and need 16-bit index registers (LDX #$0203); X is preserved, DBR and P are restored.
 ---------------------------------------------
 
@@ -36,7 +36,7 @@ SaveGameToSlot {
     REP #$20
     LDA $world_index
     INC 
-    STA $saved_scene      ; saved_scene: the scene the file select loads after Continue (scene world_index + 1 of area 0, the shrine); stored first so it is part of the image
+    STA $saved_scene      ; saved_scene: the scene the file select loads when the slot is chosen (scene world_index + 1 of area 0, the shrine); stored first so it is part of the image
     LDA $save_slot
     STA $701FFE           ; last used slot, read back by the file select to place the cursor
     XBA 
@@ -75,7 +75,7 @@ SaveGameToSlot {
 ; Copies a validated slot back into the live state.
 ; 
 ; When: HandleFileSelectChoice (engine_title_file_select) after the player picks a slot; the only caller.
-; Sees: the saved game starts: the file select goes on to scene_next = saved_scene. Carry set means no valid save (the file select then starts a new game, which is inferred, OQ-I024-5).
+; Sees: the saved game starts: the file select goes on to scene_next = saved_scene. Carry set means no valid save (the file select then starts a new game in scene 1: the walkthrough says 'Opt for an empty file to begin'; runtime check OQ-I024-5).
 ; Why: the checksum is tested before anything is written, so a damaged slot never overwrites the running state.
 ; In: JSL; X = 16-bit; save_slot = 0-3.
 ; Out: carry clear: lair_state ($200 bytes at $7F:0203) and $1A5E-$1C57 ($1FA bytes) replaced from the main copy of the slot. Carry set: sum or xor word differs, nothing changed. X, DBR and P restored (apart from carry).

@@ -1,0 +1,69 @@
+[
+  {
+    "op": "merge",
+    "blocks": ["lib_013B27", "lib_013B36", "lib_014176", "lib_0143B0", "lib_01440D"],
+    "into": "gv_title_texts",
+    "group": "grass_valley",
+    "scene": "front_end",
+    "order": null,
+    "row": "W5-01",
+    "note": "bank 2, five one-item files read only by the title and boot code: PUSH START (lib_013B27) and the copyright line (lib_013B36) printed by the title actor code_0066FC, the boot actor status line (lib_014176, code_0066C6) and the file select window text and its 80-byte table (lib_0143B0, lib_01440D, code_006D4E in engine_title_file_select). Strings read through the text renderer stay in bank 2 (DBR $02), so they cannot join gv_front_end (bank 0); they go to one file in its folder."
+  },
+  {
+    "op": "merge",
+    "blocks": ["lib_013B85", "lib_013BE1", "lib_013C3D", "lib_013CB6", "lib_013D4D", "lib_013DBA", "lib_013E2A", "lib_013E51", "lib_013EBF", "lib_013F35", "lib_013FCD", "lib_014023", "lib_01406A", "lib_0140FA"],
+    "into": "gv_prologue_texts",
+    "group": "grass_valley",
+    "scene": "front_end",
+    "order": null,
+    "row": "W5-02",
+    "note": "bank 2, the 14 intro narration pages in ROM order ('Wise men tell a tale late at night of a great King ...' to 'A SOUL BLAZER!!'). Each is loaded by one LDY #$&label in the title actor code_0066FC (gv_front_end lines 161 to 330) and printed with code_012769. Prologue only; the ending narration is gv_epilogue_texts (user request: do not mix them)."
+  },
+  {
+    "op": "merge",
+    "blocks": ["lib_014192", "lib_0141F1", "lib_014228", "lib_01426F", "lib_0142BB", "lib_0142E1", "lib_014339", "lib_0143A4", "lib_016264"],
+    "into": "gv_epilogue_texts",
+    "group": "grass_valley",
+    "scene": "front_end",
+    "order": null,
+    "row": "W5-03",
+    "note": "bank 2, the ending: seven narration pages ('Grass Valley at sunset ...' to 'Lisa feels she will be happy if she believes', loaded by LDY #$&label in the ending actor code_00729D chain, gv_front_end lines 598 to 706), THE END (lib_0143A4, loaded by the Lisa and Turbo actor in gv_up_above_trial_room_and_lisa_turbo_actors line 243) and the 1,597-byte staff roll (lib_016264, loaded by code_007638 and scrolled by lib_0126CF). ROM order keeps the narration first."
+  },
+  {
+    "op": "merge",
+    "blocks": ["lib_014516", "lib_014527", "lib_location_banner_names", "lib_014547", "lib_01456A"],
+    "into": "lib_banner_texts",
+    "row": "W5-04",
+    "note": "bank 2, texts of two banners: LEVEL UP ! and its bar (lib_014516, lib_014527; loaded in player_spells_level_up lines 989 and 997, bank 0) and the pause / location banner (lib_location_banner_names with the 128-name list, lib_014547 Monster Lair Remaining, lib_01456A; all loaded by lib_027572, bank 4). Callers are in banks 0 and 4, so the strings cannot join them."
+  },
+  {
+    "op": "merge",
+    "blocks": ["lib_menus", "lib_shared_014F74", "lib_menu_item_data", "lib_0161CE"],
+    "into": "lib_menus",
+    "row": "W5-05",
+    "note": "bank 2, menu data joins the menu code that reads it: item names (lib_shared_014F74, 64 refs from lib_menu_item_data and 8 from lib_menus), item descriptions and gear stats (lib_menu_item_data, 10 refs from lib_menus) and the eight-word table lib_0161CE (8 refs from the item data). Wave 1 kept lib_menu_item_data apart to stay under about 1,600 lines; the file is now about 1,860 lines (lib_text_render is 1,707), accepted because the data has no other reader. The souls run (asciistring_014636 .. 01469F) stays inside lib_menus, in ROM order."
+  },
+  {
+    "op": "merge",
+    "blocks": ["lib_014F02", "lib_014F15", "lib_014F23", "lib_014F43", "lib_014F5B"],
+    "into": "shared_choice_prompt_texts",
+    "group": "actor_shared",
+    "order": null,
+    "row": "W5-06",
+    "note": "bank 2, the choice prompts that COP [1A] shows: Yes/No (lib_014F02, 19 references in 11 files of five worlds), Yes only, Record/Move/Quit, Record/Quit, Stay/Go back. Shared by actors of every world, so they go to actor_shared, bank 2."
+  },
+  {
+    "op": "merge",
+    "blocks": ["lib_tile_triggers", "lib_lair_return_mode", "lib_shared_016246"],
+    "into": "lib_tile_triggers_and_lair_return",
+    "row": "W5-07",
+    "note": "bank 2. One feature in two files (FM-A4 1.4 and 1.5: the per-frame tile triggers release a lair, and the return mode frame reveals the released home), both called once from the main loop, both calling lib_shared_016246 (the 'found N GEMs' message: 3 and 2 references), lib_027348, lib_027462_part1 and lib_text_render. About 1,070 lines."
+  },
+  {
+    "op": "merge",
+    "blocks": ["lib_0108BB", "lib_017504"],
+    "into": "lib_0108BB",
+    "row": "W5-08",
+    "note": "bank 2, lib_017504 is the 296-byte live map size table read by code_0108BB six times (and twice by lib_scene_change_init through a long reference)."
+  }
+]

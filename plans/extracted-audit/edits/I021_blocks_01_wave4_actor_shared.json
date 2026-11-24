@@ -1,0 +1,26 @@
+[
+  {
+    "op": "merge",
+    "blocks": ["shared_animation_tick_loop", "shared_enemy_helper_002D67", "shared_shrine_save_menu", "shared_dialogue_tail_007A52"],
+    "into": "shared_actor_helpers_bank0",
+    "notes": "join",
+    "row": "W4-S01",
+    "note": "wave 3 left the nine actor_shared helpers apart because they live in three banks. Bank 0 file: the pickup/container base actor (4 bytes, 65 meta references), the return-address helper code_002D67 used by bank 1F enemies (345 bytes, the idiom LDA #$&code_002D67-1, PHA, RTS keeps the bank), the shrine save menu and the 5-byte dialogue tail it jumps to. All four are pinned to bank 0 already; the merge moves nothing across banks. Part order = ROM order."
+  },
+  {
+    "op": "merge",
+    "blocks": ["shared_animation_loop_helper_01B161", "shared_help_me_message_0191D2", "shared_dialogue_tail_01B988"],
+    "into": "shared_actor_helpers_bank3",
+    "notes": "join",
+    "row": "W4-S02",
+    "note": "bank 3 file of the shared helpers: the animation loop helper code_01B17C (return-address idiom, 21 callers in worlds 0 to 5), the Help me message actor used by two Greenwood actors, and the 5-byte dialogue tail asciistring_01B988 (106 references from 33 files). All pinned to bank 3 already."
+  },
+  {
+    "op": "merge",
+    "blocks": ["shared_animation_loop_hurt_message_022289", "shared_ms_fairy_gem_texts_dialogue_tail"],
+    "into": "shared_actor_helpers_bank4",
+    "notes": "join",
+    "row": "W4-S03",
+    "note": "bank 4 file of the shared helpers (worlds 3, 4 and 5): the animation loop with the hurt message (code_022289, return-address idiom) and the block of five strings (the Mountain of Souls return prompt plus the 5-byte tail asciistring_02251E that 32 files jump to; it is one part of five labels, not two parts as I020 stated, OQ-I021-1). Merging does not split it."
+  }
+]

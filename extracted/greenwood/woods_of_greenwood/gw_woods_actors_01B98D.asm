@@ -138,7 +138,7 @@ code_01BA28 {
     BNE code_01BA64
     COP [01] ( &asciistring_01BAAA )
     LDA #$0000
-    STA $APUIO0           ; APUIO0 = 0 for the pause of the joke (restored to 1 after the punch line; effect on the music not traced, OQ-I035-3)
+    STA $APUIO0           ; APUIO0 = 0: not the playing song 1, so the SPC keys off the music and freezes it; the later 1 restarts the tune (OQ-I035-3)
     LDA $text_delay
     PHA 
     LDA #$0005

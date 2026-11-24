@@ -68,10 +68,10 @@ Cop0C_JumpIfActorInBox {
     SEC 
     SBC $16
     CMP $18
-    BCC loc_0058E2
+    BCC CopBoxTestY
     BRL cop_core.CopExitSkip2
 
-  loc_0058E2:
+  CopBoxTestY:
     LDA $0002, X
     CLC 
     ADC $00
@@ -87,10 +87,10 @@ Cop0C_JumpIfActorInBox {
     SEC 
     SBC $0002, Y
     CMP $18
-    BCC loc_005904
+    BCC CopBoxInside
     BRL cop_core.CopExitSkip2
 
-  loc_005904:
+  CopBoxInside:
     LDA [$38]
     INC $38
     INC $38
@@ -416,20 +416,20 @@ Cop9A_JumpByPlayerDeltaX {
     LDA $player_x
     SEC 
     SBC $0000, X
-    BEQ loc_006158
-    BPL loc_006151
+    BEQ Cop9APick
+    BPL Cop9ARight
     EOR #$FFFF            ; EOR without INC gives |d| - 1: the left band is one pixel wider than the right (left |d| > T, right d >= T)
     CMP [$38]
-    BCC loc_006158
+    BCC Cop9APick
     LDY #$0002
-    BRA loc_006158
+    BRA Cop9APick
 
-  loc_006151:
+  Cop9ARight:
     CMP [$38]
-    BCC loc_006158
+    BCC Cop9APick
     LDY #$0006
 
-  loc_006158:
+  Cop9APick:
     LDA [$38], Y
     BRL cop_core.CopExitJump
 }
@@ -450,20 +450,20 @@ Cop9B_JumpByPlayerDeltaY {
     LDA $player_y
     SEC 
     SBC $0002, X
-    BEQ loc_00617F
-    BPL loc_006178
+    BEQ Cop9BPick
+    BPL Cop9BBelow
     EOR #$FFFF
     CMP [$38]
-    BCC loc_00617F
+    BCC Cop9BPick
     LDY #$0002
-    BRA loc_00617F
+    BRA Cop9BPick
 
-  loc_006178:
+  Cop9BBelow:
     CMP [$38]
-    BCC loc_00617F
+    BCC Cop9BPick
     LDY #$0006
 
-  loc_00617F:
+  Cop9BPick:
     LDA [$38], Y
     BRL cop_core.CopExitJump
 }
@@ -523,22 +523,22 @@ CopAD_WaitUntilOnScreen {
     TYX 
     LDA $0016, X
     BIT #$8000            ; $16 bit 15 = off screen: only an off-screen actor inside the map waits; otherwise the command is skipped
-    BNE loc_00637F
+    BNE CopADTestMapX
     BRL cop_core.CopExitSkip1
 
-  loc_00637F:
+  CopADTestMapX:
     LDA $0000, X
     CMP $map_width_px
-    BCC loc_00638A
+    BCC CopADTestMapY
     BRL cop_core.CopExitSkip1
 
-  loc_00638A:
+  CopADTestMapY:
     LDA $0002, X
     CMP $map_height_px
-    BCC loc_006395
+    BCC CopADWait
     BRL cop_core.CopExitSkip1
 
-  loc_006395:
+  CopADWait:
     LDA $38               ; dp$38 - 2 = this COP instruction: the saved resume pointer repeats it after the delay
     DEC 
     DEC 

@@ -1,0 +1,106 @@
+{
+  "_note": "I054: note corrections found while writing docs/code/save-and-load.md. (1) The fifth row of the file select is the text 'Erase record' (SaveSlotMenuText; its cursor cell $05CA is TitleMenuCursorOffsets[4]), so 'probably erase' (OQ-I024-5) becomes a statement; the erase overwrites word 0 of the main and the backup block, which makes both checksums fail. (2) The failed load (carry set) is a new game: the walkthrough says 'Opt for an empty file to begin' (01-in-the-beginning.md), so 'inferred' goes. (3) There is no 'Continue' row in the file select: the notes of lib_save_system said 'after Continue'. (4) DrawSaveSlotMenu fills the name field with five word loads whose last word overlaps the fourth, so the field is nine bytes ($0447-$044F), not eight. (5) EnterFileSelect is reached after Start reloads the title scene (file_select_request = 1), not when the player 'chooses to load'. (6) HandleFileSelectChoice: the game starts on the arrival tile of the shrine, or of the first shrine for an empty slot.",
+
+  "system/engine_title_file_select.asm": {
+    "blockNote": {
+      "edit": [
+        {
+          "find": "EnterFileSelect is reached by BRL from gv_front_end.",
+          "with": "EnterFileSelect is reached by BRL from gv_obj_title_and_prologue_0066FC (gv_front_end) when the title scene has been reloaded after Start (gv_obj_title_start_button_006B61 sets file_select_request)."
+        },
+        {
+          "find": "five fields into $0447-$044E,",
+          "with": "five word loads into $0447-$044F (the last overlaps the fourth: eight letters and the terminator of a full name),"
+        },
+        {
+          "find": "treats an answer of 4 as a second prompt (probably erase: it stores the slot offset into the first word of the main and backup blocks and switches the palette word $7F0006 from $7FFF to $03FF while it runs, OQ-I024-5)",
+          "with": "treats an answer of 4, the fifth row 'Erase record' of SaveSlotMenuText (its cursor cell $05CA is TitleMenuCursorOffsets[4]), as a second prompt for the slot to erase: it stores the slot offset into the first word of the main and backup blocks, which makes both checksums fail so that the slot is no longer listed (the data stay in SRAM), and switches the palette word $7F0006 from $7FFF to $03FF while it runs (runtime check OQ-I024-5, OQ-I054-1)"
+        },
+        {
+          "find": "(inferred: no valid save, a new game)",
+          "with": "(no valid save: a new game; the walkthrough says 'Opt for an empty file to begin', runtime check OQ-I024-5)"
+        }
+      ]
+    },
+    "partNotes": {
+      "EnterFileSelect": {
+        "edit": [
+          {
+            "find": "When: BRL from gv_front_end when the player chooses to load.",
+            "with": "When: BRL from gv_obj_title_and_prologue_0066FC (gv_front_end) when the title scene was reloaded after Start (file_select_request = 1)."
+          }
+        ]
+      },
+      "HandleFileSelectChoice": {
+        "edit": [
+          {
+            "find": "picking a slot starts the game at the start position (x $70, y $60); the second prompt turns the palette word $7F0006 to $03FF.",
+            "with": "picking a slot starts the game on the arrival tile (x $70, y $60) of the saved world's shrine, or of the first shrine for an empty slot; the fifth row, Erase record, turns the palette word $7F0006 to $03FF (white to yellow) while it asks for the slot to erase."
+          },
+          {
+            "find": "scene_next = 1 (carry: inferred new game)",
+            "with": "scene_next = 1 (carry: no valid save, a new game)"
+          },
+          {
+            "find": "Prompt answer 4 (probably erase, OQ-I024-5): the slot offset is written to the first word of the main and backup blocks and the menu is redrawn.",
+            "with": "Prompt answer 4 ('Erase record'): the next answer picks the slot whose first word, in the main and in the backup block, is overwritten with the slot offset; both checksums then fail, so the slot is not listed when the menu is redrawn (OQ-I024-5, OQ-I054-1)."
+          }
+        ]
+      }
+    },
+    "comments": {
+      "27879": {
+        "text": "Menu choice: carry set asks again from slot 0; an answer of 4 (the row 'Erase record') opens the second prompt, the slot to erase",
+        "expect": "ChooseMenuRowAtTable"
+      },
+      "27916": {
+        "text": "Erase: the slot offset (slot x $400) is stored over the first word of the slot and of its backup at +$1000, so neither checksum matches any more",
+        "expect": "STA $700000, X"
+      },
+      "27939": {
+        "text": "Load the chosen slot (lib_save_system); carry set is treated below as 'no valid save', a new game",
+        "expect": "LoadGameFromSlot"
+      }
+    }
+  },
+
+  "library/lib_save_system.asm": {
+    "blockNote": {
+      "edit": [
+        {
+          "find": "the scene of area 0 the file select loads after Continue:",
+          "with": "the scene of area 0 the file select loads when a slot is chosen:"
+        }
+      ]
+    },
+    "partNotes": {
+      "LoadGameFromSlot": {
+        "edit": [
+          {
+            "find": "Carry set means no valid save (the file select then starts a new game, which is inferred, OQ-I024-5).",
+            "with": "Carry set means no valid save (the file select then starts a new game in scene 1: the walkthrough says 'Opt for an empty file to begin'; runtime check OQ-I024-5)."
+          }
+        ]
+      }
+    },
+    "comments": {
+      "159981": {
+        "text": "saved_scene: the scene the file select loads when the slot is chosen (scene world_index + 1 of area 0, the shrine); stored first so it is part of the image",
+        "expect": "STA $saved_scene"
+      }
+    }
+  },
+
+  "grass_valley/front_end/gv_title_texts.asm": {
+    "partNotes": {
+      "SaveSlotLineTemplates": {
+        "edit": [
+          {
+            "find": "[CUR:o3][06:1,0452] and the end byte;",
+            "with": "[CUR:o3][06:1,0452] (one BCD digit: the low nibble of saved_scene, the world number 1-7) and the end byte;"
+          }
+        ]
+      }
+    }
+  }
+}

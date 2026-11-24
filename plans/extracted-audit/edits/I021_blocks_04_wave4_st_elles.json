@@ -1,0 +1,58 @@
+[
+  {
+    "op": "merge",
+    "blocks": ["se_ghost_ship_enemy_004102", "se_ghost_ship_enemy_0041A0", "se_ghost_ship_enemy_004248", "se_ghost_ship_enemy_child_scripts"],
+    "into": "se_ghost_ship_enemies",
+    "row": "W4-SE01",
+    "note": "scene ghost_ship, bank 0: the three ghost-ship enemies (Purple Worms and their relatives, placement-audit 5.3) and the 24-byte child scripts that se_ghost_ship_enemy_004102 and 004248 spawn through 2-byte COP operands (6 references). The boss se_boss_floating_skull stays a block of its own (355 lines of boss logic, placement-audit 6.4)."
+  },
+  {
+    "op": "merge",
+    "blocks": ["w2_actor_0FA23B", "w2_actor_0FA3A5"],
+    "into": "se_ghost_ship_actors",
+    "row": "W4-SE02",
+    "note": "scene ghost_ship, bank 1F: two actors (59 lines)."
+  },
+  {
+    "op": "merge",
+    "blocks": ["w2_actor_0F9AFD", "w2_actor_0F9B8B", "w2_actor_0F9DBE", "w2_actor_0F9ED4", "w2_actor_0F9F24", "w2_actor_0F9F74", "w2_actor_0F9FC4", "w2_actor_0FA106", "w2_actor_0FA494", "w2_actor_0FA4C4", "w2_actor_0FA59C", "w2_actor_0FA64B", "w2_actor_0FA874"],
+    "into": "se_seabed_of_st_elles_actors",
+    "row": "W4-SE03",
+    "note": "scene seabed_of_st_elles, bank 1F: 13 actor scripts (about 640 lines). w2_actor_0FA494 and 0FA4C4 are BRL callers of se_fairy_gem_return_prompt (st_elles_coast file) and use the return-address helper w2_shared_0FA945 (stays pinned in bank 1F); w2_actor_0FA874 has an entry in rewrites.json (offset 1026372), which is keyed by offset and not by block."
+  },
+  {
+    "op": "merge",
+    "blocks": ["se_enemy_0FBB1F", "se_enemy_0FBBA3", "se_enemy_0FBC22", "se_enemy_0FBD12", "se_enemy_0FBE81"],
+    "into": "se_seabed_of_st_elles_enemies",
+    "row": "W4-SE04",
+    "note": "scene seabed_of_st_elles, bank 1F: five enemy scripts (518 lines)."
+  },
+  {
+    "op": "merge",
+    "blocks": ["w2_actor_0F8000", "w2_actor_0F80A4", "w2_actor_0F8209", "w2_actor_0F82DD", "w2_actor_0F83AD", "w2_actor_0F8446", "w2_actor_0F8577", "w2_actor_0F85E1", "w2_actor_0F873E", "w2_actor_0F87A9", "w2_actor_0F8850", "w2_actor_0F88CC", "w2_actor_0F8941", "w2_actor_0F89CF", "w2_actor_0F8A0E", "w2_actor_0F8A7E", "w2_shared_0F8B27", "w2_actor_0F8B6A", "w2_actor_0F8CCB"],
+    "into": "se_seabed_sanctuary_actors_0F8000",
+    "row": "W4-SE05",
+    "note": "scene seabed_sanctuary, bank 1F, first half (947 lines, ROM order 0F8000 .. 0F8CCB). The area has 31 blocks and 1,864 lines, so it is cut in two by ROM order; name = first block offset. w2_shared_0F8B27 (4 references from 4 files) sits with its first users. Several actors use the return-address helper engine_003005 (bank 0)."
+  },
+  {
+    "op": "merge",
+    "blocks": ["w2_actor_0F8D58", "w2_actor_0F8E99", "w2_actor_0F8F45", "w2_actor_0F905C", "w2_actor_0F911E", "w2_actor_0F961C", "w2_actor_0F96B9", "w2_actor_0F9793", "w2_actor_0F982F", "w2_actor_0F98F5", "w2_actor_0FA014", "w2_actor_0FA7C4"],
+    "into": "se_seabed_sanctuary_actors_0F8D58",
+    "row": "W4-SE06",
+    "note": "scene seabed_sanctuary, bank 1F, second half (917 lines, 0F8D58 .. 0F98F5, plus 0FA014 and 0FA7C4 whose ROM positions are after the area's main run)."
+  },
+  {
+    "op": "merge",
+    "blocks": ["se_fairy_gem_return_prompt", "w2_actor_0FA4F4", "w2_actor_0FA5BF", "w2_actor_0FA5D6", "w2_actor_0FA7A1"],
+    "into": "se_st_elles_coast_actors",
+    "row": "W4-SE07",
+    "note": "scene st_elles_coast, bank 1F: the Fairy Gem return prompt (actor then tail from wave 0, three BRL callers, two of them in the seabed file) and four actors (about 170 lines)."
+  },
+  {
+    "op": "merge",
+    "blocks": ["se_enemy_0FBF25", "se_enemy_0FBFA1", "se_enemy_0FC01E", "se_enemy_0FC0E5", "se_enemy_0FC14E", "se_enemy_0FC296", "se_enemy_0FC3E8", "se_enemy_0FC536"],
+    "into": "se_st_elles_coast_enemies",
+    "row": "W4-SE08",
+    "note": "scene st_elles_coast, bank 1F: eight enemy scripts (1,140 lines)."
+  }
+]

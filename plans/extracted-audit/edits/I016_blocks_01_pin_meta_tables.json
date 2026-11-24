@@ -1,0 +1,9 @@
+[
+  {
+    "op": "set",
+    "blocks": ["meta_tables_008000"],
+    "movable": false,
+    "row": "R-2",
+    "note": "meta_tables_008000 is read as $&meta_tables_008000+N with DBR=$01 (34 sites in bank-0 engine code and bank-2 library code). The reads are base-relative, so the position inside bank 1 is free, but a cross-bank move breaks every one of them. movable:false pins the block to the bank of its start (32768 -> bank 01)."
+  }
+]

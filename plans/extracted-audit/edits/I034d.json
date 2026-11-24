@@ -1,0 +1,107 @@
+{
+  "_note": "I034d: PC annotate actor batch grass_valley, files 6-11 of 15: the enemies of the Underground Castle, Leo's Paintings and the unplaced green humanoid, the Metal Mantis boss and the unreferenced 'I am dreaming' string. Names applied first by renames/apply-I034d_names.json. Enemy identities come from the lair record type byte (+$15 of LairRecords, see WorldMetaPointers), the walkthrough bestiary stats and the lair texts of the walkthrough (OQ-I034-10); behaviours are static readings of the scripts.",
+
+  "grass_valley/gv_enemy_0FAA49.asm": {
+    "blockNote": [
+      "The Green Humanoid (meta type $20 of world 0, 3 HP and 1 EXP in MetaGrassValley; the walkthrough bestiary lists 3 HP, 1 EXP, 'running into you') (file offset 1026633-1026703, bank 1F).",
+      "",
+      "=== ROLE ===",
+      "A walker without an attack: it turns towards the hero (sideways with animation $05 and a flip bit, up $04, down $03) and runs into him. It is spawned by lair records whose type byte (+$15) is $20, for example the Underground Castle lairs of the walkthrough ('the Green Humanoids spawned by the monster lair').",
+      "",
+      "=== NOTES ===",
+      "- Type $20 has no placement row in any Grass Valley scene; it only comes from lair records."
+    ],
+    "partNotes": {
+      "gv_enemy_green_humanoid_0FAA49": "The Green Humanoid.\n\nWhen: meta type $20; spawned by a lair (RunLairRespawn / SpawnAll), runs every frame.\nSees: a green humanoid that follows the hero; waits 8 frames while off screen.\nWhy: the simplest chaser of the world: COP 9A compares the X distance to the hero with $10, COP 9B the Y distance.\nIn: actor script, X = own slot.\nOut: first a sideways step (animation $05, flip cleared or set by COP 97 / 96) when the hero is left or right, then a vertical one ($04 above, $03 below), then back to the start.\nClobbers: A."
+    }
+  },
+
+  "grass_valley/underground_castle/gv_underground_castle_enemies.asm": {
+    "blockNote": [
+      "The enemies of the Underground Castle that have their own code (file offsets 1026703-1027370, bank 1F): the Yellow Humanoid ($21) with its three spheres, the Walking Bush ($22), the Fly ($23), the Blue Liquid ($24) and the Blue Torch ($25) with its fireball. The Green Humanoid ($20) is in gv_enemy_0FAA49.",
+      "",
+      "=== ROSTER ===",
+      "Stats are the MetaGrassValley row (HP, BCD EXP) and the walkthrough bestiary agrees: Yellow Humanoid 4 HP / 2 EXP ('running into you, spheres'); Walking Bush, Fly and Blue Liquid 3 HP / 1 EXP; Blue Torch 5 HP / 2 EXP ('fireballs'). The type is the byte +$15 of a lair record (LairRecords): for example record $30 / $31 (Underground Castle east) has type $22 and the walkthrough says 'defeat the Walking Bushes coming from the nearby monster lair'; records $0F and $12 have type $23 and the walkthrough says 'Flies spawned by the monster lair'. The Blue Liquids ($24) and Blue Torches ($25) are placed in A02S01 and A02S02 directly (placement rows). The identity of $22 / $23 / $24 follows from these lairs and the placement, not from the sprites (OQ-I034-10).",
+      "",
+      "=== NOTES ===",
+      "- All five start with the same guard: while the actor is off screen ($16 bit $8000) it waits a few frames with COP 1B."
+    ],
+    "partNotes": {
+      "gv_enemy_yellow_humanoid_0FAA8F": "The Yellow Humanoid: a chaser that throws spheres.\n\nWhen: meta type $21; spawned by Underground Castle lairs, runs every frame.\nSees: it walks towards the hero; when it is lined up with him within $10 pixels on one axis it plays its throw (animations $0C / $0A / $0E, then $10 / $0F / $11) and a sphere flies out (animations $36 / $35 / $37 follow).\nWhy: COP 9A / 9B pick the direction (left, within, right; above, within, below); each throw spawns one of the sphere actors with COP 85.\nIn: actor script, X = own slot.\nOut: spheres gv_enemy_humanoid_sphere_0FAB61 (hero above), _0FAB6C (below), _0FAB4B (left or right, flipped by COP 96).\nClobbers: A.",
+      "gv_enemy_humanoid_sphere_0FAB4B": "Sphere thrown sideways by the Yellow Humanoid.\n\nWhen: spawned by gv_enemy_yellow_humanoid_0FAA8F (COP 85).\nSees: a small sphere that flies away and bursts.\nWhy: the sphere is its own actor so it can hurt the hero (flags $0200, priority $30, in front).\nIn: actor script, X = own slot; the spawner sets the position.\nOut: starts at offset (-1, +2) with animation $25 (the parent's flip bit gives the side; a second entry loc_0FAB56 with (+1, +2) is not referenced), repeats the flight animation $0C times, plays animation $24 and ends with COP 86; BRK $5B at the start.\nClobbers: A.",
+      "gv_enemy_humanoid_sphere_0FAB61": "Sphere thrown upward by the Yellow Humanoid.\n\nWhen: spawned by gv_enemy_yellow_humanoid_0FAA8F when the hero is above it.\nSees: as gv_enemy_humanoid_sphere_0FAB4B.\nWhy: see there; the entry only sets the offset and animation (offset (+4, -13), animation $26).\nIn: actor script, X = own slot.\nOut: falls into the shared tail at loc_0FAB75.\nClobbers: A.",
+      "gv_enemy_humanoid_sphere_0FAB6C": "Sphere thrown downward by the Yellow Humanoid.\n\nWhen: spawned by gv_enemy_yellow_humanoid_0FAA8F when the hero is below it.\nSees: as gv_enemy_humanoid_sphere_0FAB4B.\nWhy: see there; offset (-3, +2), animation $27.\nIn: actor script, X = own slot.\nOut: falls into the shared tail at loc_0FAB75.\nClobbers: A.",
+      "gv_enemy_walking_bush_0FAB9A": "The Walking Bush: stands still until the hero comes close.\n\nWhen: meta type $22; spawned by Underground Castle lairs (records $30 / $31 in the walkthrough: 'Walking Bushes').\nSees: a bush (animation $1B) that wakes and walks towards the hero once he is inside its box widened by 5 (COP 0C).\nWhy: the walkthrough bestiary lists it as 'running into you'.\nIn: actor script, X = own slot.\nOut: while the hero is near it picks the direction with COP 9A / 9B and plays walk animations $1A, $1C, $1D, $1E and $34 (16 repeats each, flipped by COP 96 / 97).\nClobbers: A.",
+      "gv_enemy_fly_0FAC31": "The Fly: flits in random directions.\n\nWhen: meta type $23; spawned by Underground Castle lairs (the Fly lairs of the walkthrough, records $0F and $12).\nSees: a fly that never aims at the hero; the walkthrough says 'running into you'.\nWhy: it draws a random number (COP 1F, rng_state + 1 & 3) and plays one of four movements ($14, $12, $16 mirrored, $16) with COP 9D / 9E until a wall is hit (COP 9E jumps back).\nIn: actor script, X = own slot.\nOut: loops for ever.\nClobbers: A.",
+      "gv_enemy_blue_liquid_0FAC7A": "The Blue Liquid: lies still, then slides towards the hero.\n\nWhen: meta type $24; placed directly in A02S01 and A02S02 ('Blue Liquids laying around').\nSees: a blob (animation $2E) that stirs (animation $2F) when the hero is inside its box widened by 5, then slides with animations $30-$33.\nWhy: COP 9C decides whether the X or the Y distance is larger, then COP 9A / 9B pick the side.\nIn: actor script, X = own slot.\nOut: returns to animation $2E when the actor is off screen ($16 bit $8000).\nClobbers: A.",
+      "gv_enemy_blue_torch_0FACF2": "The Blue Torch: stands in place and shoots fireballs.\n\nWhen: meta type $25; placed directly in A02S01 and A02S02.\nSees: a torch that burns (animation $18, 8 repeats, then $19) and fires.\nWhy: COP B0 spawns gv_enemy_torch_fireball_0FAD14 with flags $0200 once per cycle.\nIn: actor script, X = own slot.\nOut: loops for ever.\nClobbers: A.",
+      "gv_enemy_torch_fireball_0FAD14": "The fireball of the Blue Torch.\n\nWhen: spawned by gv_enemy_blue_torch_0FACF2.\nSees: a fireball that flies off (BRK $64).\nWhy: priority $30 and drawn in front (COP A3 / A2); the flight itself is the shared tail shared_actor_helpers_bank0.code_002D67, entered through a pushed return address with Y = $1F.\nIn: actor script, X = own slot.\nOut: RTL into code_002D67.\nClobbers: A, Y."
+    }
+  },
+
+  "grass_valley/leos_paintings/gv_leos_paintings_enemies.asm": {
+    "blockNote": [
+      "The enemies of Leo's Paintings (file offsets 1027370-1028341, bank 1F): the Yellow Knight ($26) with three spear actors, the Metal Crawler ($27), the Purple Bird ($28), the Green Torch ($29) with its fireball, the Monster Blocks ($2E) and the spikes ($2F).",
+      "",
+      "=== ROSTER ===",
+      "Stats from MetaGrassValley and the walkthrough bestiary: Yellow Knight 9 HP / 5 EXP ('throwing spears'), Metal Crawler 24 HP / 250 EXP ('running around', metal), Purple Bird 4 HP / 3 EXP, Green Torch 9 HP / 4 EXP ('fireballs'), Monster Blocks 4 HP ('jumping at you'), spikes 1 HP / 0 EXP. The lair records give the identities: record $22 (type $28, the Purple Birds' lair that frees a tulip) and the walkthrough's 'Purple Birds' lair to release a tulip'. The Metal Crawlers need the Zantetsu Sword (walkthrough). The spikes are placed four times in A03S02 (the walkthrough: 'stone, non-moving paths (unless you some spike fetish)').",
+      "",
+      "=== NOTES ===",
+      "- DISCREPANCY: MetaGrassValley type $2E gives the Monster Blocks 3 EXP, the walkthrough bestiary 2 EXP (OQ-I034-11). The $2E identity itself comes from the jump-at-you behaviour.",
+      "- Type $2F as 'spikes' rests on the placements and the walkthrough sentence above, not on a name in the ROM (OQ-I034-10)."
+    ],
+    "partNotes": {
+      "gv_enemy_yellow_knight_0FAD2A": "The Yellow Knight: walks and throws spears when lined up with the hero.\n\nWhen: meta type $26; spawned by Leo's Paintings lairs.\nSees: a knight that walks towards the hero ($0E / $14 / $0D / $13 / $0C / $12 animations) and, when lined up within $10 pixels, throws a spear in that direction (animations $16 / $15 / $17, then $10 / $0F / $11).\nWhy: COP 9A / 9B / 9C choose the direction.\nIn: actor script, X = own slot.\nOut: spears gv_enemy_knight_spear_0FAEAF / _0FAEBA / _0FAE8F.\nClobbers: A.",
+      "gv_enemy_knight_spear_0FAE8F": "Spear thrown by the Yellow Knight (the flipped sideways throw).\n\nWhen: spawned by gv_enemy_yellow_knight_0FAD2A.\nSees: a spear that flies until it leaves the screen.\nWhy: flags $0200, priority $30, in front; BRK $5B; offset (-1, -8).\nIn: actor script, X = own slot.\nOut: loops animation $26 and ends with COP 86 when COP 1C finds $16 bit $8000 (off screen).\nClobbers: A.",
+      "gv_enemy_knight_spear_0FAEAF": "Spear thrown by the Yellow Knight (offset (+4, -15), animation $25).\n\nWhen: spawned by gv_enemy_yellow_knight_0FAD2A.\nSees: as gv_enemy_knight_spear_0FAE8F.\nWhy: the entry only sets the offset and animation, then joins the shared tail at loc_0FAEC3.\nIn: actor script, X = own slot.\nOut: COP 91 and a loop until the actor is off screen, then COP 86.\nClobbers: A.",
+      "gv_enemy_knight_spear_0FAEBA": "Spear thrown by the Yellow Knight (offset (-4, -8), animation $24).\n\nWhen: spawned by gv_enemy_yellow_knight_0FAD2A.\nSees: as gv_enemy_knight_spear_0FAE8F.\nWhy: the entry only sets the offset and animation, then joins the shared tail at loc_0FAEC3.\nIn: actor script, X = own slot.\nOut: as gv_enemy_knight_spear_0FAEAF.\nClobbers: A.",
+      "gv_enemy_metal_crawler_0FAEE5": "The Metal Crawler: runs along the walls and is immune until the Zantetsu Sword.\n\nWhen: meta type $27; spawned by the Metal Crawler lairs of Leo's Paintings (the walkthrough: 'the monster lair you pass is for the Metal Crawlers').\nSees: a metal creature that crawls back and forth, turning at walls (24 HP, 250 EXP).\nWhy: COP A5 branches on the flip bits and COP 21-24 test the tiles around it, so it turns at obstacles; the animations are $1F-$21.\nIn: actor script, X = own slot; it ORs $0400 into its $1A flags first (the bit is undocumented, the walkthrough calls the monster 'Metal').\nOut: loops for ever.\nClobbers: A.",
+      "gv_enemy_purple_bird_0FAF44": "The Purple Bird: flutters towards the hero.\n\nWhen: meta type $28; spawned by the Purple Birds' lair (record $22, which frees a tulip in the village).\nSees: a bird that flaps in place and darts towards the hero (4 HP, 3 EXP).\nWhy: COP 9C picks the axis, COP 9A / 9B the side; animations $18-$1D, each played twice with COP 81 and followed by the rest pose.\nIn: actor script, X = own slot; priority $30 and drawn in front (COP A2 / A3).\nOut: loops for ever; waits 16 frames while off screen.\nClobbers: A.",
+      "gv_enemy_green_torch_0FAFAD": "The Green Torch: turns to the hero and shoots fireballs.\n\nWhen: meta type $29; spawned by Leo's Paintings lairs ('a ton of Green Torches').\nSees: a torch that faces the hero and fires a fireball in his direction (9 HP, 4 EXP).\nWhy: COP 9A / 9B choose up, down, left or right; COP 84 spawns gv_enemy_torch_fireball_0FB02F and the animation $27 / $28 / $29 of the child tells the direction.\nIn: actor script, X = own slot.\nOut: after the shot it plays animation $22 and loops.\nClobbers: A, Y (the child).",
+      "gv_enemy_torch_fireball_0FB02F": "The fireball of the Green Torch.\n\nWhen: spawned by gv_enemy_green_torch_0FAFAD.\nSees: a fireball (BRK $64) that flies in the direction of its animation.\nWhy: flags $0200, priority $30, in front; moved up by 4 first (COP A0).\nIn: actor script, X = own slot; the parent has written animation $27-$29 into $1E.\nOut: COP 91, then animation steps until off screen and COP 86.\nClobbers: A.",
+      "gv_enemy_monster_blocks_0FB04F": "The Monster Blocks: sit still and then jump at the hero.\n\nWhen: meta type $2E; spawned by Leo's Paintings lairs (walkthrough: 'Monster Blocks ... jump around and are easily beaten').\nSees: a block that waits until the hero is inside its box widened by 5, then plays animation $02, $03 (two repeats) and $01 (the jump) and follows him with $04-$06 while he stays near.\nWhy: COP 21-24 stop it at walls; COP 9A / 9B pick the direction.\nIn: actor script, X = own slot.\nOut: loops for ever; waits 16 frames while off screen.\nClobbers: A.",
+      "gv_enemy_spikes_0FB0D6": "The spikes of A03S02: a harmless-looking object that hurts.\n\nWhen: meta type $2F; placed four times in A03S02 (one with placement flags $C1).\nSees: static spikes, drawn behind (COP A4); they play animation $2C or $2D for 255 repeats depending on the flip state.\nWhy: they are an actor so the engine can handle the contact damage like a monster's (1 HP, 0 EXP in MetaGrassValley).\nIn: actor script, X = own slot.\nOut: loops for ever.\nClobbers: A."
+    }
+  },
+
+  "grass_valley/leos_paintings/gv_boss_metal_mantis.asm": {
+    "blockNote": [
+      "The Metal Mantis, the boss of Leo's Paintings (file offsets 12717-13254, bank 00): the mantis itself (meta type $1F, 50 HP, 50 EXP in MetaGrassValley; the walkthrough: 'Maximum HP: 50 HP, EXP. Earned: 50 EXP.') and its projectiles.",
+      "",
+      "=== ROLE ===",
+      "The boss lair is record $09 (RunLairFormation, one monster of type $1F; home location 04, the Chief's room). The script starts the fight (boss_fight_active + 1, boss_actor = X, exit_list_ofs = 0) and spawns engine_003005.RunBossMapPatch with patch id 0 (it blocks the pad while the map changes). Defeating it sets switch $09, which frees the village Chief (gv_village_actors_019475) and changes the village dialogue.",
+      "",
+      "=== ATTACKS (static reading, OQ-I034-12) ===",
+      "The walkthrough: 'Three fireballs fired simultaneously usually when you're far off', 'Arm attack if you're close', and the boss 'turns silvery' (immune) when the hero is on the far side of the field. In the script the hero's Y is tested against $70: at $70 or more the mantis is in its fire mode: three fireballs at once (gv_boss_mantis_fireball_003348 / _003359 / _003367, each spawned with COP B2 at offset (+8, -$18)) or two shots from its sides (gv_boss_mantis_shot_00337F, _003394); below $70 it uses the arm attack (gv_boss_mantis_arm_strike_0033B9 with gv_boss_mantis_arm_0033A9 on the left or _0033B1 on the right, while $16 bit $0002 is set). The silver phase is not visible in the script as a separate state (OQ-I034-12).",
+      "",
+      "=== NOTES ===",
+      "- The boss is placed in the paintings scene A03S06 through its lair, not through a placement row."
+    ],
+    "partNotes": {
+      "gv_boss_metal_mantis_0031AD": "The Metal Mantis.\n\nWhen: meta type $1F; spawned by lair record $09 in A03S06 (the Metal Mantis room, location $0C).\nSees: 'a boss that only the sword hurts' (the walkthrough); its pose depends on where the hero stands.\nWhy: the script sets up the fight and then loops forever; COP 9A / 9B and the hero's Y choose between firing and arm attacks.\nIn: actor script, X = the boss slot.\nOut: exit_list_ofs = 0, boss_fight_active += 1, boss_actor = X; RunBossMapPatch is spawned with patch id 0 in its $30; then the behaviour loops; COP 9F shifts the actor's X by +$10 before the distance tests and by -$10 in each branch, so the tests are taken from a point $10 right of its X.\nClobbers: A, Y.",
+      "gv_boss_mantis_fireball_003348": "First of the three simultaneous fireballs of the Metal Mantis.\n\nWhen: spawned by gv_boss_metal_mantis_0031AD (COP B2, flags $0200).\nSees: a fireball that flies away.\nWhy: the three share the offset (+8, -$18); this one plays animation $10 and then $1B.\nIn: actor script, X = own slot; priority $30, in front.\nOut: animation $13 repeated $0C times, then COP 86.\nClobbers: A.",
+      "gv_boss_mantis_fireball_003359": "Second of the three simultaneous fireballs.\n\nWhen: spawned by gv_boss_metal_mantis_0031AD.\nSees: a fireball with the sound BRK $61.\nWhy: as gv_boss_mantis_fireball_003348; this one has no extra animation after $10.\nIn: actor script, X = own slot.\nOut: joins the tail of 003348 (animation $13 repeated $0C times, COP 86).\nClobbers: A.",
+      "gv_boss_mantis_fireball_003367": "Third of the three simultaneous fireballs.\n\nWhen: spawned by gv_boss_metal_mantis_0031AD.\nSees: a fireball with animation $10 and then $1C.\nWhy: as gv_boss_mantis_fireball_003348.\nIn: actor script, X = own slot.\nOut: joins the tail of 003348.\nClobbers: A.",
+      "gv_boss_mantis_shot_00337F": "First kind of shot of the Metal Mantis.\n\nWhen: spawned twice per volley by gv_boss_metal_mantis_0031AD (COP B2, offset (-4, -$1A)) while the mantis plays animations $0D / $17.\nSees: a projectile (BRK $61) that plays animation $11, then $14 repeated $0C times.\nWhy: unknown beyond that it is the second kind of ranged attack (OQ-I034-12).\nIn: actor script, X = own slot.\nOut: ends with COP 86.\nClobbers: A.",
+      "gv_boss_mantis_shot_003394": "Second kind of shot of the Metal Mantis.\n\nWhen: spawned twice per volley by gv_boss_metal_mantis_0031AD (COP B2, offset (+$14, -$1A)) while the mantis plays animations $0F / $18.\nSees: as gv_boss_mantis_shot_00337F with animation $12 and then $15.\nWhy: the same shot at offset +$14 instead of -4 (OQ-I034-12).\nIn: actor script, X = own slot.\nOut: ends with COP 86.\nClobbers: A.",
+      "gv_boss_mantis_arm_0033A9": "Left arm of the arm attack.\n\nWhen: spawned by the mantis (COP B2, offset (-$28, -$18)) while it plays animation $09 / $0A.\nSees: an arm sprite (animation $19).\nWhy: it only plays the animation and ends; the damage comes from gv_boss_mantis_arm_strike_0033B9.\nIn: actor script, X = own slot.\nOut: COP 82 then COP 86.\nClobbers: A.",
+      "gv_boss_mantis_arm_0033B1": "Right arm of the arm attack.\n\nWhen: spawned by the mantis (COP B2, offset (+$28, -$18)) while it plays animation $0B / $0C.\nSees: an arm sprite (animation $1A).\nWhy: as gv_boss_mantis_arm_0033A9.\nIn: actor script, X = own slot.\nOut: COP 82 then COP 86.\nClobbers: A.",
+      "gv_boss_mantis_arm_strike_0033B9": "The hit area of the arm attack.\n\nWhen: spawned by the mantis (COP 85) during the arm attack, after it sets $16 bit $0002.\nSees: nothing of its own; it takes the animation table $8000 with bank $0D (COP A8) and plays animation $4E.\nWhy: the damage actor of the arm; priority is set from its table.\nIn: actor script, X = own slot.\nOut: COP 92 / 94 animation ticks, then COP 86.\nClobbers: A."
+    },
+    "comments": {
+      "12745": { "text": "hero Y >= $70: fire from the mantis; below $70 the arm attack at loc_0032B2", "expect": "#$0070" }
+    }
+  },
+
+  "grass_valley/gv_unreferenced_string_stub_01A4F9.asm": {
+    "blockNote": [
+      "An unreferenced string 'I am dreaming.' next to the Lisa dream texts (file offsets 107769-107786, bank 03). No label, pointer or script refers to asciistring_01A4F9; it sits between gv_underground_castle_actors.code_01A4E4 and asciistring_01A50A ('Daddy, where are you?!'). It is probably a leftover line for Lisa or the dream (OQ-I034-13).",
+      "",
+      "=== NOTES ===",
+      "- The string ends with the shared text tail asciistring_01B988 like the other dream texts."
+    ],
+    "partNotes": {
+      "asciistring_01A4F9": "'I am dreaming.' (unused).\n\nWhen: never; nothing refers to it.\nSees: nothing.\nWhy: a leftover of the dream scene (OQ-I034-13).\nIn: n/a (data).\nOut: n/a. Ends with [N] and [JMP] to asciistring_01B988.\nClobbers: n/a."
+    }
+  }
+}

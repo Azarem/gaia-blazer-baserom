@@ -1,0 +1,48 @@
+{
+  "_note": "I041c: corrections to notes of earlier iterations that I041 settled statically. OQ-I030-1 (what Move does): scene 9 of area 0 is the Up Above hub A00S09 with the map walker, and the start position table matches the walker's stop tests (SpawnPlacementList places the player at warp_dest_y + 16). OQ-I035-10 (CPY #$06AA in the Purple Flower's bee): $06AA is the pool-full value PopFreeSlot returns. Only partial edits of existing entries plus one comment replaced.",
+
+  "actor_shared/shared_choice_prompt_texts.asm": {
+    "blockNote": {
+      "edit": [
+        {
+          "find": "added once the Grass Valley chief has handed over the Brown Stone (OQ-I030-1).",
+          "with": "added once the Grass Valley chief has handed over the Brown Stone; it leaves for the Up Above hub (A00S09), where the walker starts on the stop of the current world (cm_npc_master_move_to_hub_0076B2)."
+        }
+      ]
+    },
+    "partNotes": {
+      "ChoiceRecordMoveQuitText": {
+        "edit": [
+          {
+            "find": "what it does in game is OQ-I030-1)",
+            "with": "scene 9 of area 0 is the Up Above hub A00S09, where the map walker starts on the stop of the current world)"
+          }
+        ]
+      }
+    }
+  },
+
+  "greenwood/lostside_marsh/gw_lostside_marsh_enemies.asm": {
+    "blockNote": {
+      "edit": [
+        {
+          "find": " and the meaning of CPY #$06AA in the bee (OQ-I035-10).",
+          "with": "; the bee's CPY #$06AA is the pool-full test of PopFreeSlot, not an open point."
+        }
+      ]
+    },
+    "partNotes": {
+      "gw_enemy_purple_flower_0FB561": {
+        "edit": [
+          {
+            "find": "spawns the shared homing mover cm_enemy_aimed_shot_mover_002D96 until Y = $06AA (OQ-I035-10), then ends.",
+            "with": "spawns the shared aimed-shot mover cm_enemy_aimed_shot_mover_002D96 once per wing cycle (the newer mover ends the older one) until Y = $06AA, the value PopFreeSlot returns when no actor slot is free, then ends."
+          }
+        ]
+      }
+    },
+    "comments": {
+      "1029516": { "text": "$06AA: PopFreeSlot's pool-full value; the bee ends when no slot is left for a mover", "expect": "CPY #$06AA" }
+    }
+  }
+}

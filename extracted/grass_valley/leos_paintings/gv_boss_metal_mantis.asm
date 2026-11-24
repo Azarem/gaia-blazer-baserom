@@ -1,7 +1,7 @@
 ; The Metal Mantis, the boss of Leo's Paintings (file offsets 12717-13254, bank 00): the mantis itself (meta type $1F, 50 HP, 50 EXP in MetaGrassValley; the walkthrough: 'Maximum HP: 50 HP, EXP. Earned: 50 EXP.') and its projectiles.
 ; 
 ; === ROLE ===
-; The boss lair is record $09 (RunLairFormation, one monster of type $1F; home location 04, the Chief's room). The script starts the fight (boss_fight_active + 1, boss_actor = X, exit_list_ofs = 0) and spawns engine_003005.RunBossMapPatch with patch id 0 (it blocks the pad while the map changes). Defeating it sets switch $09, which frees the village Chief (gv_village_actors_019475) and changes the village dialogue.
+; The boss lair is record $09 (RunLairFormation, one monster of type $1F; home location 04, the Chief's room). The script starts the fight (boss_fight_active + 1, boss_actor = X, exit_list_ofs = 0) and spawns engine_player_death_and_actor_helpers.RunBossMapPatch with patch id 0 (it blocks the pad while the map changes). Defeating it sets switch $09, which frees the village Chief (gv_village_actors_019475) and changes the village dialogue.
 ; 
 ; === ATTACKS (static reading, OQ-I034-12) ===
 ; The walkthrough: 'Three fireballs fired simultaneously usually when you're far off', 'Arm attack if you're close', and the boss 'turns silvery' (immune) when the hero is on the far side of the field. In the script the hero's Y is tested against $70: at $70 or more the mantis is in its fire mode: three fireballs at once (gv_boss_mantis_fireball_003348 / _003359 / _003367, each spawned with COP B2 at offset (+8, -$18)) or two shots from its sides (gv_boss_mantis_shot_00337F, _003394); below $70 it uses the arm attack (gv_boss_mantis_arm_strike_0033B9 with gv_boss_mantis_arm_0033A9 on the left or _0033B1 on the right, while $16 bit $0002 is set). The silver phase is not visible in the script as a separate state (OQ-I034-12).
@@ -12,7 +12,7 @@
 
 ?BANK 00
 
-?INCLUDE 'engine_003005'
+?INCLUDE 'engine_player_death_and_actor_helpers'
 
 !player_y                       0376
 !boss_actor                     039A
@@ -34,7 +34,7 @@ gv_boss_metal_mantis_0031AD {
     STZ $exit_list_ofs
     INC $boss_fight_active
     STX $boss_actor
-    COP [85] ( @engine_003005.RunBossMapPatch )
+    COP [85] ( @engine_player_death_and_actor_helpers.RunBossMapPatch )
     LDA #$0000
     STA $0030, Y
 

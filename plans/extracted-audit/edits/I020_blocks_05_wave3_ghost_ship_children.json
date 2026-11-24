@@ -1,0 +1,17 @@
+[
+  {
+    "op": "rename",
+    "block": "engine_004281",
+    "to": "se_ghost_ship_enemy_child_scripts",
+    "row": "W3-R121",
+    "note": "three 8-byte child scripts (COP [80] with #1B, #1C, #1D, then COP [82], COP [86], RTL) that the ghost-ship enemies se_ghost_ship_enemy_004102 and se_ghost_ship_enemy_004248 spawn with COP [B0]; no other file references the block (placement-audit 6.2)."
+  },
+  {
+    "op": "set",
+    "blocks": ["se_ghost_ship_enemy_child_scripts"],
+    "group": "st_elles",
+    "scene": "ghost_ship",
+    "row": "W3-S24",
+    "note": "placement-audit 6.2: goes with its only users. Stays in bank 0 (pinned; the user blocks are bank 0 too)."
+  }
+]

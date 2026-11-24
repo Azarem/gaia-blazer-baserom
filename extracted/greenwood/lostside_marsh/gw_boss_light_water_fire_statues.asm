@@ -1,7 +1,7 @@
 ; The boss of the Lostside marsh, the three Elemental Statues (file offsets 13254-15939, SNES $00:B3C6-$BE42, bank 00). One root script serves all three statues; the walkthrough calls them the Light Statue (far left, T-shaped thunderbolts), the Water Statue (rushes and leaves water that stays and hurts) and the Fire Statue (rushes and streams of fire). Each has 50 HP and gives 30 EXP (meta type $3D, 9/5/50 HP, EXP BCD $0030; 90 EXP in all, as in the bestiary).
 ; 
 ; === HOW THE FIGHT IS BUILT ===
-; The lair is record $50 (A05S0A, the statue tomb, RunLairFormation, 3 monsters, formation $20): three rows, ($F0,$90) with no flip, ($40,$60) flip X and ($1A0,$60) flip Y. The root gw_boss_light_water_fire_statues_0033C6 runs in all three: it clears exit_list_ofs, increments boss_fight_active, sets $0200 in $16, spawns engine_003005.RunBossMapPatch with patch id 1 (the map patch of the boss room) and then COP A5 sends each statue to its own script by flip state: none to code_0033EA, flip X to code_003732, flip Y to code_003A3D.
+; The lair is record $50 (A05S0A, the statue tomb, RunLairFormation, 3 monsters, formation $20): three rows, ($F0,$90) with no flip, ($40,$60) flip X and ($1A0,$60) flip Y. The root gw_boss_light_water_fire_statues_0033C6 runs in all three: it clears exit_list_ofs, increments boss_fight_active, sets $0200 in $16, spawns engine_player_death_and_actor_helpers.RunBossMapPatch with patch id 1 (the map patch of the boss room) and then COP A5 sends each statue to its own script by flip state: none to code_0033EA, flip X to code_003732, flip Y to code_003A3D.
 ; Only one statue is the boss at a time (boss_actor $039A). The Light Statue (code_003732) sets boss_actor at once; the other two sleep (animations $21 and $13, COP 91 loop) and wait until the boss_actor's $16 has bit $0400, which RunBossDeath sets when it writes $0700 into $16 of the dying boss. Then they wait 8 frames and write their own slot into boss_actor. Because the hand-over happens while the 32 explosions of the dead statue still run, RunBossDeath finds X != boss_actor at its end and skips KillAllOtherActors and the music change: only the last statue (boss_actor still its own) clears the room and ends the fight. The Water Statue takes over only when boss_actor is the actor in the slot after its own (code_0033EA: TXA / ADC #$0080 / CMP boss_actor), the Fire Statue (code_003A3D) after any boss_actor death (OQ-I035-12).
 ; A statue that has become the boss waits again until the hero is inside its box widened by 4 (COP 0C, slot 0), spawns a wake effect (code_003E1C animation $3A for the Water Statue, code_003E29 animation $3C for the Light Statue, code_003E36 animation $3E for the Fire Statue), clears $0300 in $16, zeroes contact_lock and starts its loop after 60 frames. The loops are tile and distance driven: COP 9A / 9B compare the distance to the hero, COP 21-24 and COP AE test tiles, COP 80 picks the animation per direction.
 ; 
@@ -18,7 +18,7 @@
 
 ?BANK 00
 
-?INCLUDE 'engine_003005'
+?INCLUDE 'engine_player_death_and_actor_helpers'
 
 !boss_actor                     039A
 !exit_list_ofs                  03B2
@@ -43,7 +43,7 @@ gw_boss_light_water_fire_statues_0033C6 {
     LDA $0016, X
     ORA #$0200
     STA $0016, X
-    COP [85] ( @engine_003005.RunBossMapPatch ) ; patch id 1 goes into its $30 (Y = the new actor)
+    COP [85] ( @engine_player_death_and_actor_helpers.RunBossMapPatch ) ; patch id 1 goes into its $30 (Y = the new actor)
     LDA #$0001
     STA $0030, Y
     COP [A5] ( &code_0033EA, &code_003732, &code_003A3D, &code_003A3D ) ; none: Water (0033EA), flip X: Light (003732), flip Y: Fire (003A3D)

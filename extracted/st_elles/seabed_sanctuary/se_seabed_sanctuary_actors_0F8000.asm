@@ -2,10 +2,10 @@
 ; 
 ; === WHAT RUNS HERE ===
 ; Every root is a placement script of a creature that the player frees from a Monster Lair of the seabed: the script is started when the scene is built and decides on the lair record (the switch number) what the actor does. All released creatures have home location $29 (the Seabed Sanctuary) in LairRecords.
-; - COP 3B (switch, &code) is the 'captive' root ($7C Servas, $83 the jumping angelfish, $C2 Anna, $A5 Kanna, $8B Nanna, $BE the angelfish of the reef): while the lair is not released the actor shows the plea of w2_shared_0FA945 (w2_npc_caged_plea, the talk handler is set by COP 17) and waits in HoldActorUntilReleased; when the lair is cleared and released it continues at &code with the appear puff.
+; - COP 3B (switch, &code) is the 'captive' root ($7C Servas, $83 the jumping angelfish, $C2 Anna, $A5 Kanna, $8B Nanna, $BE the angelfish of the reef): while the lair is not released the actor shows the plea of w2_obj_fairy_idle_loop (w2_npc_caged_plea, the talk handler is set by COP 17) and waits in HoldActorUntilReleased; when the lair is cleared and released it continues at &code with the appear puff.
 ; - COP 14 (switch, &code) is the 'already free' root ($B1 Soul of Shield, $84, $86, $99, $8D, $AD, $92, $95, $9B, $9D, $A1, $A4): the actor does nothing (RTL) until switch $n of $1ADE is set, then continues at &code.
 ; - COP 30 (switch, &code, $1F) in the statue roots and in the Soul of Shield root: when the player came back from a lair trip through this record (return_active and return_record) a one-shot actor is spawned at &code instead of the normal behaviour: the text 'hears a small voice' (statues) or the promise of the Soul of Shield.
-; - All talk handlers are set with COP 17 (own $30) and run when the player talks; most end with RTL, the texts end with a [JMP] into asciistring_0FAA44 of w2_shared_0FA945 (the common end of a dialogue).
+; - All talk handlers are set with COP 17 (own $30) and run when the player talks; most end with RTL, the texts end with a [JMP] into asciistring_0FAA44 of w2_obj_fairy_idle_loop (the common end of a dialogue).
 ; 
 ; === ROSTER (root: switch, who, what the player gets or sees) ===
 ; - se_npc_dolphin_servas_dream_0F8000: switch $7C. Servas the dolphin, napping. Equipped Dream Rod (item $1C): 'placed the Dream Rod on the dolphin's nose' and the player enters Servas's dream (A09S02, the ghost ship). Without the rod: 'Zzzzz'. After the dream (flag $0704): 'I always have the same dream. Isn't that strange!'.
@@ -31,11 +31,11 @@
 
 ?BANK 1F
 
-?INCLUDE 'engine_003005'
+?INCLUDE 'engine_player_death_and_actor_helpers'
 ?INCLUDE 'engine_spawn_lairs_death_drops'
 ?INCLUDE 'lib_map_index_helpers'
 ?INCLUDE 'shared_choice_prompt_texts'
-?INCLUDE 'w2_shared_0FA945'
+?INCLUDE 'w2_obj_fairy_idle_loop'
 
 !L_choice_result                0003D0
 !joy_block_mask                 0326
@@ -49,7 +49,7 @@
 ; Servas the dolphin of the Sanctuary (switch $7C): the entrance to Servas's dream.
 ; 
 ; When: placement script, started when the Seabed Sanctuary is built.
-; Sees: COP 3B: while lair record $7C is not released he shows the plea of w2_shared_0FA945 and is held by HoldActorUntilReleased; once released, the appear puff, the body blocks its tiles (COP 15), animation $11 in a loop, the talk handler is code_0F8029.
+; Sees: COP 3B: while lair record $7C is not released he shows the plea of w2_obj_fairy_idle_loop and is held by HoldActorUntilReleased; once released, the appear puff, the body blocks its tiles (COP 15), animation $11 in a loop, the talk handler is code_0F8029.
 ; Why: the dream is the way to the ghost ship, so the dolphin is the captive of a lair first.
 ; In: X = D = actor slot (COP entry).
 ; Out: RTL back to the dispatcher; the actor stays in HoldActorUntilReleased until the release.
@@ -57,12 +57,12 @@
 
 se_npc_dolphin_servas_dream_0F8000 {
     COP [3B] ( #$007C, &code_0F8016 )
-    COP [17] ( &w2_shared_0FA945.w2_npc_caged_plea_0FA95A )
+    COP [17] ( &w2_obj_fairy_idle_loop.w2_npc_caged_plea_0FA95A )
     SEP #$20
-    LDA #$^engine_003005.HoldActorUntilReleased
+    LDA #$^engine_player_death_and_actor_helpers.HoldActorUntilReleased
     PHA 
     REP #$20
-    LDA #$&engine_003005.HoldActorUntilReleased-1
+    LDA #$&engine_player_death_and_actor_helpers.HoldActorUntilReleased-1
     PHA 
     RTL 
 }
@@ -89,7 +89,7 @@ code_0F8016 {
 ; Clobbers: A.
 
 code_0F8029 {
-    COP [07] ( #$8704, &code_0F804A ) ; flag $0704 is set by the son in Servas's dream (se_npc_servas_son_0FA23B): afterwards the dolphin only repeats that he always has the same dream
+    COP [07] ( #$8704, &code_0F804A ) ; flag $0704 is set by the son in Servas's dream (se_npc_servas_son_0FA3A5): afterwards the dolphin only repeats that he always has the same dream
     COP [19] ( #1C, &code_0F8045 )
     COP [01] ( &asciistring_0F8059 )
     COP [3C] ( #04 )
@@ -107,11 +107,11 @@ code_0F804A {
     RTL 
 }
 
-asciistring_0F804F |[10]Zzzzz [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F804F |[10]Zzzzz [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 
-asciistring_0F8059 |[10][02:2] placed [N]the Dream Rod on [N]the dolphin s nose- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F8059 |[10][02:2] placed [N]the Dream Rod on [N]the dolphin s nose- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 
-asciistring_0F8080 |[10]I always have the same[N]dream- Isn t that [N]strange! [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F8080 |[10]I always have the same[N]dream- Isn t that [N]strange! [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 ---------------------------------------------
 
 ; The angelfish that is the Soul of Shield (switch $B1).
@@ -193,9 +193,9 @@ code_0F8108 {
     RTL 
 }
 
-asciistring_0F810F |[10][0E:3C]I have the power to [N]stop the Magma Rain- [N]I will help you if you[N]return to me- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F810F |[10][0E:3C]I have the power to [N]stop the Magma Rain- [N]I will help you if you[N]return to me- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 
-asciistring_0F814A |[10]Even though I don t [N]look like it, I am [N]from the sky just like[N]you- [FIN]I will protect you [N]from the Magma- [FIN]Please try and protect[N]all creatures- [FIN]Let s work together so[N]we may revive the [N]world! [FIN]The creature that [N]enables you to avoid [N]Magma has joined you- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F814A |[10]Even though I don t [N]look like it, I am [N]from the sky just like[N]you- [FIN]I will protect you [N]from the Magma- [FIN]Please try and protect[N]all creatures- [FIN]Let s work together so[N]we may revive the [N]world! [FIN]The creature that [N]enables you to avoid [N]Magma has joined you- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 ---------------------------------------------
 
 ; The jumping angelfish (switch $83).
@@ -209,12 +209,12 @@ asciistring_0F814A |[10]Even though I don t [N]look like it, I am [N]from the sk
 
 se_npc_angelfish_jumper_0F8209 {
     COP [3B] ( #$0083, &code_0F821F )
-    COP [17] ( &w2_shared_0FA945.w2_npc_caged_plea_0FA95A )
+    COP [17] ( &w2_obj_fairy_idle_loop.w2_npc_caged_plea_0FA95A )
     SEP #$20
-    LDA #$^engine_003005.HoldActorUntilReleased
+    LDA #$^engine_player_death_and_actor_helpers.HoldActorUntilReleased
     PHA 
     REP #$20
-    LDA #$&engine_003005.HoldActorUntilReleased-1
+    LDA #$&engine_player_death_and_actor_helpers.HoldActorUntilReleased-1
     PHA 
     RTL 
 }
@@ -270,9 +270,9 @@ code_0F826B {
     RTL 
 }
 
-asciistring_0F8270 |[10]I didn t know the [N]world under water [N]looked different from [N]the world above- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F8270 |[10]I didn t know the [N]world under water [N]looked different from [N]the world above- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 
-asciistring_0F82A8 |[10]Please don t talk to [N]me while I m jumping, [N]I will not be able to [N]breathe- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F82A8 |[10]Please don t talk to [N]me while I m jumping, [N]I will not be able to [N]breathe- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 ---------------------------------------------
 
 ; The herb mermaid (switch $84).
@@ -332,11 +332,11 @@ code_0F8317 {
 
 asciistring_0F831C |[10]Hello, I have some [N]Medical Herbs made [N]from seaweed- [N]Would you like one? [END]|
 
-asciistring_0F8355 |[10]Come back to me [N]when you don t have [N]one- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F8355 |[10]Come back to me [N]when you don t have [N]one- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 
-asciistring_0F836C |[10]Medical herbs are [N]really rare- [N]I can t give you many-[JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F836C |[10]Medical herbs are [N]really rare- [N]I can t give you many-[JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 
-asciistring_0F8395 |[10]Come see me when you [N]need another- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F8395 |[10]Come see me when you [N]need another- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 ---------------------------------------------
 
 ; The 'best jumper' angelfish (switch $86).
@@ -422,7 +422,7 @@ code_0F841B {
     RTL 
 }
 
-asciistring_0F8424 |[10]I am the best jumper! [N]I ll show you- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F8424 |[10]I am the best jumper! [N]I ll show you- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 ---------------------------------------------
 
 ; The dance teacher (switch $99).
@@ -504,9 +504,9 @@ code_0F8493 {
     COP [27] ( &se_npc_mermaid_dance_teacher_dancing_0F8482 )
 }
 
-asciistring_0F849B |[10]Mermaids have to be [N]very good at dancing- [FIN]If three of my [N]students return, I [N]will show you our [N]great dance- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F849B |[10]Mermaids have to be [N]very good at dancing- [FIN]If three of my [N]students return, I [N]will show you our [N]great dance- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 
-asciistring_0F84F1 |[10]Thank you very much- [N]Three of my students [N]came back- [FIN]I was going to show [N]you our dance-I think [N]it will be more fun if[N]you join us- [FIN]I will show you the [N]easiest dance, just [N]move like they do- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F84F1 |[10]Thank you very much- [N]Three of my students [N]came back- [FIN]I was going to show [N]you our dance-I think [N]it will be more fun if[N]you join us- [FIN]I will show you the [N]easiest dance, just [N]move like they do- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 ---------------------------------------------
 
 ; Anna, one of the Queen's dancers (switch $C2).
@@ -520,12 +520,12 @@ asciistring_0F84F1 |[10]Thank you very much- [N]Three of my students [N]came bac
 
 se_npc_mermaid_anna_0F8577 {
     COP [3B] ( #$00C2, &code_0F858D )
-    COP [17] ( &w2_shared_0FA945.w2_npc_caged_plea_0FA95A )
+    COP [17] ( &w2_obj_fairy_idle_loop.w2_npc_caged_plea_0FA95A )
     SEP #$20
-    LDA #$^engine_003005.HoldActorUntilReleased
+    LDA #$^engine_player_death_and_actor_helpers.HoldActorUntilReleased
     PHA 
     REP #$20
-    LDA #$&engine_003005.HoldActorUntilReleased-1
+    LDA #$&engine_player_death_and_actor_helpers.HoldActorUntilReleased-1
     PHA 
     RTL 
 }
@@ -554,7 +554,7 @@ code_0F85B2 {
     RTL 
 }
 
-asciistring_0F85B7 |[10]My name is Anna- [N]I am one of the [N]Queen s dancers- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F85B7 |[10]My name is Anna- [N]I am one of the [N]Queen s dancers- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 ---------------------------------------------
 
 ; Kanna, one of the Queen's dancers (switch $A5).
@@ -567,12 +567,12 @@ asciistring_0F85B7 |[10]My name is Anna- [N]I am one of the [N]Queen s dancers- 
 
 se_npc_mermaid_kanna_0F85E1 {
     COP [3B] ( #$00A5, &code_0F85F7 )
-    COP [17] ( &w2_shared_0FA945.w2_npc_caged_plea_0FA95A )
+    COP [17] ( &w2_obj_fairy_idle_loop.w2_npc_caged_plea_0FA95A )
     SEP #$20
-    LDA #$^engine_003005.HoldActorUntilReleased
+    LDA #$^engine_player_death_and_actor_helpers.HoldActorUntilReleased
     PHA 
     REP #$20
-    LDA #$&engine_003005.HoldActorUntilReleased-1
+    LDA #$&engine_player_death_and_actor_helpers.HoldActorUntilReleased-1
     PHA 
     RTL 
 }
@@ -607,9 +607,9 @@ code_0F8627 {
     RTL 
 }
 
-asciistring_0F862C |[10]My name is Kanna- [N]I am one of the [N]Queen s dancers- [FIN]As a reward for saving[N]us I will tell you a [N]secret- [FIN]No armor will protect [N]you against the Magma [N]off the volcanic [N]island, Durean- [FIN]You must find a way to[N]stop the volcano- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F862C |[10]My name is Kanna- [N]I am one of the [N]Queen s dancers- [FIN]As a reward for saving[N]us I will tell you a [N]secret- [FIN]No armor will protect [N]you against the Magma [N]off the volcanic [N]island, Durean- [FIN]You must find a way to[N]stop the volcano- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 
-asciistring_0F86E3 |[10]My name is Kanna- [N]I am one of the [N]Queen s dancers- [FIN]You have seized the [N]volcano, right? [N]You are a very brave [N]person- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F86E3 |[10]My name is Kanna- [N]I am one of the [N]Queen s dancers- [FIN]You have seized the [N]volcano, right? [N]You are a very brave [N]person- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 ---------------------------------------------
 
 ; Nanna, one of the Queen's dancers (switch $8B).
@@ -622,12 +622,12 @@ asciistring_0F86E3 |[10]My name is Kanna- [N]I am one of the [N]Queen s dancers-
 
 se_npc_mermaid_nanna_0F873E {
     COP [3B] ( #$008B, &code_0F8754 )
-    COP [17] ( &w2_shared_0FA945.w2_npc_caged_plea_0FA95A )
+    COP [17] ( &w2_obj_fairy_idle_loop.w2_npc_caged_plea_0FA95A )
     SEP #$20
-    LDA #$^engine_003005.HoldActorUntilReleased
+    LDA #$^engine_player_death_and_actor_helpers.HoldActorUntilReleased
     PHA 
     REP #$20
-    LDA #$&engine_003005.HoldActorUntilReleased-1
+    LDA #$&engine_player_death_and_actor_helpers.HoldActorUntilReleased-1
     PHA 
     RTL 
 }
@@ -656,7 +656,7 @@ code_0F8779 {
     RTL 
 }
 
-asciistring_0F877E |[10]My name is Nanna- [N]I am one of the [N]Queen s dancers- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F877E |[10]My name is Nanna- [N]I am one of the [N]Queen s dancers- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 ---------------------------------------------
 
 ; The mermaid statue of the passage to Blester (switch $8D).
@@ -728,7 +728,7 @@ code_0F87F9 {
     RTL 
 }
 
-asciistring_0F8800 |[10]I will open a passage [N]for you- [FIN]Travel up the seabed [N]to reach the island of[N]rain, Blester- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F8800 |[10]I will open a passage [N]for you- [FIN]Travel up the seabed [N]to reach the island of[N]rain, Blester- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 ---------------------------------------------
 
 ; Hint angelfish of the creek (switch $AD).
@@ -766,7 +766,7 @@ code_0F886A {
     RTL 
 }
 
-asciistring_0F8881 |[10][0A]If█you█travel[N]the█coral█reef█you[N]will█find█a█passage█to[N]a█small█creek-[JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F8881 |[10][0A]If█you█travel[N]the█coral█reef█you[N]will█find█a█passage█to[N]a█small█creek-[JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 ---------------------------------------------
 
 ; Hint angelfish of the coral reef (switch $BE).
@@ -779,12 +779,12 @@ asciistring_0F8881 |[10][0A]If█you█travel[N]the█coral█reef█you[N]will�
 
 se_npc_angelfish_coral_reef_monsters_0F88CC {
     COP [3B] ( #$00BE, &code_0F88E2 )
-    COP [17] ( &w2_shared_0FA945.w2_npc_caged_plea_0FA95A )
+    COP [17] ( &w2_obj_fairy_idle_loop.w2_npc_caged_plea_0FA95A )
     SEP #$20
-    LDA #$^engine_003005.HoldActorUntilReleased
+    LDA #$^engine_player_death_and_actor_helpers.HoldActorUntilReleased
     PHA 
     REP #$20
-    LDA #$&engine_003005.HoldActorUntilReleased-1
+    LDA #$&engine_player_death_and_actor_helpers.HoldActorUntilReleased-1
     PHA 
     RTL 
 }
@@ -805,7 +805,7 @@ code_0F88F5 {
     RTL 
 }
 
-asciistring_0F88FA |[10]The coral reef [N]hides many dangerous [N]monsters- Make sure [N]to use magic there- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F88FA |[10]The coral reef [N]hides many dangerous [N]monsters- Make sure [N]to use magic there- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 ---------------------------------------------
 
 ; The Queen's maid (switch $92).
@@ -864,9 +864,9 @@ code_0F898C {
     RTL 
 }
 
-asciistring_0F8991 |[10]This used to be the [N]Queen s palace- I am [N]the Queen s maid- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F8991 |[10]This used to be the [N]Queen s palace- I am [N]the Queen s maid- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 
-asciistring_0F89BB |[10]I am glad you came [N]back- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F89BB |[10]I am glad you came [N]back- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 ---------------------------------------------
 
 ; A mermaid friend of Servas (switch $95): stands (animation $06) and says 'Servas is the name of my friend the dolphin.'
@@ -895,7 +895,7 @@ code_0F89E4 {
     RTL 
 }
 
-asciistring_0F89E9 |[10]Servas is the name of [N]my friend the dolphin-[JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F89E9 |[10]Servas is the name of [N]my friend the dolphin-[JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 ---------------------------------------------
 
 ; A dolphin telling the story of the statues (switch $9B): 'There used to be 4 mermaid statues in this place. Those statues prevented all creatures from getting lost.'
@@ -924,7 +924,7 @@ code_0F8A28 {
     RTL 
 }
 
-asciistring_0F8A2D |[10]There used to be [N]4 mermaid statues in [N]this place- [FIN]Those statues [N]prevented all [N]creatures from getting[N]lost- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F8A2D |[10]There used to be [N]4 mermaid statues in [N]this place- [FIN]Those statues [N]prevented all [N]creatures from getting[N]lost- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 ---------------------------------------------
 
 ; The mermaid statue of the passage to Rockbird (switch $9D).
@@ -978,10 +978,10 @@ code_0F8ACE {
     RTL 
 }
 
-asciistring_0F8AD5 |[10]I will open a passage [N]for you- [FIN]Proceed right along [N]the seabed to the [N]shore reef, Rockbird- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F8AD5 |[10]I will open a passage [N]for you- [FIN]Proceed right along [N]the seabed to the [N]shore reef, Rockbird- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 ---------------------------------------------
 
-asciistring_0F8B27 |[10][0E:3C][02:2] hears [N]a small voice- [FIN]I will open the [N]passage for you, [N]return to me- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F8B27 |[10][0E:3C][02:2] hears [N]a small voice- [FIN]I will open the [N]passage for you, [N]return to me- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 ---------------------------------------------
 
 ; The Bubble Armor mermaid (switch $A1).
@@ -1055,13 +1055,13 @@ code_0F8BB5 {
     RTL 
 }
 
-asciistring_0F8BBC |[10][0E:3C]You hear a mermaid-[FIN]Is there anyone who [N]needs to use the [N]Bubble Armor? [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F8BBC |[10][0E:3C]You hear a mermaid-[FIN]Is there anyone who [N]needs to use the [N]Bubble Armor? [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 
-asciistring_0F8BF7 |[10]Oh! I have not had a [N]human guest in a long [N]time- [FIN]I know you can t [N]breathe under water, [N]so please take this- [FIN][02:2] received [N][03:24]Bubble Armor- [03:20][JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F8BF7 |[10]Oh! I have not had a [N]human guest in a long [N]time- [FIN]I know you can t [N]breathe under water, [N]so please take this- [FIN][02:2] received [N][03:24]Bubble Armor- [03:20][JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 
-asciistring_0F8C60 |[10]Have you been hurt? [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F8C60 |[10]Have you been hurt? [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 
-asciistring_0F8C75 |[10]If you get hurt, [N]return to me and I [N]will heal you- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F8C75 |[10]If you get hurt, [N]return to me and I [N]will heal you- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 
 ---------------------------------------------
 ; Helper that opens the chest of the Mermaid's Tears.
@@ -1154,6 +1154,6 @@ code_0F8D0E {
     RTL 
 }
 
-asciistring_0F8D13 |[10]Sorry, I have orders [N]from the Queen not to [N]let anyone pass- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F8D13 |[10]Sorry, I have orders [N]from the Queen not to [N]let anyone pass- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 
-asciistring_0F8D44 |[10]How did you get here? [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F8D44 |[10]How did you get here? [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|

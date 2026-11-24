@@ -1,32 +1,29 @@
-; Field menus and screens (status and souls, talk, equipment and item menu), their HUD text and the item descriptions (code at file offsets 71932-73976, SNES $02:98FC-$A0F8, plus helpers at 74576-74639, 74730-74773 and 78198-78219; text and tables at 83313-83848 85876-86757 (ItemNameList and the item names) and 87358-90589; bank 02).
+; Field menus and screens (status and souls, equipment and item menu), their menu text and the item descriptions (code at file offsets 71932-72151 and 72599-73976, SNES $02:98FC-$99D7 and $02:9B97-$A0F8, plus helpers at 74576-74639 and 74730-74773; text and tables at 83313-83723, 85876-86757 (ItemNameList and the item names) and 87358-90589; bank 02). The talk routines (72152-72598) are in lib_field_talk, the HUD strings in lib_hud and EnableDisplayAndNmi in lib_system_helpers.
 ; 
 ; === FIELD BUTTONS ===
 ; DispatchFieldButtons runs once per frame from RunMainLoop with NMI on (M = 8). Order: Select or X (joy_pressed+1 bit $20; the NMI copies X into the Select bit) opens the equipment menu; B ($80) talks to the actor in front of the player; A (low byte of joy_pressed, bit 7), only when no direction is held, shows the status and souls screen. Walkthrough 01-in-the-beginning.md: 'Press the X Button to open the menu ... Press the B Button twice to equip ... Press the Y Button to exit the menu', 'speak with him (B Button)'. The A-button screen is not in the walkthrough (OQ-I009-5). joy_pressed keeps a button as long as its release latch bit is set (engine_vblank_nmi JOYPAD note), so every chooser first waits until all buttons are up and the screens that end on a button clear the latch bits with TRB, to stop the same press acting in the field.
 ; 
 ; === STATUS AND SOULS SCREEN ===
-; A BG3-only overlay (no screen blank, no graphics swap). ShowStatusAndSoulsScreen converts HP and maximum HP to BCD (hp_bcd, max_hp_bcd), clamps the strength and defence level parts (level_power, level_defense) to 12 for the display and restores them afterwards (OQ-I009-6), and prints StatusScreenText: the player name, HP / maximum, the EXP still needed for the next level (player_exp_next, 8 digits), bars for Strength and Defence (two rows each, level part over gear part) and the four equipped item names. After A is released it waits for A, B, Y or a direction, prints the souls page (SoulsScreenTitleText, then one 21-byte line per bit of souls_flags: bit 0 Magician, 1 Light, 2 Shield, 3 Detection, 4 Reality), waits for release and another press, consumes the latch and clears BG3. WaitFrameKeepClock undoes the NMI's frame_counter increment, so the frame clock stands still while the screen is open.
-; 
-; === TALKING ===
-; RunTalkInteraction (B) disables NMI, runs FindAndTalkToActorInFront and enables NMI: the script drives its own frames. The probe point depends on the facing code (from lib_player_facing.GetPlayerFacing): code 0 (x+8, y-$10), 1 (x+8, y), 2 (x+$10, y-8), 3 (x, y-8) relative to the player's (x, y); facing 0 probes a second point two tiles up when the tile type there is 6. FindTalkableActorAt walks the actors from actor_list_tail through the $3E links and accepts the first one whose $16 has bit $0040 and whose box contains the point (x is the left edge, y the bottom edge, $10 and $12 width and height). ActivateTalkTarget needs $30,X (the script address, stored by Cop17_SetOwnParam, for example the first actor of gv_village_actors_018000) and calls it through an RTL frame: pushed bank $02 and ReturnFromTalk - 1, then the script bank (byte +$D of the actor's meta entry at $38,X) and $30,X - 1. With $16 bit $0008 the NPC first turns to face the player: TalkFacingPlayer copies the whole slot ($40 bytes) to $1A1E, ChooseFacingAnim picks the animation, the script runs, RestoreTalkedActor copies the slot back. So $16 bit $0040 = talkable and bit $0008 = turn to face the player (OQ-I005-14, OQ-I009-17).
+; A BG3-only overlay (no screen blank, no graphics swap). ShowStatusAndSoulsScreen converts HP and maximum HP to BCD (hp_bcd, max_hp_bcd), clamps the strength and defence level parts (level_power, level_defense) to 12 for the display and restores them afterwards (OQ-I009-6), and prints StatusScreenText: the player name, HP / maximum, the EXP total of the next level (player_exp_next: the LevelExpThresholds value that WatchForLevelUp compares with player_exp, not a remainder; 8 digits), bars for Strength and Defence (two rows each, level part over gear part) and the four equipped item names. After A is released it waits for A, B, Y or a direction, prints the souls page (SoulsScreenTitleText, then one 21-byte line per bit of souls_flags: bit 0 Magician, 1 Light, 2 Shield, 3 Detection, 4 Reality), waits for release and another press, consumes the latch and clears BG3. WaitFrameKeepClock undoes the NMI's frame_counter increment, so the frame clock stands still while the screen is open.
 ; 
 ; === INVENTORY TABLE AND SLOT BYTE ===
 ; inventory ($1B1E) is one 64-byte table indexed by item id minus 1. The four lists of the menu are ranges of it: weapons ids $01-$08 (8 slots, $1B1E), armors $09-$10 ($1B26), magic $11-$18 ($1B2E) and items $19-$40 (40 slots, $1B36; walkthrough grid position (row, column) is slot (row - 1) x 10 + column - 1). A slot byte holds the item id in bits 0-6 (0 = not owned; an owned slot holds the id of its own slot) and bit 7 = marker: the equipped item of each list, and during a choice the cursor. DrawInventoryIcon draws a selection frame around every slot with bit 7. The equipped state is stored twice: the marker in the list and the id in the word cells equipped_weapon, equipped_armor, equipped_magic and equipped_bracelet (high bytes never written; the text codes read them as words).
 ; Choosing from a list (ChooseFromEquipmentList, ChooseItemSlot): the cursor starts on the first slot with bit 7 set, or marks slot 0 when none is; the list is backed up to $7F0403 (only the dead cancel paths restore it); a direction moves the marker and resets menu_blink; B and Y both confirm (BRK #$18), set the marker on the slot and return A = id with carry clear. No live path cancels (CancelEquipChoice and CancelItemChoice are unreferenced, OQ-I009-14), so choosing an empty slot returns 0, which the caller stores in the equipped cell: name index 0 is the string 'not equipped'. Weapons, armors and magic are two columns of four, column-major (Right +4, Left -4, Down +1, Up -1); items are four rows of ten, row-major (Right +1, Left -1, Down +10, Up -10). A step past an end leaves the cursor where it is; stepping down from the last slot of a column goes to the top of the next.
 ; 
 ; === EQUIPMENT MENU ===
-; OpenEquipmentMenu (X or Select): HDMA off (dp$42 = 0), forced blank, BG2 map at VRAM $5C00 and characters at $2000, main screen BG2 and BG3 only, colour math and windows off; saves the four scroll words (menu_saved_bg1_x .. menu_saved_bg2_y) and zeroes the live ones, saves the CGRAM buffer ($7E6000), loads the menu graphics and palette (lib_shared_012416, lib_shared_012390), runs RunEquipmentMenu. RunEquipmentMenu prints EquipMenuFrameText (tabs Weapon, Armor, Magic at $88, $98, $A8, the description window at $408 and four equipped-item lines), switches NMI and the screen on, draws the icons, uploads the BG3 page and then the BG2 icon page ($7F7800 to VRAM $5C00), and loops on ChooseMenuRow: rows 0-2 call ChooseFromEquipmentList (A = 8, Y = list base), row 3 ChooseItemSlot (A = $28, Y = $1B36). A confirmed id is stored in the equipped cell (weapon and armor then RecalcGearStats) and the frame is reprinted from its [::] marker (the window and the equipped lines only). Y on the row level leaves.
-; Exit: the B and Y latch bits are consumed (TRB $032B with $C0) and joy_pressed+1 is cleared; the scroll words, BG2SC, TM, CGADSUB and W12SEL are restored from the scene's shadows (tm_shadow, cgadsub_shadow, bg2sc_shadow, w12sel_shadow, stored by the scene loader), BG12NBA = 0; RestoreSceneBgGfxAndPalette, RestoreCgramBuffer and LoadEquippedMagicGfx put the field back in that order; when the equipped magic changed (menu_magic_on_open) all projectiles are killed and $0433 and $0434 cleared (OQ-I009-11); lib_027781_part1.ApplyPlayerWeaponPose restores the player's pose; BG3 is cleared, hud_dirty_flags = $1F, one sub-frame runs, the screen is switched on (INIDISP = $0F).
+; OpenEquipmentMenu (X or Select): HDMA off (dp$42 = 0), forced blank, BG2 map at VRAM $5C00 and characters at $2000, main screen BG2 and BG3 only, colour math and windows off; saves the four scroll words (menu_saved_bg1_x .. menu_saved_bg2_y) and zeroes the live ones, saves the CGRAM buffer ($7E6000), loads the menu graphics, palette and tile groups (LoadMenuBg2Graphics, LoadMenuPalette, ExpandMenuTileGroups in lib_menu_screen_setup), runs RunEquipmentMenu. RunEquipmentMenu prints EquipMenuFrameText (tabs Weapon, Armor, Magic at $88, $98, $A8, the description window at $408 and four equipped-item lines), switches NMI and the screen on, draws the icons, uploads the BG3 page and then the BG2 icon page ($7F7800 to VRAM $5C00), and loops on ChooseMenuRow: rows 0-2 call ChooseFromEquipmentList (A = 8, Y = list base), row 3 ChooseItemSlot (A = $28, Y = $1B36). A confirmed id is stored in the equipped cell (weapon and armor then RecalcGearStats) and the frame is reprinted from its [::] marker (the window and the equipped lines only). Y on the row level leaves.
+; Exit: the B and Y latch bits are consumed (TRB $032B with $C0) and joy_pressed+1 is cleared; the scroll words, BG2SC, TM, CGADSUB and W12SEL are restored from the scene's shadows (tm_shadow, cgadsub_shadow, bg2sc_shadow, w12sel_shadow, stored by the scene loader), BG12NBA = 0; RestoreSceneBgGfxAndPalette, RestoreCgramBuffer and LoadEquippedMagicGfx put the field back in that order; when the equipped magic changed (menu_magic_on_open) all projectiles are killed and $0433 and $0434 cleared (OQ-I009-11); lib_player_helpers.ApplyPlayerWeaponPose restores the player's pose; BG3 is cleared, hud_dirty_flags = $1F, one sub-frame runs, the screen is switched on (INIDISP = $0F).
 ; 
 ; === BG3 PAGE, ICONS ===
 ; The BG3 text page is the 2 KB buffer at $7F7000 (bg3_tilemap_buffer), the BG2 icon page the buffer at $7F7800; vram_upload_flags bit 0 asks the NMI to send the BG3 page, bit 1 the icon page. DrawInventoryIcon writes four BG3 cells (selection frame tile $2A with its three flips, palette 3, when the slot has bit 7; else four zero cells) and the four words of the icon record IconTileRecords[id x 8] to the BG2 page (top-left, top-right, bottom-left, bottom-right). ClearBg3Page and ClearBg3UpperHalf fill the page with $2000 (tile 0, priority) but set their upload bit with DBR = $7F, so the TSB reaches $7F:03B8 instead of vram_upload_flags (OQ-I027-1).
 ; 
-; === HUD TEXT, GEAR AND DESCRIPTIONS ===
-; StatusScreenText, SoulsScreenTitleText, the five soul lines, EquipMenuFrameText, ItemMenuFrameText, the HUD strings (HudFrameText .. EnemyGaugeText with the repeat counts in HudRepeatCounts) and the description headers are ASCIIString parts with text control codes (the renderer is lib_text_render, batch A6: [CUR:o] cursor to BG3 byte offset o, [07:w,h] window, [03:v] attribute, [06:n,addr] n packed BCD digits, [0B:t,&c] repeat tile t by the count byte at c, [TBL:list,addr] string number (word at addr) of a pointer list, [02:n] entry n of TextListPointers (0 and 1 are fixed six-tile labels, 2 = the player name at $1B92), [04:a,b] gauge from two words, [N] newline, [::] marks the re-entry point '+M', [JMP:&s] continue at s). The extractor prints the period glyph as '-' and an apostrophe as a space ('Goat s Food').
+; === MENU TEXT, GEAR AND DESCRIPTIONS ===
+; StatusScreenText, SoulsScreenTitleText, the five soul lines, EquipMenuFrameText, ItemMenuFrameText and the description headers (the HUD strings HudFrameText .. EnemyGaugeText with the repeat counts in HudRepeatCounts are in lib_hud) are ASCIIString parts with text control codes (the renderer is lib_text_render, batch A6: [CUR:o] cursor to BG3 byte offset o, [07:w,h] window, [03:v] attribute, [06:n,addr] n packed BCD digits, [0B:t,&c] repeat tile t by the count byte at c, [TBL:list,addr] string number (word at addr) of a pointer list, [02:n] entry n of TextListPointers (0 and 1 are fixed six-tile labels, 2 = the player name at $1B92), [04:a,b] gauge from two words, [N] newline, [::] marks the re-entry point '+M', [JMP:&s] continue at s). The extractor prints the period glyph as '-' and an apostrophe as a space ('Goat s Food').
 ; DescriptionTextList holds 65 string pointers, index = item id (0 = empty window). Every record starts [CUR:48A][TBL:&ItemNameList,&NameIndexCells + 2 x (id - 1)] (the item name on the first line; NameIndexCells holds k + 1 for entry k because [TBL] reads its index from memory). Weapons then print the minimum swing level from WeaponMinLevelBcd (two BCD digits at $4B2) and a bar of GearStatTable strength tiles; armors only a defence bar; magic and items start the text at $50A. Stub records (ids $2B-$31, $33, $34, $3B-$3F) print their own name and [JMP] into the carrying record (DescMastersEmblemA, DescRedHotMirror, DescBrownStone) at its [::] marker. The Gem costs of magic are literal text digits (4, 8, 8, 1, 8, 20, 8, 2; OQ-I009-10).
 ; GearStatTable has two rows of 17 bytes indexed by item id: row 0 the strength bonus of weapons ids 1-8 (1, 2, 3, 4, 6, 8, 10, 12), row 1 (+$11) the defence bonus of armor ids 9-$10 (the same numbers). RecalcGearStats adds the weapon and armor entries into gear_power and gear_defense. The minimum levels (1, 5, 11, 15, 16, 19, 22, 24) are compared by the player code (player_core) with player_level_bcd; the walkthrough weapon table lists exactly these. The item names (ItemNameList and its 65 strings, file offsets 85876-86757) are noted in the ItemNameList part (batch A8).
 ; 
 ; === NOTES ===
-; - StoreInventoryEntry (file offset 73977, lib_0109D6_part3, batch A4) lies between ChooseItemSlot's neighbour routines: the code of this file continues at 74040 in lib_0118FC_part2.
+; - StoreInventoryEntry (file offset 73977, lib_inventory_store, batch A4) lies between ChooseItemSlot's neighbour routines: the code of this file continues at 74040 in lib_choice_menus.
 ; - ROM item names differ from the walkthrough in a few places (OQ-I027-3); labels use the walkthrough names, the strings keep the ROM text.
 ; - Sound requests: BRK #$07 follows every cursor move and page change, BRK #$18 every confirm (OQ-I009-12).
 ---------------------------------------------
@@ -36,20 +33,15 @@
 ?INCLUDE 'data_engine_tables'
 ?INCLUDE 'data_iris_and_icon_tiles'
 ?INCLUDE 'engine_boot_main_loop'
-?INCLUDE 'engine_scheduler_sprites_combat_collision'
 ?INCLUDE 'engine_spawn_lairs_death_drops'
-?INCLUDE 'lib_0118FC_part2'
-?INCLUDE 'lib_0118FC_part5'
-?INCLUDE 'lib_0118FC_part6'
-?INCLUDE 'lib_027781_part1'
 ?INCLUDE 'lib_arithmetic'
-?INCLUDE 'lib_map_index_helpers'
-?INCLUDE 'lib_player_facing'
-?INCLUDE 'lib_shared_012390'
-?INCLUDE 'lib_shared_012416'
+?INCLUDE 'lib_choice_menus'
+?INCLUDE 'lib_field_talk'
+?INCLUDE 'lib_hud'
+?INCLUDE 'lib_menu_screen_setup'
+?INCLUDE 'lib_player_helpers'
 ?INCLUDE 'lib_system_helpers'
 ?INCLUDE 'lib_text_render'
-?INCLUDE 'WorldMetaPointers'
 
 !frame_counter                  0312
 !joy_pressed                    0322
@@ -59,7 +51,6 @@
 !scroll_bg1_y                   033C
 !scroll_bg2_x                   033E
 !scroll_bg2_y                   0340
-!player_actor                   039C
 !vram_upload_flags              03B8
 !tm_shadow                      03C0
 !cgadsub_shadow                 03C1
@@ -67,7 +58,6 @@
 !w12sel_shadow                  03C3
 !menu_count                     03C4
 !menu_blink                     03C6
-!nmi_enabled                    03D2
 !menu_item_page                 042F
 !spell_active_count             0433
 !menu_magic_on_open             0435
@@ -75,7 +65,6 @@
 !menu_saved_bg1_y               045C
 !menu_saved_bg2_x               045E
 !menu_saved_bg2_y               0460
-!actor_list_tail                06A6
 !inventory                      1B1E
 !equipped_weapon                1B5E
 !equipped_armor                 1B60
@@ -94,10 +83,8 @@
 !W12SEL                         2123
 !TM                             212C
 !CGADSUB                        2131
-!NMITIMEN                       4200
 !S_bg3_tilemap_buffer           7000
 !cgram_buffer                   7F0000
-!tile_type_map                  7F8000
 
 ---------------------------------------------
 
@@ -119,7 +106,7 @@ DispatchFieldButtons {
   loc_011906:
     BIT #$80
     BEQ loc_01190D
-    BRL RunTalkInteraction
+    BRL lib_field_talk.RunTalkInteraction
 
   loc_01190D:
     BIT #$0F              ; A (low byte bit 7) acts only when no direction is down
@@ -134,7 +121,7 @@ DispatchFieldButtons {
 ; Shows the status page (HP, level parts, equipment) and then the souls page.
 ; 
 ; When: DispatchFieldButtons, A pressed with no direction (not described in the walkthrough, OQ-I009-5).
-; Sees: a window with the player name, HP / maximum HP, 'Next level :' with the EXP still needed, Strength and Defence bars and the four equipped items; after a button the 'Souls' page with one line for each recruited soul; another button closes it.
+; Sees: a window with the player name, HP / maximum HP, 'Next level :' with the EXP total of the next level (player_exp_next), Strength and Defence bars and the four equipped items; after a button the 'Souls' page with one line for each recruited soul; another button closes it.
 ; Why: gives the player a read-out of HP, strength and defence without the equipment menu.
 ; In: long call; M = 8; reads player_hp, player_max_hp, level_power, level_defense, souls_flags.
 ; Out: hp_bcd and max_hp_bcd set; the strength and defence level parts are clamped to 12 only for the print and restored (the walkthrough caps strength at 13, OQ-I009-6); BRK #$07 when a page opens; after the second press the latch bits for B, Y, A and X are consumed (TRB $C0C0), joy_pressed = 0, BG3 cleared, hud_dirty_flags = $1F and UpdateHud runs once. The frame_counter does not advance while the screen is open (WaitFrameKeepClock).
@@ -205,7 +192,7 @@ DispatchFieldButtons {
     JSR $&ClearBg3Page
     LDA #$1F
     STA $hud_dirty_flags
-    JSL $@lib_0118FC_part6.UpdateHud
+    JSL $@lib_hud.UpdateHud
     JSR $&WaitFrameKeepClock
     RTL 
 }
@@ -262,350 +249,8 @@ DrawRecruitedSouls {
     CPY #$&EquipMenuFrameText ; Stop at the first byte after the five soul lines
     BNE loc_0119BD
     RTS 
-
-; Runs the NPC talk lookup with NMI off.
-; 
-; When: DispatchFieldButtons, B pressed.
-; Sees: the NPC in front of the player starts its text (walkthrough: 'speak with him (B Button)').
-; Why: the talk script drives its own frames (text boxes, yes/no menus), so the NMI must be off while it runs.
-; In: long call from DispatchFieldButtons.
-; Out: DisableNmi, FindAndTalkToActorInFront, EnableNmi, RTL.
-; Clobbers: as FindAndTalkToActorInFront.
-
-  RunTalkInteraction:
-    JSL $@lib_system_helpers.DisableNmi ; The talk script runs with NMI off and drives its own frames
-    JSR $&FindAndTalkToActorInFront
-    JSL $@lib_system_helpers.EnableNmi
-    RTL 
 }
-
 ---------------------------------------------
-; Probes the point in front of the player for a talkable actor and starts its script.
-; 
-; When: RunTalkInteraction.
-; Sees: the NPC, sign or object in front of the player speaks; nothing happens when no talkable actor is there.
-; Why: talking needs no marker: any actor whose $16 has bit $0040 and a script address in $30 can be spoken to; the probe point depends on the facing.
-; In: JSR; M = 8 (REP inside); player slot = player_actor; the facing code A comes from lib_player_facing.GetPlayerFacing (carry set = animation id $2C or more: no probe, return).
-; Out: dp$00 = facing code; probe point (dp$16, dp$18) from the player's (x, y): code 0 (x+8, y-$10), 1 (x+8, y), 2 (x+$10, y-8), 3 (x, y-8); code 0 probes a second point (x+8, y-$20) when the tile type of the cell at (x, y-$20) is 6 (OQ-I009-7). On a hit FindTalkableActorAt's actor goes to ActivateTalkTarget (BRL, which ends in ReturnFromTalk); P is restored on the no-hit paths.
-; Clobbers: A, X, Y, dp$00, dp$16, dp$18.
-
-FindAndTalkToActorInFront {
-    JSL $@lib_player_facing.GetPlayerFacing ; A = facing code from the player's animation id; carry set = animation id $2C or more, no probe (OQ-I009-7)
-    BCC loc_0119EB
-    RTS 
-
-  loc_0119EB:
-    PHP 
-    REP #$20
-    LDY $player_actor
-    AND #$00FF
-    BEQ loc_011A43        ; Facing 0 (up) probes first at (x+8, y-$10)
-    DEC 
-    BNE loc_0119FC
-    BRL loc_011AA7
-
-  loc_0119FC:
-    DEC 
-    BNE loc_011A02
-    BRL loc_011A05
-
-  loc_011A02:
-    BRL loc_011A26
-
-  loc_011A05:
-    LDA #$0002            ; Facing 2: probe point (x+$10, y-8)
-    STA $00
-    LDA $0000, Y
-    CLC 
-    ADC #$0010
-    STA $16
-    LDA $0002, Y
-    SEC 
-    SBC #$0008
-    STA $18
-    JSR $&FindTalkableActorAt
-    BCC loc_011A24
-    BRL ActivateTalkTarget
-
-  loc_011A24:
-    PLP 
-    RTS 
-
-  loc_011A26:
-    LDA #$0003            ; Facing 3: probe point (x, y-8)
-    STA $00
-    LDA $0000, Y
-    STA $16
-    LDA $0002, Y
-    SEC 
-    SBC #$0008
-    STA $18
-    JSR $&FindTalkableActorAt
-    BCC loc_011A41
-    BRL ActivateTalkTarget
-
-  loc_011A41:
-    PLP 
-    RTS 
-
-  loc_011A43:
-    LDA #$0000
-    STA $00
-    LDA $0000, Y
-    CLC 
-    ADC #$0008
-    STA $16
-    LDA $0002, Y
-    SEC 
-    SBC #$0010
-    STA $18
-    JSR $&FindTalkableActorAt
-    BCC loc_011A62
-    BRL ActivateTalkTarget
-
-  loc_011A62:
-    PHX 
-    LDX $player_actor
-    LDA $0000, X
-    AND #$FFF0
-    STA $16
-    LDA $0002, X
-    SEC 
-    SBC #$0020
-    AND #$FFF0
-    STA $18
-    JSL $@lib_map_index_helpers.PixelToMapIndex
-    LDA $tile_type_map, X
-    PLX 
-    AND #$000F
-    CMP #$0006            ; Facing 0 only, nothing found: when the tile type two tiles up is 6 (OQ-I009-7) a second probe at (x+8, y-$20) follows
-    BNE loc_011AA5
-    LDA $0000, Y
-    CLC 
-    ADC #$0008
-    STA $16
-    LDA $0002, Y
-    SEC 
-    SBC #$0020
-    STA $18
-    JSR $&FindTalkableActorAt
-    BCC loc_011AA5
-    BRL ActivateTalkTarget
-
-  loc_011AA5:
-    PLP 
-    RTS 
-
-  loc_011AA7:
-    LDA #$0001            ; Facing 1: probe point (x+8, y)
-    STA $00
-    LDA $0000, Y
-    CLC 
-    ADC #$0008
-    STA $16
-    LDA $0002, Y
-    STA $18
-    JSR $&FindTalkableActorAt
-    BCC loc_011AC2
-    BRL ActivateTalkTarget
-
-  loc_011AC2:
-    PLP 
-    RTS 
-}
-
----------------------------------------------
-; Finds the first talkable actor whose box contains a point.
-; 
-; When: five probes in FindAndTalkToActorInFront.
-; Sees: n/a.
-; Why: a small list walk replaces a collision test of the whole actor pool.
-; In: JSR; M = 16; dp$16 = x, dp$18 = y of the point.
-; Out: carry set and X = the actor, or carry clear (X = 0). Walks the run order from actor_list_tail through $3E; an actor matches when $16 has bit $0040, 0 <= x - $00,X <= $10,X (x is the left edge) and -$12,X <= y - $02,X <= 0 (y is the bottom edge).
-; Clobbers: A, X.
-
-FindTalkableActorAt {
-    LDA $actor_list_tail  ; Walk the run order from actor_list_tail through the $3E links; X = 0 ends it
-
-  loc_011AC7:
-    TAX 
-    BEQ loc_011AF5
-    LDA $0016, X
-    BIT #$0040            ; $16 bit $0040: the actor can be talked to (OQ-I009-17)
-    BEQ loc_011AF0
-    LDA $16
-    SEC 
-    SBC $0000, X
-    CMP $0010, X          ; 0 <= point x - actor x <= width: x is the left edge
-    BEQ loc_011ADF
-    BCS loc_011AF0
-
-  loc_011ADF:
-    LDA $18
-    SEC 
-    SBC $0002, X
-    CLC 
-    ADC $0012, X          ; -height <= point y - actor y <= 0: y is the bottom edge
-    CMP $0012, X
-    BEQ loc_011AF7
-    BCC loc_011AF7
-
-  loc_011AF0:
-    LDA $003E, X
-    BRA loc_011AC7
-
-  loc_011AF5:
-    CLC 
-    RTS 
-
-  loc_011AF7:
-    SEC 
-    RTS 
-
-; Calls the talk script of the actor found, optionally after turning it toward the player.
-; 
-; When: FindAndTalkToActorInFront (5 BRL).
-; Sees: the NPC's lines start.
-; Why: the script is a normal actor script run on the stack, so it can use every COP command and text box.
-; In: X = the actor, M = 16.
-; Out: $30,X = 0: nothing to say, to ReturnFromTalk. $16,X bit $0008: TalkFacingPlayer. Else a call frame is pushed (bank $02, ReturnFromTalk - 1, script bank = byte +$D of the actor's meta entry at $38,X, $30,X - 1) and RTL enters the script with X = the slot, M = 16; its final RTL returns to ReturnFromTalk.
-; Clobbers: A, Y.
-
-  ActivateTalkTarget:
-    LDA $0030, X          ; $30,X = talk script address (Cop17_SetOwnParam); 0 = nothing to say
-    BEQ ReturnFromTalk
-    LDA $0016, X
-    BIT #$0008            ; $16 bit $0008: turn to face the player first
-    BNE TalkFacingPlayer
-    SEP #$20
-    LDA #$02              ; Build a call frame so the script's final RTL returns to ReturnFromTalk: bank $02 and ReturnFromTalk - 1, then the script bank and script address - 1; the RTL below enters the script
-    PHA 
-    PEA $&ReturnFromTalk-1
-    LDY $0038, X
-    LDA $&WorldMetaPointers+D, Y ; Script bank: byte +$D of the actor's meta entry ($38,X)
-    PHA 
-    LDY $0030, X
-    DEY 
-    PHY 
-    REP #$20
-    RTL 
-
-; Turns the NPC toward the player, runs its script and restores the slot afterwards.
-; 
-; When: ActivateTalkTarget, for actors with $16 bit $0008.
-; Sees: the NPC faces the player while speaking and goes back to its pose when the box closes.
-; Why: the NPC animation is a side effect of the turn; the whole slot is copied so every field is restored exactly.
-; In: X = the actor, M = 16.
-; Out: slot (64 bytes) copied to $1A1E (MVN #$01,#$01), $1E,X = ChooseFacingAnim result, $20,X = 0, SetActorAnimFrame redraws it; then a call frame as in ActivateTalkTarget whose return address is RestoreTalkedActor, with the slot number on the stack.
-; Clobbers: A, Y (X is pulled back after the MVN).
-
-  TalkFacingPlayer:
-    PHX 
-    LDY #$1A1E            ; Save the whole slot ($40 bytes) to $1A1E: MVN copies X (slot) to Y ($1A1E)
-    LDA #$003F
-    MVN #$01, #$01
-    PLX 
-    PHX 
-    JSR $&ChooseFacingAnim
-    AND #$00FF            ; New animation id, step 0, then redraw the frame (SetActorAnimFrame)
-    STA $001E, X
-    STZ $0020, X
-    JSL $@engine_scheduler_sprites_combat_collision.SetActorAnimFrame
-    SEP #$20
-    LDA #$02
-    PHA 
-    PEA $&RestoreTalkedActor-1
-    LDY $0038, X
-    LDA $&WorldMetaPointers+D, Y
-    PHA 
-    LDY $0030, X
-    DEY 
-    PHY 
-    REP #$20
-    RTL 
-}
-
----------------------------------------------
-; Copies the saved slot back over the NPC after its talk script.
-; 
-; When: return address of the call frame built by TalkFacingPlayer.
-; Sees: the NPC returns to the animation it had before the talk.
-; Why: see TalkFacingPlayer.
-; In: the script returned; the slot number is on the stack.
-; Out: $1A1E-$1A5D copied back over the slot (MVN #$01,#$01); falls into ReturnFromTalk.
-; Clobbers: A, X, Y.
-
-RestoreTalkedActor {
-    LDX #$1A1E            ; Copy the saved slot back: X = $1A1E, Y = the slot pulled from the stack
-    PLY 
-    LDA #$003F
-    MVN #$01, #$01
-}
-
----------------------------------------------
-; Common end of the talk call: restores P and returns to RunTalkInteraction.
-; 
-; When: the script's final RTL (through the pushed frame), or ActivateTalkTarget when $30,X is 0.
-; Sees: n/a.
-; Why: the P pushed by FindAndTalkToActorInFront has to be popped on every path.
-; In: stack: P, then the return address of the JSR in RunTalkInteraction.
-; Out: PLP, RTS.
-; Clobbers: P restored.
-
-ReturnFromTalk {
-    PLP 
-    RTS 
-}
-
----------------------------------------------
-; Picks the NPC animation that looks toward the player.
-; 
-; When: TalkFacingPlayer.
-; Sees: an NPC turns to the player (down, up or sideways view, flipped toward the player's side).
-; Why: NPC animations come in groups of six; the first of the group is the base and the facing code adds 0, 1 or 2.
-; In: JSR; X = the actor; dp$00 = the player's facing code.
-; Out: A and dp$01 = 6 x (anim / 6) + {0, 1, 2, 2}[facing] (anim = $1E,X; Divide and Multiply give the base). For facing 2 and 3 the flip bit ($1C bit $4000) is toggled only when it differs from 'facing is 3', through lib_player_facing.FlipActorX: an unflipped side view looks left, a flipped one right. That +0, +1, +2 are the down, up and side views is inferred from the player's facing (OQ-I009-8).
-; Clobbers: A, Y; dp$01.
-
-ChooseFacingAnim {
-    PHP 
-    SEP #$20
-    LDY $001E, X
-    LDA #$06
-    JSL $@lib_arithmetic.DivideWordByByte ; 6 x (anim / 6) = the first animation of the NPC's group of six
-    XBA 
-    LDA #$06
-    JSL $@lib_arithmetic.Multiply8x8
-    STA $01
-    LDA $00
-    BEQ loc_011B93
-    DEC 
-    BEQ loc_011B91
-    DEC 
-    BEQ loc_011B84
-    LDA $001D, X          ; Facing 3 needs the flip bit set, facing 2 clear: toggle only when it differs (an unflipped side view looks left)
-    BIT #$40
-    BNE loc_011B8F
-    BRA loc_011B8B
-
-  loc_011B84:
-    LDA $001D, X
-    BIT #$40
-    BEQ loc_011B8F
-
-  loc_011B8B:
-    JSL $@lib_player_facing.FlipActorX
-
-  loc_011B8F:
-    INC $01
-
-  loc_011B91:
-    INC $01
-
-  loc_011B93:
-    LDA $01
-    PLP 
-    RTS 
 
 ; Opens the equipment and item menu and puts the field back when it closes.
 ; 
@@ -616,7 +261,7 @@ ChooseFacingAnim {
 ; Out: RTL after Y closed the menu, screen on. Saves scroll_bg1/2 (menu_saved_*), the CGRAM buffer ($7E6000) and equipped_magic (menu_magic_on_open), sets BG2SC = $5C, BG12NBA = $20, TM = 6, CGADSUB = W12SEL = 0, runs RunEquipmentMenu; on exit restores them, calls RestoreSceneBgGfxAndPalette, RestoreCgramBuffer and LoadEquippedMagicGfx, kills all projectiles and clears $0433 and $0434 when the magic changed, restores the player pose, clears BG3, hud_dirty_flags = $1F, runs one sub-frame and sets INIDISP = $0F.
 ; Clobbers: A, X, Y; menu_saved_*, $7E6000-$7E61FF.
 
-  OpenEquipmentMenu:
+OpenEquipmentMenu {
     STZ $42               ; No HDMA while the menu is open
     JSL $@lib_system_helpers.WaitVBlank
     LDA #$80
@@ -646,9 +291,9 @@ ChooseFacingAnim {
     LDA $equipped_magic
     STA $menu_magic_on_open
     JSR $&SaveCgramBuffer
-    JSR $&lib_shared_012416.LoadMenuBg2Graphics
-    JSR $&lib_shared_012416.LoadMenuPalette
-    JSR $&lib_shared_012390.code_012390
+    JSR $&lib_menu_screen_setup.LoadMenuBg2Graphics
+    JSR $&lib_menu_screen_setup.LoadMenuPalette
+    JSR $&lib_menu_screen_setup.ExpandMenuTileGroups
     JSL $@lib_system_helpers.WaitVBlank
     BRK #$07
     JSR $&RunEquipmentMenu
@@ -675,9 +320,9 @@ ChooseFacingAnim {
     STA $CGADSUB
     LDA $w12sel_shadow
     STA $W12SEL
-    JSL $@lib_0118FC_part5.RestoreSceneBgGfxAndPalette
+    JSL $@lib_menu_screen_setup.RestoreSceneBgGfxAndPalette
     JSR $&RestoreCgramBuffer ; Overwrites the whole CGRAM buffer, including the colours RestoreSceneBgGfxAndPalette just wrote, so the spell palette is loaded after it
-    JSL $@lib_0118FC_part5.LoadEquippedMagicGfx
+    JSL $@lib_menu_screen_setup.LoadEquippedMagicGfx
     LDA $equipped_magic
     CMP $menu_magic_on_open
     BEQ loc_011C5D
@@ -686,7 +331,7 @@ ChooseFacingAnim {
     STZ $0434
 
   loc_011C5D:
-    JSL $@lib_027781_part1.ApplyPlayerWeaponPose
+    JSL $@lib_player_helpers.ApplyPlayerWeaponPose
     JSR $&ClearBg3Page
     LDA #$1F
     STA $hud_dirty_flags
@@ -715,7 +360,7 @@ RunEquipmentMenu {
     LDA #$01              ; vram_upload_flags: bit 0 = BG3 page, bit 1 = BG2 icon page ($7F7800 to VRAM $5C00)
     STA $vram_upload_flags
     JSL $@lib_system_helpers.EnableNmi
-    JSL $@EnableDisplayAndNmi
+    JSL $@lib_system_helpers.EnableDisplayAndNmi
     JSR $&DrawEquipIconRows
     LDA #$02
     STA $vram_upload_flags
@@ -729,7 +374,7 @@ RunEquipmentMenu {
     LDA #$04
 
   loc_011CAF:
-    JSR $&lib_0118FC_part2.ChooseMenuRow
+    JSR $&lib_choice_menus.ChooseMenuRow
     BCC loc_011CB7
     BRL ExitEquipmentMenu
 
@@ -833,7 +478,7 @@ RunEquipmentMenu {
 ; Sees: the item grid is replaced by the weapon, armor and magic icons.
 ; Why: the item grid and the equipment frame share the screen and are swapped as the cursor moves.
 ; In: JSR; M = 8.
-; Out: clears the upper half of BG3, prints EquipMenuFrameText, loads the equipment palette (lib_shared_012416.LoadMenuPalette), draws the icons, uploads BG3, the BG2 page and BG3 again, one frame each.
+; Out: clears the upper half of BG3, prints EquipMenuFrameText, loads the equipment palette (lib_menu_screen_setup.LoadMenuPalette), draws the icons, uploads BG3, the BG2 page and BG3 again, one frame each.
 ; Clobbers: A; X and Y are preserved.
 
 RedrawEquipmentPage {
@@ -845,7 +490,7 @@ RedrawEquipmentPage {
     LDA #$01
     STA $vram_upload_flags
     JSL $@lib_system_helpers.WaitVBlank
-    JSR $&lib_shared_012416.LoadMenuPalette
+    JSR $&lib_menu_screen_setup.LoadMenuPalette
     JSR $&DrawEquipIconRows
     LDA #$02
     STA $vram_upload_flags
@@ -876,7 +521,7 @@ DrawItemPage {
     LDA #$01
     STA $vram_upload_flags
     JSL $@lib_system_helpers.WaitVBlank
-    JSR $&lib_0118FC_part5.LoadItemPagePalette
+    JSR $&lib_menu_screen_setup.LoadItemPagePalette
     JSR $&DrawItemIconGrid
     LDA #$02
     STA $vram_upload_flags
@@ -1758,29 +1403,6 @@ RestoreCgramBuffer {
 }
 ---------------------------------------------
 
-; Waits for a vblank, then turns on NMI and the screen at full brightness.
-; 
-; When: RunEquipmentMenu, after the first page is printed.
-; Sees: the menu appears.
-; Why: the screen stays blanked while VRAM is being filled and is switched on in a vblank.
-; In: long call; M = 8 is set inside.
-; Out: WaitVBlank, NMITIMEN = $A1, INIDISP = $0F, nmi_enabled += 1; P restored.
-; Clobbers: A.
-
-EnableDisplayAndNmi {
-    PHP 
-    SEP #$20
-    JSL $@lib_system_helpers.WaitVBlank
-    LDA #$A1
-    STA $NMITIMEN
-    LDA #$0F
-    STA $INIDISP
-    INC $nmi_enabled
-    PLP 
-    RTL 
-}
----------------------------------------------
-
 ; The status page of the A-button screen.
 ; 
 ; When: ShowStatusAndSoulsScreen (once).
@@ -1851,104 +1473,6 @@ EquipMenuFrameText |[CUR:88][07:6,C]Weapon[CUR:98][07:6,C]Armor[CUR:A8][07:6,C]M
 ; Clobbers: n/a.
 
 ItemMenuFrameText |[CUR:88][07:16,C]Item|
----------------------------------------------
-
-; Two count bytes for the HUD strings: $19 (25) and $20 (32).
-; 
-; When: the [0B:t,&c] codes of HudFrameText, EnemyGaugeClearText and EnemyGaugeText repeat a tile by the byte at c.
-; Sees: 25-tile and 32-tile rows behind the HUD labels and the enemy gauge (OQ-I009-16).
-; Why: the control code takes its count from memory, not from the string.
-; In: n/a (data; read as bytes).
-; Out: n/a.
-; Clobbers: n/a.
-
-HudRepeatCounts [
-  $#1920
-]
----------------------------------------------
-
-; The frame of the HUD: backing tiles and the labels LEV, EXP and GEM.
-; 
-; When: UpdateHud, dirty bit 0 (every menu close, scene start).
-; Sees: 25 tiles $1A at $700, the labels LEV ($42), EXP ($50) and GEM ($6A), a fixed six-tile label (entry 0 of TextListPointers, tiles $0A-$0F) at $C0 and 32 blanks at $CC.
-; Why: the static parts of the HUD are drawn once and the numbers are updated separately.
-; In: n/a (data). Single-row glyph mode [09], palettes [03:24] and [03:28].
-; Out: n/a.
-; Clobbers: n/a.
-
-HudFrameText |[09][03:24][CUR:700][0B:1A,&HudRepeatCounts][CUR:42]LEV[CUR:50]EXP[CUR:6A]GEM[CUR:C0][02:0][CUR:CC][03:28][0B:20,&HudRepeatCounts+1]|
-
----------------------------------------------
-; The EXP number of the HUD (8 BCD digits from $1B78).
-; 
-; When: UpdateHud, dirty bit 1 (EXP changed).
-; Sees: the EXP value next to the EXP label.
-; Why: updated alone when only the EXP changes.
-; In: n/a (data). Position $58.
-; Out: n/a.
-; Clobbers: n/a.
-
-HudExpText |[09][CUR:58][03:20][06:8,1B78]|
-
----------------------------------------------
-; The HP gauge of the HUD.
-; 
-; When: UpdateHud, dirty bit 2 (HP changed).
-; Sees: the gauge at $CC, palette 3, from player_hp and player_max_hp ([04:1B88,1B8A], two words).
-; Why: updated alone when only the HP changes.
-; In: n/a (data).
-; Out: n/a.
-; Clobbers: n/a.
-
-HudHpGaugeText |[09][CUR:CC][03:2C][04:1B88,1B8A]|
-
----------------------------------------------
-; The level number of the HUD (2 BCD digits from $1B6A).
-; 
-; When: UpdateHud, dirty bit 3.
-; Sees: the level next to LEV.
-; Why: updated alone on a level up.
-; In: n/a (data). Position $4A.
-; Out: n/a.
-; Clobbers: n/a.
-
-HudLevelText |[09][CUR:4A][03:20][06:2,1B6A]|
-
----------------------------------------------
-; The Gem number of the HUD (6 BCD digits from $1B66).
-; 
-; When: UpdateHud, dirty bit 4.
-; Sees: the Gems next to GEM.
-; Why: updated alone when Gems change.
-; In: n/a (data). Position $72.
-; Out: n/a.
-; Clobbers: n/a.
-
-HudGemsText |[09][CUR:72][03:20][06:6,1B66]|
-
----------------------------------------------
-; Erases the enemy gauge (25 blanks at $140).
-; 
-; When: UpdateHud, when enemy_gauge_timer reaches 0.
-; Sees: the enemy gauge disappears about a second after the last hit.
-; Why: see UpdateHud.
-; In: n/a (data).
-; Out: n/a.
-; Clobbers: n/a.
-
-EnemyGaugeClearText |[09][CUR:140][0B:20,&HudRepeatCounts]|
-
----------------------------------------------
-; Draws the enemy gauge: a fixed label and the life bar.
-; 
-; When: UpdateHud on the frame after a hit set enemy_gauge_timer to $80.
-; Sees: a six-tile label (entry 1 of TextListPointers, tiles $10-$15) at $140 and a bar at $14C from enemy_gauge_hp and enemy_gauge_max ([04:336,338], two words) over 32 blank tiles.
-; Why: shows how much life the monster just hit has left.
-; In: n/a (data).
-; Out: n/a.
-; Clobbers: n/a.
-
-EnemyGaugeText |[09][CUR:140][03:24][02:1][CUR:14C][03:2C][0B:20,&HudRepeatCounts+1][CUR:14C][04:336,338]|
 ---------------------------------------------
 
 ; Pointer list of the 65 item name strings, indexed by item id (0 = 'not equipped').
@@ -2311,7 +1835,7 @@ DescSwordOfLife |[CUR:48A][TBL:&ItemNameList,&NameIndexCells][CUR:4B2][06:2,&Wea
 ; 
 ; When: the cursor is on the Psycho Sword.
 ; Sees: 'Lev 5', one strength bar and 'Invincible monsters temporarily paralyzed'; items.md lists no special effect for it (OQ-I009-3).
-; Why: text for the weapon; the effect is in the combat code (engine_scheduler_sprites_combat_collision).
+; Why: text for the weapon; the effect is in the combat code (engine_actor_scheduler_and_sprites).
 ; In: n/a (data).
 ; Out: n/a.
 ; Clobbers: n/a.

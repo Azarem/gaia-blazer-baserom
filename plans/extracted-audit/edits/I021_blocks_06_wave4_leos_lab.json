@@ -1,0 +1,44 @@
+[
+  {
+    "op": "merge",
+    "blocks": ["ll_fairy_gem_return_prompt", "w4_actor_023E57", "w4_actor_023F17"],
+    "into": "ll_laboratory_dungeon_actors",
+    "row": "W4-LL01",
+    "note": "scene laboratory_dungeon, bank 4: the Fairy Gem return prompt (actor then tail from wave 0), its BRL caller w4_actor_023E57 (the other caller, w4_actor_023E27, is in the town_models file) and w4_actor_023F17 (109 lines)."
+  },
+  {
+    "op": "merge",
+    "blocks": ["ll_enemy_0FD275", "ll_enemy_0FD345", "ll_enemy_0FD402", "ll_enemy_0FD502", "ll_enemy_0FD6EC", "ll_enemy_0FD752"],
+    "into": "ll_laboratory_dungeon_enemies",
+    "row": "W4-LL02",
+    "note": "scene laboratory_dungeon, bank 1F: six enemy scripts (900 lines). ll_enemy_0FD502 is one of the two COP [9B] jump files of placement-audit 4.7 (three explicit targets, no fall-through)."
+  },
+  {
+    "op": "merge",
+    "blocks": ["w4_actor_022523", "w4_actor_0225C4", "w4_actor_02260D", "w4_actor_0226C0", "w4_actor_022794", "w4_actor_022886", "w4_actor_02297C", "w4_actor_0229DF", "w4_actor_022AFB", "w4_actor_022B80", "w4_actor_022C7C", "w4_actor_022D05", "w4_actor_022DC6", "w4_actor_022E10", "w4_actor_022F68", "w4_actor_02312F", "w4_actor_02317F", "w4_actor_023214", "w4_actor_0232B3", "w4_actor_02345D", "w4_actor_0234EC", "w4_actor_0237A7", "w4_actor_02382D", "w4_actor_0238A7", "w4_actor_0239BA", "w4_actor_0239F8", "w4_actor_023A36", "w4_actor_023B0B", "w4_actor_023D6B", "w4_actor_023D84"],
+    "into": "ll_laboratory_actors",
+    "row": "W4-LL03",
+    "note": "scene leos_laboratory, bank 4: all 30 blocks of the area in one file (1,545 lines, within about 3 percent of the 1,500-line guide; a split would cut the area at an arbitrary actor). w4_actor_0229DF and 023A36 end in a COP [27] jump, no fall-through."
+  },
+  {
+    "op": "merge",
+    "blocks": ["w4_actor_023E27", "w4_actor_023E87"],
+    "into": "ll_town_models_actors",
+    "row": "W4-LL04",
+    "note": "scene town_models, bank 4 (75 lines): the second BRL caller of the Fairy Gem return prompt and one actor."
+  },
+  {
+    "op": "merge",
+    "blocks": ["ll_enemy_0FD944", "ll_enemy_0FD9E6", "ll_enemy_0FDAED", "ll_enemy_0FDBFB", "ll_enemy_0FDCFC"],
+    "into": "ll_town_models_enemies",
+    "row": "W4-LL05",
+    "note": "scene town_models, bank 1F: five enemy scripts (652 lines)."
+  },
+  {
+    "op": "rename",
+    "block": "w4_shared_023F33",
+    "to": "ll_watching_over_world_return_prompt_texts",
+    "row": "W4-LL06",
+    "note": "five strings: 'I am watching over the world- Please take this- [name] received EXP-', 'Would you like to go back to Dr-Leo s Laboratory?', the two answers and the 5-byte tail asciistring_023FA3 that 32 files jump to (64 references). Named from the ROM text; no scene (OQ-I020-5)."
+  }
+]

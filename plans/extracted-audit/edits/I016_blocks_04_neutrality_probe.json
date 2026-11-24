@@ -1,0 +1,16 @@
+[
+  {
+    "op": "set",
+    "blocks": ["cop_handler_0060EE"],
+    "group": "system",
+    "row": "OQ-I015-3",
+    "note": "Dry-run probe only: is a pure group change byte-neutral? Compare the verify rebuild SHA-1 with the current build."
+  },
+  {
+    "op": "set",
+    "blocks": ["cop_handler_006100"],
+    "scene": "engine",
+    "row": "OQ-I015-3",
+    "note": "Dry-run probe only: is a pure scene change byte-neutral?"
+  }
+]

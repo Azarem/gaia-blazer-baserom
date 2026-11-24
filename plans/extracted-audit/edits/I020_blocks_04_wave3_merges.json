@@ -1,0 +1,20 @@
+[
+  {
+    "op": "merge",
+    "blocks": ["common_actor_001A28_part1", "player_attack_animation_handlers"],
+    "into": "player_core",
+    "group": "system",
+    "notes": "join",
+    "row": "W3-M01",
+    "note": "placement-audit 6.1 and pinned.md wave 0 promise: the player core (movement, attack and animation handlers, parts code_001512 .. code_002678 in bank 0) is one file of about 1,660 lines. player_spells_level_up stays a block of its own (the audit's player_magic, 1,010 lines)."
+  },
+  {
+    "op": "merge",
+    "blocks": ["common_shared_0FDFC0", "common_shared_0FE769"],
+    "into": "unreferenced_stubs_bank1f",
+    "group": "system",
+    "notes": "join",
+    "row": "W3-M02",
+    "note": "placement-audit 4.8 and 7.4: two 3-byte stubs (COP [86] then RTL) in bank 1F with no reference anywhere in extracted/. Static statement only: 'unreferenced' is not 'dead' (OQ-I020-4). Kept in bank 1F."
+  }
+]

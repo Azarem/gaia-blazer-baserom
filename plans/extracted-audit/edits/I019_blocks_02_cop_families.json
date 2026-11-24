@@ -1,0 +1,70 @@
+[
+  {
+    "op": "merge",
+    "blocks": [
+      "cop_handler_00579E", "cop_handler_0057F5", "cop_handler_00580B", "cop_handler_00581D",
+      "cop_handler_005838", "cop_handler_00583E", "cop_set_or_clear_event_flag", "cop_handler_005946",
+      "cop_handler_0059CC", "cop_handler_005A88", "cop_handler_005AD6", "cop_handler_005BB1",
+      "cop_handler_005CF0", "cop_handler_005D10", "cop_handler_005D76", "cop_handler_005E0D",
+      "cop_handler_005E6C", "cop_handler_006063"
+    ],
+    "into": "cop_script_flow_flags",
+    "row": "W2-05",
+    "note": "COP family 1 of 5 (placement 6.2, FM-A3 sections 2.2, 2.3, 2.6, 2.12, 2.13), 18 handlers: script flow (Cop00 yield, Cop03/04 loop, Cop05 wait on flag, Cop06 goto, Cop07/08 jump on flag with the shared tail loc_005849, Cop1B delay then goto, Cop27 yield then goto, Cop91 SetEntryHere), event flag write (Cop09) and switches (Cop14, Cop3B), random (Cop1F, Cop35), next scene and transition type (Cop10, Cop3C), and the music-load spawners (Cop31, Cop32). Bank 0, pinned, group cop_handlers. Each handler still ends by BRL into the exit chain in cop_core and is reached only from the table in cop_dispatch. Fall-through pairs stay inside one handler block: Cop08 into loc_005849 (cop_handler_00583E)."
+  },
+  {
+    "op": "merge",
+    "blocks": [
+      "cop_handler_0057A2", "cop_handler_0057BD", "cop_handler_005874", "cop_handler_005888",
+      "cop_handler_005A0F", "cop_handler_005A28", "cop_handler_005A43", "cop_handler_005B65",
+      "cop_handler_005B79", "cop_handler_005D94", "cop_handler_005DB0", "cop_handler_005DBE",
+      "cop_handler_005DCB", "cop_handler_005E05"
+    ],
+    "into": "cop_items_stats_text",
+    "row": "W2-06",
+    "note": "COP family 2 of 5 (placement 6.2, FM-A3 sections 2.4 and 2.5), 14 handlers: inventory (Cop0A give if empty, Cop0B remove, Cop18 jump if missing, Cop19 jump unless equipped), Gems (Cop25 add, Cop26 pay or jump), EXP and HP (Cop36 add EXP, Cop37 heal to full, Cop38 queue EXP, Cop39 damage the player) and text, menus and name entry (Cop01 show text, Cop02 yes/no prompt, Cop1A choice menu, Cop3A name entry). Bank 0, pinned, group cop_handlers."
+  },
+  {
+    "op": "merge",
+    "blocks": [
+      "cop_jump_if_actor_in_box", "cop_handler_00590D", "cop_handler_005A9E", "cop_handler_005AFD",
+      "cop_handler_005F5F", "cop_handler_005F85", "cop_handler_005FAB", "cop_handler_005FD1",
+      "cop_handler_005FF7", "cop_handler_00600C", "cop_handler_006136", "cop_handler_00615D",
+      "cop_handler_006184", "cop_handler_006373"
+    ],
+    "into": "cop_conditions",
+    "row": "W2-07",
+    "note": "COP family 3 of 5 (placement 6.2, FM-A3 section 2.7), 14 handlers that test the actors, the player or the screen and jump or continue: Cop0C/Cop2E actor in a box (with the shared loc_0058C0), Cop0D actor at a tile, Cop1C actor flags, Cop20 player off the tile grid, Cop89-8C player within or beyond a distance, Cop8D/8E off-screen bit, Cop9A-9C jump by the player's position, CopAD yield while off screen. Bank 0, pinned, group cop_handlers."
+  },
+  {
+    "op": "merge",
+    "blocks": [
+      "cop_handler_005970", "cop_handler_00599E", "cop_handler_0059B5", "cop_handler_005A02",
+      "cop_handler_005AB6", "cop_handler_005AC6", "cop_handler_005C97", "cop_handler_005D30",
+      "cop_handler_005D53", "cop_handler_005E7A", "cop_handler_005E90", "cop_handler_005EB0",
+      "cop_handler_005EBD", "cop_handler_005F45", "cop_handler_005F52", "cop_handler_006021",
+      "cop_handler_006042", "cop_handler_006075", "cop_handler_00608E", "cop_handler_0060B1",
+      "cop_handler_0060CD", "cop_handler_0060EE", "cop_handler_006100", "cop_handler_006112",
+      "cop_handler_006124", "cop_handler_0061B2", "cop_handler_0061D1", "cop_handler_0061EF",
+      "cop_handler_006200", "cop_handler_006211", "cop_handler_00622F", "cop_handler_006248",
+      "cop_handler_006255", "cop_handler_006262", "cop_handler_00628B", "cop_handler_006298",
+      "cop_handler_0062A5", "cop_handler_0062C1", "cop_handler_0062E6"
+    ],
+    "into": "cop_actor_fields_animation",
+    "row": "W2-08",
+    "note": "COP family 4 of 5 (placement 6.2, FM-A3 sections 2.8 and 2.9), 39 handlers: setters and movement on the calling actor or a slot-addressed one (Cop11 move to tile, Cop12/13/17 resume and parameter words, Cop1D/1E flag word, Cop2F shift the player actors, Cop33/34 show and hide the player actors, flips Cop87/88/8F/90/96-99, offsets Cop9F-A1, priority and palette CopA2/AA, draw-order flags CopA3/A4/A6/A7, CopA5 jump by flip state, CopA8/A9 animation table and dynamic tile source) and the animation commands (Cop80-83, Cop92-95, Cop9D/9E). Bank 0, pinned, group cop_handlers."
+  },
+  {
+    "op": "merge",
+    "blocks": [
+      "cop_block_own_tiles", "cop_handler_0059FB", "cop_handler_005B15", "cop_handler_005B2B",
+      "cop_handler_005B39", "cop_handler_005B4F", "cop_handler_005BC1", "cop_handler_005BEB",
+      "cop_handler_005C1F", "cop_handler_005C50", "cop_handler_0063A9", "cop_handler_005ECF",
+      "cop_conditional_spawn", "cop_handler_005F0D", "cop_handler_0062FF", "cop_handler_006339",
+      "cop_handler_0063E1", "cop_handler_006409", "cop_handler_006431"
+    ],
+    "into": "cop_tiles_spawn_kill",
+    "row": "W2-09",
+    "note": "COP family 5 of 5 (placement 6.2, FM-A3 sections 2.10 and 2.11), 19 handlers: tiles and collision (Cop15/16 block and unblock the actor's own tiles, Cop21-24/Cop28 sample a neighbouring tile through the shared tail loc_005BD0, Cop29, Cop2A/2B block or unblock a tile, CopAE) and spawn and kill (Cop84/Cop85 spawn after or before, Cop30 conditional spawn that branches into Cop85, CopAB/AC/AF/B0/B1 variants with position or flags, Cop86 kill self; CopB2 lives in cop_core). Bank 0, pinned, group cop_handlers."
+  }
+]

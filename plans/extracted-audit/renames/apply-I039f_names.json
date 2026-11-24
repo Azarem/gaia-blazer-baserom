@@ -1,0 +1,10 @@
+[
+  { "address": 147401, "old": "code_023FC9", "new": "mc_npc_soldier_ghost_hint_arrival_023FC9", "row": "I039-F1" },
+  { "address": 147729, "old": "code_024111", "new": "mc_npc_soldier_elemental_hint_arrival_024111", "row": "I039-F1" },
+  { "address": 149013, "old": "code_024615", "new": "mc_npc_singer_theater_arrival_024615", "row": "I039-F1" },
+  { "address": 149969, "old": "code_0249D1", "new": "mc_npc_queen_arrival_0249D1", "row": "I039-F1" },
+  { "address": 152090, "old": "code_02521A", "new": "mc_npc_soldier_soul_of_reality_arrival_02521A", "row": "I039-F1" },
+  { "address": 153060, "old": "code_0255E4", "new": "mc_npc_king_magridd_arrival_0255E4", "row": "I039-F1" },
+  { "address": 154520, "old": "code_025B98", "new": "mc_dock_soldier_start_ship_arrival_025B98", "row": "I039-F1" },
+  { "address": 155677, "old": "code_02601D", "new": "mc_dock_dr_leo_arrival_02601D", "row": "I039-F1" }
+]

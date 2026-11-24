@@ -1,0 +1,14 @@
+{
+  "cop_handlers/cop_script_flow_flags.asm": {
+    "partNotes": {
+      "Cop3B_JumpIfSwitchSetElseHold": {
+        "edit": [
+          {
+            "find": "stays frozen (released by the lair, as in the walkthrough) or acts normally.",
+            "with": "stays frozen until its lair switch is set, or acts normally (OQ-I025-1)."
+          }
+        ]
+      }
+    }
+  }
+}

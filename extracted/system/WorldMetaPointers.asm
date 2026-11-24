@@ -26,7 +26,7 @@
 ?INCLUDE 'data_anim_palette_cycles'
 ?INCLUDE 'data_anim_player'
 ?INCLUDE 'gv_boss_metal_mantis'
-?INCLUDE 'gv_enemy_0FAA49'
+?INCLUDE 'gv_enemy_green_humanoid'
 ?INCLUDE 'gv_front_end'
 ?INCLUDE 'gv_leos_paintings_actors'
 ?INCLUDE 'gv_leos_paintings_enemies'
@@ -37,13 +37,14 @@
 ?INCLUDE 'gv_up_above_trial_room_and_lisa_turbo_actors'
 ?INCLUDE 'gv_village_actors_018000'
 ?INCLUDE 'gv_village_actors_019475'
+?INCLUDE 'gw_actor_fixed_gem_pickup'
 ?INCLUDE 'gw_boss_light_water_fire_statues'
 ?INCLUDE 'gw_enemies_without_placement'
 ?INCLUDE 'gw_lostside_marsh_actors'
 ?INCLUDE 'gw_lostside_marsh_enemies'
 ?INCLUDE 'gw_woods_actors_01B98D'
 ?INCLUDE 'gw_woods_actors_01D045'
-?INCLUDE 'lib_0116C3'
+?INCLUDE 'lib_hdma_window_effects'
 ?INCLUDE 'll_boss_tin_doll'
 ?INCLUDE 'll_laboratory_actors'
 ?INCLUDE 'll_laboratory_dungeon_actors'
@@ -59,8 +60,8 @@
 ?INCLUDE 'mc_castle_towers_enemies'
 ?INCLUDE 'ms_boss_poseidon'
 ?INCLUDE 'ms_dungeon_actors'
-?INCLUDE 'ms_enemy_0FCFD6'
-?INCLUDE 'ms_enemy_0FD058'
+?INCLUDE 'ms_enemy_ice_crystal'
+?INCLUDE 'ms_enemy_ice_maker'
 ?INCLUDE 'ms_multi_area_actors'
 ?INCLUDE 'ms_multi_area_enemies'
 ?INCLUDE 'ms_snow_mountain_actors'
@@ -68,7 +69,6 @@
 ?INCLUDE 'ms_soul_of_mountain_house_actors_02100B'
 ?INCLUDE 'player_core'
 ?INCLUDE 'se_boss_floating_skull'
-?INCLUDE 'se_enemy_0FBB78'
 ?INCLUDE 'se_ghost_ship_actors'
 ?INCLUDE 'se_ghost_ship_enemies'
 ?INCLUDE 'se_seabed_of_st_elles_actors'
@@ -77,14 +77,14 @@
 ?INCLUDE 'se_seabed_sanctuary_actors_0F8D58'
 ?INCLUDE 'se_st_elles_coast_actors'
 ?INCLUDE 'se_st_elles_coast_enemies'
+?INCLUDE 'se_unused_enemy_drifting'
 ?INCLUDE 'shared_actor_helpers_bank0'
-?INCLUDE 'w1_actor_01E4BB'
-?INCLUDE 'w2_actor_0FA6F5'
-?INCLUDE 'w6_actor_01EC4B'
-?INCLUDE 'w6_actor_01F14F'
+?INCLUDE 'w2_effect_player_overlay'
 ?INCLUDE 'we_deathtolls_shrine_actors'
 ?INCLUDE 'we_evil_world_actors'
 ?INCLUDE 'we_evil_world_enemies'
+?INCLUDE 'we_fx_battle_bg2_hofs_bands'
+?INCLUDE 'we_obj_master_shrine_event'
 
 ---------------------------------------------
 
@@ -114,7 +114,7 @@ WorldMetaPointers [
 ; Sees: the Grass Valley monsters, NPCs and objects.
 ; Why: see the block note; the list is the type space of this world.
 ; In: n/a (data); row = list + type x 14.
-; Out: type $00 the hero. Enemy types matched by HP and EXP with the bestiary (inferred): $1F Metal Mantis (boss, HP 50, EXP 50; it is the monster of lair record $09, see LairRecords), $20, $22, $23 and $24 (HP 3, EXP 1: the bestiary gives Blue Liquid, Fly, Green Humanoid and Walking Bush the same stats, so the four ids cannot be assigned), $21 Yellow Humanoid, $25 Blue Torch, $26 Yellow Knight, $27 Metal Crawler, $28 and $2E Purple Bird (two types), $29 Green Torch. The other types are NPCs and objects.
+; Out: type $00 the hero. Enemy types matched by HP and EXP with the bestiary (inferred): $1F Metal Mantis (boss, HP 50, EXP 50; it is the monster of lair record $09, see LairRecords), $20, $22, $23 and $24 (HP 3, EXP 1: the bestiary gives Blue Liquid, Fly, Green Humanoid and Walking Bush the same stats, so the four ids cannot be assigned), $21 Yellow Humanoid, $25 Blue Torch, $26 Yellow Knight, $27 Metal Crawler, $28 Purple Bird, $29 Green Torch, $2E Monster Blocks (script gv_enemy_monster_blocks_0FB04F; HP 4 matches the bestiary, the EXP word is 3 where the bestiary says 2: OQ-I049-1). The other types are NPCs and objects.
 ; Clobbers: n/a (data).
 
 MetaGrassValley [
@@ -150,7 +150,7 @@ MetaGrassValley [
   meta_entry < #00, #00, #00, #$0000, #18, #$3040, $7E3800, @gv_village_actors_019475.gv_npc_lonely_goat_guide_019A2C >   ;1D
   meta_entry < #00, #00, #00, #$0000, #18, #$2040, $7E3800, @gv_village_actors_019475.gv_npc_gourmet_goat_019CDE >   ;1E
   meta_entry < #06, #02, #32, #$0050, #00, #$1000, $7E3800, @gv_boss_metal_mantis.gv_boss_metal_mantis_0031AD >   ;1F
-  meta_entry < #01, #00, #03, #$0001, #00, #$1000, $7E3800, @gv_enemy_0FAA49.gv_enemy_green_humanoid_0FAA49 >   ;20
+  meta_entry < #01, #00, #03, #$0001, #00, #$1000, $7E3800, @gv_enemy_green_humanoid.gv_enemy_green_humanoid_0FAA49 >   ;20
   meta_entry < #01, #01, #04, #$0002, #06, #$1000, $7E3800, @gv_underground_castle_enemies.gv_enemy_yellow_humanoid_0FAA8F >   ;21
   meta_entry < #01, #01, #03, #$0001, #1B, #$0000, $7E3800, @gv_underground_castle_enemies.gv_enemy_walking_bush_0FAB9A >   ;22
   meta_entry < #01, #00, #03, #$0001, #12, #$1000, $7E3800, @gv_underground_castle_enemies.gv_enemy_fly_0FAC31 >   ;23
@@ -268,7 +268,7 @@ MetaGreenwood [
   meta_entry < #00, #00, #00, #$0000, #02, #$3048, $7E3800, @gw_woods_actors_01D045.gw_npc_squirrel_turbo_raft_01DF73 >   ;27
   meta_entry < #00, #00, #00, #$0000, #00, #$3048, $7E3800, @gw_woods_actors_01D045.gw_npc_squirrel_exchanger_01E005 >   ;28
   meta_entry < #00, #00, #00, #$0000, #00, #$3048, $7E3800, @gw_woods_actors_01D045.gw_npc_squirrel_master_emblem_c_01E1C0 >   ;29
-  meta_entry < #00, #00, #00, #$0000, #07, #$2010, @data_anim_effects.EffectAnims, @lib_0116C3.code_0116C3 >   ;2A
+  meta_entry < #00, #00, #00, #$0000, #07, #$2010, @data_anim_effects.EffectAnims, @lib_hdma_window_effects.RunSoulOfLightEffect >   ;2A
   meta_entry < #00, #00, #00, #$0000, #00, #$2010, $000000, @gw_lostside_marsh_actors.gw_effect_bg2_scroll_01E9C1 >   ;2B
   meta_entry < #04, #01, #0A, #$0010, #00, #$2200, $7E3800, @gw_lostside_marsh_enemies.gw_enemy_water_lizard_0FB0F5 >   ;2C
   meta_entry < #04, #00, #0C, #$0011, #24, #$1000, $7E3800, @gw_lostside_marsh_enemies.gw_enemy_mud_man_0FB302 >   ;2D
@@ -288,7 +288,7 @@ MetaGreenwood [
   meta_entry < #00, #00, #00, #$0000, #2D, #$0040, $7E3800, @gw_lostside_marsh_actors.gw_raft_south_entry_01E7D5 >   ;3B
   meta_entry < #00, #00, #00, #$0000, #2D, #$0040, $7E3800, @gw_lostside_marsh_actors.gw_raft_east_entry_01E8ED >   ;3C
   meta_entry < #09, #05, #32, #$0030, #00, #$1000, $7E3800, @gw_boss_light_water_fire_statues.gw_boss_light_water_fire_statues_0033C6 >   ;3D
-  meta_entry < #00, #00, #00, #$0000, #0C, #$2050, $7E3800, @w1_actor_01E4BB.gw_actor_fixed_gem_pickup_01E4BB >   ;3E
+  meta_entry < #00, #00, #00, #$0000, #0C, #$2050, $7E3800, @gw_actor_fixed_gem_pickup.gw_actor_fixed_gem_pickup_01E4BB >   ;3E
   meta_entry < #00, #00, #00, #$0000, #0C, #$0050, $7E3800, @gw_lostside_marsh_actors.gw_npc_fairy_gem_exp_150_01E4C3 >   ;3F
   meta_entry < #00, #00, #00, #$0000, #0C, #$2050, $7E3800, @gw_lostside_marsh_actors.gw_npc_fairy_gem_exp_180_01E510 >   ;40
   meta_entry < #00, #00, #00, #$0000, #0C, #$2050, $7E3800, @gw_lostside_marsh_actors.gw_npc_fairy_gem_light_arrow_01E540 >   ;41
@@ -368,10 +368,10 @@ MetaStElles [
   meta_entry < #00, #00, #00, #$0000, #0E, #$2050, $7E3800, @se_seabed_of_st_elles_actors.se_npc_dolphin_lue_0F9B8B >   ;2D
   meta_entry < #00, #00, #00, #$0000, #11, #$2050, $7E3800, @se_seabed_of_st_elles_actors.se_npc_dolphin_lue_friend_0F9DBE >   ;2E
   meta_entry < #00, #00, #00, #$0000, #00, #$2010, $000000, @se_st_elles_coast_actors.se_effect_bg2_scroll_follow_0FA7A1 >   ;2F
-  meta_entry < #00, #00, #00, #$0000, #00, #$2010, $7E3800, @w2_actor_0FA6F5.w2_effect_player_overlay_0FA6F5 >   ;30
+  meta_entry < #00, #00, #00, #$0000, #00, #$2010, $7E3800, @w2_effect_player_overlay.w2_effect_player_overlay_0FA6F5 >   ;30
   meta_entry < #00, #00, #00, #$0000, #00, #$2010, $000000, @se_seabed_sanctuary_actors_0F8D58.se_effect_sanctuary_wave_hdma_0FA7C4 >   ;31
   meta_entry < #09, #02, #24, #$0020, #04, #$1000, $7E3800, @se_seabed_of_st_elles_enemies.se_enemy_sea_urchin_0FBB1F >   ;32
-  meta_entry < #01, #02, #03, #$0000, #22, #$2310, $7E3800, @se_enemy_0FBB78.se_unused_enemy_drifting_0FBB78 >   ;33
+  meta_entry < #01, #02, #03, #$0000, #22, #$2310, $7E3800, @se_unused_enemy_drifting.se_unused_enemy_drifting_0FBB78 >   ;33
   meta_entry < #06, #01, #0A, #$0025, #00, #$0000, $7E3800, @se_seabed_of_st_elles_enemies.se_enemy_jellyfish_0FBBA3 >   ;34
   meta_entry < #09, #04, #0F, #$0022, #1A, #$1000, $7E3800, @se_seabed_of_st_elles_enemies.se_enemy_hermit_crab_0FBC22 >   ;35
   meta_entry < #08, #03, #0A, #$0030, #08, #$0000, $7E3800, @se_seabed_of_st_elles_enemies.se_enemy_manta_ray_0FBD12 >   ;36
@@ -406,7 +406,7 @@ MetaStElles [
   meta_entry < #00, #00, #00, #$0000, #0C, #$2050, $7E3800, @se_seabed_of_st_elles_actors.se_npc_fairy_exp_250_0FA4C4 >   ;53
   meta_entry < #00, #00, #00, #$0000, #0C, #$2050, $7E3800, @se_st_elles_coast_actors.se_npc_fairy_pyramid_hint_0FA4F4 >   ;54
   meta_entry < #00, #00, #00, #$0000, #00, #$2040, $7E3800, @se_st_elles_coast_actors.se_obj_durean_hot_coals_0FA5BF >   ;55
-  meta_entry < #00, #00, #00, #$0000, #07, #$2010, @data_anim_effects.EffectAnims, @lib_0116C3.code_01172E >   ;56
+  meta_entry < #00, #00, #00, #$0000, #07, #$2010, @data_anim_effects.EffectAnims, @lib_hdma_window_effects.RunSoulOfShieldEffect >   ;56
 ]
 
 ---------------------------------------------
@@ -472,8 +472,8 @@ MetaMountainOfSouls [
   meta_entry < #0A, #04, #28, #$2000, #12, #$0000, $7E3800, @ms_multi_area_enemies.ms_enemy_snowball_0FCA35 >   ;31
   meta_entry < #0E, #05, #11, #$0085, #00, #$0000, $7E3800, @ms_multi_area_enemies.ms_enemy_purple_wizard_0FCBDF >   ;32
   meta_entry < #0E, #04, #14, #$0100, #00, #$0000, $7E3800, @ms_multi_area_enemies.ms_enemy_red_wizard_0FCDBA >   ;33
-  meta_entry < #0E, #07, #18, #$0070, #18, #$0000, $7E3800, @ms_enemy_0FCFD6.ms_enemy_ice_maker_0FCFD6 >   ;34
-  meta_entry < #0D, #00, #18, #$4000, #1A, #$0001, $7E3800, @ms_enemy_0FD058.ms_enemy_ice_crystal_0FD058 >   ;35
+  meta_entry < #0E, #07, #18, #$0070, #18, #$0000, $7E3800, @ms_enemy_ice_maker.ms_enemy_ice_maker_0FCFD6 >   ;34
+  meta_entry < #0D, #00, #18, #$4000, #1A, #$0001, $7E3800, @ms_enemy_ice_crystal.ms_enemy_ice_crystal_0FD058 >   ;35
   meta_entry < #0D, #06, #0E, #$0075, #28, #$0000, $7E3800, @ms_multi_area_enemies.ms_enemy_cave_bat_0FD11B >   ;36
   meta_entry < #0C, #06, #0C, #$0080, #2B, #$1000, $7E3800, @ms_multi_area_enemies.ms_enemy_green_blob_0FD1E5 >   ;37
   meta_entry < #10, #0C, #4F, #$0400, #14, #$0200, $7E3800, @ms_boss_poseidon.ms_boss_poseidon_004299 >   ;38
@@ -543,7 +543,7 @@ MetaLeosLab [
   meta_entry < #11, #09, #18, #$0175, #12, #$0000, $7E3800, @ll_town_models_enemies.ll_enemy_toy_lunge_0FDAED >   ;27
   meta_entry < #13, #09, #1E, #$0180, #1E, #$0000, $7E3800, @ll_town_models_enemies.ll_enemy_catapult_0FDBFB >   ;28
   meta_entry < #12, #0A, #24, #$0160, #2B, #$0000, $7E3800, @ll_town_models_enemies.ll_enemy_spike_launcher_0FDCFC >   ;29
-  meta_entry < #00, #00, #00, #$0000, #07, #$2010, @data_anim_effects.EffectAnims, @lib_0116C3.code_011707 >   ;2A
+  meta_entry < #00, #00, #00, #$0000, #07, #$2010, @data_anim_effects.EffectAnims, @lib_hdma_window_effects.RunSoulOfDetectionEffect >   ;2A
   meta_entry < #00, #00, #00, #$0000, #19, #$2040, $7E3800, @ll_laboratory_actors.ll_obj_model_town_1_0239BA >   ;2B
   meta_entry < #00, #00, #00, #$0000, #19, #$2040, $7E3800, @ll_laboratory_actors.ll_obj_model_town_2_0239F8 >   ;2C
   meta_entry < #00, #00, #00, #$0000, #00, #$2040, $7E3800, @shared_actor_helpers_bank0.cm_npc_master_shrine_menu_00766C >   ;2D
@@ -573,7 +573,7 @@ MetaMagriddsCastle [
   meta_entry < #00, #00, #00, #$0000, #03, #$2010, @data_anim_palette_cycles.PaletteAnimLists, @shared_actor_helpers_bank0.cm_fx_palette_cycle_loop_0029E8 >   ;01
   meta_entry < #00, #00, #00, #$0000, #32, #$2010, @data_anim_palette_cycles.PaletteAnimLists, @shared_actor_helpers_bank0.cm_fx_palette_cycle_loop_0029E8 >   ;02
   meta_entry < #00, #00, #00, #$0000, #33, #$2010, @data_anim_palette_cycles.PaletteAnimLists, @shared_actor_helpers_bank0.cm_fx_palette_cycle_loop_0029E8 >   ;03
-  meta_entry < #00, #00, #00, #$0000, #07, #$2010, @data_anim_effects.EffectAnims, @lib_0116C3.code_0116E2 >   ;04
+  meta_entry < #00, #00, #00, #$0000, #07, #$2010, @data_anim_effects.EffectAnims, @lib_hdma_window_effects.RunSoulOfRealityEffect >   ;04
   meta_entry < #00, #00, #00, #$0000, #00, #$2010, $000000, @mc_airship_dock_actors.mc_dock_key_wheel_026F57 >   ;05
   meta_entry < #00, #00, #00, #$0000, #00, #$2010, $000000, @mc_airship_dock_actors.mc_deck_bg2_scroll_y_fast_026F48 >   ;06
   meta_entry < #00, #00, #00, #$0000, #00, #$2010, $000000, @mc_airship_dock_actors.mc_dream_bg2_scroll_y_026F53 >   ;07
@@ -652,7 +652,7 @@ MetaWorldOfEvil [
   meta_entry < #00, #00, #00, #$0000, #38, #$2010, @data_anim_palette_cycles.PaletteAnimLists, @shared_actor_helpers_bank0.cm_fx_palette_cycle_loop_0029E8 >   ;05
   meta_entry < #00, #00, #00, #$0000, #00, #$2010, $000000, @we_evil_world_actors.we_fx_bg2_hofs_wave_01EEF3 >   ;06
   meta_entry < #00, #00, #00, #$0000, #00, #$2010, $000000, @we_evil_world_actors.we_fx_bg2_vofs_wobble_01F063 >   ;07
-  meta_entry < #00, #00, #00, #$0000, #00, #$2010, $000000, @w6_actor_01F14F.we_fx_battle_bg2_hofs_bands_01F14F >   ;08
+  meta_entry < #00, #00, #00, #$0000, #00, #$2010, $000000, @we_fx_battle_bg2_hofs_bands.we_fx_battle_bg2_hofs_bands_01F14F >   ;08
   meta_entry < #1A, #15, #63, #$0000, #00, #$0200, $7E3800, @we_deathtolls_shrine_actors.we_boss_deathtoll_mage_004D8B >   ;09
   meta_entry < #19, #0C, #2D, #$2700, #00, #$1000, $7E3800, @we_evil_world_enemies.we_enemy_purple_bull_0FEA1D >   ;0A
   meta_entry < #18, #0C, #17, #$3000, #15, #$0000, $7E3800, @we_evil_world_enemies.we_enemy_firefly_0FEB95 >   ;0B
@@ -662,7 +662,7 @@ MetaWorldOfEvil [
   meta_entry < #19, #00, #01, #$0000, #29, #$2000, $7E3800, @we_evil_world_enemies.we_enemy_static_hazard_0FEEA5 >   ;0F
   meta_entry < #00, #00, #00, #$0000, #00, #$2040, $7E3800, @shared_actor_helpers_bank0.cm_npc_master_shrine_menu_00766C >   ;10
   meta_entry < #1C, #FF, #64, #$0000, #0F, #$0201, $7E3800, @we_deathtolls_shrine_actors.we_boss_deathtoll_demon_005043 >   ;11
-  meta_entry < #00, #00, #00, #$0000, #00, #$2040, $7E3800, @w6_actor_01EC4B.we_obj_master_shrine_event_01EC4B >   ;12
+  meta_entry < #00, #00, #00, #$0000, #00, #$2040, $7E3800, @we_obj_master_shrine_event.we_obj_master_shrine_event_01EC4B >   ;12
   meta_entry < #00, #00, #00, #$0000, #20, #$2050, $7E3800, @we_deathtolls_shrine_actors.we_boss_deathtoll_mage_handover_004F4D >   ;13
   meta_entry < #00, #00, #00, #$0000, #00, #$2040, $7E3800, @we_evil_world_actors.we_obj_phoenix_call_scene_01EE6D >   ;14
 ]

@@ -1,10 +1,10 @@
 ; COP commands that change fields of an actor: position, parameters, animation, mirroring, drawing order, palette. Commands (id, uses): 11 MoveActorToTile (32), 12 SetActorResume (10), 13 SetActorParam (0), 17 SetOwnParam (367), 1D SetActorFlags (1), 1E MaskActorFlags (1), 2F ShiftPlayerActors (12), 33 ShowPlayerActors (5), 34 HidePlayerActors (12), 80 SetAnimation (1614), 81 SetAnimationRepeat (522), 82 WaitAnimationDone (1623), 83 WaitAnimationRepeat (529), 87 / 88 ToggleFlipX / Y (45 / 4), 8F / 90 FacePlayerX / Y (3 / 2), 92 StartAnimation (21), 93 StartAnimationCount (0), 94 AnimTick (22), 95 AnimTickRepeat (0), 96-99 SetFlipX / ClearFlipX / SetFlipY / ClearFlipY (226 / 310 / 10 / 14), 9D SetAnimationClearBlocked (51), 9E WaitAnimationDoneOrJumpIfBlocked (51), 9F AddX (79), A0 AddY (39), A1 AddXY (58), A2 SetPriority (54), A3 DrawInFront (121), A4 DrawBehind (34), A5 JumpByFlipState (25), A6 / A7 ClearDrawInFront / Behind (13 / 5), A8 SetAnimationTable (37), A9 SetDynamicTileSource (1), AA SetPalette (11). Conventions shared by all handlers: cop_core block note.
 ; 
 ; === FIELDS TOUCHED ===
-; Actor fields (engine_scheduler_sprites_combat_collision block note): $00/$02 x/y, $16 flags, $18 resume address, $1A attribute flags, $1C OAM attribute (bit 15 flip Y, bit 14 flip X, bits 12-13 priority, bits 9-11 palette), $1E animation id, $20 animation step, $22/$24 animation table and bank, $2A repeat counter, $2C/$34 dynamic-tile bank and source, $30 free parameter word. $1A: $8000 dynamic-tile sprite, $4000 draw in front, $2000 draw behind, $0080 not drawn.
+; Actor fields (engine_actor_scheduler_and_sprites block note): $00/$02 x/y, $16 flags, $18 resume address, $1A attribute flags, $1C OAM attribute (bit 15 flip Y, bit 14 flip X, bits 12-13 priority, bits 9-11 palette), $1E animation id, $20 animation step, $22/$24 animation table and bank, $2A repeat counter, $2C/$34 dynamic-tile bank and source, $30 free parameter word. $1A: $8000 dynamic-tile sprite, $4000 draw in front, $2000 draw behind, $0080 not drawn.
 ; 
 ; === ANIMATION COMMANDS ===
-; Cop80 and its relatives store the animation id in $1E, clear the step $20 and save the address after the command as the resume pointer. Cop82 then calls SetActorAnimFrame once per run: carry clear = a step was loaded, the actor yields and re-runs Cop82 next frame (the resume pointer points at it); carry set = the animation ended, the script goes on. Cop83 repeats the animation $2A times (set by Cop81). Cop92/Cop93/Cop94/Cop95 drive the stepper in lib_animation directly (NextFrameRecord = advance, carry set = finished, CopyFrameData = copies the record's bytes to WRAM bank $7F, a colour animation, OQ-I026-3). Cop9D and Cop9E add the tile-blocked bit: $16 bit 2 is set when the actor ran into a solid tile.
+; Cop80 and its relatives store the animation id in $1E, clear the step $20 and save the address after the command as the resume pointer. Cop82 then calls SetActorAnimFrame once per run: carry clear = a step was loaded (its duration is now in $14), the actor yields and re-runs Cop82 when that wait has run out (the resume pointer points at it); carry set = the animation ended, the script goes on. Cop83 repeats the animation $2A times (set by Cop81). Cop92/Cop93/Cop94/Cop95 drive the stepper in lib_animation directly (NextFrameRecord = advance, carry set = finished, CopyFrameData = copies the record's bytes to WRAM bank $7F, a colour animation, OQ-I026-3). Cop9D and Cop9E add the tile-blocked bit: $16 bit 2 is set when the actor ran into a solid tile.
 ; 
 ; === SPRITE ATTRIBUTES ===
 ; CopA2 and CopAA do not translate the operand: the byte is the high byte of the attribute, with the bits already in place (priority $10-$30, palette $02-$0E). CopA3/A4/A6/A7 set and clear the draw-order bits that CullAndSortActors turns into sort keys 0 (in front) and $01FE (behind). CopA8 sets the animation table pointer $22 and bank $24 (the effects bank $0E with table $8000 is used by RunAppearPuff); CopA9 turns an actor into a dynamic-tile sprite ($1A bit $8000).
@@ -16,7 +16,7 @@
 ?BANK 00
 
 ?INCLUDE 'cop_core'
-?INCLUDE 'engine_scheduler_sprites_combat_collision'
+?INCLUDE 'engine_actor_scheduler_and_sprites'
 ?INCLUDE 'lib_animation'
 
 !player_x                       0374
@@ -332,16 +332,16 @@ Cop81_SetAnimationRepeat {
 ; Sees: the script advances when the animation ends.
 ; Why: calls SetActorAnimFrame once per run; carry clear = a step was loaded; the saved resume pointer (set by Cop80) points back at this command.
 ; In: no operand; X = actor.
-; Out: animation ended (carry set): continues; otherwise yield (re-runs next frame).
+; Out: animation ended (carry set): continues; otherwise yield; the step duration is in $14, so the next call comes that many frames + 1 later.
 ; Clobbers: A, Y.
 
 Cop82_WaitAnimationDone {
     TYX 
-    JSL $@engine_scheduler_sprites_combat_collision.SetActorAnimFrame
-    BCC loc_005EBA
+    JSL $@engine_actor_scheduler_and_sprites.SetActorAnimFrame
+    BCC Cop82Yield
     BRL cop_core.CopExitContinue
 
-  loc_005EBA:
+  Cop82Yield:
     BRL cop_core.CopExitYield
 }
 ---------------------------------------------
@@ -352,20 +352,20 @@ Cop82_WaitAnimationDone {
 ; Sees: an animation plays N times, then the script goes on.
 ; Why: each finished run decrements the counter set by Cop81 and the next call restarts the animation.
 ; In: no operand; $2A,X = repeat count.
-; Out: counter zero: continues; otherwise yield while a step is running.
+; Out: counter zero: continues; otherwise yield while a step is running. The counter is decremented before it is tested, so a count of 0 would run 65536 times; no script uses a COP 81 count below 2.
 ; Clobbers: A, Y.
 
 Cop83_WaitAnimationRepeat {
     TYX 
 
-  loc_005EBE:
-    JSL $@engine_scheduler_sprites_combat_collision.SetActorAnimFrame
-    BCC loc_005ECC
+  Cop83Step:
+    JSL $@engine_actor_scheduler_and_sprites.SetActorAnimFrame
+    BCC Cop83Yield
     DEC $002A, X
-    BNE loc_005EBE
+    BNE Cop83Step
     BRL cop_core.CopExitContinue
 
-  loc_005ECC:
+  Cop83Yield:
     BRL cop_core.CopExitYield
 }
 ---------------------------------------------
@@ -693,7 +693,7 @@ Cop9E_WaitAnimationDoneOrJumpIfBlocked {
     LDA $0016, X
     BIT #$0004
     BNE loc_0061E6
-    JSL $@engine_scheduler_sprites_combat_collision.SetActorAnimFrame
+    JSL $@engine_actor_scheduler_and_sprites.SetActorAnimFrame
     BCC loc_0061E3
     BRL cop_core.CopExitSkip2
 
@@ -856,19 +856,19 @@ CopA5_JumpByFlipState {
     PLA 
     LDY #$0000
     AND #$C000            ; Y = 0, 2, 4, 6 picks the target: no flip, flip X ($4000), flip Y ($8000), both
-    BEQ loc_006286
+    BEQ CopA5Pick
     INY 
     INY 
     CMP #$4000
-    BEQ loc_006286
+    BEQ CopA5Pick
     INY 
     INY 
     CMP #$8000
-    BEQ loc_006286
+    BEQ CopA5Pick
     INY 
     INY 
 
-  loc_006286:
+  CopA5Pick:
     LDA [$38], Y
     BRL cop_core.CopExitJump
 }

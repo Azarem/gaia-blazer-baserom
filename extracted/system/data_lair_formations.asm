@@ -2,11 +2,11 @@
 ; 
 ; === MODEL ===
 ; RunLairFormation (the script of 107 lair records) places all monsters of a lair at once instead of one after the other. The index is in the lair actor's $26 (the record's +14); the list is the word at FormationPointers + $26 x 2. For each of the lair's monsters (count in $0C, the live count taken from the record's +13) it reads one row: word x, word y, word flip bits (ORed into $1C after AND $3FFF) and spawns the monster at that position with no appear puff.
-; Rows (6 bytes): +0 word x, +2 word y (pixels), +4 word OR bits for $1C (flip bits $4000 and $8000, so a formation can be mirrored). Lists have no terminator: the monster count ends the walk, so every list must have at least as many rows as the lair has monsters.
+; Rows (6 bytes): +0 word x, +2 word y (pixels), +4 word OR bits for $1C (flip bits $4000 and $8000, so a formation can be mirrored). Lists have no terminator: the monster count ends the walk, so every list must have at least as many rows as the lair has monsters (in all 107 records that use a formation the list has exactly as many rows as the record's +13).
 ; 
 ; === NOTES ===
 ; - The 112 lists keep their auto names (unk9_00EF6E ...): they are named by index in FormationPointers ($00-$6F), which is what the lair records use.
-; - Check: 224 + 434 x 6 = 2828 bytes.
+; - Check: 224 + 434 x 6 = 2828 bytes. The 107 records use 107 different lists (407 rows); the other five (indices $06, $0B, $0E, $29 and $2B; 10, 3, 6, 4 and 4 rows) are named by no record (OQ-I057-2, docs/code/data-tables.md).
 ---------------------------------------------
 
 ?BANK 01
@@ -19,7 +19,7 @@
 ; Sees: a group of monsters standing in a set pattern (some mirrored) the moment the lair opens.
 ; Why: the timed lair scripts cannot place monsters at exact positions.
 ; In: n/a (data): word at index x 2 = the bank-$01 address of a list of 6-byte rows (x word, y word, flip bits word).
-; Out: 112 lists of 434 rows in all; no list terminator (the lair's monster count ends the walk).
+; Out: 112 lists of 434 rows in all (107 used, five named by no record: OQ-I057-2); no list terminator (the lair's monster count ends the walk and equals the row count of every used list).
 ; Clobbers: n/a (data).
 
 FormationPointers [

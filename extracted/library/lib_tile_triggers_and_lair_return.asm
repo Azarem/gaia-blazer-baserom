@@ -27,15 +27,13 @@
 ?INCLUDE 'data_lair_records'
 ?INCLUDE 'data_plate_lists'
 ?INCLUDE 'engine_boot_main_loop'
-?INCLUDE 'lib_0109D6_part1'
-?INCLUDE 'lib_0109D6_part3'
 ?INCLUDE 'lib_arithmetic'
 ?INCLUDE 'lib_bit_array'
+?INCLUDE 'lib_inventory_store'
 ?INCLUDE 'lib_map_index_helpers'
+?INCLUDE 'lib_map_tile_patches'
 ?INCLUDE 'lib_menus'
-?INCLUDE 'lib_player_facing'
-?INCLUDE 'lib_player_stats'
-?INCLUDE 'lib_scene_map_patches'
+?INCLUDE 'lib_player_helpers'
 ?INCLUDE 'lib_text_render'
 
 !area_current                   0314
@@ -140,11 +138,11 @@ CheckPlayerTileTriggers {
 ; Sees: the chest tile opens, the message box shows 'Nothing inside', '<item> recieved' or 'found N GEMs' (the walkthrough: chests with Gems or items, 02-grass-valley.md line 47).
 ; Why: chest data is a list (ChestListPointers), so any room can hold chests without an actor.
 ; In: M = 1. Row of ChestListPointers (6 bytes): +0 x, +1 y of the tile the player stands on, +2 chest id (bit 7 = tile on both layers; the low 7 bits index the array $1A7E), +3 content (0 = empty, $FF = Gems, otherwise the inventory entry), +4 word Gem amount.
-; Out: carry clear = nothing happened. Carry set = the chest opened: the tile at (player_x, player_y - $20) must be $FB, becomes $FC (SetMetatileBg1 or ...Bg1Bg2), the chest bit is set, BRK #$15, the text box opens (WaitFrames with A = $1E); an item goes through StoreInventoryEntry (BRK #$9E); Gems go through lib_player_stats.AddGems with hud_dirty_flags |= $10 (BRK #$8D); an empty chest prints 'Nothing inside'. text_arg carries the entry or the amount.
+; Out: carry clear = nothing happened. Carry set = the chest opened: the tile at (player_x, player_y - $20) must be $FB, becomes $FC (SetMetatileBg1 or ...Bg1Bg2), the chest bit is set, BRK #$15, the text box opens (WaitFrames with A = $1E); an item goes through StoreInventoryEntry (BRK #$9E); Gems go through lib_player_helpers.AddGems with hud_dirty_flags |= $10 (BRK #$8D); an empty chest prints 'Nothing inside'. text_arg carries the entry or the amount.
 ; Clobbers: A, X, Y, text_arg.
 
 TryOpenChest {
-    JSL $@lib_player_facing.GetPlayerFacing
+    JSL $@lib_player_helpers.GetPlayerFacing
     BCS loc_010A5A        ; Carry set = no facing direction; A = 0 is the up direction (the chest is above the player)
     CMP #$00
     BNE loc_010A5A
@@ -201,12 +199,12 @@ TryOpenChest {
     LDA $&data_chest_lists.ChestListPointers+2, X
     BMI loc_010AA0        ; Bit 7 of the id: the chest tile exists on both layers
     LDA #$FC
-    JSL $@lib_0109D6_part1.SetMetatileBg1
+    JSL $@lib_map_tile_patches.SetMetatileBg1
     BRA loc_010AA6
 
   loc_010AA0:
     LDA #$FC
-    JSL $@lib_0109D6_part1.SetMetatileBg1Bg2
+    JSL $@lib_map_tile_patches.SetMetatileBg1Bg2
 
   loc_010AA6:
     LDA #$1E
@@ -217,7 +215,7 @@ TryOpenChest {
     BEQ loc_010ACA        ; Content byte: 0 = empty chest, $FF = Gems (amount at +4), anything else = the inventory entry
     CMP #$FF
     BEQ loc_010AD3
-    JSL $@lib_0109D6_part3.StoreInventoryEntry
+    JSL $@lib_inventory_store.StoreInventoryEntry
     LDY #$&ChestItemReceivedText
     JSL $@lib_text_render.ShowDialogueText
     BRK #$9E
@@ -234,7 +232,7 @@ TryOpenChest {
     REP #$20
     LDA $&data_chest_lists.ChestListPointers+4, X
     STA $text_arg
-    JSL $@lib_player_stats.AddGems
+    JSL $@lib_player_helpers.AddGems
     LDA #$0010
     TSB $hud_dirty_flags
     SEP #$20
@@ -258,38 +256,38 @@ TryOpenChest {
 CheckExitRegions {
     PHP 
     LDX $exit_list_ofs
-    BEQ loc_010B23
+    BEQ NoExitHit
 
-  loc_010AF8:
+  TestExitRow:
     LDA $&data_exit_lists.ExitListPointers, X
     CMP #$FF
-    BEQ loc_010B23
+    BEQ NoExitHit
     LDA $player_tile_x
     SEC 
     SBC $&data_exit_lists.ExitListPointers, X
     CMP $&data_exit_lists.ExitListPointers+2, X ; Tile test: player tile - region origin, unsigned, must be below the size
-    BCS loc_010B17
+    BCS AdvanceExitRow
     LDA $player_tile_y
     SEC 
     SBC $&data_exit_lists.ExitListPointers+1, X
     CMP $&data_exit_lists.ExitListPointers+3, X
-    BCC loc_010B26
+    BCC TestExitPixels
 
-  loc_010B17:
+  AdvanceExitRow:
     REP #$20
     TXA 
     CLC 
     ADC #$000B
     TAX 
     SEP #$20
-    BRA loc_010AF8
+    BRA TestExitRow
 
-  loc_010B23:
+  NoExitHit:
     PLP 
     CLC 
     RTL 
 
-  loc_010B26:
+  TestExitPixels:
     REP #$20
     LDA $&data_exit_lists.ExitListPointers, X
     AND #$00FF
@@ -329,12 +327,12 @@ CheckExitRegions {
     SEC 
     SBC $00               ; Pixel test: the region shrunk by 15 pixels, so the warp starts only when the player is well inside
     CMP $04
-    BCS loc_010B23
+    BCS NoExitHit
     LDA $player_y
     SEC 
     SBC $02
     CMP $06
-    BCS loc_010B23
+    BCS NoExitHit
     SEP #$20
     LDA $&data_exit_lists.ExitListPointers+4, X ; Destination of the exit: area, scene, arrival animation, x and y from the region row
     STA $area_next
@@ -397,7 +395,7 @@ TriggerVariantPlate {
     CLC 
     ADC #$02
     STA $release_slab     ; Slab = plate_variant + 2 (the variant slabs are 2 and 3)
-    JSR $&lib_scene_map_patches.CopyMapRectFromSlab
+    JSR $&lib_map_tile_patches.CopyMapRectFromSlab
     LDA #$01
     STA $sweep_step       ; Starts the sweep at step 1
     INC $sweep_bg1        ; sweep_bg1 = 1: the sweep redraws BG1 (0 redraws BG2)
@@ -500,10 +498,10 @@ ReleaseLairAtSwitch {
     PLX 
     LDA $&data_lair_records.LairRecords+E, X ; +E / +F = the staging rectangle; both zero = the lair frees an NPC instead of opening a path
     ORA $&data_lair_records.LairRecords+F, X
-    BNE loc_010C80
-    BRL loc_010D18
+    BNE ReleaseLairPathCase
+    BRL ReleaseLairNpcCase
 
-  loc_010C80:
+  ReleaseLairPathCase:
     PHX 
     LDA $&data_lair_records.LairRecords+A, X
     ORA #$80
@@ -549,11 +547,11 @@ ReleaseLairAtSwitch {
     BEQ loc_010CFA
     LSR 
     BCC loc_010CE1
-    JSR $&lib_scene_map_patches.CopyMapRectFromStagingBothLayers
+    JSR $&lib_map_tile_patches.CopyMapRectFromStagingBothLayers
     BRA loc_010CE4
 
   loc_010CE1:
-    JSR $&lib_scene_map_patches.CopyMapRectFromStaging
+    JSR $&lib_map_tile_patches.CopyMapRectFromStaging
 
   loc_010CE4:
     BRK #$94
@@ -569,7 +567,7 @@ ReleaseLairAtSwitch {
     BRA loc_010D03
 
   loc_010CFA:
-    JSR $&lib_scene_map_patches.CopyMapRectFromStaging
+    JSR $&lib_map_tile_patches.CopyMapRectFromStaging
 
   loc_010CFD:
     JSL $@engine_boot_main_loop.RunSubFrameMapSweep
@@ -588,7 +586,7 @@ ReleaseLairAtSwitch {
     STZ $sweep_bg1
     RTL 
 
-  loc_010D18:
+  ReleaseLairNpcCase:
     PHX 
     LDA $&data_lair_records.LairRecords+A, X
     ORA #$C0
@@ -597,7 +595,7 @@ ReleaseLairAtSwitch {
     PLX 
     LDA $&data_lair_records.LairRecords, X
     CMP $location_id
-    BNE loc_010D54
+    BNE StartLairReturnTrip
     REP #$20
     LDA $&data_lair_records.LairRecords+2, X
     AND #$00FF
@@ -619,7 +617,7 @@ ReleaseLairAtSwitch {
     STA $tile_type_map, X ; Type 1 on the NPC's home tile: RunLairReleaseOnReturn looks for it
     BRA loc_010CFD
 
-  loc_010D54:
+  StartLairReturnTrip:
     BRK #$98
     LDA $area_current
     STA $return_area      ; The home is elsewhere: save the return point (area, scene, x, y - 16) and warp to the NPC
@@ -779,7 +777,7 @@ PlayLairReleaseScene {
     BRA loc_010E95
 
   loc_010E74:
-    JSR $&lib_scene_map_patches.CopyMapRectFromSlab
+    JSR $&lib_map_tile_patches.CopyMapRectFromSlab
     LDA #$01
     STA $sweep_step
     INC $sweep_bg1
@@ -1073,7 +1071,7 @@ ChestEmptyText |[10] Nothing inside-[JMP:&ChestGemsFoundText+M]|
 
 ; '<hero> found <n> GEMs-' chest message and the shared tail of the five chest and lair messages.
 ; 
-; When: TryOpenChest, when the content byte is $FF (the amount is the word at row +4, added to the Gem counter by lib_player_stats.AddGems); the other four strings jump into its '+M' entry.
+; When: TryOpenChest, when the content byte is $FF (the amount is the word at row +4, added to the Gem counter by lib_player_helpers.AddGems); the other four strings jump into its '+M' entry.
 ; Sees: the player name, 'found' and the amount with ' GEMs-' on the second line ([03:24] sets the highlight attribute for the number); then the box waits for a key and disappears. The ROM text spells 'GEMs', the walkthrough 'Gems'.
 ; Why: the key wait and box erase are written once, in the part that every message reaches.
 ; In: n/a (data). text_arg = the Gem amount as packed BCD, 3 digits ([06:3,03C8]); entered at [::] by the other messages, where text_arg means something else.

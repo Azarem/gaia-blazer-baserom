@@ -1,0 +1,4 @@
+[
+  { "address": 6757,  "old": null, "new": "loc_001A65", "row": "P3-3.2", "note": "branch target inside code_001A28 reached by 32 JMP/BRA from the engine_routines block; a cross-block branch does not create the sub-label, so it needs a names entry" },
+  { "address": 22720, "old": null, "new": "loc_0058C0", "row": "P3-3.3", "note": "branch target inside cop_handler_0058A9 reached by BRL from cop_handler_005C81 (other block)" }
+]

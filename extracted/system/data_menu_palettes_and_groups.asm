@@ -1,7 +1,7 @@
 ; Menu palettes and the tile group map (file offsets 323584-324511, SNES $09:F000-$F39F, bank 04; 256 + 256 + 256 + 160 bytes).
 ; 
 ; === WHAT IS HERE ===
-; ItemPagePalette and MenuBgPalette are 256-byte palettes (CGRAM colours 0-127) copied into cgram_buffer for the item page and the rest of the menus. MenuTileGroupMap is a 16 x 16 map of group numbers (x 8 indexes IconTileRecords) used by code_012390 (lib_shared_012390). MenuSpellPalettes holds the palettes 11-15 (160 bytes, cgram_buffer + $160) restored after a menu closes.
+; ItemPagePalette and MenuBgPalette are 256-byte palettes (CGRAM colours 0-127) copied into cgram_buffer for the item page and the rest of the menus. MenuTileGroupMap is a 16 x 16 map of group numbers (x 8 indexes IconTileRecords) used by ExpandMenuTileGroups (lib_menu_screen_setup). MenuSpellPalettes holds the palettes 11-15 (160 bytes, cgram_buffer + $160) restored after a menu closes.
 ---------------------------------------------
 
 ---------------------------------------------
@@ -37,7 +37,7 @@ ItemPagePalette [
 
 ; The menu palette: 256 bytes, colours 0-127.
 ; 
-; When: LoadMenuPalette (OpenEquipmentMenu, RedrawEquipmentPage and lib_01232B).
+; When: LoadMenuPalette (OpenEquipmentMenu, RedrawEquipmentPage and lib_menu_screen_setup).
 ; Sees: the menu colours on the next NMI upload.
 ; Why: the CGRAM buffer is uploaded by the NMI, so loading the palette is a copy.
 ; In: n/a (data): 128 BGR555 words.
@@ -66,7 +66,7 @@ MenuBgPalette [
 
 ; A 16 x 16 map of tile group numbers for the icon records.
 ; 
-; When: code_012390 (lib_shared_012390), when it draws a block of icon tiles.
+; When: ExpandMenuTileGroups (lib_menu_screen_setup), when it draws a block of icon tiles.
 ; Sees: a block of icon tiles drawn in one pass.
 ; Why: the group number selects the icon record (group x 8 into IconTileRecords).
 ; In: n/a (data): 256 bytes, row-major.

@@ -1,0 +1,16 @@
+[
+  { "address": 135179, "old": "code_02100B", "new": "ms_npc_boy_leo_lab_hint_02100B", "row": "I037-B1" },
+  { "address": 135311, "old": "code_02108F", "new": "ms_npc_snail_nome_silver_stone_02108F", "row": "I037-B1" },
+  { "address": 135779, "old": "code_021263", "new": "ms_npc_grandpa_lucky_blade_021263", "row": "I037-B1" },
+  { "address": 135934, "old": "code_0212FE", "new": "ms_npc_snail_jockey_legend_0212FE", "row": "I037-B1" },
+  { "address": 136277, "old": "code_021455", "new": "ms_npc_snail_jockey_flash_021455", "row": "I037-B1" },
+  { "address": 136625, "old": "code_0215B1", "new": "ms_npc_snail_jockey_third_0215B1", "row": "I037-B1" },
+  { "address": 136977, "old": "code_021711", "new": "ms_npc_mushroom_short_lives_021711", "row": "I037-B1" },
+  { "address": 137177, "old": "code_0217D9", "new": "ms_npc_grandpa_lune_gate_0217D9", "row": "I037-B1" },
+  { "address": 137407, "old": "code_0218BF", "new": "ms_npc_grandpa_dream_rod_0218BF", "row": "I037-B1" },
+  { "address": 137567, "old": "code_02195F", "new": "ms_npc_snail_old_man_child_02195F", "row": "I037-B1" },
+  { "address": 137678, "old": "code_0219CE", "new": "ms_npc_mushroom_prison_0219CE", "row": "I037-B1" },
+  { "address": 137803, "old": "code_021A4B", "new": "ms_npc_snail_master_emblem_e_021A4B", "row": "I037-B1" },
+  { "address": 137930, "old": "code_021ACA", "new": "ms_npc_girl_race_starter_021ACA", "row": "I037-B1" },
+  { "address": 138416, "old": "code_021CB0", "new": "ms_npc_girl_mountain_warm_021CB0", "row": "I037-B1" }
+]

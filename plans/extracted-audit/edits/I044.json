@@ -1,0 +1,81 @@
+{
+  "_note": "I044: corrections to stale statements found while writing docs/code/actor-system.md. Evidence: RunActors loads actor_list_tail and NextActor loads $3E, so run order is tail to head along $3E; SpawnActorAfter sets new.$3E = X and X.$3C = new (the new actor sits before X in run order, first run next frame); SpawnActorBefore sets new.$3C = X and X.$3E = new (right after X, same frame); SpawnPlacementList links every actor as the new head; the run order of the player helpers in player_core (WatchForLevelUp, RunSoulOrb, FilterPlayerInput, player, RunWeaponLayer, FinishPlayerMove) agrees. data_scene_placements: rg over the 97 lists finds 93 rows with meta type 0 and four lists whose first row is not type 0 (A00S09 type $53; A00S0A, A00S0B, A00S0C one row each, types $56, $57, $5B). RespawnOrKillActor: rg for stores into $1A in extracted/ finds only bits $0080, $0100, $0200, $0400, $0800, $2000, $4000 and $8000, never $1000. Open points: questions/I044_questions.md.",
+
+  "system/cop_core.asm": {
+    "blockNote": { "edit": [
+      { "find": "($3C = next, $3E = previous; heads $06A6 and $06A8)",
+        "with": "($3C points toward the tail = earlier in run order, $3E toward the head = later; actor_list_tail $06A6 runs first, actor_list_head $06A8 last)" },
+      { "find": "link a new actor after (SpawnActorAfter) or before (SpawnActorBefore) the caller",
+        "with": "link a new actor on the $3C side of the caller (SpawnActorAfter: the new actor runs before the caller, first on the next frame) or on the $3E side (SpawnActorBefore: it runs right after the caller, in the same frame)" }
+    ] },
+    "partNotes": {
+      "SpawnActorAfter": { "edit": [
+        { "find": "Sees: a monster, effect, projectile or pickup appears next to its spawner.",
+          "with": "Sees: a monster, effect, projectile or pickup appears next to its spawner; it sits before X in run order, so its first run is the next frame." }
+      ] }
+    }
+  },
+
+  "cop_handlers/cop_tiles_spawn_kill.asm": {
+    "blockNote": { "edit": [
+      { "find": "($3C next, $3E previous; heads $06A8 / $06A6)",
+        "with": "($3C toward the tail, $3E toward the head; the tail $06A6 runs first)" }
+    ] },
+    "partNotes": {
+      "Cop84_SpawnActorAfter": { "edit": [
+        { "find": "Why: actor list order decides who runs first; after = later.",
+          "with": "Why: the actor loop runs from the tail along $3E, and the new actor is linked on the $3C side of the caller, so it runs before the caller and first on the next frame (the player's input filter and level-up watcher use it to run ahead of the hero)." }
+      ] },
+      "Cop85_SpawnActorBefore": { "edit": [
+        { "find": "Why: see Cop84; before = runs earlier.",
+          "with": "Why: the new actor is linked on the $3E side of the caller, so it runs right after the caller in the same frame (the player's weapon layer and move finisher use it to run after the hero)." }
+      ] }
+    },
+    "comments": {
+      "24337": "Unlink from the list: $3C = toward the tail (earlier in run order), $3E = toward the head; no $3C neighbour means the actor is the tail"
+    }
+  },
+
+  "system/engine_actor_scheduler_and_sprites.asm": {
+    "blockNote": { "edit": [
+      { "find": "A new actor is linked in as the new head.",
+        "with": "A scene's placement list links each actor in as the new head, so its first row is the tail and runs first; SpawnActorAfter links on the $3C side of its caller (the new actor runs before the caller, first on the next frame) and SpawnActorBefore on the $3E side (right after the caller, in the same frame)." }
+    ] }
+  },
+
+  "system/engine_spawn_lairs_death_drops.asm": {
+    "blockNote": { "edit": [
+      { "find": "re-creates it in the same slot from its placement record ($3A).",
+        "with": "re-creates it in the same slot from its placement record ($3A). No code in extracted/ sets $1A bit $1000, so by static reading the respawn branch is never taken (OQ-I044-6)." }
+    ] },
+    "partNotes": {
+      "RespawnOrKillActor": { "edit": [
+        { "find": "Sees: the enemy is gone; a respawning enemy returns as a fresh copy after the player has left it off screen for about 10 seconds.",
+          "with": "Sees: the enemy is gone. With $1A bit $1000 set it would return as a fresh copy after the player has left it off screen for about 10 seconds; no code in extracted/ sets that bit (OQ-I044-6), so by static reading every enemy without a lair is killed here." },
+        { "find": "Why: ordinary field enemies come back, scripted ones (and bosses) do not; $1A bit $1000 decides.",
+          "with": "Why: $1A bit $1000 is the switch between a field enemy that comes back and a scripted actor or boss that does not." }
+      ] }
+    }
+  },
+
+  "system/data_scene_placements.asm": {
+    "blockNote": { "edit": [
+      { "find": "The first row of every list is the hero (meta type 0): its tile is the start position of the scene when no warp_dest is set.",
+        "with": "The first row of 93 of the 97 lists is the hero (meta type 0): its tile is the start position of the scene when no warp_dest is set. The four lists without a hero are PlacementA00S09 (first row type $53) and PlacementA00S0A, PlacementA00S0B and PlacementA00S0C (one row each, types $56, $57 and $5B); by static reading these are the scenes of locations $0F-$12, which have no player (OQ-I044-5)." },
+      { "find": "913 rows in all (97 hero rows and 816 actors)",
+        "with": "913 rows in all (93 hero rows and 820 other actors)" }
+    ] }
+  },
+
+  "st_elles/seabed_sanctuary/se_seabed_sanctuary_actors_0F8D58.asm": {
+    "partNotes": {
+      "se_obj_pearl_ride_out_0F8FAB": { "edit": [
+        { "find": "$3C is the next-actor link, which is the dolphin because the ride actor was spawned before it.",
+          "with": "$3C is the link toward the tail and holds the spawner, which is the dolphin because the ride actor was spawned before it (COP 85)." }
+      ] }
+    },
+    "comments": {
+      "1019845": "$3C holds the spawner (COP 85 stores it in the new actor): the ride actor was spawned before the dolphin, so Y is the dolphin"
+    }
+  }
+}

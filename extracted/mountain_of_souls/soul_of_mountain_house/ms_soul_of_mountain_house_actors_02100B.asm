@@ -29,7 +29,7 @@
 
 ?BANK 04
 
-?INCLUDE 'engine_003005'
+?INCLUDE 'engine_player_death_and_actor_helpers'
 ?INCLUDE 'engine_spawn_lairs_death_drops'
 ?INCLUDE 'shared_actor_helpers_bank4'
 
@@ -50,10 +50,10 @@ ms_npc_boy_leo_lab_hint_02100B {
     COP [3B] ( #$00D7, &code_021021 )
     COP [17] ( &shared_actor_helpers_bank4.cm_npc_captive_plea_02229E )
     SEP #$20
-    LDA #$^engine_003005.HoldActorUntilReleased
+    LDA #$^engine_player_death_and_actor_helpers.HoldActorUntilReleased
     PHA 
     REP #$20
-    LDA #$&engine_003005.HoldActorUntilReleased-1
+    LDA #$&engine_player_death_and_actor_helpers.HoldActorUntilReleased-1
     PHA 
     RTL 
 }
@@ -87,10 +87,10 @@ ms_npc_snail_nome_silver_stone_02108F {
     COP [3B] ( #$00D6, &code_0210A5 )
     COP [17] ( &shared_actor_helpers_bank4.cm_npc_captive_plea_02229E )
     SEP #$20
-    LDA #$^engine_003005.HoldActorUntilReleased
+    LDA #$^engine_player_death_and_actor_helpers.HoldActorUntilReleased
     PHA 
     REP #$20
-    LDA #$&engine_003005.HoldActorUntilReleased-1
+    LDA #$&engine_player_death_and_actor_helpers.HoldActorUntilReleased-1
     PHA 
     RTL 
 }
@@ -146,7 +146,7 @@ code_02126A {
 }
 
 code_02127E {
-    COP [09] ( #$8706 )   ; flag $0706 is set once the King is free; no script that reads it was found (OQ-I037-4)
+    COP [09] ( #$8706 )   ; flag $0706 is set once the King is free; it is bit number $3E of three FlagMapPatchTable rows at location $3D that ApplyFlagMapPatches reads at scene load
     COP [17] ( &code_02128E )
     COP [91]
     RTL 
@@ -681,10 +681,10 @@ ms_npc_snail_old_man_child_02195F {
     COP [3B] ( #$00FA, &code_021975 )
     COP [17] ( &shared_actor_helpers_bank4.cm_npc_captive_plea_02229E )
     SEP #$20
-    LDA #$^engine_003005.HoldActorUntilReleased
+    LDA #$^engine_player_death_and_actor_helpers.HoldActorUntilReleased
     PHA 
     REP #$20
-    LDA #$&engine_003005.HoldActorUntilReleased-1
+    LDA #$&engine_player_death_and_actor_helpers.HoldActorUntilReleased-1
     PHA 
     RTL 
 }

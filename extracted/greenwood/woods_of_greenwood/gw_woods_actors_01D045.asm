@@ -14,7 +14,7 @@
 ; $46 gw_effect_wave_hdma_01E9D3: the wave effect of the Woods, placed in A04S01 and A04S06.
 ; 
 ; === THE SHOW OF THE WOODSTIN-TRIO (Billy, the deer of gw_woods_actors_01B98D and the dog) ===
-; The three actors never talk to each other except through the event flags $0000-$0007 of byte 0 of event_flags ($1A5E). COP 05 waits until a flag is set, COP 09 sets or clears it. Billy and the dog use COP 3B: while their lair is not released they are held (talk handler shared_actor_helpers_bank3.cm_npc_captive_plea_01B191, 'Please, someone help me!', then engine_003005.HoldActorUntilReleased); the deer uses COP 14.
+; The three actors never talk to each other except through the event flags $0000-$0007 of byte 0 of event_flags ($1A5E). COP 05 waits until a flag is set, COP 09 sets or clears it. Billy and the dog use COP 3B: while their lair is not released they are held (talk handler shared_actor_helpers_bank3.cm_npc_captive_plea_01B191, 'Please, someone help me!', then engine_player_death_and_actor_helpers.HoldActorUntilReleased); the deer uses COP 14.
 ; Round 1 (the transformation, walkthrough: 'speak with the one in the lead and he'll first transform his buddies into squirrels like him'): the hero talks to Billy: 'The band is back together, so let's start the show!', flag $0003 is set. The deer waits for $0003, dances, plays animation $00 (the squirrel look) and sets $0004. The dog waits for $0004, dances, sets $0005. Billy waits for $0005, clears it and offers the game. The text routines for the three are code_01D0E3 (Billy), code_01BC21 (deer) and code_01D3EA (dog).
 ; Round 2 (the guessing game): Billy's second talk: 'you must try and guess the real squirrel, me ... Here we go!' sets flag $0006. The deer and the dog wait for $0006 and start to shuffle (animations $03-$05, flips); Billy clears $0006 in the middle of his own shuffle (118951). Afterwards each of the three has a talk handler that says 'Okay, let's see if I really am Billy': the deer and the dog set $0006 and $0007 (a wrong pick), Billy sets $0000 and $0007 (the right pick; walkthrough: 'he is always the rightmost squirrel'). Flag $0007 releases the other two waits: the deer and the dog puff back (animation $0C) and say 'Too bad, almost' or, when $0000 is set, 'I hope you liked our show'; Billy says 'Too bad, but please try again soon' when $0006 is set, otherwise 'You're right!! Okay, I will give you a present' and gives the Medical Herb (item $38). Leaving and re-entering the scene starts the show again (the walkthrough: 'you play as much as desired (just leave and re-enter the area to play again)'). The flags are plain event flags; no run of the protocol was traced in the emulator (OQ-I035-5), and the boss of the Lostside marsh clears the whole of event_flags byte 0 (OQ-I035-8).
 ; 
@@ -34,7 +34,7 @@
 
 ?BANK 03
 
-?INCLUDE 'engine_003005'
+?INCLUDE 'engine_player_death_and_actor_helpers'
 ?INCLUDE 'engine_spawn_lairs_death_drops'
 ?INCLUDE 'gw_watching_over_world_return_prompt_texts'
 ?INCLUDE 'lib_system_helpers'
@@ -63,10 +63,10 @@ gw_npc_squirrel_billy_01D045 {
     COP [3B] ( #$005D, &code_01D05B )
     COP [17] ( &shared_actor_helpers_bank3.cm_npc_captive_plea_01B191 )
     SEP #$20
-    LDA #$^engine_003005.HoldActorUntilReleased
+    LDA #$^engine_player_death_and_actor_helpers.HoldActorUntilReleased
     PHA 
     REP #$20
-    LDA #$&engine_003005.HoldActorUntilReleased-1
+    LDA #$&engine_player_death_and_actor_helpers.HoldActorUntilReleased-1
     PHA 
     RTL 
 }
@@ -200,10 +200,10 @@ gw_npc_dog_woodstin_trio_01D2F3 {
     COP [3B] ( #$003F, &code_01D309 )
     COP [17] ( &shared_actor_helpers_bank3.cm_npc_captive_plea_01B191 )
     SEP #$20
-    LDA #$^engine_003005.HoldActorUntilReleased
+    LDA #$^engine_player_death_and_actor_helpers.HoldActorUntilReleased
     PHA 
     REP #$20
-    LDA #$&engine_003005.HoldActorUntilReleased-1
+    LDA #$&engine_player_death_and_actor_helpers.HoldActorUntilReleased-1
     PHA 
     RTL 
 }
@@ -362,7 +362,7 @@ code_01D51D {
     BRK #$5E
     COP [0A] ( #3B )      ; item $3B is the Green Stone
     COP [09] ( #$8507 )
-    COP [09] ( #$9B01 )   ; flag $1B01: read by gv_up_above_actors_and_name_entry, purpose not traced (OQ-I035-7)
+    COP [09] ( #$9B01 )   ; flag $1B01 = the Green Stone was given (flags $1B00-$1B05 pair with stones $3A-$3F); gv_up_above_actors_and_name_entry reads $1B00-$1B05 for its path markers
 }
 
 code_01D52E {
@@ -634,7 +634,7 @@ code_01D9A5 {
 code_01D9AF {
     COP [91]
     COP [18] ( #1F, &code_01D9BA )
-    COP [09] ( #$8907 )   ; flag $0907 is set when $0307 and $0400 are clear and the ribbon is in the bag; no reader found (OQ-I035-6)
+    COP [09] ( #$8907 )   ; flag $0907 is set when $0307 and $0400 are clear and the ribbon is in the bag; it is bit number $4F of a FlagMapPatchTable row at location $16 that ApplyFlagMapPatches reads at scene load
 }
 
 code_01D9BA {

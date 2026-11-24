@@ -13,11 +13,11 @@
 ; === FLAG BITS USED ===
 ; - $16 bit $0200 (the 'unexplained' bit of OQ-I005-14) is part of the engine's target mask $EEC0, so an actor with it cannot be hit by sword or projectile; bit $0100 keeps an actor from being a hit source ($0D00); $0080 is a hit source, $0020 a projectile, $0002 deflects hits. The bolts and flashes of the pyramid use $02A0 (unhittable hit-source projectile), the seeds, bubbles and tornado $0200, the rocks $0202.
 ; - $1A bit $0400 is the metal immunity class (only the Zantetsu Sword hurts): the Metal Ape sets it for good.
-; - The lava bomb has $16 = $0301 while it flies; DestroyHazardsNearOrb (engine_003005, the Soul of Shield) bursts exactly such actors near the orb. This confirms the link the engine note called inferred: the Durean bombs are the $0301 actors.
+; - The lava bomb has $16 = $0301 while it flies; DestroyHazardsNearOrb (engine_player_death_and_actor_helpers, the Soul of Shield) bursts exactly such actors near the orb. This confirms the link the engine note called inferred: the Durean bombs are the $0301 actors.
 ; 
 ; === OPEN ===
 ; - The Purple Fish treats a non-zero tile_type_map byte under it as 'in the water' and zero as dry land (inferred from the walkthrough: the fish dries up and lies down when the water is gone; OQ-I036-10).
-; - The Lightning Pyramid damage: the bolt sets $30 = $00FF; whether the hit code reads $30 as the damage is inferred from the walkthrough ('zapping any enemy nearby to death - even if they are metal enemies').
+; - The Lightning Pyramid damage: the bolt sets $30 = $00FF; ApplyProjectileHit reads $30 first and $FF skips the boss, class and Phoenix tests, so the bolt kills any enemy as the walkthrough says ('zapping any enemy nearby to death - even if they are metal enemies').
 ---------------------------------------------
 
 ?BANK 1F

@@ -1,0 +1,232 @@
+[
+  {
+    "area": "area_00",
+    "new": "up_above",
+    "note": "Up Above: the world shrines and the Trial room; scene N (1-7) is the shrine of world N",
+    "scenes": {
+      "scene_01": "grass_valley_shrine",
+      "scene_02": "greenwood_shrine",
+      "scene_03": "st_elles_shrine",
+      "scene_04": "soul_sanctuary",
+      "scene_05": "laboratory_shrine",
+      "scene_06": "magridd_castle_shrine",
+      "scene_07": "evil_world_shrine",
+      "scene_08": "trial_room",
+      "scene_09": "unnamed_0f",
+      "scene_0A": "unnamed_10",
+      "scene_0B": "unnamed_11",
+      "scene_0C": "unnamed_12",
+      "scene_0D": "unnamed_13"
+    }
+  },
+  {
+    "area": "area_01",
+    "new": "grass_valley_village",
+    "scenes": {
+      "scene_01": "highlands",
+      "scene_02": "childs_secret_passage",
+      "scene_03": "treasure_room",
+      "scene_04": "chiefs_room"
+    }
+  },
+  {
+    "area": "area_02",
+    "new": "underground_castle",
+    "scenes": {
+      "scene_01": "west",
+      "scene_02": "east",
+      "scene_03": "lisas_dream"
+    }
+  },
+  {
+    "area": "area_03",
+    "new": "leos_paintings",
+    "scenes": {
+      "scene_01": "paintings_1",
+      "scene_02": "paintings_2",
+      "scene_03": "paintings_3",
+      "scene_04": "tulips_dream",
+      "scene_05": "paintings_4",
+      "scene_06": "metal_mantis"
+    }
+  },
+  {
+    "area": "area_04",
+    "new": "woods_of_greenwood",
+    "scenes": {
+      "scene_01": "woods",
+      "scene_02": "moles_hole",
+      "scene_03": "squirrels_house",
+      "scene_04": "squirrel_exchanger",
+      "scene_05": "birds_dream",
+      "scene_06": "stumps_dream"
+    }
+  },
+  {
+    "area": "area_05",
+    "new": "lostside_marsh",
+    "scenes": {
+      "scene_01": "marsh",
+      "scene_02": "water_shrine_1",
+      "scene_03": "water_shrine_2",
+      "scene_04": "water_shrine_3",
+      "scene_05": "fire_shrine_1",
+      "scene_06": "fire_shrine_2",
+      "scene_07": "fire_shrine_3",
+      "scene_08": "light_shrine_1",
+      "scene_09": "light_shrine_2",
+      "scene_0A": "statue_tomb"
+    }
+  },
+  {
+    "area": "area_06",
+    "new": "seabed_sanctuary",
+    "scenes": {
+      "scene_01": "sanctuary"
+    }
+  },
+  {
+    "area": "area_07",
+    "new": "seabed_of_st_elles",
+    "scenes": {
+      "scene_01": "seabed_1",
+      "scene_02": "secret_cave_1",
+      "scene_03": "secret_cave_2",
+      "scene_04": "dolphins_dream",
+      "scene_05": "seabed_2"
+    }
+  },
+  {
+    "area": "area_08",
+    "new": "st_elles_coast",
+    "scenes": {
+      "scene_01": "southerta",
+      "scene_02": "rockbird_reef",
+      "scene_03": "durean",
+      "scene_04": "blester"
+    }
+  },
+  {
+    "area": "area_09",
+    "new": "ghost_ship",
+    "scenes": {
+      "scene_01": "ship",
+      "scene_02": "servas_dream"
+    }
+  },
+  {
+    "area": "area_0A",
+    "new": "soul_of_mountain_house",
+    "scenes": {
+      "scene_01": "house"
+    }
+  },
+  {
+    "area": "area_0B",
+    "new": "mountain_of_souls_dungeon",
+    "scenes": {
+      "scene_01": "north_slope",
+      "scene_02": "aurora_ridge",
+      "scene_03": "old_mans_dream",
+      "scene_04": "passage_to_lune",
+      "scene_05": "lune_lake",
+      "scene_06": "mushrooms_dream",
+      "scene_07": "poseidon"
+    }
+  },
+  {
+    "area": "area_0C",
+    "new": "snow_mountain",
+    "scenes": {
+      "scene_01": "summit",
+      "scene_02": "ice_hill",
+      "scene_03": "laynole_ice_field"
+    }
+  },
+  {
+    "area": "area_0D",
+    "new": "leos_laboratory",
+    "scenes": {
+      "scene_01": "laboratory_1",
+      "scene_02": "laboratory_2",
+      "scene_03": "attic",
+      "scene_04": "mice_nest",
+      "scene_05": "cats_dream"
+    }
+  },
+  {
+    "area": "area_0E",
+    "new": "laboratory_dungeon",
+    "scenes": {
+      "scene_01": "basement_1",
+      "scene_02": "basement_2",
+      "scene_03": "power_plant",
+      "scene_04": "tin_doll",
+      "scene_05": "dream"
+    }
+  },
+  {
+    "area": "area_0F",
+    "new": "town_models",
+    "scenes": {
+      "scene_01": "model_1",
+      "scene_02": "model_2"
+    }
+  },
+  {
+    "area": "area_10",
+    "new": "castle_of_magridd",
+    "scenes": {
+      "scene_01": "castle"
+    }
+  },
+  {
+    "area": "area_11",
+    "new": "castle_dungeon",
+    "scenes": {
+      "scene_01": "torture_chamber",
+      "scene_02": "basement_1",
+      "scene_03": "basement_2",
+      "scene_04": "dream"
+    }
+  },
+  {
+    "area": "area_12",
+    "new": "castle_towers",
+    "scenes": {
+      "scene_01": "left_tower_1",
+      "scene_02": "left_tower_2",
+      "scene_03": "prison",
+      "scene_04": "right_tower_1",
+      "scene_05": "right_tower_2",
+      "scene_06": "right_tower_3",
+      "scene_07": "dock_corridor"
+    }
+  },
+  {
+    "area": "area_13",
+    "new": "airship_dock",
+    "scenes": {
+      "scene_01": "dock",
+      "scene_02": "deck",
+      "scene_03": "soldiers_dream"
+    }
+  },
+  {
+    "area": "area_14",
+    "new": "evil_world",
+    "scenes": {
+      "scene_01": "world_of_evil_1",
+      "scene_02": "world_of_evil_2",
+      "scene_03": "dazzling_space"
+    }
+  },
+  {
+    "area": "area_15",
+    "new": "deathtolls_shrine",
+    "scenes": {
+      "scene_01": "shrine",
+      "scene_02": "battle"
+    }
+  }
+]

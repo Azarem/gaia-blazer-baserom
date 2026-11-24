@@ -11,7 +11,7 @@
 ; - se_npc_mermaid_red_hot_stick_0F982F: switch $8E (captive). Gives the Red-Hot Stick (item $34) when the hero has neither it nor the Phoenix (item $18): 'The Phoenix resides on the Stick. Take the Red-Hot Stick and visit the Mountain King.'
 ; - se_npc_mermaid_guard_west_0F98F5: switch $8A. The west guard of the portal to Lue: with the Thunder Ring (item $24) in the bag she steps aside at once; without it she asks 'Have you seen the Queen of the Mermaids?' (Yes / No): Yes: 'Lue, the dolphin has been captured! Please save him!' and she steps aside; No: 'Okay, wait.' and she shows what the Queen looks like, then the same message.
 ; - se_npc_statue_arrival_hint_0FA014: switches $B6 and $9D. The statue of the arrival: before the first passage is opened '[the hero] heard a small voice. This is St. Elles Palace in the ocean. No human can live under the sea. Go to the island, Southerta, through the shrine and look for the Bubble Clothing.' (flag $0502); afterwards 'Listen closely to the advice of the 4 mermaid statues.' It removes itself when the Queen is free.
-; - se_effect_sanctuary_wave_hdma_0FA7C4: the water shimmer of the Sanctuary (HDMA channel $0F).
+; - se_effect_sanctuary_wave_hdma_0FA7C4: the water shimmer of the Sanctuary (HDMA on PPU register $0F).
 ; 
 ; === EVENT FLAGS ===
 ; $0000 first talk to the pearl ride dolphin, $0500 / $0501 the Durean / ghost ship passage was used (set by the gate actors of se_seabed_of_st_elles_actors), $0502 the arrival statue has spoken, $0503 the volcano of Durean is out, $0903 a statue trip is running (cleared by the gate on return), $1B02 the Blue Stone was given, $1F02 the ending was run, $0002 the west guard has been told 'wait' (No answer).
@@ -22,12 +22,12 @@
 
 ?BANK 1F
 
-?INCLUDE 'engine_003005'
+?INCLUDE 'engine_player_death_and_actor_helpers'
 ?INCLUDE 'engine_spawn_lairs_death_drops'
 ?INCLUDE 'lib_system_helpers'
 ?INCLUDE 'se_seabed_sanctuary_actors_0F8000'
 ?INCLUDE 'shared_choice_prompt_texts'
-?INCLUDE 'w2_shared_0FA945'
+?INCLUDE 'w2_obj_fairy_idle_loop'
 
 !L_choice_result                0003D0
 !frame_counter                  0312
@@ -51,12 +51,12 @@
 
 se_npc_mermaid_tears_hint_0F8D58 {
     COP [3B] ( #$00A7, &code_0F8D6E )
-    COP [17] ( &w2_shared_0FA945.w2_npc_caged_plea_0FA95A )
+    COP [17] ( &w2_obj_fairy_idle_loop.w2_npc_caged_plea_0FA95A )
     SEP #$20
-    LDA #$^engine_003005.HoldActorUntilReleased
+    LDA #$^engine_player_death_and_actor_helpers.HoldActorUntilReleased
     PHA 
     REP #$20
-    LDA #$&engine_003005.HoldActorUntilReleased-1
+    LDA #$&engine_player_death_and_actor_helpers.HoldActorUntilReleased-1
     PHA 
     RTL 
 }
@@ -97,11 +97,11 @@ code_0F8D96 {
     RTL 
 }
 
-asciistring_0F8D9B |[10]The teardrops from a [N]mermaid have the power[N]to turn Magma to [N]stone- [FIN]Use them at the top of[N]the volcanic island- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F8D9B |[10]The teardrops from a [N]mermaid have the power[N]to turn Magma to [N]stone- [FIN]Use them at the top of[N]the volcanic island- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 
-asciistring_0F8DF9 |[10]Open the treasure [N]chest- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F8DF9 |[10]Open the treasure [N]chest- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 
-asciistring_0F8E14 |[10]These teardrops were [N]left by a mermaid when[N]evil invaded this [N]place- [FIN]Icy teardrops, filled [N]with sorrow, will turn[N]even the hottest Magma[N]to stone- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F8E14 |[10]These teardrops were [N]left by a mermaid when[N]evil invaded this [N]place- [FIN]Icy teardrops, filled [N]with sorrow, will turn[N]even the hottest Magma[N]to stone- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 ---------------------------------------------
 
 ; The mermaid statue of the passage to Durean (switch $AB).
@@ -162,7 +162,7 @@ code_0F8EE9 {
     RTL 
 }
 
-asciistring_0F8EF0 |[10]I will open the [N]passage for you- [FIN]Walk downward under [N]the sea and go to the [N]volcanic island, [N]Durean- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F8EF0 |[10]I will open the [N]passage for you- [FIN]Walk downward under [N]the sea and go to the [N]volcanic island, [N]Durean- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 ---------------------------------------------
 
 ; The dolphin of the Big Pearl ride (switch $C1).
@@ -229,7 +229,7 @@ code_0F8F97 {
 ; When: spawned by the dolphin (COP 85, before it).
 ; Sees: blocks the pad ($2F80), loads $0025 with $01B0 as a countdown and clears bit $1000 of the hero's $16; every frame the hero's Y is set to the dolphin's Y minus $20 and his $0006 to $FFFF; at zero the bit is set again, the pad released and the actor kills itself.
 ; Why: the hero is dragged by the dolphin instead of walking.
-; In: X = D = slot of the ride actor; $3C is the next-actor link, which is the dolphin because the ride actor was spawned before it.
+; In: X = D = slot of the ride actor; $3C is the link toward the tail and holds the spawner, which is the dolphin because the ride actor was spawned before it (COP 85).
 ; Out: RTL each frame; COP 86 at the end.
 ; Clobbers: A, Y.
 
@@ -243,7 +243,7 @@ se_obj_pearl_ride_out_0F8FAB {
     AND #$EFFF
     STA $0016, Y
     COP [91]
-    LDY $003C, X          ; $3C is the next-actor link: the ride actor was spawned before the dolphin, so Y is the dolphin
+    LDY $003C, X          ; $3C holds the spawner (COP 85 stores it in the new actor): the ride actor was spawned before the dolphin, so Y is the dolphin
     LDA $0002, Y
     SEC 
     SBC #$0020
@@ -319,7 +319,7 @@ code_0F9041 {
     RTL 
 }
 
-asciistring_0F904A |[10]Stand on my nose- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F904A |[10]Stand on my nose- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 ---------------------------------------------
 
 ; The Magic Flair mermaid (switch $B5).
@@ -333,12 +333,12 @@ asciistring_0F904A |[10]Stand on my nose- [JMP:&w2_shared_0FA945.asciistring_0FA
 
 se_npc_mermaid_magic_flair_0F905C {
     COP [3B] ( #$00B5, &code_0F9072 )
-    COP [17] ( &w2_shared_0FA945.w2_npc_caged_plea_0FA95A )
+    COP [17] ( &w2_obj_fairy_idle_loop.w2_npc_caged_plea_0FA95A )
     SEP #$20
-    LDA #$^engine_003005.HoldActorUntilReleased
+    LDA #$^engine_player_death_and_actor_helpers.HoldActorUntilReleased
     PHA 
     REP #$20
-    LDA #$&engine_003005.HoldActorUntilReleased-1
+    LDA #$&engine_player_death_and_actor_helpers.HoldActorUntilReleased-1
     PHA 
     RTL 
 }
@@ -375,7 +375,7 @@ code_0F908F {
 
 asciistring_0F9099 |[10]I will give you [N][03:24]the Magic Flair- [FIN][03:20][JMP:&asciistring_0F90B5+M]|
 
-asciistring_0F90B5 |[10][::]Magic Flair is useful [N]against monsters that [N]fly and have a large [N]amount of hit points- [FIN]You know which [N]monsters I am [N]referring to, right? [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F90B5 |[10][::]Magic Flair is useful [N]against monsters that [N]fly and have a large [N]amount of hit points- [FIN]You know which [N]monsters I am [N]referring to, right? [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 ---------------------------------------------
 
 ; The Mermaid Queen (switch $B6).
@@ -552,19 +552,19 @@ code_0F9242 {
     RTL 
 }
 
-asciistring_0F9252 |[10]I have heard about you[N]from Lue- [FIN]You are the one who [N]saved me- [FIN]Everything started [N]when I saw the jewel [N]that Lue had- [FIN]One glance at the Blue[N]Stone caused desire [N]and hatred to [N]overwhelm me- [FIN]Right after that the [N]creatures disappeared [N]and the monsters took [N]over- [FIN]Maybe because we let [N]bad feeling dominate [N]us we created the [N]monsters ourselves- [FIN]I will give you [03:24]the [N]Blue Stone- [FIN][03:20][::]Please travel to other[N]regions and release [N]all creatures- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F9252 |[10]I have heard about you[N]from Lue- [FIN]You are the one who [N]saved me- [FIN]Everything started [N]when I saw the jewel [N]that Lue had- [FIN]One glance at the Blue[N]Stone caused desire [N]and hatred to [N]overwhelm me- [FIN]Right after that the [N]creatures disappeared [N]and the monsters took [N]over- [FIN]Maybe because we let [N]bad feeling dominate [N]us we created the [N]monsters ourselves- [FIN]I will give you [03:24]the [N]Blue Stone- [FIN][03:20][::]Please travel to other[N]regions and release [N]all creatures- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 
 asciistring_0F938C |[10][JMP:&asciistring_0F9252+M]|
 
-asciistring_0F9390 |[10][0E:1E]Queen! [0E:3C][JMP:&w2_shared_0FA945.asciistring_0FAA44+M]|
+asciistring_0F9390 |[10][0E:1E]Queen! [0E:3C][JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44+M]|
 
-asciistring_0F939F |[10][0E:3C]A beautiful voice came[N]from inside the [N]palace- [FIN]I am the Mermaid [N]Queen- [FIN]I know not who you [N]are, but thank you for[N]releasing me- [FIN]Please return to the [N]palace- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F939F |[10][0E:3C]A beautiful voice came[N]from inside the [N]palace- [FIN]I am the Mermaid [N]Queen- [FIN]I know not who you [N]are, but thank you for[N]releasing me- [FIN]Please return to the [N]palace- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 
-asciistring_0F9416 |[10][0F][02:2], [N]thank you very much! [N][0E:3C]Peace has returned [N]here, to St-Elles- [N][0E:5A]The dolphin, Lue, used[N]to live with Dr-Leo- [N][0E:5A]It s strange, whenever[N]he tells me about Dr- [N]Leo and his daughter [N]Lisa- [N][0E:2D]I miss them and [N]sometimes find myself [N]crying- [N][0E:5A]Now Dr-Leo is gone, [N][0E:1E]Lisa must be very [N]lonely- [N][0E:5A]Oh, here comes Lue- He[N]must have heard your [N]voice- [N][0E:78][JMP:&w2_shared_0FA945.asciistring_0FAA44+M]|
+asciistring_0F9416 |[10][0F][02:2], [N]thank you very much! [N][0E:3C]Peace has returned [N]here, to St-Elles- [N][0E:5A]The dolphin, Lue, used[N]to live with Dr-Leo- [N][0E:5A]It s strange, whenever[N]he tells me about Dr- [N]Leo and his daughter [N]Lisa- [N][0E:2D]I miss them and [N]sometimes find myself [N]crying- [N][0E:5A]Now Dr-Leo is gone, [N][0E:1E]Lisa must be very [N]lonely- [N][0E:5A]Oh, here comes Lue- He[N]must have heard your [N]voice- [N][0E:78][JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44+M]|
 
-asciistring_0F953B |[10][0F]Phew! [N][0E:5A][02:2], [N]why did you not visit [N]me? [N][0E:5A]I decided to return to[N]my home town along [N]with my friends- [N][0E:5A]To tell you the truth,[N][0E:28]I am to be married- [N][0E:50]Hey Lala, come in [N]here! [0E:78][JMP:&w2_shared_0FA945.asciistring_0FAA44+M]|
+asciistring_0F953B |[10][0F]Phew! [N][0E:5A][02:2], [N]why did you not visit [N]me? [N][0E:5A]I decided to return to[N]my home town along [N]with my friends- [N][0E:5A]To tell you the truth,[N][0E:28]I am to be married- [N][0E:50]Hey Lala, come in [N]here! [0E:78][JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44+M]|
 
-asciistring_0F95CE |[10][0F]Don t you think she is[N]beautiful- [N][0E:5A]We will be happy [N]together- [N][0E:5A][02:2], [N]I wish you luck- [0E:78][JMP:&w2_shared_0FA945.asciistring_0FAA44+M]|
+asciistring_0F95CE |[10][0F]Don t you think she is[N]beautiful- [N][0E:5A]We will be happy [N]together- [N][0E:5A][02:2], [N]I wish you luck- [0E:78][JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44+M]|
 ---------------------------------------------
 
 ; The mermaid statue of the passage to the ghost ship (switch $B9).
@@ -618,7 +618,7 @@ code_0F966C {
     RTL 
 }
 
-asciistring_0F9673 |[10]I will open the [N]passage for you- [FIN]Go ¦ along the [N]seabed and you will [N]find a ghost ship- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F9673 |[10]I will open the [N]passage for you- [FIN]Go ¦ along the [N]seabed and you will [N]find a ghost ship- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 ---------------------------------------------
 
 ; The mermaid who dreamt of the Queen (switch $BD).
@@ -679,9 +679,9 @@ code_0F970C {
     RTL 
 }
 
-asciistring_0F9711 |[10]I saw the Queen when [N]I was dreaming- [N]She looked very sad- [FIN]It was somewhere near [N]a sunken ship- [N]Please save the [N]Queen!! [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F9711 |[10]I saw the Queen when [N]I was dreaming- [N]She looked very sad- [FIN]It was somewhere near [N]a sunken ship- [N]Please save the [N]Queen!! [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 
-asciistring_0F976C |[10]Thank you very much! [N]I can hardly believe [N]that she is really [N]back! [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F976C |[10]Thank you very much! [N]I can hardly believe [N]that she is really [N]back! [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 ---------------------------------------------
 
 ; A mermaid of the coral reef (switch $C0).
@@ -694,12 +694,12 @@ asciistring_0F976C |[10]Thank you very much! [N]I can hardly believe [N]that she
 
 se_npc_mermaid_coral_reef_pearls_0F9793 {
     COP [3B] ( #$00C0, &code_0F97A9 )
-    COP [17] ( &w2_shared_0FA945.w2_npc_caged_plea_0FA95A )
+    COP [17] ( &w2_obj_fairy_idle_loop.w2_npc_caged_plea_0FA95A )
     SEP #$20
-    LDA #$^engine_003005.HoldActorUntilReleased
+    LDA #$^engine_player_death_and_actor_helpers.HoldActorUntilReleased
     PHA 
     REP #$20
-    LDA #$&engine_003005.HoldActorUntilReleased-1
+    LDA #$&engine_player_death_and_actor_helpers.HoldActorUntilReleased-1
     PHA 
     RTL 
 }
@@ -732,7 +732,7 @@ code_0F97E2 {
     RTL 
 }
 
-asciistring_0F97E7 |[10]The coral reef is home[N]to the dolphins- [FIN]The pearls made in the[N]reef are their [N]treasure- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F97E7 |[10]The coral reef is home[N]to the dolphins- [FIN]The pearls made in the[N]reef are their [N]treasure- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 ---------------------------------------------
 
 ; The Red-Hot Stick mermaid (switch $8E).
@@ -746,12 +746,12 @@ asciistring_0F97E7 |[10]The coral reef is home[N]to the dolphins- [FIN]The pearl
 
 se_npc_mermaid_red_hot_stick_0F982F {
     COP [3B] ( #$008E, &code_0F9845 )
-    COP [17] ( &w2_shared_0FA945.w2_npc_caged_plea_0FA95A )
+    COP [17] ( &w2_obj_fairy_idle_loop.w2_npc_caged_plea_0FA95A )
     SEP #$20
-    LDA #$^engine_003005.HoldActorUntilReleased
+    LDA #$^engine_player_death_and_actor_helpers.HoldActorUntilReleased
     PHA 
     REP #$20
-    LDA #$&engine_003005.HoldActorUntilReleased-1
+    LDA #$&engine_player_death_and_actor_helpers.HoldActorUntilReleased-1
     PHA 
     RTL 
 }
@@ -797,7 +797,7 @@ code_0F9869 {
 
 asciistring_0F9873 |[10]Thank you very [N]much for releasing me![FIN]I will give you [03:24]the [N]Red+Hot Stick- [N][03:20]The Phoenix resides on[N]the Stick- [FIN][JMP:&asciistring_0F98C6+M]|
 
-asciistring_0F98C6 |[10][::]Take the Red+Hot Stick[N]and visit the Mountain[N]King- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F98C6 |[10][::]Take the Red+Hot Stick[N]and visit the Mountain[N]King- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 ---------------------------------------------
 
 ; The west guard (switch $8A).
@@ -927,17 +927,17 @@ code_0F99DB {
 
 asciistring_0F99E0 |[10]Have you seen the [N]Queen of the Mermaids?[END]|
 
-asciistring_0F9A00 |Okay, wait- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F9A00 |Okay, wait- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 
 asciistring_0F9A0F |[10][0A]This█is█a█secret,█the[N]Queen█looks█like█this-[FIN][END]|
 
 asciistring_0F9A3F |[0A]She█always█sits█like[N]this-[N]She█looks█so█mean-[FIN][END]|
 
-asciistring_0F9A6F |[0A]Lue,█the█dolphin█has[N]been█captured![N]Please█save█him![JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F9A6F |[0A]Lue,█the█dolphin█has[N]been█captured![N]Please█save█him![JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 
 asciistring_0F9AA7 |[10][JMP:&asciistring_0F9A6F]|
 
-asciistring_0F9AAB |[10]Lue can leave whenever[N]he wishes, but he [N]never comes out- [FIN]Maybe he likes that [N]place- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0F9AAB |[10]Lue can leave whenever[N]he wishes, but he [N]never comes out- [FIN]Maybe he likes that [N]place- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 ---------------------------------------------
 
 ; The statue of the arrival in the Sanctuary (switches $B6 and $9D).
@@ -979,15 +979,15 @@ code_0FA03A {
     RTL 
 }
 
-asciistring_0FA03F |[10][02:2] heard [N]a small voice- [FIN]This is St-Elles [N]Palace in the ocean- [FIN]No human can live [N]under the sea- [FIN]Go to the island, [N]Southerta, through the[N]shrine and look for [N]the Bubble Clothing- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0FA03F |[10][02:2] heard [N]a small voice- [FIN]This is St-Elles [N]Palace in the ocean- [FIN]No human can live [N]under the sea- [FIN]Go to the island, [N]Southerta, through the[N]shrine and look for [N]the Bubble Clothing- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 
-asciistring_0FA0D3 |[10]Listen closely to the [N]advice of the 4 [N]mermaid statues- [JMP:&w2_shared_0FA945.asciistring_0FAA44]|
+asciistring_0FA0D3 |[10]Listen closely to the [N]advice of the 4 [N]mermaid statues- [JMP:&w2_obj_fairy_idle_loop.asciistring_0FAA44]|
 ---------------------------------------------
 
-; The water shimmer of the Sanctuary: an HDMA wave on BG1.
+; The water shimmer of the Sanctuary: an HDMA wave on PPU register $0F (BG2HOFS; which layer it moves depends on bg_scroll_swap, OQ-I051-7).
 ; 
 ; When: runs every frame while the actor lives.
-; Sees: builds 14 HDMA table entries of $90 (16 lines each) at $7E7000 that all point at $7E7100; each frame fills 16 words there from word_0FA834 (a +1 / 0 / -1 / 0 wave, index = frame / 4 + scroll_bg1_y / 2) plus scroll_bg1_x / 2, and queues the table on channel $0F with QueueHdmaIndirect.
+; Sees: builds 14 HDMA table entries of $90 (16 lines each) at $7E7000 that all point at $7E7100; each frame fills 16 words there from word_0FA834 (a +1 / 0 / -1 / 0 wave, index = frame / 4 + scroll_bg1_y / 2) plus scroll_bg1_x / 2, and queues the table for PPU register $0F (the HDMA channel is chosen by the queue) with QueueHdmaIndirect.
 ; Why: the screen wobbles horizontally like water.
 ; In: X = D = slot; DP $00 and $02 are scratch.
 ; Out: RTL; X restored (PHX / PLX), DBR restored.

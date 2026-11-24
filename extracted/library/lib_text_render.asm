@@ -31,7 +31,7 @@
 ; 
 ; === DIALOGUE BOX FLOW (ShowDialogueText) ===
 ; 1. First byte $10: the standard box [07:16,9] at offset $0408 (BG3 row 16, column 4; 22 x 9 interior) is drawn and the $10 is consumed. First byte $01: a plain print at the caller's X. Anything else: continue the previous dialogue at text_resume_pos (the next line when text_delay is not 0, otherwise a cleared page).
-; 2. DispatchDialogueCode fetches bytes with ReadDialogueByte and dispatches; a glyph is written (PrintDialogueGlyph) and followed by TickAfterGlyph: it sets the upload bit, waits text_delay frames (WaitFrames, so actors keep running) and plays the blip (BRK #$07) while text_blip_flag is set; a blank does neither.
+; 2. DispatchDialogueCode fetches bytes with ReadDialogueByte and dispatches; a glyph is written (PrintDialogueGlyph) and followed by TickAfterGlyph: it sets the upload bit, waits text_delay frames (WaitFrames: the sub-frame runs only the actors with $16 bit $0010, the hero's among them) and plays the blip (BRK #$07) while text_blip_flag is set; a blank does neither.
 ; 3. [N] (AdvanceDialogueLine): looks at the tile two rows below the line start. Not the bottom border (tile 4): next line, X + $80. Border: with text_delay 0 the page is prompted and restarted (PromptThenAdvance), otherwise the window interior scrolls up two rows (FindTextWindowBounds, ScrollTextWindowUp).
 ; 4. [FIN]: PromptThenAdvance measures the window, blinks the down arrow (tile $3D) under the line start (BlinkContinuePrompt: first while B or Y is still held, then until it is pressed), then goes to the next line (text_delay not 0) or restarts the page.
 ; 5. 00 (after a key wait) and [END] leave through EndDialogue: line start into text_resume_pos, upload bit set, P and DBR restored.
@@ -44,7 +44,7 @@
 ; WaitFrames (A frames of RunSubFrame), WaitForButtonPress (release, then press of B, Y or a direction), RunFrameReadButtons (one sub-frame, returns joy_pressed+1) and WaitFrameReadButtons (the same, or a vblank wait when NMI is on). They live in this file because the renderers use them.
 ; 
 ; === TEXT STATE ($03E9-$03F9, $1B84) ===
-; text_attr $03E9 (byte); text_window_origin $03EB (word), text_window_width $03ED, text_window_height $03EF; text_resume_pos $03F3 (word; also written by the debug scanner); text_blip_flag $03F5 (bit 0, set to 1 at the start of a dialogue); text_last_window_origin $03F7 (word, origin of the last [07] drawn by the menu renderer; Cop02 and Cop1A erase it); text_font_flip $03F9 (bit 7); text_delay $1B84 (frames per printed glyph, 0 = instant; set to 3 by a new game, other values by speech scenes; the renderer reads a byte while the scenes write words, OQ-I010-1). The old reading of $1B84 as an ending flag is withdrawn.
+; text_attr $03E9 (byte); text_window_origin $03EB (word), text_window_width $03ED, text_window_height $03EF; text_resume_pos $03F3 (word; also written by the debug scanner); text_blip_flag $03F5 (bit 0, set to 1 at the start of a dialogue); text_last_window_origin $03F7 (word, origin of the last [07] drawn by the menu renderer; Cop02 and Cop1A erase it); text_font_flip $03F9 (bit 7); text_delay $1B84 (frames per printed glyph, 0 = instant; set to 3 once at boot by InitFixedState, other values by speech scenes; the renderer reads a byte while the scenes write words, OQ-I010-1). The old reading of $1B84 as an ending flag is withdrawn.
 ; 
 ; === DATA ===
 ; TextListPointers ([02:n]) and its tile strings are at the end of the file.
@@ -2261,8 +2261,8 @@ TickAfterGlyph {
 ; Waits A frames by running RunSubFrame A times.
 ; 
 ; When: WaitReturnDone (A = $78), TryOpenChest, TickAfterGlyph and HandleDelayCode.
-; Sees: the game keeps running (actors animate) while the caller waits.
-; Why: a plain wait loop would freeze the actors.
+; Sees: the frame work keeps running while the caller waits, but only the hero and the other actors with $16 bit $0010 run; every other actor stands still (FilterSubFrameActor).
+; Why: with the NMI off a plain wait loop would not pass a frame; RunSubFrame runs the frame work and the vblank wait.
 ; In: long call (JSL); A = frames (M = 8); NMI off.
 ; Out: returns after A sub-frames; A = 0.
 ; Clobbers: A.

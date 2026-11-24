@@ -1,0 +1,16 @@
+[
+  { "address": 19438, "old": "code_004BEE", "new": "mc_boss_demon_falcon_004BEE", "row": "I039-C1" },
+  { "address": 19464, "old": "code_004C08", "new": "mc_boss_demon_falcon_alert_004C08", "row": "I039-C1" },
+  { "address": 19471, "old": "code_004C0F", "new": "mc_boss_demon_falcon_takeoff_004C0F", "row": "I039-C1" },
+  { "address": 19566, "old": "code_004C6E", "new": "mc_boss_demon_falcon_hover_004C6E", "row": "I039-C1" },
+  { "address": 19573, "old": "code_004C75", "new": "mc_boss_demon_falcon_feather_drop_004C75", "row": "I039-C1" },
+  { "address": 19626, "old": "code_004CAA", "new": "mc_boss_demon_falcon_feather_004CAA", "row": "I039-C1" },
+  { "address": 19663, "old": "code_004CCF", "new": "mc_boss_demon_falcon_feather_fall_004CCF", "row": "I039-C1" },
+  { "address": 19679, "old": "code_004CDF", "new": "mc_boss_demon_falcon_feather_trail_004CDF", "row": "I039-C1" },
+  { "address": 19694, "old": "code_004CEE", "new": "mc_boss_demon_falcon_feather_trail_check_004CEE", "row": "I039-C1" },
+  { "address": 19702, "old": "code_004CF6", "new": "mc_boss_demon_falcon_feather_trail_spawn_004CF6", "row": "I039-C1" },
+  { "address": 19721, "old": "code_004D09", "new": "mc_boss_demon_falcon_wing_dust_004D09", "row": "I039-C1" },
+  { "address": 19807, "old": "code_004D5F", "new": "mc_boss_demon_falcon_wing_dust_piece_004D5F", "row": "I039-C1" },
+  { "address": 19819, "old": "code_004D6B", "new": "mc_boss_demon_falcon_wing_dust_piece_004D6B", "row": "I039-C1" },
+  { "address": 19831, "old": "code_004D77", "new": "mc_boss_demon_falcon_dust_jitter_004D77", "row": "I039-C1" }
+]

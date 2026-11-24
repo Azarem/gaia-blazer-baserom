@@ -1,0 +1,64 @@
+{
+  "leos_lab/laboratory_dungeon/ll_laboratory_dungeon_actors.asm": {
+    "blockNote": [
+      "Two Fairy Gems of the Laboratory Dungeon, their shared return prompt and the fire pit (file offsets 146899-147250 in two ranges, 146899-147078 and 147223-147250, SNES $04:BDD3-$BE86 and $04:BF17-$BF32; the other parts between them belong to ll_town_models_actors). The third Fairy Gem of the area is in ll_town_models_actors.",
+      "",
+      "=== FAIRY GEMS (meta types $2F and $32) ===",
+      "- ll_npc_fairy_exp_300_023DD3: type $2F, tile ($03,$52) of A0ES02, switch $127 (lair record $127: 5 Mini Helicopters (meta type $21) with RunLairSpawnAll, lair in location $57 at tile ($06,$52)), latch flag $1D01.",
+      "- ll_npc_fairy_exp_300_023E57: type $32, tile ($23,$3A) of A0ES03, switch $130 (lair record $130: 6 Mini Helicopters with RunLairRespawn, lair in location $58 at tile ($1C,$3A)), latch flag $1D03.",
+      "Both: COP 14 returns until the lair is released; then the shared fairy setup (shared_actor_helpers_bank3.code_01B161: animation table $0E:8000, animation 07, the scene's sprite attribute word, COP 15), the talk handler (COP 17) and a tail jump (RTL with the address pushed) into the shared idle loop shared_actor_helpers_bank4.code_022289 (animation 0C within $18 pixels of the hero, else animation 07). The first talk shows 'I am watching over the world. Please take this. <name> received EXP!', queues 300 EXP (COP 38, BCD $0300) and sets the latch flag; every talk then goes on to ll_fairy_return_prompt_023E00. The walkthrough: 'Defeat them and use the nearby Fairy Gem for 300 EXP.' and 'beat up the Mini Helicopters to make a Fairy Gem appear back to the east. You can backtrack to it for 300 EXP.'",
+      "ll_fairy_return_prompt_023E00 is the question 'Would you like to go back to Dr-Leo's Laboratory?' with the Stay / Go back window (shared_choice_prompt_texts.ChoiceStayGoBackText).",
+      "",
+      "=== FIRE PIT (meta type $2E) ===",
+      "ll_obj_fire_pit_023F17 is placed at tile ($00,$00) of A0ES02 and A0ES03 (no switch): an invisible actor that runs every frame. While the Ice Armor (item $0A) is not worn (COP 19) it tests whether the hero stands on metatile $F3 or $E1 (lib_map_index_helpers.IsPlayerOnMetatile) and hurts him with COP 39 ($04 damage). IsPlayerOnMetatile answers 'no' during hit stun, so the test repeats only after the stun. The walkthrough: '(You might want to equip the Ice Armor to deal with the painful fire.)' Which tiles are $F3 and $E1 on the screen: OQ-I038-1.",
+      "",
+      "=== FLAGS ===",
+      "$1D01 / $1D03: the 300 EXP of the gem of A0ES02 / of A0ES03 has been taken (persistent; $1D02 is the gem of Town Model 1)."
+    ],
+    "partNotes": {
+      "ll_npc_fairy_exp_300_023DD3": "The Fairy Gem of A0ES02: 300 EXP once, then the way back to the laboratory.\n\nWhen: placement script (type $2F, tile ($03,$52) of A0ES02); COP 14 returns until lair record $127 (5 Mini Helicopters of location $57) is released.\nSees: the shared fairy setup (JSL shared_actor_helpers_bank3.code_01B161), the talk handler code_023DEE (flag $1D01 clear: 'I am watching over the world. Please take this. <name> received EXP!', 300 EXP, flag $1D01 set; then the prompt ll_fairy_return_prompt_023E00, which a set flag reaches at once).\nWhy: the dungeon's fairy gives EXP once and an exit to the laboratory (walkthrough: 'use the nearby Fairy Gem for 300 EXP').\nIn: X = D = slot $04 of A0ES02.\nOut: a tail jump (RTL with the address pushed) into the shared idle loop.\nClobbers: A.",
+      "ll_fairy_return_prompt_023E00": "The question every Fairy Gem of the laboratory asks after its reward: 'Would you like to go back to Dr-Leo's Laboratory?'\n\nWhen: reached by BRL or COP 07 from the talk handler of the three gems; it is not an actor of its own.\nSees: the question and the Stay / Go back window (cancel counts as Stay). Go back: 'Good luck.' and the scene changes to area $0D scene $01 (A0DS01) at pixel ($0188,$0190); Stay (code_023E22): 'Come back to me when you wish to return.'\nWhy: the same prompt as the fairies of the other worlds (compare gw_fairy_gem_return_prompt_01E4E9).\nIn: talk handler, X = the gem's slot.\nOut: RTL, or the scene change (INC contact_lock before it).\nClobbers: A.",
+      "ll_npc_fairy_exp_300_023E57": "The Fairy Gem of A0ES03: the same script with latch flag $1D03.\n\nWhen: placement script (type $32, tile ($23,$3A) of A0ES03); COP 14 returns until lair record $130 (6 Mini Helicopters of location $58) is released.\nSees: as ll_npc_fairy_exp_300_023DD3, talk handler code_023E72 with flag $1D03, ending in BRL ll_fairy_return_prompt_023E00.\nWhy: see there (walkthrough: 'beat up the Mini Helicopters to make a Fairy Gem appear back to the east. You can backtrack to it for 300 EXP').\nIn: X = D = slot $0F of A0ES03.\nOut: a tail jump into the shared idle loop.\nClobbers: A.",
+      "ll_obj_fire_pit_023F17": "The floor hazard of the dungeon: 4 damage on the fire metatiles unless the Ice Armor is worn.\n\nWhen: placement script (type $2E, tile ($00,$00) of A0ES02 and A0ES03); no switch; runs every frame (RTL without COP 91).\nSees: COP 19 on item $0A (Ice Armor): worn, nothing happens; not worn: code_023F1D tests metatile $F3 and then $E1 under the hero (IsPlayerOnMetatile) and on either hurts him with COP 39 (4 damage).\nWhy: the walkthrough: 'You might want to equip the Ice Armor to deal with the painful fire.'\nIn: X = D = slot of the actor ($03 in A0ES02, $04 in A0ES03).\nOut: RTL.\nClobbers: A."
+    },
+    "comments": {
+      "146926": { "text": "flag $1D01 (persistent): the 300 EXP of this gem has been taken; bit 15 set = jump when set", "expect": "COP [07]" },
+      "146936": { "text": "300 EXP (BCD) queued", "expect": "COP [38]" },
+      "146968": { "text": "area $0D scene $01: A0DS01 (laboratory 1) at pixel ($0188,$0190)", "expect": "COP [10]" },
+      "147058": { "text": "flag $1D03: the 300 EXP of this gem has been taken", "expect": "COP [07]" },
+      "147223": { "text": "item $0A = the Ice Armor: the fire only hurts while it is not worn", "expect": "COP [19]" },
+      "147247": { "text": "4 damage; the hit stun makes IsPlayerOnMetatile answer 'no', so the next hit comes after the stun", "expect": "COP [39]" }
+    }
+  },
+  "leos_lab/town_models/ll_town_models_actors.asm": {
+    "blockNote": [
+      "The third Fairy Gem of the laboratory and the effect of one building-removal lair of Town Model 1 (file offsets 146983-147222 in two ranges, 146983-147030 and 147079-147222, SNES $04:BE27-$BE56 and $04:BE87-$BF16; the fairy gem of A0ES03 lies between them and belongs to ll_laboratory_dungeon_actors).",
+      "",
+      "=== ROSTER ===",
+      "- ll_npc_fairy_exp_300_023E27: type $30, tile ($3B,$0B) of A0FS01, switch $147 (lair record $147: 6 Toy Soldiers (meta type $25) with RunLairRespawn, lair in location $5B at tile ($38,$0B)), latch flag $1D02. The same script as the two gems of ll_laboratory_dungeon_actors (talk handler code_023E42, 300 EXP once, then ll_laboratory_dungeon_actors.ll_fairy_return_prompt_023E00). The walkthrough: 'the lair will spawn a Fairy Gem you can use to get 300 EXP'.",
+      "- ll_effect_model_release_023E87: type $31, tile ($23,$24) of A0FS01, switch $143 (lair record $143: 5 monsters of meta type $27 (ll_enemy_toy_lunge) with RunLairRespawn, lair in location $5B at tile ($26,$26); it frees no NPC but opens a path: its release rectangle is 9 x 7 metatiles from ($22,$23) on layer 3, staged from ($22,$43)). The root spawns eight ll_effect_model_release_piece_023EF3 actors once (flag $1B07).",
+      "",
+      "=== FLAGS ===",
+      "$1D02: the 300 EXP of the gem of Town Model 1 has been taken. $1B07: the effect of lair $143 has played (persistent), so it plays only once."
+    ],
+    "partNotes": {
+      "ll_npc_fairy_exp_300_023E27": "The Fairy Gem of Town Model 1: 300 EXP once, then the way back to the laboratory.\n\nWhen: placement script (type $30, tile ($3B,$0B) of A0FS01); COP 14 returns until lair record $147 (6 Toy Soldiers of location $5B) is released.\nSees: as ll_npc_fairy_exp_300_023DD3: the shared fairy setup, talk handler code_023E42 with latch flag $1D02, then BRL to ll_laboratory_dungeon_actors.ll_fairy_return_prompt_023E00.\nWhy: see there (walkthrough: 'the lair will spawn a Fairy Gem you can use to get 300 EXP').\nIn: X = D = slot $0B of A0FS01.\nOut: a tail jump into the shared idle loop.\nClobbers: A.",
+      "ll_effect_model_release_023E87": "The effect that plays once when lair record $143 of Town Model 1 is released.\n\nWhen: placement script (type $31, tile ($23,$24) of A0FS01); COP 14 returns until lair record $143 is released.\nSees: with flag $1B07 set it ends at once (code_023EF0, COP 86). Otherwise it sets $1B07 and spawns eight pieces with COP B2 at the offsets (0,0), ($20,0), ($40,0), ($60,0), (0,$40), ($20,$40), ($40,$40), ($60,$40), flags $4000, then kills itself.\nWhy: the lair opens a path by changing a map rectangle; the pieces animate over its area (what they draw: OQ-I038-8).\nIn: X = D = slot $0A of A0FS01.\nOut: RTL after the kill.\nClobbers: A, Y.",
+      "ll_effect_model_release_piece_023EF3": "One piece of the release effect: plays animation 05 once and animation 0A sixty times and ends.\n\nWhen: spawned eight times (COP B2) by ll_effect_model_release_023E87.\nSees: animation table $0E:8000 (COP A8), the animation id from an absolute read of $0005 (not the piece's DP; OQ-I038-8), the scene's sprite attribute word, COP A4, animation 05, then animation 0A with 60 repeats, COP 86.\nWhy: the visual of the opened path.\nIn: X = D = the piece.\nOut: RTL after the kill.\nClobbers: A."
+    },
+    "comments": {
+      "147010": { "text": "flag $1D02: the 300 EXP of this gem has been taken", "expect": "COP [07]" },
+      "147086": { "text": "flag $1B07 (persistent): the effect has played already; bit 15 set = jump when set", "expect": "COP [07]" },
+      "147096": { "text": "eight pieces: a 4 x 2 grid in steps of 32 x 64 pixels from the actor, flags $4000", "expect": "COP [B2]" },
+      "147192": { "text": "an absolute read of $0005, not the piece's own DP (OQ-I038-8)", "expect": "LDA $0005" },
+      "147214": { "text": "animation $0A, $3C repeats, then the piece ends", "expect": "COP [81]" }
+    }
+  },
+  "leos_lab/ll_watching_over_world_return_prompt_texts.asm": {
+    "blockNote": [
+      "The shared strings of the Fairy Gems of Leo's Laboratory and the common end of all laboratory dialogue (file offsets 147251-147367, SNES $04:BF33-$BFA7, bank 04): the reward text, the return question, both answers and the dialogue erase.",
+      "asciistring_023F33: 'I am watching over the world. Please take this. <name> received EXP!' (ends [FIN][END]; the EXP itself is queued by the script, COP 38). asciistring_023F59: 'Would you like to go back to Dr-Leo's Laboratory?' (ends with [END] so that the Stay / Go back window follows). asciistring_023F7D: 'Good luck.'. asciistring_023F8B: 'Come back to me when you wish to return.'. asciistring_023FA3: the dialogue erase ([12] wait for a key, [08:408]), the target of the [JMP] that ends every NPC string of ll_laboratory_actors and of the two answers here.",
+      "Users: the three Fairy Gems (ll_laboratory_dungeon_actors, ll_town_models_actors) and, for the common end, ll_laboratory_actors. The font prints the full stop as a dash and the apostrophe as a space: 'Dr-Leo s'."
+    ]
+  }
+}

@@ -1,22 +1,22 @@
 ; COP commands for text, menus, items, Gems, EXP and HP. Commands (id, uses): 01 ShowText (608), 02 PromptYesNo (0), 0A GiveItemIfNotOwned (47), 0B RemoveItem (27), 18 JumpIfItemMissing (55), 19 JumpUnlessItemEquipped (36), 1A ChoiceMenu (27), 25 AddGems (0), 26 PayGemsOrJump (8), 36 AddExp (0), 37 HealPlayerToFull (12), 38 QueueExp (13), 39 DamagePlayer (6), 3A EnterPlayerName (1). Conventions shared by all handlers: cop_core block note.
 ; 
 ; === INVENTORY ===
-; The inventory is the byte array inventory ($1B1E); entry n (1-based, the item id) is at $1B1E + n - 1: bits 0-6 hold the value (the entry number itself when owned; the engine's give routine lib_0109D6_part3.StoreInventoryEntry writes it), bit 7 is the 'equipped' flag (OQ-I006-2). cop_core.LookupInventoryEntry reads an entry for Cop0A, Cop0B, Cop18 and Cop19. Ids seen in the scripts: $38 Medical Herb, $39 Strange Bottle, $40 Magic Bell (CheckPlayerDeath, engine_003005), $20-$29 (Cop19 in scene actors; names in plans/doc-audit/walkthrough-crosswalk.md section 4).
+; The inventory is the byte array inventory ($1B1E); entry n (1-based, the item id) is at $1B1E + n - 1: bits 0-6 hold the value (the entry number itself when owned; the engine's give routine lib_inventory_store.StoreInventoryEntry writes it), bit 7 is the 'equipped' flag (OQ-I006-2). cop_core.LookupInventoryEntry reads an entry for Cop0A, Cop0B, Cop18 and Cop19. Ids seen in the scripts: $38 Medical Herb, $39 Strange Bottle, $40 Magic Bell (CheckPlayerDeath, engine_player_death_and_actor_helpers), $20-$29 (Cop19 in scene actors; names in plans/doc-audit/walkthrough-crosswalk.md section 4).
 ; 
 ; === GEMS, EXP, HP ===
-; All three counters are BCD. Gems: gems_low ($1B66) and gems_high ($1B68), capped at 999999 by lib_player_stats.AddGems; the price check is SubtractGems (carry set = not enough). EXP: player_exp ($1B78 low word, $1B7A high word). Cop38 does not add EXP directly: it stores the amount in exp_pending ($043D) and the main loop's DrainPendingExp pays it out one digit step per 8 frames with sound. Cop37 sets heal_pending ($043B) = max HP - HP and DrainPendingHeal heals one point every 4 frames. hud_dirty_flags ($0332) bit $04 redraws the HP bar, bit $02 the EXP and bit $10 the Gem counter.
+; All three counters are BCD. Gems: gems_low ($1B66) and gems_high ($1B68), capped at 999999 by lib_player_helpers.AddGems; the price check is SubtractGems (carry set = not enough). EXP: player_exp ($1B78 low word, $1B7A high word). Cop38 does not add EXP directly: it stores the amount in exp_pending ($043D) and the main loop's DrainPendingExp pays it out one digit step per 8 frames with sound. Cop37 sets heal_pending ($043B) = max HP - HP and DrainPendingHeal heals one point every 4 frames. hud_dirty_flags ($0332) bit $04 redraws the HP bar, bit $02 the EXP and bit $10 the Gem counter.
 ; 
 ; === TEXT AND MENUS ===
-; Cop01 passes a 16-bit string pointer in the script bank to lib_text_render.ShowDialogueText (DBR = script bank). Cop1A prints the option text (PrintTextString), runs lib_012281.RunChoiceMenu (A = number of entries; returns the chosen index in A, carry set = cancelled; sound $18 on choosing, $07 on cancelling), redraws (EraseWindowFrame) and stores the index in choice_result ($03D0). The option strings are in shared_choice_prompt_texts (ChoiceYesNoText ' Yes / No' with 2 entries, ChoiceYesOnlyText a single 'Yes', ChoiceRecordMoveQuitText 'Record / Move / Quit' with 3 entries, ChoiceRecordQuitText 'Record / Quit' with 2, ChoiceStayGoBackText 'Stay / Go back' with 2; layout rule in the block note of shared_choice_prompt_texts). Cop3A opens the name-entry screen (lib_name_entry.RunNameEntryScreen, name buffer from $1B92), used once at the start of the game after the Master's speech (the walkthrough: 'you will then get to pick a name for yourself').
+; Cop01 passes a 16-bit string pointer in the script bank to lib_text_render.ShowDialogueText (DBR = script bank). Cop1A prints the option text (PrintTextString), runs lib_choice_menus.RunChoiceMenu (A = number of entries; returns the chosen index in A, carry set = cancelled; sound $18 on choosing, $07 on cancelling), redraws (EraseWindowFrame) and stores the index in choice_result ($03D0). The option strings are in shared_choice_prompt_texts (ChoiceYesNoText ' Yes / No' with 2 entries, ChoiceYesOnlyText a single 'Yes', ChoiceRecordMoveQuitText 'Record / Move / Quit' with 3 entries, ChoiceRecordQuitText 'Record / Quit' with 2, ChoiceStayGoBackText 'Stay / Go back' with 2; layout rule in the block note of shared_choice_prompt_texts). Cop3A opens the name-entry screen (lib_name_entry_and_staff_roll.RunNameEntryScreen, name buffer from $1B92), used once at the start of the game after the Master's speech (the walkthrough: 'you will then get to pick a name for yourself').
 ---------------------------------------------
 
 ?BANK 00
 
 ?INCLUDE 'cop_core'
-?INCLUDE 'lib_0109D6_part3'
-?INCLUDE 'lib_012281'
-?INCLUDE 'lib_name_entry'
-?INCLUDE 'lib_player_stats'
+?INCLUDE 'lib_choice_menus'
+?INCLUDE 'lib_inventory_store'
+?INCLUDE 'lib_name_entry_and_staff_roll'
+?INCLUDE 'lib_player_helpers'
 ?INCLUDE 'lib_text_render'
 ?INCLUDE 'shared_choice_prompt_texts'
 
@@ -71,7 +71,7 @@ Cop01_ShowText {
 ; Sees: ' Yes / No' with a cursor.
 ; Why: probably the first version of Cop1A (inferred).
 ; In: &Code = target.
-; Out: runs the 2-entry menu (lib_012281.RunChoiceMenu, A = 2); cancelled or choice not 0: jump; Yes: CopExitSkip2.
+; Out: runs the 2-entry menu (lib_choice_menus.RunChoiceMenu, A = 2); cancelled or choice not 0: jump; Yes: CopExitSkip2.
 ; Clobbers: A, Y; dp$38.
 
 Cop02_PromptYesNo {
@@ -83,7 +83,7 @@ Cop02_PromptYesNo {
     LDA #$00
     XBA 
     LDA #$02
-    JSL $@lib_012281.RunChoiceMenu
+    JSL $@lib_choice_menus.RunChoiceMenu
     PHP 
     LDX $text_last_window_origin
     JSL $@lib_text_render.EraseWindowFrame
@@ -111,7 +111,7 @@ Cop02_PromptYesNo {
 ; Sees: the item is in the inventory afterwards; the pickup message is a separate Cop01.
 ; Why: an owned entry stores its own number as value, so giving means writing the number into an empty entry.
 ; In: Byte = entry number (item id, 1-based).
-; Out: LookupInventoryEntry; value bits zero: lib_0109D6_part3.StoreInventoryEntry stores the entry (see its part note); already owned: nothing. Continues.
+; Out: LookupInventoryEntry; value bits zero: lib_inventory_store.StoreInventoryEntry stores the entry (see its part note); already owned: nothing. Continues.
 ; Clobbers: A, Y; dp$38.
 
 Cop0A_GiveItemIfNotOwned {
@@ -121,7 +121,7 @@ Cop0A_GiveItemIfNotOwned {
     AND #$00FF
     JSR $&cop_core.LookupInventoryEntry
     BCC loc_005885
-    JSL $@lib_0109D6_part3.StoreInventoryEntry
+    JSL $@lib_inventory_store.StoreInventoryEntry
 
   loc_005885:
     BRL cop_core.CopExitContinue
@@ -218,7 +218,7 @@ Cop19_JumpUnlessItemEquipped {
 ; Sees: the question with a cursor list; the player picks and confirms, or cancels.
 ; Why: one menu command for every prompt; the choice is read later from choice_result.
 ; In: &ASCIIString = option text, Byte = number of entries, &Code = target when cancelled.
-; Out: prints the string (lib_text_render.PrintTextString), runs lib_012281.RunChoiceMenu (A = entries; returns A = chosen index, carry set = cancelled), redraws (EraseWindowFrame), vram_upload_flags = 1. Chosen: choice_result ($03D0) = index, CopExitSkip2; cancelled: jump.
+; Out: prints the string (lib_text_render.PrintTextString), runs lib_choice_menus.RunChoiceMenu (A = entries; returns A = chosen index, carry set = cancelled), redraws (EraseWindowFrame), vram_upload_flags = 1. Chosen: choice_result ($03D0) = index, CopExitSkip2; cancelled: jump.
 ; Clobbers: A, Y; dp$38.
 
 Cop1A_ChoiceMenu {
@@ -238,7 +238,7 @@ Cop1A_ChoiceMenu {
     INC $39
 
   loc_005A5D:
-    JSL $@lib_012281.RunChoiceMenu
+    JSL $@lib_choice_menus.RunChoiceMenu
     PHA 
     PHP 
     LDX $text_last_window_origin
@@ -264,11 +264,11 @@ Cop1A_ChoiceMenu {
 
 ; Adds Gems to the player.
 ; 
-; When: no script uses it (0 uses; OQ-I025-4); Gem pickups use lib_player_stats.AddGems directly.
+; When: no script uses it (0 uses; OQ-I025-4); Gem pickups use lib_player_helpers.AddGems directly.
 ; Sees: the Gem counter would rise.
 ; Why: unknown; complete command set.
 ; In: Word = amount in BCD (copdef lists two Bytes).
-; Out: lib_player_stats.AddGems (BCD add, capped at 999999); hud_dirty_flags bit $10; continues.
+; Out: lib_player_helpers.AddGems (BCD add, capped at 999999); hud_dirty_flags bit $10; continues.
 ; Clobbers: A, Y; dp$38.
 
 Cop25_AddGems {
@@ -276,7 +276,7 @@ Cop25_AddGems {
     LDA [$38]
     INC $38
     INC $38
-    JSL $@lib_player_stats.AddGems
+    JSL $@lib_player_helpers.AddGems
     LDA #$0010
     TSB $hud_dirty_flags
     BRL cop_core.CopExitContinue
@@ -289,7 +289,7 @@ Cop25_AddGems {
 ; Sees: casting makes the Gem counter drop; with too few Gems the spell does not fire. The walkthrough: the Magic Bell prevents magic from using Gems, Magic Armor halves the consumption.
 ; Why: every spell goes through one price check, and the two items change the price here.
 ; In: Word = cost in BCD, &Code = target when the player is too poor.
-; Out: Magic Bell ($1B64 = $40): cost 0; Magic Armor ($1B60 = $0C): cost halved, at least 1; then lib_player_stats.SubtractGems (BCD subtract; carry set = not enough, nothing taken). Paid: hud_dirty_flags bit $10 and CopExitSkip2; short: jump.
+; Out: Magic Bell ($1B64 = $40): cost 0; Magic Armor ($1B60 = $0C): cost halved, at least 1; then lib_player_helpers.SubtractGems (BCD subtract; carry set = not enough, nothing taken). Paid: hud_dirty_flags bit $10 and CopExitSkip2; short: jump.
 ; Clobbers: A, Y; dp$00-$05; dp$38.
 
 Cop26_PayGemsOrJump {
@@ -312,7 +312,7 @@ Cop26_PayGemsOrJump {
     INC 
 
   loc_005B99:
-    JSL $@lib_player_stats.SubtractGems ; BCD subtract of A from the Gems; carry set = not enough, nothing taken
+    JSL $@lib_player_helpers.SubtractGems ; BCD subtract of A from the Gems; carry set = not enough, nothing taken
     BCS loc_005BA8
     LDA #$0010
     TSB $hud_dirty_flags
@@ -330,7 +330,7 @@ Cop26_PayGemsOrJump {
 ; 
 ; When: no script uses it (0 uses; OQ-I025-4); EXP is awarded by Cop38.
 ; Sees: nothing.
-; Why: unknown; unlike lib_player_stats.AddExp it does not cap the sum at 99999999.
+; Why: unknown; unlike lib_player_helpers.AddExp it does not cap the sum at 99999999.
 ; In: Word = EXP in BCD.
 ; Out: player_exp ($1B78) + word in decimal mode, the carry into $1B7A.
 ; Clobbers: A, Y; D flag restored; dp$38.
@@ -340,7 +340,7 @@ Cop36_AddExp {
     LDA [$38]
     INC $38
     INC $38
-    SED                   ; EXP is BCD; unlike lib_player_stats.AddExp this add has no cap at 99999999
+    SED                   ; EXP is BCD; unlike lib_player_helpers.AddExp this add has no cap at 99999999
     CLC 
     ADC $player_exp
     STA $player_exp
@@ -356,7 +356,7 @@ Cop36_AddExp {
 ; 
 ; When: 12 scripts (healing scenes in the Mountain of Souls, Leo's Laboratory, Greenwood, the Seabed Sanctuary and Magridd's Castle, and a shared helper).
 ; Sees: the HP bar fills one point every 4 frames with a sound.
-; Why: the command only queues the amount; lib_player_stats.DrainPendingHeal does the stepping.
+; Why: the command only queues the amount; lib_player_helpers.DrainPendingHeal does the stepping.
 ; In: no operand.
 ; Out: heal_pending ($043B) = max HP - HP.
 ; Clobbers: A, Y.
@@ -374,7 +374,7 @@ Cop37_HealPlayerToFull {
 ; Awards EXP to the player.
 ; 
 ; When: 13 scripts, amounts $0001, $0150, $0180, $0200, $0250, $0300 and $0400 (Lostside Marsh, Seabed of St. Elles, Leo's Laboratory, Mountain of Souls).
-; Sees: the EXP counter climbs in steps with a sound (one digit step per 8 frames, lib_player_stats.DrainPendingExp).
+; Sees: the EXP counter climbs in steps with a sound (one digit step per 8 frames, lib_player_helpers.DrainPendingExp).
 ; Why: rewards other than monster kills (the amount is queued, not added at once).
 ; In: Word = EXP in BCD.
 ; Out: exp_pending ($043D) = word (replaces an amount still waiting).
@@ -437,11 +437,11 @@ Cop39_DamagePlayer {
 ; Sees: the player chooses a name for himself (the walkthrough, In the Beginning: 'you will then get to pick a name for yourself').
 ; Why: the name is typed into the buffer at $1B92 and printed later by the text codes.
 ; In: no operand.
-; Out: lib_name_entry.RunNameEntryScreen runs the screen; continues.
+; Out: lib_name_entry_and_staff_roll.RunNameEntryScreen runs the screen; continues.
 ; Clobbers: A, Y.
 
 Cop3A_EnterPlayerName {
     TYX 
-    JSL $@lib_name_entry.RunNameEntryScreen
+    JSL $@lib_name_entry_and_staff_roll.RunNameEntryScreen
     BRL cop_core.CopExitContinue
 }

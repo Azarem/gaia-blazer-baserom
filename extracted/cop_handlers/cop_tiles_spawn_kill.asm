@@ -7,7 +7,7 @@
 ; Operands: 84 / 85: @Code (word + bank byte); AF / B0: @Code, Word flags ($16); AB / AC: @Code, Word x, Word y, Word flags; B1 / B2: @Code, Word dx, Word dy, Word flags (position = the caller's plus the offset); 30: Word record index, @Code. Every variant allocates with SpawnActorAfter / SpawnActorBefore, which clone the caller (InitSpawnedActor), then store the entry in $18 and the bank in $36 and, depending on the variant, overwrite position and $16. With an empty free-slot stack the new actor lands in the scratch slot $06AA and nothing is linked (the handlers do not check the carry). Cop30 spawns only for a visit that began at lair record N: return_active ($03FB) non-zero and return_record ($0405, stored by the return-trip warp in lib_tile_triggers_and_lair_return) equal to the operand.
 ; 
 ; === KILL ===
-; Cop86 unlinks the caller from the actor list ($3C next, $3E previous; heads $06A8 / $06A6) and pushes its slot on the free-slot stack. The script keeps running after the COP, which is why every kill is followed by RTL.
+; Cop86 unlinks the caller from the actor list ($3C toward the tail, $3E toward the head; the tail $06A6 runs first) and pushes its slot on the free-slot stack. The script keeps running after the COP, which is why a kill in a script is followed by RTL (280 of the 283 sites; the other three are engine routines that issue COP [86] with X = the victim: KillAllOtherActors, KillAllProjectiles, ApplyGemPickup).
 ---------------------------------------------
 
 ?BANK 00
@@ -328,7 +328,7 @@ Cop30_SpawnIfEnteredViaRecord {
 ; 
 ; When: 13 scripts.
 ; Sees: a new object appears at the caller's position.
-; Why: actor list order decides who runs first; after = later.
+; Why: the actor loop runs from the tail along $3E, and the new actor is linked on the $3C side of the caller, so it runs before the caller and first on the next frame (the player's input filter and level-up watcher use it to run ahead of the hero).
 ; In: @Code = entry of the new actor (word + bank).
 ; Out: SpawnActorAfter; $18 = word, $36 = bank; the new actor starts as a clone of the caller.
 ; Clobbers: A, Y = new slot (or $06AA when the pool is full); dp$38.
@@ -355,7 +355,7 @@ Cop84_SpawnActorAfter {
 ; 
 ; When: 346 scripts (puffs, projectiles, monsters, pickups; RunAppearPuff from about 150 scene scripts).
 ; Sees: a new object appears at the caller's position.
-; Why: see Cop84; before = runs earlier.
+; Why: the new actor is linked on the $3E side of the caller, so it runs right after the caller in the same frame (the player's weapon layer and move finisher use it to run after the hero).
 ; In: @Code = entry of the new actor.
 ; Out: SpawnActorBefore; $18 = word, $36 = bank.
 ; Clobbers: A, Y = new slot (or $06AA); dp$38.
@@ -380,7 +380,7 @@ Cop85_SpawnActorBefore {
 
 ; Removes the calling actor.
 ; 
-; When: 283 scripts, always followed by RTL.
+; When: 283 sites: 280 in scripts, each followed by RTL, and three engine routines (KillAllOtherActors, KillAllProjectiles, ApplyGemPickup).
 ; Sees: the actor vanishes.
 ; Why: unlinks it from the actor list and frees its slot; the script still runs on to the RTL.
 ; In: no operand; X = actor.
@@ -390,27 +390,27 @@ Cop85_SpawnActorBefore {
 Cop86_KillSelf {
     TYX 
     LDY $003C, X
-    BNE loc_005F23        ; Unlink from the list: $3C = next, $3E = previous; an actor without a next link is the tail
+    BNE KillUnlinkInside  ; Unlink from the list: $3C = toward the tail (earlier in run order), $3E = toward the head; no $3C neighbour means the actor is the tail
     LDY $003E, X
     STY $actor_list_tail
-    BEQ loc_005F37
+    BEQ KillPushSlot
     LDA #$0000
     STA $003C, Y
-    BRA loc_005F37
+    BRA KillPushSlot
 
-  loc_005F23:
+  KillUnlinkInside:
     LDA $003E, X
     STA $003E, Y
-    BNE loc_005F30
+    BNE KillRelinkNeighbor
     STY $actor_list_head
-    BRA loc_005F37
+    BRA KillPushSlot
 
-  loc_005F30:
+  KillRelinkNeighbor:
     TAY 
     LDA $003C, X
     STA $003C, Y
 
-  loc_005F37:
+  KillPushSlot:
     SEP #$20
     DEC $4A               ; Push the slot back on the free-slot stack: $4A -= 2, then the slot word is stored at ($4A)
     DEC $4A

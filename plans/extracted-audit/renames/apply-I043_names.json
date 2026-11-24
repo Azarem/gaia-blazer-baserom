@@ -1,0 +1,16 @@
+[
+  { "address": 1063,  "old": "loc_000427", "new": "Bg3PageCheckFlags",      "row": "I043-N1" },
+  { "address": 1069,  "old": "loc_00042D", "new": "Bg3PageSelect",          "row": "I043-N2" },
+  { "address": 1090,  "old": "loc_000442", "new": "Bg3PageSecond",          "row": "I043-N3" },
+  { "address": 1107,  "old": "loc_000453", "new": "Bg3PageStartDma",        "row": "I043-N4" },
+  { "address": 1176,  "old": "loc_000498", "new": "WriteScrollSwapped",     "row": "I043-N5" },
+  { "address": 1259,  "old": "loc_0004EB", "new": "DynamicTilesPass1",      "row": "I043-N6" },
+  { "address": 1284,  "old": "loc_000504", "new": "DynamicTilesBumpSource", "row": "I043-N7" },
+  { "address": 1300,  "old": "loc_000514", "new": "DynamicTilesPass2",      "row": "I043-N8" },
+  { "address": 1346,  "old": "loc_000542", "new": "SpriteTileRecordsDone",  "row": "I043-N9" },
+  { "address": 1353,  "old": "loc_000549", "new": "AnimatedStripStart",     "row": "I043-N10" },
+  { "address": 1426,  "old": "loc_000592", "new": "FlushQueueLoop",         "row": "I043-N11" },
+  { "address": 1438,  "old": "loc_00059E", "new": "FlushQueueDone",         "row": "I043-N12" },
+  { "address": 349,   "old": "loc_00015D", "new": "LoaderAfterHud",         "row": "I043-N13" },
+  { "address": 78270, "old": "loc_0131BE", "new": "WaitVBlankLoop",         "row": "I043-N14" }
+]

@@ -7,7 +7,7 @@
 ; IsPlayerOnMetatile tests whether the BG1 id at the player's feet row (y - $10: y is the bottom edge of the actor) is a given id, over the 1, 2 or 4 metatiles the player's 16-pixel box covers: x and y multiples of 16 = 1 cell, only x = 2 cells one below the other, only y = 2 cells side by side, neither = 4 cells (walked east, south, east). It returns carry set at once for a cell that matches, and carry clear at once when the player's flags have $0C00 (hit stun $0800 or dying $0400).
 ; 
 ; === NOTES ===
-; - PixelToMapIndex has about 40 callers (player_core, cop_core, cop_tiles_spawn_kill, lib_scene_map_patches, lib_0108BB, lib_0109D6_part1, lib_tile_triggers_and_lair_return, lib_menus, engine_spawn_lairs_death_drops and four actor files); it needs M = 16 on entry and returns with M = 16 (it ends with REP #$20). It relies on B holding the high byte of dp$18 after LDA $18 at M = 16 (the page row for Multiply8x8).
+; - PixelToMapIndex has about 40 callers (player_core, cop_core, cop_tiles_spawn_kill, lib_map_tile_patches, lib_map_tile_patches, lib_map_tile_patches, lib_tile_triggers_and_lair_return, lib_menus, engine_spawn_lairs_death_drops and four actor files); it needs M = 16 on entry and returns with M = 16 (it ends with REP #$20). It relies on B holding the high byte of dp$18 after LDA $18 at M = 16 (the page row for Multiply8x8).
 ; - IsPlayerOnMetatile is the floor hazard of four scenes. Each script first tests an inventory entry with Cop19 and only checks the tile while the item is not worn, then hurts the player with Cop39: Lostside Marsh id $80, 1 damage (guarded by item entry $0A; walkthrough items.md: Ice Armor protects from the fiery floors in Lostside), Leo's Laboratory dungeon ids $F3 and $E1, 4 damage (item entry $0A; 06-dr-leos-lab.md: equip the Ice Armor for the flaming bridges), Magridd's Castle dungeon id $88, 3 damage (item entry $0F; walkthrough items.md: Elemental Mail prevents spike damage), and the St. Elles coast id $47, 4 damage (after a COP [07] flag test; what the tile is is open, OQ-I031-2).
 ; - The routine never saves P: M = 16 is an input and kept on return.
 ---------------------------------------------
@@ -66,7 +66,7 @@ PixelToMapIndex {
 
 ; Turns a pixel position into the VRAM word address of its 8 x 8 BG1 tile.
 ; 
-; When: SetMetatileBg1 and SetMetatileBg1Bg2 (lib_0109D6_part1, 2 sites) and the scene map patcher (lib_0108BB) when they queue VRAM writes.
+; When: SetMetatileBg1 and SetMetatileBg1Bg2 (lib_map_tile_patches, 2 sites) and the scene map patcher (lib_map_tile_patches) when they queue VRAM writes.
 ; Sees: nothing directly; the address says where the changed tile is drawn.
 ; Why: BG1 uses a 64 x 64 tile map made of four 32 x 32 screens, so the address is not a plain row-major index.
 ; In: JSL; M = 16; dp$16 = x, dp$18 = y (pixels).

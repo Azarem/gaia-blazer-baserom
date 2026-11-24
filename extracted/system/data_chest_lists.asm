@@ -1,7 +1,7 @@
 ; Chest lists: the 128-word pointer table by location_id and the lists of 6-byte chest rows (file offsets 43486-44181, SNES $01:A9DE-$AC95, bank 00; 256 + 440 bytes).
 ; 
 ; === MODEL ===
-; TryOpenChest (lib_tile_triggers_and_lair_return) and the scene init code in lib_scene_map_patches read chest_list_ofs, the list of the current location, which the scene loader takes from ChestListPointers[location_id x 2]. A chest is not an actor: the map holds the chest tile ($FB closed, $FC open) and the list says which tile belongs to which chest, what it holds and which bit of the chest array remembers that it was opened.
+; TryOpenChest (lib_tile_triggers_and_lair_return) and the scene init code in lib_map_tile_patches read chest_list_ofs, the list of the current location, which the scene loader takes from ChestListPointers[location_id x 2]. A chest is not an actor: the map holds the chest tile ($FB closed, $FC open) and the list says which tile belongs to which chest, what it holds and which bit of the chest array remembers that it was opened.
 ; Row (6 bytes): +0 x, +1 y of the tile the player stands on (the chest tile is one above, y - 1); +2 chest id (bits 0-6 = the bit number in the array $1A7E, bit 7 = the tile is also edited on BG2); +3 content (0 empty, $FF Gems, any other value an inventory entry); +4 word Gem amount (BCD, little-endian: the bytes 12 00 are 12 Gems). A list ends with $FF.
 ; 
 ; === WHAT IS HERE ===
@@ -10,7 +10,7 @@
 ; Checked against the walkthrough: the chest of the Trial room (ChestListLoc0D) holds item 1, the Sword of Life (01-in-the-beginning.md); the chest in the Underground Castle (ChestListLoc05) holds the 12 Gems of 02-grass-valley.md.
 ; 
 ; === NOTES ===
-; - The bit number is a 7-bit value, so a chest id is below 128; $1A7E lies inside the first switch array ($1A5E + $20) and is the chest-opened array.
+; - The bit number is a 7-bit value, so a chest id is below 128; the chest-opened array is $1A7E, right behind the 32 event flag bytes: chest bit n is bit number $100 + n of the shared bit space (16 of its 32 bytes are used).
 ---------------------------------------------
 
 ?BANK 01

@@ -1,0 +1,10 @@
+[
+  {
+    "op": "merge",
+    "blocks": ["lib_01065B", "lib_0106CD"],
+    "into": "lib_animation",
+    "movable": true,
+    "row": "R-2-spike",
+    "note": "Spike cluster: the animation frame-advance pair. Callers are the four animation COP handlers (JSL $@, long). After the R-2 transform on lib_01065B there is no outbound 2-byte reference, so the cluster is bank-agnostic and may be movable."
+  }
+]

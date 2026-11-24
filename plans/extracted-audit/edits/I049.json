@@ -1,0 +1,65 @@
+{
+  "_note": "I049: note corrections found while writing docs/code/combat-damage-and-enemy-records.md. (1) ApplySwordHit, DetectHitSourceCollisions and mc_obj_floor_spikes_check_026F36 said 'knocked back' / 'knock-back'; no routine of engine_combat_hits.asm and not Cop39_DamagePlayer writes $00-$06 of a victim (OQ-I047-6), a hit only sets the hit stun, freezes the target or redirects it to RunEnemyDeath. (2) AddExp named engine_actor_scheduler_and_sprites as the home of the two kill paths; they are KillTarget and KillOrSpareProjectileTarget in engine_combat_hits.asm (the block note of lib_player_helpers already says so). (3) The MetaGrassValley note listed $2E as a second Purple Bird; the row's script is gv_enemy_monster_blocks_0FB04F (the Monster Blocks, HP 4, EXP word 3: the bestiary says 2 EXP, OQ-I049-1). (4) The scheduler block note listed $16 bits $0100 and $0200 as unexplained; the combat masks ($0D00 sources, $EEC0 targets, $25C0 contact) define them (OQ-I005-14 answered for those two). (5) The St. Elles coast block note called the Lightning Pyramid damage inferred; ApplyProjectileHit reads the $30 byte first and $FF skips the class and boss tests.",
+
+  "system/engine_combat_hits.asm": {
+    "partNotes": {
+      "ApplySwordHit": {
+        "edit": [
+          { "find": "the monster flashes and is knocked back, loses HP", "with": "the monster flashes and loses HP (it stands still for the stun while the hero swings; nothing is knocked back, OQ-I047-6)" }
+        ]
+      },
+      "DetectHitSourceCollisions": {
+        "edit": [
+          { "find": "monsters flash, are knocked back, lose HP and die.", "with": "monsters flash, lose HP and die (nothing is knocked back, OQ-I047-6)." }
+        ]
+      }
+    }
+  },
+
+  "library/lib_player_helpers.asm": {
+    "partNotes": {
+      "AddExp": {
+        "edit": [
+          { "find": "the two enemy kill paths in engine_actor_scheduler_and_sprites (the meta entry's EXP at once)", "with": "the two enemy kill paths in engine_combat_hits (KillTarget and KillOrSpareProjectileTarget; the meta entry's EXP at once)" }
+        ]
+      }
+    }
+  },
+
+  "system/WorldMetaPointers.asm": {
+    "partNotes": {
+      "MetaGrassValley": {
+        "edit": [
+          { "find": "$28 and $2E Purple Bird (two types), $29 Green Torch", "with": "$28 Purple Bird, $29 Green Torch, $2E Monster Blocks (script gv_enemy_monster_blocks_0FB04F; HP 4 matches the bestiary, the EXP word is 3 where the bestiary says 2: OQ-I049-1)" }
+        ]
+      }
+    }
+  },
+
+  "magridds_castle/castle_dungeon/mc_castle_dungeon_actors.asm": {
+    "partNotes": {
+      "mc_obj_floor_spikes_check_026F36": {
+        "edit": [
+          { "find": "on a hit COP 39 #3 (3 points of damage with the knock-back of Cop39_DamagePlayer).", "with": "on a hit COP 39 #3 (3 points of damage; Cop39_DamagePlayer sets the hit stun and moves nothing, OQ-I047-6)." },
+          { "find": "the knock-back gives the hero a few frames before the next test.", "with": "the hit stun gives the hero a few frames before the next test (IsPlayerOnMetatile answers 'no' while he is stunned)." }
+        ]
+      }
+    }
+  },
+
+  "system/engine_actor_scheduler_and_sprites.asm": {
+    "blockNote": {
+      "edit": [
+        { "find": "Read but unexplained: $0008, $0040, $0100, $0200 (OQ-I005-14).", "with": "Combat masks (engine_combat_hits): $0100 = inert (neither a hit source nor a contact hazard); $0200 = cannot be hit but still hurts on contact; $0040 = neither a target nor a contact hazard. Unexplained outside combat: $0008 and the other uses of $0040 (OQ-I049-9)." }
+      ]
+    }
+  },
+
+  "st_elles/st_elles_coast/se_st_elles_coast_enemies.asm": {
+    "blockNote": {
+      "edit": [
+        { "find": "whether the hit code reads $30 as the damage is inferred from the walkthrough", "with": "ApplyProjectileHit reads $30 first and $FF skips the boss, class and Phoenix tests, so the bolt kills any enemy as the walkthrough says" }
+      ]
+    }
+  }
+}

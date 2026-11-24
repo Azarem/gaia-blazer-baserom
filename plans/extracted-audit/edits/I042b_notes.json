@@ -1,0 +1,36 @@
+{
+  "_note": "I042b: stale references left by the I042 regroup (talk and combat routines that moved, EnableDisplayAndNmi, and two block names that did not exist before I042: lib_027781_part3 is the scene change code in lib_boot_and_scene_init; common_actor_0066C6.code_0066DE is code_0066DE of gv_front_end). Evidence: grep of the call sites in extracted/ (RestoreSceneBgGfxAndPalette and LoadEquippedMagicGfx are called from lib_boot_and_scene_init, lib_menus and gv_front_end).",
+
+  "library/lib_player_helpers.asm": {
+    "blockNote": { "edit": [
+      { "find": "RunTalkInteraction (lib_menus) for the probe point of the talk button", "with": "RunTalkInteraction (lib_field_talk) for the probe point of the talk button" },
+      { "find": "ChooseFacingAnim (lib_menus) calls FlipActorX", "with": "ChooseFacingAnim (lib_field_talk) calls FlipActorX" }
+    ] },
+    "partNotes": {
+      "FlipActorX": "Mirrors an actor horizontally.\n\nWhen: ChooseFacingAnim (lib_field_talk) when an actor turns toward the player and needs the side view the other way round.\nSees: the actor's sprite is drawn flipped.\nWhy: the side animations exist only once; the flip bit makes the second direction.\nIn: JSL; X = actor.\nOut: bit $4000 of the actor's $1C word toggled. P restored.\nClobbers: A."
+    }
+  },
+
+  "library/lib_hud.asm": {
+    "blockNote": { "edit": [
+      { "find": "SetEnemyGauge in engine_actor_scheduler_and_sprites", "with": "SetEnemyGauge in engine_combat_hits" }
+    ] }
+  },
+
+  "library/lib_system_helpers.asm": {
+    "blockNote": { "edit": [
+      { "find": "EnableDisplayAndNmi (lib_menus) increments it", "with": "EnableDisplayAndNmi increments it" }
+    ] }
+  },
+
+  "library/lib_menu_screen_setup.asm": {
+    "blockNote": { "edit": [
+      { "find": "the scene loader (lib_027781_part3, when $0454 is set) and common_actor_0066C6.code_0066DE call it too",
+        "with": "the scene change (lib_boot_and_scene_init, when $0454 is set) and code_0066DE of gv_front_end call it too" }
+    ] },
+    "partNotes": {
+      "LoadEquippedMagicGfx": "Loads the graphics and palette of the equipped spell.\n\nWhen: ExitEquipmentMenu and the scene change (lib_boot_and_scene_init).\nSees: the spell's own effect tiles and colours (the Flame Ball, Light Arrow ... of walkthrough magic.md) are available when the player casts it.\nWhy: only one spell's graphics fit; they are swapped in when the equipped magic changes.\nIn: long call; reads equipped_magic.\nOut: for equipped_magic - $11 = n in 0-7: $800 bytes of graphics_07B000 + the MagicGraphicsPointers offset to VRAM word $2600 (DMA channel 0), and 32 bytes of palette_07D000 + $20 x n (source bank $0F) to cgram_buffer + $160; any other value (no magic) does nothing.\nClobbers: A, X, Y; DMA channel 0.",
+      "RestoreSceneBgGfxAndPalette": "Puts the field's background graphics and palettes 11-15 back after a menu or a scene load.\n\nWhen: ExitEquipmentMenu, code_0066DE of gv_front_end and the scene change (lib_boot_and_scene_init).\nSees: the field looks normal again after the menu.\nWhy: the menu overwrote VRAM $2000 and part of the palette.\nIn: long call; M = 8; the screen must be in forced blank (it writes VRAM through DMA channel 0).\nOut: VRAM word $2000 receives $2000 bytes from $7F:C000; MenuSpellPalettes (160 bytes) is copied to cgram_buffer + $160; DBR restored.\nClobbers: A, X, Y; DMA channel 0."
+    }
+  }
+}

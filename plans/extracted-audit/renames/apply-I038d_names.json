@@ -1,0 +1,19 @@
+[
+  { "address": 1038660, "old": "code_0FD944", "new": "ll_enemy_toy_soldier_0FD944", "row": "I038-D1" },
+  { "address": 1038822, "old": "code_0FD9E6", "new": "ll_enemy_toy_spear_0FD9E6", "row": "I038-D1" },
+  { "address": 1039044, "old": "code_0FDAC4", "new": "ll_enemy_toy_spear_hitbox_0FDAC4", "row": "I038-D1" },
+  { "address": 1039054, "old": "code_0FDACE", "new": "ll_enemy_toy_spear_hitbox_0FDACE", "row": "I038-D1" },
+  { "address": 1039064, "old": "code_0FDAD8", "new": "ll_enemy_toy_spear_hitbox_0FDAD8", "row": "I038-D1" },
+  { "address": 1039074, "old": "code_0FDAE2", "new": "ll_enemy_toy_spear_hitbox_0FDAE2", "row": "I038-D1" },
+  { "address": 1039085, "old": "code_0FDAED", "new": "ll_enemy_toy_lunge_0FDAED", "row": "I038-D1" },
+  { "address": 1039355, "old": "code_0FDBFB", "new": "ll_enemy_catapult_0FDBFB", "row": "I038-D1" },
+  { "address": 1039534, "old": "code_0FDCAE", "new": "ll_enemy_catapult_boulder_0FDCAE", "row": "I038-D1" },
+  { "address": 1039547, "old": "code_0FDCBB", "new": "ll_enemy_catapult_boulder_0FDCBB", "row": "I038-D1" },
+  { "address": 1039560, "old": "code_0FDCC8", "new": "ll_enemy_catapult_boulder_0FDCC8", "row": "I038-D1" },
+  { "address": 1039573, "old": "code_0FDCD5", "new": "ll_enemy_catapult_boulder_0FDCD5", "row": "I038-D1" },
+  { "address": 1039612, "old": "code_0FDCFC", "new": "ll_enemy_spike_launcher_0FDCFC", "row": "I038-D1" },
+  { "address": 1039903, "old": "code_0FDE1F", "new": "ll_enemy_spike_launcher_spike_0FDE1F", "row": "I038-D1" },
+  { "address": 1039905, "old": "code_0FDE21", "new": "ll_enemy_spike_launcher_spike_0FDE21", "row": "I038-D1" },
+  { "address": 1039918, "old": "code_0FDE2E", "new": "ll_enemy_spike_launcher_spike_0FDE2E", "row": "I038-D1" },
+  { "address": 1039931, "old": "code_0FDE3B", "new": "ll_enemy_spike_launcher_spike_0FDE3B", "row": "I038-D1" }
+]

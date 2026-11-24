@@ -1,0 +1,10 @@
+[
+  { "address": 157416, "old": "mc_dock_soldier_escort_0266E8", "new": "mc_dock_lisa_arrives_0266E8", "row": "I039g-1" },
+  { "address": 158049, "old": "code_026961", "new": "mc_dock_scene_escort_026961", "row": "I039g-2" },
+  { "address": 155288, "old": "code_025E98", "new": "mc_dock_dr_leo_hostage_scene_025E98", "row": "I039g-3" },
+  { "address": 155459, "old": "code_025F43", "new": "mc_dock_dr_leo_key_handover_025F43", "row": "I039g-4" },
+  { "address": 159104, "old": "mc_dock_airship_return_026D80", "new": "mc_deck_airship_return_026D80", "row": "I039g-5" },
+  { "address": 159560, "old": "mc_dock_bg2_scroll_y_fast_026F48", "new": "mc_deck_bg2_scroll_y_fast_026F48", "row": "I039g-6" },
+  { "address": 159769, "old": "mc_dock_push_zones_027019", "new": "mc_deck_push_zones_027019", "row": "I039g-7" },
+  { "address": 159787, "old": "unk16_02702B", "new": "mc_deck_push_zone_records_02702B", "row": "I039g-8" }
+]

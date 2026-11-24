@@ -1,7 +1,7 @@
 ; Scene asset loader, Quintet LZ expander and boot hardware reset (file offsets 78281-78288 and 78450-80601, SNES $02:B1C9 and $02:B272-$BAD9, bank 02).
 ; 
 ; === MODEL ===
-; Every scene change calls LoadSceneAssets once (lib_scene_change_init InitSceneState), after the scene-change code has put the PPU in forced blank with NMI off. So every VRAM, CGRAM-buffer and WRAM write below happens without a vblank check. dp$2F-$31 is the long pointer to the asset list (SceneAssetLists, $05:8000), set once at boot by InitHardwareAndClearWram.
+; Every scene change calls LoadSceneAssets once (lib_boot_and_scene_init InitSceneState), after the scene-change code has put the PPU in forced blank with NMI off. So every VRAM, CGRAM-buffer and WRAM write below happens without a vblank check. dp$2F-$31 is the long pointer to the asset list (SceneAssetLists, $05:8000), set once at boot by InitHardwareAndClearWram.
 ; The asset list has one record per scene: area, scene, commands, then a 00 byte. FindSceneRecord walks the records from the top and stops at the first whose scene equals scene_current ($0316) and whose area equals area_current ($0314). The first record is a dummy (area $53, scene $59) with no commands and the list has no end sentinel (OQ-I011-3). The other 97 records are exactly the 97 scenes that have a scene profile.
 ; A command byte has exactly one bit set. LoadSceneAssets reads one command at a time and tries the bits from $80 down to $01 (a BIT ladder), calls the handler, which reads its own operands with ReadAssetByte, and stops on a 00 byte:
 ;   $80 graphics   6 operand bytes  b0 start, b1 end (512-byte units, b0 bit 7 = raw), b2 VRAM page (word address b2 << 8), 3-byte pointer. LoadSceneGraphics. Skipped when asset_skip_mask bit 3 is set
@@ -16,13 +16,13 @@
 ; 
 ; === STREAM POINTERS AND CACHE ===
 ; Every asset pointer in a record is a 3-byte linear FILE OFFSET (lo, mid, hi). ReadAssetPointer converts it to a LoROM address in dp$29-$2B: bank = offset >> 15, address = $8000 + (offset and $7FFF). Ten 3-byte cache cells at $0407-$0424 remember the pointer of the last asset loaded into a slot: graphics by VRAM page (asset_cache_gfx0-3 for b2 $00, $10, $20, $30), tileset per layer (asset_cache_tileset1/2), tilemap per layer (asset_cache_tilemap1/2), spritemap and music. CheckAssetCache compares the new pointer with the cell, stores it and says 'load' (carry set) only when different, so entering a scene that uses the same assets in the same slots costs nothing. Palettes have no cache. A graphics b2 other than $00/$10/$20/$30 ($40 and $FF), and a tileset or tilemap type other than 1 or 2, zero the cells of that kind and always load. A zeroed cell forces a reload: other code zeroes cells to invalidate them. The cache keys on the pointer only, not on the range (b0, b1); no two commands of the shipped list share a pointer with different ranges, so that hazard does not occur.
-; asset_skip_mask ($03B4) is a one-shot request: an actor that warps inside a world writes $0020 before the scene change so that the music is not reloaded (15 writer sites in 13 files), and InitSceneState clears it after the load. Skipped commands still advance Y past their operands. The record walkers (FindSceneRecord, FindAssetLabel) ignore the mask.
+; asset_skip_mask ($03B4) is a one-shot request: a cutscene script (or ReleaseLairAtSwitch for the return trip) writes $0020 just before its scene change so that the music is not reloaded, even when the warp goes to another world (15 writer sites in 10 files; the Phoenix scene of the Soul of Mountain House goes to the World of Evil this way), and InitSceneState clears it after the load. Skipped commands still advance Y past their operands. The record walkers (FindSceneRecord, FindAssetLabel) ignore the mask.
 ; 
 ; === QUINTET LZ ===
 ; DecompressQuintetLz is the Quintet LZ expander of corpus/gaia-core/quintet-lz.md: a 256-byte ring pre-filled with $20, first write position $EF, a flag bit per token (1 = literal byte, 0 = back reference of an 8-bit ring position and a 4-bit length, count = length + 2), bits read MSB first with the one-hot mask dp$1E. It does NOT read the 2-byte length word that precedes every compressed stream: each caller reads it into dp$23 first. The loader decompresses to $7E:6000 (graphics and tileset staging, 8 KB at most), $7E:C000 (Mode 7 map), $7E:3800 or $7E:F000 (spritemap) and the layer map pages.
 ; 
 ; === SCENE PROFILE, MUSIC AND VARIANT ===
-; ApplySceneProfile writes the PPU layout of the scene from a 12-byte record of lib_scene_profile_data (see its block note for the layout) and sets location_id, world_index, the BG tile attributes, the view height, the parallax ratios, scene_variant and no_combat_scene. scene_variant ($031E) selects which music record of the scene plays: LoadSceneMusic plays a record only when its variant byte equals scene_variant. InitSceneState clears scene_variant after the load, so it is a one-shot request: an actor may set it before the scene change; otherwise LookupSceneVariant (lib_scene_map_patches) may set it from the switch rows of SceneVariantRules; otherwise bits 7 and 6 of profile byte 11 add 1 each. The profile command is always the first command of a record, so the variant is final before the music command runs.
+; ApplySceneProfile writes the PPU layout of the scene from a 12-byte record of lib_scene_profile_data (see its block note for the layout) and sets location_id, world_index, the BG tile attributes, the view height, the parallax ratios, scene_variant and no_combat_scene. scene_variant ($031E) selects which music record of the scene plays: LoadSceneMusic plays a record only when its variant byte equals scene_variant. InitSceneState clears scene_variant after the load, so it is a one-shot request: an actor may set it before the scene change; otherwise LookupSceneVariant (lib_map_tile_patches) may set it from the switch rows of SceneVariantRules; otherwise bits 7 and 6 of profile byte 11 add 1 each. The profile command is always the first command of a record, so the variant is final before the music command runs.
 ; 
 ; === NOTES ===
 ; - The loader never sets dp$2E, the bank byte of the copy destination [dp$2C]. Its only writer is the SPC upload (engine_spc_ipl_upload: $07 at the start, incremented per bank, $7E at the end), so the tileset and raw map copies write to the bank left by the last music upload. Whether the very first scene after boot sees $7E is open (OQ-I011-1).
@@ -37,7 +37,7 @@
 ?INCLUDE 'data_scene_asset_lists'
 ?INCLUDE 'engine_spc_ipl_upload'
 ?INCLUDE 'lib_arithmetic'
-?INCLUDE 'lib_scene_map_patches'
+?INCLUDE 'lib_map_tile_patches'
 ?INCLUDE 'lib_scene_profile_data'
 ?INCLUDE 'lib_system_helpers'
 
@@ -160,7 +160,7 @@ WaitVblankFrames {
 
 ; Expands one Quintet LZ stream into bank $7E.
 ; 
-; When: LoadSceneGraphics, LoadMetatileDefs, LoadMapLayer, LoadMode7Map, LoadSceneSpritemap (5 sites) and three sites of lib_02719F.
+; When: LoadSceneGraphics, LoadMetatileDefs, LoadMapLayer, LoadMode7Map, LoadSceneSpritemap (5 sites) and three sites of lib_boot_and_scene_init.
 ; Sees: the decoded graphics, tile definitions or map bytes that the caller then copies on.
 ; Why: all scene data is stored compressed; the ring keeps the last 256 output bytes so a back reference costs 12 bits.
 ; In: JSL; dp$29-$2B = source (behind the 2-byte length word), dp$23 = bytes to produce, dp$25 = destination offset in bank $7E. Sets M = 8, X = 16 itself and DBR = $7E for the call.
@@ -438,7 +438,7 @@ ReadLzNibble {
 ---------------------------------------------
 ; Loads everything a scene needs: graphics, palette, tile definitions, maps, profile, music and sprite map.
 ; 
-; When: every scene change, from InitSceneState (lib_scene_change_init), with the screen in forced blank.
+; When: every scene change, from InitSceneState (lib_boot_and_scene_init), with the screen in forced blank.
 ; Sees: after it returns the new scene's data is in VRAM and WRAM; the player sees it when the screen is unblanked.
 ; Why: scenes are data. One list, one record per scene and one command per asset replace a loader routine per scene.
 ; In: JSL; area_current, scene_current set; dp$2F-$31 = asset list.
@@ -1320,7 +1320,7 @@ ApplySceneProfile {
     BRA ProfileKeepVariant
 
   loc_013866:
-    JSL $@lib_scene_map_patches.LookupSceneVariant ; carry set: a SceneVariantRules row had its switch set and wrote scene_variant
+    JSL $@lib_map_tile_patches.LookupSceneVariant ; carry set: a SceneVariantRules row had its switch set and wrote scene_variant
     BCC ProfileAddVariantBits
 
   ProfileKeepVariant:
@@ -1411,9 +1411,9 @@ LoadSceneMusic {
 ; 
 ; When: LoadSceneMusic, when the variant matches and the pointer is new.
 ; Sees: the previous music stops; the new song starts at the end.
-; Why: the SPC must be taken out of its engine and into the IPL boot handler before a block can be sent.
+; Why: the SPC must be told to stop ($F0) and to enter its own copy of the IPL receive loop ($FF, BootHandshake) before a block can be sent; the boot ROM is not involved.
 ; In: dp$29-$2B = song block.
-; Out: APUIO0 = $F0 and wait until the SPC answers 0; 2 frames; APUIO0 = $FF (the SPC's boot handshake handler, as in MusicLoadUpload); 2 frames; engine_spc_ipl_upload.code_0FEFF5 sends the block; 3 frames; APUIO0 = bgm_start_cmd.
+; Out: APUIO0 = $F0 and wait until the SPC answers 0; 2 frames; APUIO0 = $FF (the SPC's boot handshake handler, as in MusicLoadUpload); 2 frames; engine_spc_ipl_upload.UploadSpcStream sends the block; 3 frames; APUIO0 = bgm_start_cmd.
 ; Clobbers: A.
 
   UploadSceneMusic:
@@ -1429,7 +1429,7 @@ LoadSceneMusic {
     STA $APUIO0           ; $FF = the SPC's boot handshake handler (as MusicLoadUpload)
     LDA #$02
     JSL $@WaitVblankFrames
-    JSL $@engine_spc_ipl_upload.code_0FEFF5 ; the song block at dp$29-$2B goes through the IPL transfer
+    JSL $@engine_spc_ipl_upload.UploadSpcStream ; the song block at dp$29-$2B goes through the IPL transfer
     LDA #$03
     JSL $@WaitVblankFrames
     LDA $bgm_start_cmd

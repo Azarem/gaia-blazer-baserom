@@ -1,0 +1,47 @@
+{
+  "_note": "I035e: PC annotate actor batch greenwood, file 8 of 8: gw_boss_light_water_fire_statues (the statue boss of the Lostside marsh). Evidence: lair record $50 (data_lair_records: lair location $22 = A05S0A, RunLairFormation, 3 monsters, formation $20, meta type $3D), formation $20 (data_lair_formations), MetaGreenwood type $3D (9/5/50 HP, EXP BCD $0030), engine_spawn_lairs_death_drops (RunBossDeath writes $0700 into $16, then compares X with boss_actor), engine_003005 (RunBossMapPatch), docs/walkthrough/03-greenwood.md (the Elemental Statues) and enemy-bestiary.md ('Elemental Statues, 50 HP each, 90 EXP total'). COP semantics from docs/cop/index.md (COP A5 by flip state none / X / Y / both; COP 21 / 22 / 23 / 24 tile above / below / left / right; COP AE tile type at (dx,dy) non-zero; COP 0C hero in the box widened by the margin; COP 1B delay then goto; COP 9A / 9B distance tests).",
+
+  "greenwood/lostside_marsh/gw_boss_light_water_fire_statues.asm": {
+    "blockNote": [
+      "The boss of the Lostside marsh, the three Elemental Statues (file offsets 13254-15939, SNES $00:B3C6-$BE42, bank 00). One root script serves all three statues; the walkthrough calls them the Light Statue (far left, T-shaped thunderbolts), the Water Statue (rushes and leaves water that stays and hurts) and the Fire Statue (rushes and streams of fire). Each has 50 HP and gives 30 EXP (meta type $3D, 9/5/50 HP, EXP BCD $0030; 90 EXP in all, as in the bestiary).",
+      "",
+      "=== HOW THE FIGHT IS BUILT ===",
+      "The lair is record $50 (A05S0A, the statue tomb, RunLairFormation, 3 monsters, formation $20): three rows, ($F0,$90) with no flip, ($40,$60) flip X and ($1A0,$60) flip Y. The root gw_boss_light_water_fire_statues_0033C6 runs in all three: it clears exit_list_ofs, increments boss_fight_active, sets $0200 in $16, spawns engine_003005.RunBossMapPatch with patch id 1 (the map patch of the boss room) and then COP A5 sends each statue to its own script by flip state: none to code_0033EA, flip X to code_003732, flip Y to code_003A3D.",
+      "Only one statue is the boss at a time (boss_actor $039A). The Light Statue (code_003732) sets boss_actor at once; the other two sleep (animations $21 and $13, COP 91 loop) and wait until the boss_actor's $16 has bit $0400, which RunBossDeath sets when it writes $0700 into $16 of the dying boss. Then they wait 8 frames and write their own slot into boss_actor. Because the hand-over happens while the 32 explosions of the dead statue still run, RunBossDeath finds X != boss_actor at its end and skips KillAllOtherActors and the music change: only the last statue (boss_actor still its own) clears the room and ends the fight. The Water Statue takes over only when boss_actor is the actor in the slot after its own (code_0033EA: TXA / ADC #$0080 / CMP boss_actor), the Fire Statue (code_003A3D) after any boss_actor death (OQ-I035-12).",
+      "A statue that has become the boss waits again until the hero is inside its box widened by 4 (COP 0C, slot 0), spawns a wake effect (code_003E1C animation $3A for the Water Statue, code_003E29 animation $3C for the Light Statue, code_003E36 animation $3E for the Fire Statue), clears $0300 in $16, zeroes contact_lock and starts its loop after 60 frames. The loops are tile and distance driven: COP 9A / 9B compare the distance to the hero, COP 21-24 and COP AE test tiles, COP 80 picks the animation per direction.",
+      "",
+      "=== THE THREE ATTACKS ===",
+      "Light Statue (code_003732 ... code_003A15): rushes at the hero (the walkthrough: 'general rushing') and the T-shaped bolt. The bolt is eight children made one after the other (COP 85): two for each direction, south (code_0039AE, code_0039BD), west (code_0039CA, code_0039D9), north (code_0039E6, code_0039F5) and east (code_003A04, code_003A15), each a piece of the T (offsets in COP A1, direction in $1E, $2A = 4) that vanishes by itself. The order matches the walkthrough: south, west, north, east. A COP 27 loop starts the cycle again.",
+      "Water Statue (code_0033EA ... code_00372B): rushes at the hero (the walkthrough: equal-length rushes, turns of 90 degrees); every so often (COP 07 #$9905 tests the lock, COP 09 sets it) it spawns a puddle trail (code_003661, code_0036BF, then the chain code_003630 ... code_0036A2 / code_0036CF). Each puddle spawns the next one step further (COP 21-24 decide when the trail ends) and counts the segments in byte 0 of event_flags (at most 4); the last one clears the lock flag $1905 and the counter. The walkthrough: the water stays for some time and hurts on touch.",
+      "Fire Statue (code_003A3D ... code_003CFE): rushes at the hero (the walkthrough: rushes of varying length); when the tile test in its facing and the four probes ahead (COP AE, 64-80 pixels away) all pass it spawns a flame (code_003D3C, code_003D0D, code_003D6F, code_003DA1 by direction, which spawn the flame code_003DE4 with animations $22, $40 and $3F) and waits 30 frames.",
+      "",
+      "=== SHARED STATE ===",
+      "boss_actor $039A (the active statue), boss_fight_active $0458, exit_list_ofs $03B2, contact_lock $042D, flag $1905 (puddle trail running), byte 0 of event_flags ($1A5E: flags $0000-$0007, the puddle counter; the statue clears it at the start and the trail at its end, OQ-I035-8). The statue tomb is entered from the Lostside; after the third statue the switch $50 releases the Guardian of the Woods (walkthrough: the switch under the lair in the north-west corner).",
+      "",
+      "Open points: the position of the Water and the Fire Statue (the walkthrough puts the Water Statue at the far right; by the rows of formation $20 the far right row runs the Fire script, OQ-I035-13, DISCREPANCY), the exact hand-over order of the second and third statue (OQ-I035-12), the clearing of event_flags byte 0 (OQ-I035-8)."
+    ],
+    "partNotes": {
+      "gw_boss_light_water_fire_statues_0033C6": "The root of all three Elemental Statues: starts the boss fight and sends each statue to its own script.\n\nWhen: meta type $3D, lair record $50 (A05S0A, 3 monsters, formation $20): every statue starts here.\nSees: nothing yet; the statues are asleep until their turn (see the block note).\nWhy: the three statues share the fight start (boss_fight_active, the map patch) and differ only after COP A5 by flip state. The patch actor RunBossMapPatch is spawned three times, once by each statue (it blocks the buttons while the room is patched; whether it closes or opens the room is OQ-I024-3).\nIn: actor script, X = the statue's slot, Y = the new patch actor after COP 85.\nOut: STZ exit_list_ofs, boss_fight_active + 1, $16 bit $0200 set, patch id 1 in $30 of the patch actor; then a jump by COP A5 to code_0033EA, code_003732 or code_003A3D.\nClobbers: A, Y."
+    },
+    "comments": {
+      "13257": { "text": "ends with the boss music change (RunBossDeath of the last statue)", "expect": "INC $boss_fight_active" },
+      "13269": { "text": "patch id 1 goes into its $30 (Y = the new actor)", "expect": "COP [85]" },
+      "13280": { "text": "none: Water (0033EA), flip X: Light (003732), flip Y: Fire (003A3D)", "expect": "COP [A5]" },
+      "13302": { "text": "the Water Statue takes over only from the actor in the next slot", "expect": "CMP $boss_actor" },
+      "13316": { "text": "$0400: RunBossDeath wrote $0700 into $16 of the dying boss", "expect": "BIT #$0400" },
+      "13328": { "text": "this statue is now the boss: its death ends the fight", "expect": "STX $boss_actor" },
+      "13345": { "text": "no puddle trail is running", "expect": "COP [09]" },
+      "13351": { "text": "event_flags byte 0 = the puddle counter (OQ-I035-8)", "expect": "STZ $event_flags" },
+      "13404": { "text": "flag $1905 set: a puddle trail is out", "expect": "COP [09]" },
+      "13884": { "text": "at most 4 puddle segments", "expect": "LDA $event_flags" },
+      "13906": { "text": "one more segment", "expect": "INC $event_flags" },
+      "14066": { "text": "trail over: counter cleared, lock cleared just before", "expect": "STZ $event_flags" },
+      "14130": { "text": "the Light Statue is the boss from the start", "expect": "STX $boss_actor" },
+      "14140": { "text": "slot 0 (the hero) inside the box widened by 4: wake up", "expect": "COP [0C]" },
+      "14301": { "text": "the T-shaped bolt: two pieces per direction, south, west, north, east", "expect": "COP [85]" },
+      "14922": { "text": "$0400: the boss is dying; any statue may follow (OQ-I035-12)", "expect": "BIT #$0400" },
+      "14934": { "text": "the Fire Statue is the boss now", "expect": "STX $boss_actor" },
+      "15031": { "text": "the five tile tests ahead passed: place a flame", "expect": "COP [85]" }
+    }
+  }
+}

@@ -1,0 +1,1153 @@
+{
+  "_note": "I027: batch A5 (library 0118: HDMA channel queue, field button dispatch, status and souls screen, NPC talk, equipment and item menu, row chooser, BG3 page and CGRAM helpers, graphics handoff, HUD and enemy gauge, NMI switches, multiply, divide, BCD, menu strings and item descriptions). Names applied first by plans/extracted-audit/renames/apply-I027_names.json; M override at 71774 (ResetHdmaQueue) in us/overrides.json; WRAM mnemonics (tm_shadow .. defense_current; the player name at $1B92 gets none because binary_list_014789 prints it as a pointer operand and the name changes the assembled bytes) and docs/wram-memory-map.md section 7f by hand. Sources: plans/doc-audit/function-map/FM-A5.md re-read against the code (two corrections: UpdateHud skips the heal and EXP drains in locations $0F-$12 too; ClearBg3Page and ClearBg3UpperHalf set a flag with DBR = $7F, OQ-I027-1), walkthrough items.md, magic.md, level-up.md and 01-in-the-beginning.md for item, weapon, spell and button facts. Comment addresses are the ; {n} tags of extract:lt; every comment carries an expect guard. The six block-note edit operations on engine_boot_main_loop (WaitVBlank, EnableNmi and DisableNmi names, step 3 and step 7 wording, the M-flag sentence) were applied by the first merge run and removed so that the spec can be re-run. The neighbours code_0131FE, code_01320E and code_013246 of lib_arithmetic are outside A5 and only mentioned in the block note.",
+
+  "library/lib_system_helpers.asm": {
+    "blockNote": [
+      "HDMA channel queue and the NMI and vblank switches (file offsets 71774-71931 and 78220-78280, SNES $02:985E-$98FB and $02:B18C-$B1C8, bank 02).",
+      "",
+      "=== HDMA CHANNEL QUEUE ===",
+      "HDMA channels 4-7 are handed out one per call within a frame; channels 0-2 are used by the NMI for OAM, CGRAM and VRAM transfers (HandleVBlank, engine_vblank_nmi). State lives in the direct page: dp$42 is the pending channel mask (the NMI copies it to HDMAEN), dp$44 the bit of the next free channel ($10 first), dp$46 the offset of that channel's register block from $4300 ($40 first, so channel 4 = $4340) and dp$48 is set to $6000 and never read. ResetHdmaQueue empties the queue at the start of every work phase. QueueHdmaDirect and QueueHdmaIndirect program the next channel; both are entered by long call with M = 8 and X = 16, take A.low = bank, B = PPU register index ($00-$3F, the low byte of the $21xx register) and Y = table address (load them with LDA #reg, XBA, LDA #bank, LDY #addr) and finish in the shared tail WriteHdmaChannelRegisters. HdmaDmapByRegister, indexed by the register number, supplies the DMA mode byte (one register, a register pair or the same register twice).",
+      "Indirect mode (DMAP or $40) sets both the table bank A1Bn and the indirect data bank DASBn to the bank given, so the table and the data it points to share one bank; every caller passes $7E and a WRAM table at $7800 or $7000. Direct mode reads the table as is (ROM tables binary_006A86 and binary_01B284 or WRAM).",
+      "There is no overflow guard: the fourth call shifts $80 out of dp$44 and the carry that ADC #$10 then adds (there is no CLC) makes dp$46 = $81; a fifth call per frame would write $4381-$4387, which is not a DMA channel (OQ-I009-9).",
+      "",
+      "=== NMI AND VBLANK ===",
+      "nmi_enabled ($03D2) is non-zero while the frame code runs with NMI on: EnableNmi increments it, EnableDisplayAndNmi (lib_menus) increments it, DisableNmi and ForceBlankNmiOff zero it. The text renderer's input wait (lib_text_render.code_013169) tests it: with NMI on it waits for the vblank, with NMI off it runs a whole sub-frame instead (RunSubFrame). WaitVBlank is the only wait for a vblank; when NMI is on, HandleVBlank runs inside it.",
+      "",
+      "=== NOTES ===",
+      "- The extractor decoded ResetHdmaQueue with M = 16 (LDA #$8510 and MVP) until the M override at 71774; the real code is the 16 bytes shown now (OQ-I005-7).",
+      "- ForceBlankNmiOff, EnableNmi and DisableNmi are the NMI switches of the main loop and the scene change; their call sites are in engine_boot_main_loop, lib_menus, lib_scene_change_init and engine_spawn_lairs_death_drops."
+    ],
+    "partNotes": {
+      "ResetHdmaQueue": [
+        "Empties the HDMA channel queue for the coming frame.",
+        "",
+        "When: once at the start of every work phase (RunMainLoop, RunReducedLoop, the two scene-change paths and the sub-frame wrapper: 6 call sites).",
+        "Sees: nothing by itself; HDMA effects stop unless an actor queues its channel again this frame.",
+        "Why: HDMA is a per-frame effect: whoever wants a scanline effect queues a channel in every frame and the NMI enables exactly the queued channels (HDMAEN = dp$42).",
+        "In: long call; M = 8, X = 16 (the M override at 71774 makes the extractor decode it that way).",
+        "Out: dp$42 = 0 (pending mask), dp$44 = $10 (bit of channel 4), dp$46 = $40 (offset of $4340 from $4300), dp$48 = $6000 (never read).",
+        "Clobbers: A, X."
+      ],
+      "QueueHdmaIndirect": [
+        "Programs the next free HDMA channel (4-7) for an indirect table and enables it.",
+        "",
+        "When: 10 call sites in world actors (every caller passes bank $7E and a WRAM table at $7800 or $7000).",
+        "Sees: the scanline effect of the calling actor appears from the next frame's NMI on (HDMAEN gets the channel bit).",
+        "Why: the queue lets several actors share channels 4-7 without knowing which is free.",
+        "In: long call; M = 8, X = 16; A.low = bank of the table and of the data it points to, B = PPU register index ($00-$3F), Y = table address.",
+        "Out: DMAPn = HdmaDmapByRegister[reg] or $40, BBADn = reg, A1TnL/H = Y, A1Bn = DASBn = bank; dp$42 or= dp$44, dp$44 shifted left, dp$46 += $10 (plus the carry of the shift). No guard against a fifth call (OQ-I009-9).",
+        "Clobbers: A (low = bank, B = 0); P, X and Y are restored."
+      ],
+      "QueueHdmaDirect": [
+        "Programs the next free HDMA channel (4-7) for a direct table and enables it.",
+        "",
+        "When: 14 call sites (player and world actors, the soul code in lib_011695 and lib_0116C3); tables are ROM (binary_006A86, binary_01B284) or WRAM.",
+        "Sees: as QueueHdmaIndirect.",
+        "Why: same queue as the indirect entry; direct mode needs no data bank.",
+        "In: as QueueHdmaIndirect (the bank is the table's bank).",
+        "Out: as QueueHdmaIndirect with DMAPn = HdmaDmapByRegister[reg] and no DASBn.",
+        "Clobbers: as QueueHdmaIndirect."
+      ],
+      "WriteHdmaChannelRegisters": [
+        "Shared tail of the two queue entries: writes the channel registers and advances the queue.",
+        "",
+        "When: QueueHdmaDirect falls into it; QueueHdmaIndirect reaches it with BRA.",
+        "Sees: n/a (called only from the two entries).",
+        "Why: the two entries differ only in DMAP and DASBn, the rest is identical.",
+        "In: stack: register index (top), then bank; X = dp$46 (the channel's register offset), Y = table address.",
+        "Out: BBADn = register index, A1TnL/H = Y, A1Bn = bank, dp$42 or= dp$44, dp$44 shifted left, dp$46 += $10 plus carry; PLX and PLP of the entry, RTL. The carry of ASL dp$44 is not cleared first (see the block note).",
+        "Clobbers: A."
+      ],
+      "HdmaDmapByRegister": [
+        "The DMAP byte for each PPU register, 64 bytes indexed by the low byte of the register address ($2100-$213F).",
+        "",
+        "When: QueueHdmaDirect and QueueHdmaIndirect read it with the register index.",
+        "Sees: n/a (data).",
+        "Why: an HDMA channel must be told how many bytes go to the register per line; scroll, matrix and palette registers take a byte twice, address registers take a pair.",
+        "In: n/a (data). Index = register number.",
+        "Out: n/a. 0 = one register ($2105-$210C, $2115, $211A, $2121 and the rest), 1 = register pair ($2102/3, $2116/7, $2118/9), 2 = the same register written twice ($2104, $210D-$2114, $211B-$2120, $2122); $80 or more for registers that are read ($2134-$213F: $80, $2138 $82, $2139/A $81, $213B-$213D $82). No caller queues a read register.",
+        "Clobbers: n/a."
+      ],
+      "ForceBlankNmiOff": [
+        "Blanks the screen and turns NMI off.",
+        "",
+        "When: the scene-change code, before it rebuilds VRAM (counterpart of EnableDisplayAndNmi).",
+        "Sees: the screen goes black.",
+        "Why: VRAM can only be written freely in forced blank, and an NMI during the rewrite would run the frame uploads.",
+        "In: long call; M = 8 is set inside (P restored).",
+        "Out: waits for a vblank (WaitVBlank), NMITIMEN = $01 (NMI off, auto-joypad on), INIDISP = $80 (forced blank), nmi_enabled = 0.",
+        "Clobbers: A (P restored)."
+      ],
+      "EnableNmi": [
+        "Turns NMI on and counts the section.",
+        "",
+        "When: 12 call sites: the end of every work phase in engine_boot_main_loop (8), RunEquipmentMenu, RunTalkInteraction, lib_scene_change_init and engine_spawn_lairs_death_drops.",
+        "Sees: the next vblank runs HandleVBlank, which uploads what the work phase prepared.",
+        "Why: the work phase runs with NMI off (DisableNmi), so this call is what lets the frame's results reach the screen.",
+        "In: long call; M = 8.",
+        "Out: reads RDNMI first (clears a vblank flag that is still set, so no NMI fires at once), NMITIMEN = $A1 (NMI, V-IRQ mode bit 5 which never fires because the I flag stays set, and auto-joypad), nmi_enabled += 1.",
+        "Clobbers: A."
+      ],
+      "DisableNmi": [
+        "Turns NMI off (the auto-joypad read stays on).",
+        "",
+        "When: 9 call sites: after the menu step of every main-loop frame and in the other loops of engine_boot_main_loop (7), RunTalkInteraction (around the NPC talk script) and engine_spawn_lairs_death_drops.",
+        "Sees: n/a.",
+        "Why: the work phase moves the stack pointer in the sort and OAM code and must not be interrupted (OQ-I005-20).",
+        "In: long call; M = 8.",
+        "Out: NMITIMEN = $01, nmi_enabled = 0.",
+        "Clobbers: A."
+      ],
+      "WaitVBlank": [
+        "Waits until the next vblank starts (when NMI is on, HandleVBlank runs inside the wait).",
+        "",
+        "When: the first step of every main-loop frame and every wait of the menus, the status screen and the scene change.",
+        "Sees: one frame passes.",
+        "Why: the only frame wait in the game; code that polls RDNMI itself does not exist.",
+        "In: long call; any M (set to 8 inside, P restored).",
+        "Out: returns just after the vblank flag was seen.",
+        "Clobbers: none (A and P are saved)."
+      ]
+    },
+    "comments": {
+      "71776": { "text": "Queue state: dp$44 = bit of the next free channel ($10 = channel 4), dp$46 = offset of its register block from $4300 ($40 = $4340), dp$48 = $6000 (written, never read)", "expect": "LDA" },
+      "71800": { "text": "DMAP mode byte of this PPU register (X = register index, B was cleared above)", "expect": "HdmaDmapByRegister" },
+      "71806": { "text": "Indirect mode (bit 6): the table holds pointers to the data", "expect": "ORA" },
+      "71811": { "text": "The bank pushed by the caller (below the register index): table bank and indirect data bank", "expect": "LDA" },
+      "71861": { "text": "+$10 per channel, plus the carry of the ASL above: no CLC, so after the fourth call dp$46 becomes $81 (OQ-I009-9)", "expect": "ADC" },
+      "78227": { "text": "NMITIMEN = 1: NMI off, auto-joypad read on", "expect": "LDA" },
+      "78242": { "text": "Reading RDNMI clears a pending vblank flag, so enabling NMI below does not fire one at once", "expect": "RDNMI" },
+      "78245": { "text": "$A1: NMI (bit 7), V-IRQ mode (bit 5, masked by the I flag), auto-joypad (bit 0)", "expect": "LDA" },
+      "78267": { "text": "Discard a vblank flag left from an earlier frame, then wait for a new one", "expect": "RDNMI" }
+    }
+  },
+
+  "library/lib_arithmetic.asm": {
+    "blockNote": [
+      "Hardware multiply and divide wrappers and packed BCD (file offsets 78289-78333 and 78357-78405, SNES $02:B1D1-$B1FD and $02:B215-$B245, bank 02; the neighbours code_0131FE, code_01320E and code_013246 up to file offset 78449 are not annotated yet and are outside batch A5).",
+      "",
+      "=== MODEL ===",
+      "Multiply8x8 and DivideWordByByte use the SNES multiplier ($4202/$4203) and divider ($4204-$4206): write the operands, wait the fixed time with NOPs and read the result. All three routines are entered by long call with M = 8 and X = 16 and have no side effects beyond A, B and the hardware registers. ByteToPackedBcd converts 0-255 to the packed BCD that the text control [06:n,addr] prints (digit bytes, least significant first).",
+      "",
+      "=== NOTES ===",
+      "- Multiply8x8 has about 22 call sites (map streaming and sweep, scene loading, COP core, combat and spawn code, ChooseFacingAnim); DivideWordByByte only two: ChooseFacingAnim and shared_actor_helpers_bank0.",
+      "- docs/wram-memory-map.md names code_013246 as the generator of rng_state."
+    ],
+    "partNotes": {
+      "Multiply8x8": [
+        "Multiplies two bytes with the hardware multiplier.",
+        "",
+        "When: about 22 call sites, among them SlotNumberToActor (slot x $40), the map streaming and sweep code and ChooseFacingAnim (6 x quotient).",
+        "Sees: n/a.",
+        "Why: the 5A22 multiplier needs only four NOPs, faster than a software loop.",
+        "In: long call; M = 8; A.low = first factor, B = second factor.",
+        "Out: A (16 bits) = the product (high byte in B, low byte in A.low), read after four NOPs.",
+        "Clobbers: A, B."
+      ],
+      "DivideWordByByte": [
+        "Divides a 16-bit value by a byte with the hardware divider.",
+        "",
+        "When: ChooseFacingAnim (animation id / 6) and shared_actor_helpers_bank0.",
+        "Sees: n/a.",
+        "Why: the divider takes 16 cycles, eight NOPs, and avoids a software loop.",
+        "In: long call; M = 8, X = 16; Y = dividend, A.low = divisor.",
+        "Out: A.low = quotient (low 8 bits only), B = remainder.",
+        "Clobbers: A, B."
+      ],
+      "ByteToPackedBcd": [
+        "Converts a byte (0-255) to packed BCD in two bytes.",
+        "",
+        "When: ShowStatusAndSoulsScreen (HP and maximum HP) and the pause code (lib_027572).",
+        "Sees: the status screen prints the result with [06:3,1B6C] and [06:3,1B6E], three BCD digits.",
+        "Why: the text renderer prints digits from BCD bytes, not binary.",
+        "In: long call; M = 8, X = 16; A = value, X = destination address (DBR-relative, WRAM).",
+        "Out: [X] = tens in the high nibble and ones in the low nibble, [X+1] = hundreds (0-2).",
+        "Clobbers: A."
+      ]
+    },
+    "comments": {
+      "78298": { "text": "Four NOPs (8 cycles): the product is not ready sooner", "expect": "NOP" },
+      "78318": { "text": "Eight NOPs (16 cycles): the divide takes 16", "expect": "NOP" },
+      "78363": { "text": "Hundreds: subtract 100 and count in [X+1]", "expect": "CMP" },
+      "78387": { "text": "Tens x 16 (four ASL) then OR the ones: packed BCD", "expect": "ASL" }
+    }
+  },
+
+  "library/lib_0118FC_part2.asm": {
+    "blockNote": [
+      "Menu row chooser (file offsets 74040-74368, SNES $02:A138-$A280, bank 02; the cursor offset table is at 74359-74368).",
+      "",
+      "=== MODEL ===",
+      "A cursor of one glyph (BG3 tile $2B, drawn in the cell at the row's offset and in the cell one tilemap row above it) moves between a few rows of a menu. ChooseMenuRow serves the equipment menu: rows are $80 apart in the BG3 buffer (two text rows), Up and Down move, Y cancels (carry set) and B confirms (carry clear); the equipment menu uses it with four rows (Weapon, Armor, Magic, Item) and swaps the page on the way. ChooseMenuRowAtTable is the same loop for the file-select and erase menus of engine_title_file_select: the row offsets come from TitleMenuCursorOffsets ($C0 apart) and there is no page swap; B plays the confirm sound ($18) there and the cancel and move sounds are $07 (OQ-I009-12).",
+      "Both wait for all buttons to be up (lib_text_render.code_013169, which returns the high byte of joy_pressed) before reading a press and call lib_shared_01230B.code_01230B while waiting (it blinks the cursor glyph; menu_blink counts the frames).",
+      "",
+      "=== NOTES ===",
+      "- Input: A = row count (stored in menu_count), B (after XBA) = start row, X = BG3 byte offset of the start row's cursor cell. Output: carry clear and A = row; carry set when Y was pressed. The final cursor glyph stays drawn on the last row.",
+      "- The first 'wait until released' loop gives an edge-triggered feel: joy_pressed holds a button as long as it is down (or until the latch is cleared), so a held button would otherwise repeat."
+    ],
+    "partNotes": {
+      "ChooseMenuRow": [
+        "Lets the player move a cursor between menu rows and returns the chosen row.",
+        "",
+        "When: RunEquipmentMenu, once per row choice (rows Weapon, Armor, Magic, Item).",
+        "Sees: the cursor glyph on the active row; moving onto the Item row swaps the equipment page for the item page, moving off redraws the equipment page (walkthrough: 'Press the B Button twice to equip ... Y Button to exit').",
+        "Why: one loop for the row level; the lists (ChooseFromEquipmentList, ChooseItemSlot) are separate loops entered after B.",
+        "In: JSR; M = 8; A = row count, B = start row, X = BG3 byte offset of the cursor cell of the start row.",
+        "Out: carry clear and A = the row on B (BRK #$07); carry set on Y (BRK #$07). The cursor glyph ($2B) stays on the final row. Up and Down move one row ($80 in the BG3 buffer) and are ignored at the ends; each move plays BRK #$07, resets menu_blink and runs the page swap: with menu_item_page clear, entering row 3 calls DrawItemPage and increments menu_item_page; with it set, leaving row 3 calls RedrawEquipmentPage and clears it.",
+        "Clobbers: A, X, Y (X is not restored); vram_upload_flags bit 0 is set on every cursor change."
+      ],
+      "ChooseMenuRowAtTable": [
+        "The same row chooser for menus whose row offsets come from a table.",
+        "",
+        "When: engine_title_file_select, twice: the file-select menu and the erase menu.",
+        "Sees: the cursor glyph moves between the rows of those menus.",
+        "Why: these menus have rows three tile rows apart, not two, and no item page.",
+        "In: long call (ends REP #$20 and RTL); A = row count, B = start row.",
+        "Out: A = the row, carry clear on B (BRK #$18), carry set on Y (BRK #$07); the cursor glyph is drawn at the final row on confirm and erased (tile $20) on cancel; X is preserved (PHX and PLX).",
+        "Clobbers: A."
+      ],
+      "TitleMenuCursorOffsets": [
+        "BG3 byte offsets of the cursor cell of the five rows of the file-select menus.",
+        "",
+        "When: ChooseMenuRowAtTable (entry = row).",
+        "Sees: the cursor beside each of five rows, $C0 apart (three tile rows).",
+        "Why: data, so the menu layout is changed in one place.",
+        "In: n/a (data). Five words: $02CA, $038A, $044A, $050A, $05CA.",
+        "Out: n/a.",
+        "Clobbers: n/a."
+      ]
+    },
+    "comments": {
+      "74048": { "text": "Cursor glyph: tile $2B in the cell at X and in the cell one tilemap row above ($7F6FC0 + X = $7F7000 + X - $40)", "expect": "LDA" },
+      "74076": { "text": "High byte of joy_pressed: $08 Up, $04 Down, $40 Y (cancel), $80 B (confirm)", "expect": "BIT" },
+      "74175": { "text": "Page swap: entering row 3 draws the item page, leaving it redraws the equipment page", "expect": "LDA" },
+      "74233": { "text": "Cursor cell of this row (file select and erase menus)", "expect": "TitleMenuCursorOffsets" }
+    }
+  },
+
+  "library/lib_0118FC_part5.asm": {
+    "blockNote": [
+      "Palette and graphics handoff of the menus (file offsets 74832-74989, SNES $02:A450-$A4ED, bank 02).",
+      "",
+      "=== MODEL ===",
+      "The equipment menu replaces the field's VRAM character data at word $2000 with its own graphics and the palette with its own, and puts the field back on exit. LoadItemPagePalette gives the item page its palette (colours 0-127 from binary_04F000). RestoreSceneBgGfxAndPalette DMAs the 8 KB copy of graphics_04D000 that lib_02719F keeps at $7F:C000 back to VRAM word $2000 and restores palettes 11-15 (binary_04F300, 160 bytes, to cgram_buffer + $160); the scene loader (lib_027781_part3, when $0454 is set) and common_actor_0066C6.code_0066DE call it too. LoadEquippedMagicGfx then puts the graphics and palette of the equipped spell on top.",
+      "On the menu exit the order is RestoreSceneBgGfxAndPalette, RestoreCgramBuffer (which overwrites the whole CGRAM buffer, including the colours just written) and LoadEquippedMagicGfx: the spell palette is loaded last so it survives.",
+      "",
+      "=== NOTES ===",
+      "- What graphics_04D000 is (field BG or shared tile set): OQ-I009-13.",
+      "- Spell n = equipped_magic - $11 (0-7). table_00FB88 holds a 3-byte pointer per spell (graphics_07B000 plus $0, $0, $800, $1000, $1000, $1800, $1800, $800), table_00FBA0 a word per spell (palette_07D000 + $20 x n; the source bank is fixed to $0F)."
+    ],
+    "partNotes": {
+      "LoadItemPagePalette": [
+        "Copies the item page palette into the CGRAM buffer.",
+        "",
+        "When: DrawItemPage, every time the item page is shown.",
+        "Sees: the item icons and the page frame use their own colours.",
+        "Why: the item icons need colours different from the equipment page.",
+        "In: JSR; any M (REP #$20 inside).",
+        "Out: 256 bytes of binary_04F000 copied to cgram_buffer (colours 0-127) with MVN; M = 8 on return; DBR restored.",
+        "Clobbers: A, X, Y."
+      ],
+      "RestoreSceneBgGfxAndPalette": [
+        "Puts the field's background graphics and palettes 11-15 back after a menu or a scene load.",
+        "",
+        "When: ExitEquipmentMenu, common_actor_0066C6.code_0066DE and the scene loader (lib_027781_part3).",
+        "Sees: the field looks normal again after the menu.",
+        "Why: the menu overwrote VRAM $2000 and part of the palette.",
+        "In: long call; M = 8; the screen must be in forced blank (it writes VRAM through DMA channel 0).",
+        "Out: VRAM word $2000 receives $2000 bytes from $7F:C000; binary_04F300 (160 bytes) is copied to cgram_buffer + $160; DBR restored.",
+        "Clobbers: A, X, Y; DMA channel 0."
+      ],
+      "LoadEquippedMagicGfx": [
+        "Loads the graphics and palette of the equipped spell.",
+        "",
+        "When: ExitEquipmentMenu and the scene loader (lib_027781_part3).",
+        "Sees: the spell's own effect tiles and colours (the Flame Ball, Light Arrow ... of walkthrough magic.md) are available when the player casts it.",
+        "Why: only one spell's graphics fit; they are swapped in when the equipped magic changes.",
+        "In: long call; reads equipped_magic.",
+        "Out: for equipped_magic - $11 = n in 0-7: $800 bytes of graphics_07B000 + the table_00FB88 offset to VRAM word $2600 (DMA channel 0), and 32 bytes of palette_07D000 + $20 x n (source bank $0F) to cgram_buffer + $160; any other value (no magic) does nothing.",
+        "Clobbers: A, X, Y; DMA channel 0."
+      ]
+    },
+    "comments": {
+      "74844": { "text": "256 bytes to the CGRAM buffer (X = source, Y = 0); the bank operands are destination $7F, source bank of binary_04F000", "expect": "MVN" },
+      "74851": { "text": "VRAM word $2000 <- $2000 bytes from $7F:C000, the copy of graphics_04D000 made at scene load", "expect": "LDX" },
+      "74898": { "text": "160 bytes to cgram_buffer + $160: palettes 11-15", "expect": "LDA" },
+      "74915": { "text": "Magic ids $11-$18 become spell 0-7; anything else (no magic, other items) returns", "expect": "SBC" },
+      "74926": { "text": "A = 3 x spell number (the table entries are 3 bytes)", "expect": "ADC" },
+      "74984": { "text": "32 bytes of palette_07D000 + $20 x n to cgram_buffer + $160 (bank $0F)", "expect": "MVN" }
+    }
+  },
+
+  "library/lib_0118FC_part6.asm": {
+    "blockNote": [
+      "HUD update and enemy gauge (file offsets 75353-75470, SNES $02:A659-$A6CE, bank 02).",
+      "",
+      "=== MODEL ===",
+      "UpdateHud runs once per frame at the end of the work phase (RunMainLoop step 7, RunReturnLoop, RunSubFrame) and once from ShowStatusAndSoulsScreen. It draws the enemy gauge, pays out the pending heal and EXP (lib_player_stats.code_0275ED and code_027614) and redraws the parts of the HUD that hud_dirty_flags marks.",
+      "Locations $0F-$12 have no HUD: UpdateHud returns at once for location_id - $0F below 4, so the heal and EXP drains and the redraw are skipped there too, and the dirty bits are cleared (FM-A5 section 1.8 said the drains still ran; the code does not). The reduced loop of $10-$12 never calls it; location $0F still runs the full main loop (OQ-I027-2).",
+      "",
+      "=== ENEMY GAUGE ===",
+      "enemy_gauge_timer ($0330) is one byte. A hit sets it to $80 (SetEnemyGauge in engine_scheduler_sprites_combat_collision); on the next UpdateHud $80 is the only value that draws the gauge (EnemyGaugeText: a fixed six-tile label, entry 1 of the text renderer's list binary_list_014789, and the bar from enemy_gauge_hp and enemy_gauge_max). The timer then counts down by 2 per frame ($7E ... $00, 63 frames, about one second); at 0 the clear string is drawn and the timer becomes $FE; every other negative value is idle and draws nothing (OQ-I009-15).",
+      "",
+      "=== HUD PARTS ===",
+      "hud_dirty_flags ($0332) is shifted out bit by bit: bit 0 HudFrameText (the backing tiles, the LEV, EXP and GEM labels and a fixed six-tile label, entry 0 of binary_list_014789), bit 1 HudExpText (8 BCD digits from player_exp), bit 2 HudHpGaugeText (the HP gauge from player_hp and player_max_hp), bit 3 HudLevelText (2 digits from player_level_bcd's low byte at $1B6A), bit 4 HudGemsText (6 digits from gems_low). The menus store $1F to redraw everything; hits set bits 1 and 2, pickups bit 4.",
+      "",
+      "=== NOTES ===",
+      "- The BG3 cells are written into the buffer by the text renderer (lib_text_render.code_012769) and reach VRAM through the upload flags it sets."
+    ],
+    "partNotes": {
+      "UpdateHud": [
+        "Draws the enemy gauge, pays out the pending heal and EXP and redraws the dirty parts of the HUD.",
+        "",
+        "When: once per frame at the end of the work phase (5 call sites in engine_boot_main_loop) and from ShowStatusAndSoulsScreen.",
+        "Sees: the LEV, EXP and GEM numbers and the HP bar at the top of the screen, and the enemy gauge below them for about a second after a hit (walkthrough level-up.md and the HUD of every chapter).",
+        "Why: all HUD text goes through one routine and a dirty mask, so only what changed is redrawn.",
+        "In: long call; M = 8; reads location_id, enemy_gauge_timer, hud_dirty_flags.",
+        "Out: nothing at all for locations $0F-$12 (hud_dirty_flags is cleared). Otherwise: the gauge by enemy_gauge_timer (see the block note), code_0275ED and code_027614 drained, one HUD string per set bit of hud_dirty_flags, then hud_dirty_flags = 0.",
+        "Clobbers: A, Y; X by the callees."
+      ]
+    },
+    "comments": {
+      "75357": { "text": "Locations $0F-$12 have no HUD: skip everything, including the heal and EXP drains", "expect": "SBC" },
+      "75366": { "text": "Enemy gauge timer (a byte): $80 = a hit just set it, draw the gauge; 2 per frame down to 0, then erase; negative = idle", "expect": "LDA" },
+      "75373": { "text": "$80 - 1 = $7F is positive, so only $80 draws; other negative values stay idle (the result is not stored)", "expect": "DEC" },
+      "75394": { "text": "Pay out heal_pending and exp_pending", "expect": "JSL" },
+      "75402": { "text": "One LSR per bit: 0 frame, 1 EXP, 2 HP, 3 level, 4 gems", "expect": "LDA" }
+    }
+  },
+
+  "library/lib_menus.asm": {
+    "blockNote": [
+      "Field menus and screens (status and souls, talk, equipment and item menu), their HUD text and the item descriptions (code at file offsets 71932-73976, SNES $02:98FC-$A0F8, plus helpers at 74576-74639, 74730-74773 and 78198-78219; text and tables at 83313-83848 and 87358-90589; bank 02).",
+      "",
+      "=== FIELD BUTTONS ===",
+      "DispatchFieldButtons runs once per frame from RunMainLoop with NMI on (M = 8). Order: Select or X (joy_pressed+1 bit $20; the NMI copies X into the Select bit) opens the equipment menu; B ($80) talks to the actor in front of the player; A (low byte of joy_pressed, bit 7), only when no direction is held, shows the status and souls screen. Walkthrough 01-in-the-beginning.md: 'Press the X Button to open the menu ... Press the B Button twice to equip ... Press the Y Button to exit the menu', 'speak with him (B Button)'. The A-button screen is not in the walkthrough (OQ-I009-5). joy_pressed keeps a button as long as its release latch bit is set (engine_vblank_nmi JOYPAD note), so every chooser first waits until all buttons are up and the screens that end on a button clear the latch bits with TRB, to stop the same press acting in the field.",
+      "",
+      "=== STATUS AND SOULS SCREEN ===",
+      "A BG3-only overlay (no screen blank, no graphics swap). ShowStatusAndSoulsScreen converts HP and maximum HP to BCD (hp_bcd, max_hp_bcd), clamps the strength and defence level parts (level_power, level_defense) to 12 for the display and restores them afterwards (OQ-I009-6), and prints StatusScreenText: the player name, HP / maximum, the EXP still needed for the next level (player_exp_next, 8 digits), bars for Strength and Defence (two rows each, level part over gear part) and the four equipped item names. After A is released it waits for A, B, Y or a direction, prints the souls page (SoulsScreenTitleText, then one 21-byte line per bit of souls_flags: bit 0 Magician, 1 Light, 2 Shield, 3 Detection, 4 Reality), waits for release and another press, consumes the latch and clears BG3. WaitFrameKeepClock undoes the NMI's frame_counter increment, so the frame clock stands still while the screen is open.",
+      "",
+      "=== TALKING ===",
+      "RunTalkInteraction (B) disables NMI, runs FindAndTalkToActorInFront and enables NMI: the script drives its own frames. The probe point depends on the facing code (from lib_player_facing.code_0273D4): code 0 (x+8, y-$10), 1 (x+8, y), 2 (x+$10, y-8), 3 (x, y-8) relative to the player's (x, y); facing 0 probes a second point two tiles up when the tile type there is 6. FindTalkableActorAt walks the actors from actor_list_tail through the $3E links and accepts the first one whose $16 has bit $0040 and whose box contains the point (x is the left edge, y the bottom edge, $10 and $12 width and height). ActivateTalkTarget needs $30,X (the script address, stored by Cop17_SetOwnParam, for example the first actor of gv_village_actors_018000) and calls it through an RTL frame: pushed bank $02 and ReturnFromTalk - 1, then the script bank (byte +$D of the actor's meta entry at $38,X) and $30,X - 1. With $16 bit $0008 the NPC first turns to face the player: TalkFacingPlayer copies the whole slot ($40 bytes) to $1A1E, ChooseFacingAnim picks the animation, the script runs, RestoreTalkedActor copies the slot back. So $16 bit $0040 = talkable and bit $0008 = turn to face the player (OQ-I005-14, OQ-I009-17).",
+      "",
+      "=== INVENTORY TABLE AND SLOT BYTE ===",
+      "inventory ($1B1E) is one 64-byte table indexed by item id minus 1. The four lists of the menu are ranges of it: weapons ids $01-$08 (8 slots, $1B1E), armors $09-$10 ($1B26), magic $11-$18 ($1B2E) and items $19-$40 (40 slots, $1B36; walkthrough grid position (row, column) is slot (row - 1) x 10 + column - 1). A slot byte holds the item id in bits 0-6 (0 = not owned; an owned slot holds the id of its own slot) and bit 7 = marker: the equipped item of each list, and during a choice the cursor. DrawInventoryIcon draws a selection frame around every slot with bit 7. The equipped state is stored twice: the marker in the list and the id in the word cells equipped_weapon, equipped_armor, equipped_magic and equipped_bracelet (high bytes never written; the text codes read them as words).",
+      "Choosing from a list (ChooseFromEquipmentList, ChooseItemSlot): the cursor starts on the first slot with bit 7 set, or marks slot 0 when none is; the list is backed up to $7F0403 (only the dead cancel paths restore it); a direction moves the marker and resets menu_blink; B and Y both confirm (BRK #$18), set the marker on the slot and return A = id with carry clear. No live path cancels (CancelEquipChoice and CancelItemChoice are unreferenced, OQ-I009-14), so choosing an empty slot returns 0, which the caller stores in the equipped cell: name index 0 is the string 'not equipped'. Weapons, armors and magic are two columns of four, column-major (Right +4, Left -4, Down +1, Up -1); items are four rows of ten, row-major (Right +1, Left -1, Down +10, Up -10). A step past an end leaves the cursor where it is; stepping down from the last slot of a column goes to the top of the next.",
+      "",
+      "=== EQUIPMENT MENU ===",
+      "OpenEquipmentMenu (X or Select): HDMA off (dp$42 = 0), forced blank, BG2 map at VRAM $5C00 and characters at $2000, main screen BG2 and BG3 only, colour math and windows off; saves the four scroll words (menu_saved_bg1_x .. menu_saved_bg2_y) and zeroes the live ones, saves the CGRAM buffer ($7E6000), loads the menu graphics and palette (lib_shared_012416, lib_shared_012390), runs RunEquipmentMenu. RunEquipmentMenu prints EquipMenuFrameText (tabs Weapon, Armor, Magic at $88, $98, $A8, the description window at $408 and four equipped-item lines), switches NMI and the screen on, draws the icons, uploads the BG3 page and then the BG2 icon page ($7F7800 to VRAM $5C00), and loops on ChooseMenuRow: rows 0-2 call ChooseFromEquipmentList (A = 8, Y = list base), row 3 ChooseItemSlot (A = $28, Y = $1B36). A confirmed id is stored in the equipped cell (weapon and armor then RecalcGearStats) and the frame is reprinted from its [::] marker (the window and the equipped lines only). Y on the row level leaves.",
+      "Exit: the B and Y latch bits are consumed (TRB $032B with $C0) and joy_pressed+1 is cleared; the scroll words, BG2SC, TM, CGADSUB and W12SEL are restored from the scene's shadows (tm_shadow, cgadsub_shadow, bg2sc_shadow, w12sel_shadow, stored by the scene loader), BG12NBA = 0; RestoreSceneBgGfxAndPalette, RestoreCgramBuffer and LoadEquippedMagicGfx put the field back in that order; when the equipped magic changed (menu_magic_on_open) all projectiles are killed and $0433 and $0434 cleared (OQ-I009-11); lib_027781_part1.code_0273F9 restores the player's pose; BG3 is cleared, hud_dirty_flags = $1F, one sub-frame runs, the screen is switched on (INIDISP = $0F).",
+      "",
+      "=== BG3 PAGE, ICONS ===",
+      "The BG3 text page is the 2 KB buffer at $7F7000 (bg3_tilemap_buffer), the BG2 icon page the buffer at $7F7800; vram_upload_flags bit 0 asks the NMI to send the BG3 page, bit 1 the icon page. DrawInventoryIcon writes four BG3 cells (selection frame tile $2A with its three flips, palette 3, when the slot has bit 7; else four zero cells) and the four words of the icon record unk17_048800[id x 8] to the BG2 page (top-left, top-right, bottom-left, bottom-right). ClearBg3Page and ClearBg3UpperHalf fill the page with $2000 (tile 0, priority) but set their upload bit with DBR = $7F, so the TSB reaches $7F:03B8 instead of vram_upload_flags (OQ-I027-1).",
+      "",
+      "=== HUD TEXT, GEAR AND DESCRIPTIONS ===",
+      "StatusScreenText, SoulsScreenTitleText, the five soul lines, EquipMenuFrameText, ItemMenuFrameText, the HUD strings (HudFrameText .. EnemyGaugeText with the repeat counts in HudRepeatCounts) and the description headers are ASCIIString parts with text control codes (the renderer is lib_text_render, batch A6: [CUR:o] cursor to BG3 byte offset o, [07:w,h] window, [03:v] attribute, [06:n,addr] n packed BCD digits, [0B:t,&c] repeat tile t by the count byte at c, [TBL:list,addr] string number (word at addr) of a pointer list, [02:n] entry n of binary_list_014789 (0 and 1 are fixed six-tile labels, 2 = the player name at $1B92), [04:a,b] gauge from two words, [N] newline, [::] marks the re-entry point '+M', [JMP:&s] continue at s). The extractor prints the period glyph as '-' and an apostrophe as a space ('Goat s Food').",
+      "DescriptionTextList holds 65 string pointers, index = item id (0 = empty window). Every record starts [CUR:48A][TBL:&asciistring_list_014F74,&NameIndexCells + 2 x (id - 1)] (the item name on the first line; NameIndexCells holds k + 1 for entry k because [TBL] reads its index from memory). Weapons then print the minimum swing level from WeaponMinLevelBcd (two BCD digits at $4B2) and a bar of GearStatTable strength tiles; armors only a defence bar; magic and items start the text at $50A. Stub records (ids $2B-$31, $33, $34, $3B-$3F) print their own name and [JMP] into the carrying record (DescMastersEmblemA, DescRedHotMirror, DescBrownStone) at its [::] marker. The Gem costs of magic are literal text digits (4, 8, 8, 1, 8, 20, 8, 2; OQ-I009-10).",
+      "GearStatTable has two rows of 17 bytes indexed by item id: row 0 the strength bonus of weapons ids 1-8 (1, 2, 3, 4, 6, 8, 10, 12), row 1 (+$11) the defence bonus of armor ids 9-$10 (the same numbers). RecalcGearStats adds the weapon and armor entries into gear_power and gear_defense. The minimum levels (1, 5, 11, 15, 16, 19, 22, 24) are compared by the player code (player_core) with player_level_bcd; the walkthrough weapon table lists exactly these. The item names (asciistring_list_014F74 and its strings, file offsets 85876-86758) belong to another batch.",
+      "",
+      "=== NOTES ===",
+      "- StoreInventoryEntry (file offset 73977, lib_0109D6_part3, batch A4) lies between ChooseItemSlot's neighbour routines: the code of this file continues at 74040 in lib_0118FC_part2.",
+      "- ROM item names differ from the walkthrough in a few places (OQ-I027-3); labels use the walkthrough names, the strings keep the ROM text.",
+      "- Sound requests: BRK #$07 follows every cursor move and page change, BRK #$18 every confirm (OQ-I009-12)."
+    ],
+    "partNotes": {
+      "DispatchFieldButtons": [
+        "Reads the field buttons once per frame and opens the matching screen.",
+        "",
+        "When: once per frame from RunMainLoop (step 3, NMI on).",
+        "Sees: X or Select opens the equipment menu, B talks to the NPC in front of the player, A alone shows the status and souls screen.",
+        "Why: one place decides which button does what in the field; the other buttons (attack, Start) are handled by the player code and the pause code.",
+        "In: long call; M = 8; reads joy_pressed.",
+        "Out: RTL after the screen has been closed, or at once when no relevant button is down. Tests in order: joy_pressed+1 bit $20 (Select or X) -> OpenEquipmentMenu; bit $80 (B) -> RunTalkInteraction; direction bits $0F clear and joy_pressed low byte bit 7 (A) -> ShowStatusAndSoulsScreen.",
+        "Clobbers: A (the tests use BIT)."
+      ],
+      "ShowStatusAndSoulsScreen": [
+        "Shows the status page (HP, level parts, equipment) and then the souls page.",
+        "",
+        "When: DispatchFieldButtons, A pressed with no direction (not described in the walkthrough, OQ-I009-5).",
+        "Sees: a window with the player name, HP / maximum HP, 'Next level :' with the EXP still needed, Strength and Defence bars and the four equipped items; after a button the 'Souls' page with one line for each recruited soul; another button closes it.",
+        "Why: gives the player a read-out of HP, strength and defence without the equipment menu.",
+        "In: long call; M = 8; reads player_hp, player_max_hp, level_power, level_defense, souls_flags.",
+        "Out: hp_bcd and max_hp_bcd set; the strength and defence level parts are clamped to 12 only for the print and restored (the walkthrough caps strength at 13, OQ-I009-6); BRK #$07 when a page opens; after the second press the latch bits for B, Y, A and X are consumed (TRB $C0C0), joy_pressed = 0, BG3 cleared, hud_dirty_flags = $1F and UpdateHud runs once. The frame_counter does not advance while the screen is open (WaitFrameKeepClock).",
+        "Clobbers: A, X, Y; $1B6C-$1B6F; joy_pressed, joy_release_latch."
+      ],
+      "WaitFrameKeepClock": [
+        "Waits one frame without letting the frame counter advance and returns the pad state.",
+        "",
+        "When: five times in ShowStatusAndSoulsScreen.",
+        "Sees: n/a.",
+        "Why: HandleVBlank increments frame_counter, which drives animations; undoing it freezes the field's animation clock while the screen is open.",
+        "In: JSR; M as the caller (8 or 16).",
+        "Out: A = joy_pressed (low byte with M = 8, the word with M = 16); frame_counter unchanged over the call (DEX and STX undo the NMI's increment).",
+        "Clobbers: A, X."
+      ],
+      "DrawRecruitedSouls": [
+        "Prints one line for every soul the player has recruited.",
+        "",
+        "When: ShowStatusAndSoulsScreen, after the 'Souls' title.",
+        "Sees: 'Soul of Magician', 'Soul of Light', 'Soul of Shield', 'Soul of Detection', 'Soul of Reality' for the souls that joined (walkthrough: the five souls of the game).",
+        "Why: the five lines are adjacent 21-byte strings, so a loop over souls_flags prints them by stepping Y.",
+        "In: JSR; M = 8; souls_flags (bit 0 Magician, 1 Light, 2 Shield, 3 Detection, 4 Reality).",
+        "Out: prints the line of every set bit (lowest bit first), Y stepping $15 from SoulOfMagicianText up to EquipMenuFrameText.",
+        "Clobbers: A, Y; X by the renderer."
+      ],
+      "RunTalkInteraction": [
+        "Runs the NPC talk lookup with NMI off.",
+        "",
+        "When: DispatchFieldButtons, B pressed.",
+        "Sees: the NPC in front of the player starts its text (walkthrough: 'speak with him (B Button)').",
+        "Why: the talk script drives its own frames (text boxes, yes/no menus), so the NMI must be off while it runs.",
+        "In: long call from DispatchFieldButtons.",
+        "Out: DisableNmi, FindAndTalkToActorInFront, EnableNmi, RTL.",
+        "Clobbers: as FindAndTalkToActorInFront."
+      ],
+      "FindAndTalkToActorInFront": [
+        "Probes the point in front of the player for a talkable actor and starts its script.",
+        "",
+        "When: RunTalkInteraction.",
+        "Sees: the NPC, sign or object in front of the player speaks; nothing happens when no talkable actor is there.",
+        "Why: talking needs no marker: any actor whose $16 has bit $0040 and a script address in $30 can be spoken to; the probe point depends on the facing.",
+        "In: JSR; M = 8 (REP inside); player slot = player_actor; the facing code A comes from lib_player_facing.code_0273D4 (carry set = animation id $2C or more: no probe, return).",
+        "Out: dp$00 = facing code; probe point (dp$16, dp$18) from the player's (x, y): code 0 (x+8, y-$10), 1 (x+8, y), 2 (x+$10, y-8), 3 (x, y-8); code 0 probes a second point (x+8, y-$20) when the tile type of the cell at (x, y-$20) is 6 (OQ-I009-7). On a hit FindTalkableActorAt's actor goes to ActivateTalkTarget (BRL, which ends in ReturnFromTalk); P is restored on the no-hit paths.",
+        "Clobbers: A, X, Y, dp$00, dp$16, dp$18."
+      ],
+      "FindTalkableActorAt": [
+        "Finds the first talkable actor whose box contains a point.",
+        "",
+        "When: five probes in FindAndTalkToActorInFront.",
+        "Sees: n/a.",
+        "Why: a small list walk replaces a collision test of the whole actor pool.",
+        "In: JSR; M = 16; dp$16 = x, dp$18 = y of the point.",
+        "Out: carry set and X = the actor, or carry clear (X = 0). Walks the run order from actor_list_tail through $3E; an actor matches when $16 has bit $0040, 0 <= x - $00,X <= $10,X (x is the left edge) and -$12,X <= y - $02,X <= 0 (y is the bottom edge).",
+        "Clobbers: A, X."
+      ],
+      "ActivateTalkTarget": [
+        "Calls the talk script of the actor found, optionally after turning it toward the player.",
+        "",
+        "When: FindAndTalkToActorInFront (5 BRL).",
+        "Sees: the NPC's lines start.",
+        "Why: the script is a normal actor script run on the stack, so it can use every COP command and text box.",
+        "In: X = the actor, M = 16.",
+        "Out: $30,X = 0: nothing to say, to ReturnFromTalk. $16,X bit $0008: TalkFacingPlayer. Else a call frame is pushed (bank $02, ReturnFromTalk - 1, script bank = byte +$D of the actor's meta entry at $38,X, $30,X - 1) and RTL enters the script with X = the slot, M = 16; its final RTL returns to ReturnFromTalk.",
+        "Clobbers: A, Y."
+      ],
+      "TalkFacingPlayer": [
+        "Turns the NPC toward the player, runs its script and restores the slot afterwards.",
+        "",
+        "When: ActivateTalkTarget, for actors with $16 bit $0008.",
+        "Sees: the NPC faces the player while speaking and goes back to its pose when the box closes.",
+        "Why: the NPC animation is a side effect of the turn; the whole slot is copied so every field is restored exactly.",
+        "In: X = the actor, M = 16.",
+        "Out: slot (64 bytes) copied to $1A1E (MVN #$01,#$01), $1E,X = ChooseFacingAnim result, $20,X = 0, SetActorAnimFrame redraws it; then a call frame as in ActivateTalkTarget whose return address is RestoreTalkedActor, with the slot number on the stack.",
+        "Clobbers: A, Y (X is pulled back after the MVN)."
+      ],
+      "RestoreTalkedActor": [
+        "Copies the saved slot back over the NPC after its talk script.",
+        "",
+        "When: return address of the call frame built by TalkFacingPlayer.",
+        "Sees: the NPC returns to the animation it had before the talk.",
+        "Why: see TalkFacingPlayer.",
+        "In: the script returned; the slot number is on the stack.",
+        "Out: $1A1E-$1A5D copied back over the slot (MVN #$01,#$01); falls into ReturnFromTalk.",
+        "Clobbers: A, X, Y."
+      ],
+      "ReturnFromTalk": [
+        "Common end of the talk call: restores P and returns to RunTalkInteraction.",
+        "",
+        "When: the script's final RTL (through the pushed frame), or ActivateTalkTarget when $30,X is 0.",
+        "Sees: n/a.",
+        "Why: the P pushed by FindAndTalkToActorInFront has to be popped on every path.",
+        "In: stack: P, then the return address of the JSR in RunTalkInteraction.",
+        "Out: PLP, RTS.",
+        "Clobbers: P restored."
+      ],
+      "ChooseFacingAnim": [
+        "Picks the NPC animation that looks toward the player.",
+        "",
+        "When: TalkFacingPlayer.",
+        "Sees: an NPC turns to the player (down, up or sideways view, flipped toward the player's side).",
+        "Why: NPC animations come in groups of six; the first of the group is the base and the facing code adds 0, 1 or 2.",
+        "In: JSR; X = the actor; dp$00 = the player's facing code.",
+        "Out: A and dp$01 = 6 x (anim / 6) + {0, 1, 2, 2}[facing] (anim = $1E,X; Divide and Multiply give the base). For facing 2 and 3 the flip bit ($1C bit $4000) is toggled only when it differs from 'facing is 3', through lib_player_facing.code_0273EB: an unflipped side view looks left, a flipped one right. That +0, +1, +2 are the down, up and side views is inferred from the player's facing (OQ-I009-8).",
+        "Clobbers: A, Y; dp$01."
+      ],
+      "OpenEquipmentMenu": [
+        "Opens the equipment and item menu and puts the field back when it closes.",
+        "",
+        "When: DispatchFieldButtons, X or Select pressed.",
+        "Sees: the pause menu with the tabs Weapon, Armor, Magic and Item, the icon grid and the equipped lines (walkthrough: 'Press the X Button to open the menu').",
+        "Why: the menu needs its own graphics, palette and screen mode, so everything it changes is saved and restored here.",
+        "In: long call; M = 8; NMI on.",
+        "Out: RTL after Y closed the menu, screen on. Saves scroll_bg1/2 (menu_saved_*), the CGRAM buffer ($7E6000) and equipped_magic (menu_magic_on_open), sets BG2SC = $5C, BG12NBA = $20, TM = 6, CGADSUB = W12SEL = 0, runs RunEquipmentMenu; on exit restores them, calls RestoreSceneBgGfxAndPalette, RestoreCgramBuffer and LoadEquippedMagicGfx, kills all projectiles and clears $0433 and $0434 when the magic changed, restores the player pose, clears BG3, hud_dirty_flags = $1F, runs one sub-frame and sets INIDISP = $0F.",
+        "Clobbers: A, X, Y; menu_saved_*, $7E6000-$7E61FF."
+      ],
+      "RunEquipmentMenu": [
+        "The menu loop: draws the frame and lists, chooses rows and stores the chosen items.",
+        "",
+        "When: OpenEquipmentMenu.",
+        "Sees: the frame and icons appear, the cursor moves between the rows, B opens a list, B or Y inside a list equips the item under the cursor.",
+        "Why: one loop owns the row level and calls the list choosers.",
+        "In: JSR; M = 8.",
+        "Out: loops on ChooseMenuRow until Y (carry set, ExitEquipmentMenu). Row 0: ChooseFromEquipmentList (A = 8, Y = $1B1E), equipped_weapon = id, RecalcGearStats; row 1: Y = $1B26, equipped_armor, RecalcGearStats; row 2: Y = $1B2E, equipped_magic; row 3: ChooseItemSlot (A = $28, Y = $1B36), equipped_bracelet. After a choice the frame is reprinted from its [::] marker and the loop continues on the same row. Uploads: BG3 page, then the BG2 icon page, then the BG3 page again.",
+        "Clobbers: A, X, Y."
+      ],
+      "ExitEquipmentMenu": [
+        "Return path of the menu loop: carry set means the menu was closed.",
+        "",
+        "When: RunEquipmentMenu, when ChooseMenuRow reports Y.",
+        "Sees: n/a.",
+        "Why: gives the loop a single exit that returns to OpenEquipmentMenu.",
+        "In: entered by BRL from RunEquipmentMenu.",
+        "Out: SEC, RTS (returns from RunEquipmentMenu). The unreferenced loc_011D42 before it is the same with CLC (dead).",
+        "Clobbers: P.C."
+      ],
+      "RedrawEquipmentPage": [
+        "Redraws the equipment page (frame and icons) when the cursor leaves the item row.",
+        "",
+        "When: ChooseMenuRow, when the cursor moves off row 3 while the item page is shown.",
+        "Sees: the item grid is replaced by the weapon, armor and magic icons.",
+        "Why: the item grid and the equipment frame share the screen and are swapped as the cursor moves.",
+        "In: JSR; M = 8.",
+        "Out: clears the upper half of BG3, prints EquipMenuFrameText, loads the equipment palette (lib_shared_012416.code_01243D), draws the icons, uploads BG3, the BG2 page and BG3 again, one frame each.",
+        "Clobbers: A; X and Y are preserved."
+      ],
+      "DrawItemPage": [
+        "Draws the item page (frame, palette and the 40 item icons) when the cursor enters the item row.",
+        "",
+        "When: ChooseMenuRow, when the cursor moves onto row 3.",
+        "Sees: the item grid (4 rows of 10, walkthrough items.md) in place of the weapon, armor and magic icons.",
+        "Why: see RedrawEquipmentPage.",
+        "In: JSR; M = 8.",
+        "Out: prints ItemMenuFrameText, loads LoadItemPagePalette, draws DrawItemIconGrid and uploads BG3, the BG2 page and BG3 again, one frame each.",
+        "Clobbers: A; X and Y are preserved."
+      ],
+      "ChooseFromEquipmentList": [
+        "Lets the player move a marker through one equipment list and pick an item.",
+        "",
+        "When: RunEquipmentMenu, rows Weapon, Armor and Magic (3 call sites).",
+        "Sees: the icons with a blinking selection frame on the cursor, the name and description of the item under it (header window with the level and Strength for weapons, Defence for armors), and the frame stays on the confirmed item.",
+        "Why: one loop for all three eight-slot lists; the header changes with the id range.",
+        "In: JSR; M = 8; A = slot count (8), Y = list base ($1B1E, $1B26, $1B2E).",
+        "Out: carry clear and A = the chosen slot byte and $7F (the id; 0 for an empty slot); the marker (bit 7) is set on the chosen slot; BRK #$18 on confirm. The cursor starts on the first slot with bit 7 or on slot 0. Header: WeaponDescHeaderText for ids 1-8, ArmorDescHeaderText for 9-$10, PlainDescHeaderText above; then the string DescriptionTextList[id]. The loop waits for all buttons to be up, then reads Right, Left, Down, Up (bits 0-3 of joy_pressed+1), skips Start and Select, and confirms on Y (bit 6) or B (bit 7).",
+        "Clobbers: A, X, Y; dp$56/$57 (list pointer), menu_count, menu_blink, $7F0403 (backup); vram_upload_flags."
+      ],
+      "CancelEquipChoice": [
+        "Cancel path of the equipment list: restores the list and returns carry set. Unreferenced.",
+        "",
+        "When: never (0 references; B and Y both confirm, OQ-I009-14).",
+        "Sees: n/a.",
+        "Why: left over from a version in which a key cancelled the choice.",
+        "In: n/a.",
+        "Out: BRK #$07, RestoreSlotList, DrawEquipIconRows, vram_upload_flags bit 0, WaitVBlank, SEC, RTS.",
+        "Clobbers: n/a."
+      ],
+      "MoveSelectionRight": [
+        "Equipment list: moves the marker one column to the right (slot + 4) if it exists.",
+        "",
+        "When: ChooseFromEquipmentList, Right pressed.",
+        "Sees: the selection frame jumps to the next column.",
+        "Why: the lists are two columns of four, column-major.",
+        "In: Y = current slot, menu_count = slot count.",
+        "Out: Y + 4 when below menu_count (X = old slot, then MoveSelectionMarker), else unchanged (back to the list loop).",
+        "Clobbers: A, X, Y."
+      ],
+      "MoveSelectionLeft": [
+        "Equipment list: moves the marker one column to the left (slot - 4) if it exists.",
+        "",
+        "When: ChooseFromEquipmentList, Left pressed.",
+        "Sees: the frame jumps to the previous column.",
+        "Why: see MoveSelectionRight.",
+        "In: Y = current slot.",
+        "Out: Y - 4 when not negative, else unchanged.",
+        "Clobbers: A, X, Y."
+      ],
+      "MoveSelectionDown": [
+        "Equipment list: moves the marker down one slot (slot + 1).",
+        "",
+        "When: ChooseFromEquipmentList, Down pressed.",
+        "Sees: the frame steps down; from the last slot of a column it goes to the top of the next column.",
+        "Why: the column-major order makes the next slot the one below.",
+        "In: Y = current slot.",
+        "Out: Y + 1 when below menu_count, else unchanged.",
+        "Clobbers: A, X, Y."
+      ],
+      "MoveSelectionUp": [
+        "Equipment list: moves the marker up one slot (slot - 1).",
+        "",
+        "When: ChooseFromEquipmentList, Up pressed.",
+        "Sees: the frame steps up.",
+        "Why: see MoveSelectionDown.",
+        "In: Y = current slot.",
+        "Out: Y - 1 when not negative (X = old slot through the TYX and DEY), else unchanged.",
+        "Clobbers: A, X, Y."
+      ],
+      "MoveSelectionMarker": [
+        "Equipment list: moves the marker bit from the old slot to the new one.",
+        "",
+        "When: after every accepted move (BRA from the four move routines).",
+        "Sees: the selection frame and the description change.",
+        "Why: the marker is bit 7 of the slot byte, so a move sets it on the new slot and clears it on the old.",
+        "In: X = old slot, Y = new slot, dp$56 = list.",
+        "Out: BRK #$07; bit 7 set on Y's byte and cleared on X's, menu_blink = 0, one blink step, then back to redraw (BRL to the list loop).",
+        "Clobbers: A."
+      ],
+      "BackupSlotList": [
+        "Copies the list being chosen to $7F0403.",
+        "",
+        "When: the start of ChooseFromEquipmentList and ChooseItemSlot.",
+        "Sees: n/a.",
+        "Why: so a cancel could restore the markers; only the unreferenced cancel paths read the copy.",
+        "In: JSR; M = 8; dp$56 = list, menu_count = bytes.",
+        "Out: menu_count bytes copied to $7F0403.",
+        "Clobbers: A, X, Y."
+      ],
+      "RestoreSlotList": [
+        "Copies the backup at $7F0403 back over the list.",
+        "",
+        "When: only CancelEquipChoice and CancelItemChoice (both unreferenced).",
+        "Sees: n/a.",
+        "Why: see BackupSlotList.",
+        "In: as BackupSlotList.",
+        "Out: menu_count bytes copied from $7F0403 to the list.",
+        "Clobbers: A, X, Y."
+      ],
+      "BlinkSelectionMarker": [
+        "Makes the marker bit of the current slot blink.",
+        "",
+        "When: 6 call sites in the two list choosers and MoveSelectionMarker, once per frame while waiting.",
+        "Sees: the selection frame is visible 24 of every 32 frames and hidden for 8.",
+        "Why: the blink shows which slot is active.",
+        "In: Y = slot, dp$56 = list.",
+        "Out: bit 7 of the slot set while menu_blink and $1F is below $18, cleared otherwise; menu_blink += 1; vram_upload_flags bit 0 set.",
+        "Clobbers: A."
+      ],
+      "RecalcGearStats": [
+        "Recomputes the gear part of Strength and Defence from the equipped weapon and armor.",
+        "",
+        "When: RunEquipmentMenu after a weapon or an armor was chosen.",
+        "Sees: the Strength and Defence bars of the status screen change (walkthrough items.md weapon and armor tables).",
+        "Why: gear_power and gear_defense are stored sums that the combat code reads.",
+        "In: M = 8, X = 16; equipped_weapon, equipped_armor.",
+        "Out: gear_power = GearStatTable[weapon] + GearStatTable[armor]; gear_defense = GearStatTable[weapon + $11] + GearStatTable[armor + $11] (the weapon rows of the second half and the armor rows of the first are 0).",
+        "Clobbers: A, X."
+      ],
+      "DrawEquipIconRows": [
+        "Draws the 8 weapon, 8 armor and 8 magic icons.",
+        "",
+        "When: RunEquipmentMenu, RedrawEquipmentPage and every blink frame of ChooseFromEquipmentList (7 call sites).",
+        "Sees: the three icon rows of the equipment page with the selection frame on equipped or chosen items.",
+        "Why: redrawing all 24 is simpler than tracking one icon; the BG buffers are small.",
+        "In: JSR; M = 16 is set inside (P restored).",
+        "Out: DrawInventoryIcon for each slot of inventory $1B1E, $1B26, $1B2E at the positions of word_00F9F7, word_00FA07 and word_00FA17 (the 16-bit load also reads the next slot's byte, which DrawInventoryIcon ignores).",
+        "Clobbers: A, X (= 8 at the end); Y and P are restored."
+      ],
+      "DrawInventoryIcon": [
+        "Draws one 2x2 icon with an optional selection frame.",
+        "",
+        "When: DrawEquipIconRows (24 times per call) and DrawItemIconGrid (40 times).",
+        "Sees: an item icon; a frame of four tiles around it when the slot has bit 7 (equipped or under the cursor); an empty slot shows blank cells.",
+        "Why: the frame is on BG3 (text layer) and the icon on BG2, so the cursor can blink without redrawing the icon.",
+        "In: JSR; M = 16; A = the word loaded from the slot (slot byte in the low byte, the next byte in the high byte), Y = BG byte offset of the top-left cell.",
+        "Out: BG3 page cells at Y: with bit 7 the frame tile $2A (attribute or $0C = palette 3; top-right flipped H, bottom-left V, bottom-right H and V), else four zero cells; BG2 page at $7F7800 + Y: the four words of unk17_048800[id x 8] (id = slot byte and $7F). DBR is $7F inside.",
+        "Clobbers: A (M = 16 on return); X, DBR and P preserved."
+      ],
+      "DrawItemIconGrid": [
+        "Draws the 40 item icons.",
+        "",
+        "When: DrawItemPage and every blink frame of ChooseItemSlot (6 call sites).",
+        "Sees: the item grid.",
+        "Why: as DrawEquipIconRows.",
+        "In: JSR; M = 16 is set inside.",
+        "Out: DrawInventoryIcon for each slot of $1B36 at the positions of word_00FA27.",
+        "Clobbers: A, X (= $28 at the end); Y and P restored."
+      ],
+      "ChooseItemSlot": [
+        "Lets the player move a marker through the 40 item slots and pick one.",
+        "",
+        "When: RunEquipmentMenu, row Item.",
+        "Sees: the item grid with the blinking frame; the item name and its description appear under the cursor (e.g. 'Delicious Seeds', 'Goat s Food').",
+        "Why: same loop as ChooseFromEquipmentList for the 4 x 10 grid; the header is always the plain window.",
+        "In: JSR; M = 8; A = $28 (slot count), Y = $1B36.",
+        "Out: as ChooseFromEquipmentList: carry clear and A = id (0 for an empty slot); BRK #$18 on confirm; B and Y confirm.",
+        "Clobbers: A, X, Y; dp$56/$57, menu_count, menu_blink, $7F0403."
+      ],
+      "CancelItemChoice": [
+        "Cancel path of the item list. Unreferenced.",
+        "",
+        "When: never (0 references, OQ-I009-14).",
+        "Sees: n/a.",
+        "Why: see CancelEquipChoice.",
+        "In: n/a.",
+        "Out: BRK #$07, RestoreSlotList, DrawItemIconGrid, vram_upload_flags bit 0, WaitVBlank, SEC, RTS.",
+        "Clobbers: n/a."
+      ],
+      "MoveItemSelectionDown": [
+        "Item list: moves the marker one row down (slot + 10).",
+        "",
+        "When: ChooseItemSlot, Down pressed.",
+        "Sees: the frame moves down one row of ten.",
+        "Why: the grid is row-major.",
+        "In: Y = slot.",
+        "Out: Y + 10 when below menu_count, else unchanged.",
+        "Clobbers: A, X, Y."
+      ],
+      "MoveItemSelectionUp": [
+        "Item list: moves the marker one row up (slot - 10).",
+        "",
+        "When: ChooseItemSlot, Up pressed.",
+        "Sees: the frame moves up.",
+        "Why: see MoveItemSelectionDown.",
+        "In: Y = slot.",
+        "Out: Y - 10 when not negative.",
+        "Clobbers: A, X, Y."
+      ],
+      "MoveItemSelectionRight": [
+        "Item list: moves the marker one slot right (slot + 1).",
+        "",
+        "When: ChooseItemSlot, Right pressed.",
+        "Sees: the frame moves right; from the end of a row it goes to the start of the next.",
+        "Why: row-major order.",
+        "In: Y = slot.",
+        "Out: Y + 1 when below menu_count.",
+        "Clobbers: A, X, Y."
+      ],
+      "MoveItemSelectionLeft": [
+        "Item list: moves the marker one slot left (slot - 1).",
+        "",
+        "When: ChooseItemSlot, Left pressed (BRL).",
+        "Sees: the frame moves left; from the start of a row it goes to the end of the previous.",
+        "Why: see MoveItemSelectionRight.",
+        "In: Y = slot.",
+        "Out: Y - 1 when not negative.",
+        "Clobbers: A, X, Y."
+      ],
+      "MoveItemSelectionMarker": [
+        "Item list: moves the marker bit from the old slot to the new one.",
+        "",
+        "When: after every accepted move in ChooseItemSlot.",
+        "Sees: the frame and description change.",
+        "Why: as MoveSelectionMarker.",
+        "In: X = old slot, Y = new slot, dp$56 = list.",
+        "Out: BRK #$07; bit 7 set on Y, cleared on X; menu_blink = 0; one blink step; back to the list loop (BRL).",
+        "Clobbers: A."
+      ],
+      "ClearBg3Page": [
+        "Fills the whole BG3 text page ($7F7000, 1024 words) with the blank tile.",
+        "",
+        "When: ShowStatusAndSoulsScreen, OpenEquipmentMenu (on the way in and out) and RunEquipmentMenu.",
+        "Sees: all text of the page vanishes.",
+        "Why: the BG3 buffer is the single text layer shared by the HUD and every window.",
+        "In: JSR; any M.",
+        "Out: every word of the page = $2000 (tile 0, priority); DBR is $7F while it runs, so the TSB of bit 0 at the end reaches $7F:03B8, not vram_upload_flags (OQ-I027-1; the callers set the upload flag themselves afterwards); P and DBR restored.",
+        "Clobbers: A, X."
+      ],
+      "ClearBg3UpperHalf": [
+        "Fills the upper half of the BG3 page (512 words) with the blank tile.",
+        "",
+        "When: RedrawEquipmentPage.",
+        "Sees: the upper window area is cleared while the lower lines of the equipment page stay.",
+        "Why: the equipped-item lines live in the lower half and are reprinted separately.",
+        "In: JSR; any M.",
+        "Out: words $7000-$73FE = $2000; the same $7F:03B8 TSB as ClearBg3Page (OQ-I027-1); P and DBR restored.",
+        "Clobbers: A, X."
+      ],
+      "SaveCgramBuffer": [
+        "Copies the 512-byte CGRAM buffer to $7E6000.",
+        "",
+        "When: OpenEquipmentMenu.",
+        "Sees: n/a.",
+        "Why: the menu rewrites palettes; the field's colours are restored on exit.",
+        "In: JSR.",
+        "Out: cgram_buffer (512 bytes) copied to $7E6000-$7E61FF.",
+        "Clobbers: A (P and X restored)."
+      ],
+      "RestoreCgramBuffer": [
+        "Copies the backup at $7E6000 back over the CGRAM buffer.",
+        "",
+        "When: OpenEquipmentMenu on exit, after RestoreSceneBgGfxAndPalette.",
+        "Sees: the field's colours return.",
+        "Why: see SaveCgramBuffer.",
+        "In: JSR.",
+        "Out: $7E6000 copied to cgram_buffer (the whole buffer, including palettes 11-15 that RestoreSceneBgGfxAndPalette just wrote; LoadEquippedMagicGfx then puts the spell palette on top).",
+        "Clobbers: A (P and X restored)."
+      ],
+      "EnableDisplayAndNmi": [
+        "Waits for a vblank, then turns on NMI and the screen at full brightness.",
+        "",
+        "When: RunEquipmentMenu, after the first page is printed.",
+        "Sees: the menu appears.",
+        "Why: the screen stays blanked while VRAM is being filled and is switched on in a vblank.",
+        "In: long call; M = 8 is set inside.",
+        "Out: WaitVBlank, NMITIMEN = $A1, INIDISP = $0F, nmi_enabled += 1; P restored.",
+        "Clobbers: A."
+      ],
+      "StatusScreenText": [
+        "The status page of the A-button screen.",
+        "",
+        "When: ShowStatusAndSoulsScreen (once).",
+        "Sees: a window at $186 (23 x 19) with the player name at $20C ([02:2] = the string at $1B92), 'HP' with HP / maximum HP (3 BCD digits each), 'Next level :' with 8 digits at $2A6, 'Strength :' and 'Defence  :' with two bars each ([0B:26,1B72] over [0B:26,1B70], [0B:27,1B76] over [0B:27,1B74]) and 'Weapon: ', 'Armor : ', 'Magic : ', 'Item  : ' with the equipped names ([TBL:&asciistring_list_014F74,1B5E..1B64]).",
+        "Why: one string draws the page; the numbers come from WRAM through the control codes.",
+        "In: n/a (data). Starts by erasing the name area ([CUR:216][14:A]).",
+        "Out: n/a. The '-' glyph in the extract is the period glyph.",
+        "Clobbers: n/a."
+      ],
+      "SoulsScreenTitleText": [
+        "The souls page title and window.",
+        "",
+        "When: ShowStatusAndSoulsScreen, after the first press.",
+        "Sees: the status window is erased ([08:186]) and a window at $18A (18 x 19) with 'Souls' at $258 appears.",
+        "Why: the souls page replaces the status page in the same place.",
+        "In: n/a (data).",
+        "Out: n/a.",
+        "Clobbers: n/a."
+      ],
+      "SoulOfMagicianText": [
+        "The five soul lines ('Soul of Magician' here, then Light, Shield, Detection, Reality in the adjacent strings).",
+        "",
+        "When: DrawRecruitedSouls, one line per set bit of souls_flags.",
+        "Sees: a line at $30E (Magician), $3CE (Light), $48E (Shield), $54E (Detection), $60E (Reality), $C0 apart.",
+        "Why: all five lines are 21 bytes ([CUR:o] and 18 characters padded with blanks), so the walk steps by $15.",
+        "In: n/a (data). The extractor prints the word gaps and the padding as a block character.",
+        "Out: n/a.",
+        "Clobbers: n/a."
+      ],
+      "EquipMenuFrameText": [
+        "The frame of the equipment page.",
+        "",
+        "When: RunEquipmentMenu, RedrawEquipmentPage and OpenEquipmentMenu (7 uses, six of them from the [::] marker with +M).",
+        "Sees: the tab boxes 'Weapon', 'Armor', 'Magic' (6 x 12 at $88, $98, $A8), the description window at $408 (22 x 8) and four lines ' Wep-: ', ' Arm-: ', ' Mag-: ', ' Item: ' at $48A, $50A, $58A, $60A with the equipped names ([TBL:...,1B5E..1B64]); the walkthrough writes 'Wep.', the extractor prints the period glyph as '-'.",
+        "Why: the part after [::] is reprinted alone after each choice, so the tabs are not redrawn.",
+        "In: n/a (data).",
+        "Out: n/a.",
+        "Clobbers: n/a."
+      ],
+      "ItemMenuFrameText": [
+        "The frame of the item page.",
+        "",
+        "When: DrawItemPage.",
+        "Sees: a 22 x 12 box at $88 with the title 'Item'.",
+        "Why: the item grid needs a larger box than the equipment page.",
+        "In: n/a (data).",
+        "Out: n/a.",
+        "Clobbers: n/a."
+      ],
+      "HudRepeatCounts": [
+        "Two count bytes for the HUD strings: $19 (25) and $20 (32).",
+        "",
+        "When: the [0B:t,&c] codes of HudFrameText, EnemyGaugeClearText and EnemyGaugeText repeat a tile by the byte at c.",
+        "Sees: 25-tile and 32-tile rows behind the HUD labels and the enemy gauge (OQ-I009-16).",
+        "Why: the control code takes its count from memory, not from the string.",
+        "In: n/a (data; read as bytes).",
+        "Out: n/a.",
+        "Clobbers: n/a."
+      ],
+      "HudFrameText": [
+        "The frame of the HUD: backing tiles and the labels LEV, EXP and GEM.",
+        "",
+        "When: UpdateHud, dirty bit 0 (every menu close, scene start).",
+        "Sees: 25 tiles $1A at $700, the labels LEV ($42), EXP ($50) and GEM ($6A), a fixed six-tile label (entry 0 of binary_list_014789, tiles $0A-$0F) at $C0 and 32 blanks at $CC.",
+        "Why: the static parts of the HUD are drawn once and the numbers are updated separately.",
+        "In: n/a (data). Single-row glyph mode [09], palettes [03:24] and [03:28].",
+        "Out: n/a.",
+        "Clobbers: n/a."
+      ],
+      "HudExpText": [
+        "The EXP number of the HUD (8 BCD digits from $1B78).",
+        "",
+        "When: UpdateHud, dirty bit 1 (EXP changed).",
+        "Sees: the EXP value next to the EXP label.",
+        "Why: updated alone when only the EXP changes.",
+        "In: n/a (data). Position $58.",
+        "Out: n/a.",
+        "Clobbers: n/a."
+      ],
+      "HudHpGaugeText": [
+        "The HP gauge of the HUD.",
+        "",
+        "When: UpdateHud, dirty bit 2 (HP changed).",
+        "Sees: the gauge at $CC, palette 3, from player_hp and player_max_hp ([04:1B88,1B8A], two words).",
+        "Why: updated alone when only the HP changes.",
+        "In: n/a (data).",
+        "Out: n/a.",
+        "Clobbers: n/a."
+      ],
+      "HudLevelText": [
+        "The level number of the HUD (2 BCD digits from $1B6A).",
+        "",
+        "When: UpdateHud, dirty bit 3.",
+        "Sees: the level next to LEV.",
+        "Why: updated alone on a level up.",
+        "In: n/a (data). Position $4A.",
+        "Out: n/a.",
+        "Clobbers: n/a."
+      ],
+      "HudGemsText": [
+        "The Gem number of the HUD (6 BCD digits from $1B66).",
+        "",
+        "When: UpdateHud, dirty bit 4.",
+        "Sees: the Gems next to GEM.",
+        "Why: updated alone when Gems change.",
+        "In: n/a (data). Position $72.",
+        "Out: n/a.",
+        "Clobbers: n/a."
+      ],
+      "EnemyGaugeClearText": [
+        "Erases the enemy gauge (25 blanks at $140).",
+        "",
+        "When: UpdateHud, when enemy_gauge_timer reaches 0.",
+        "Sees: the enemy gauge disappears about a second after the last hit.",
+        "Why: see UpdateHud.",
+        "In: n/a (data).",
+        "Out: n/a.",
+        "Clobbers: n/a."
+      ],
+      "EnemyGaugeText": [
+        "Draws the enemy gauge: a fixed label and the life bar.",
+        "",
+        "When: UpdateHud on the frame after a hit set enemy_gauge_timer to $80.",
+        "Sees: a six-tile label (entry 1 of binary_list_014789, tiles $10-$15) at $140 and a bar at $14C from enemy_gauge_hp and enemy_gauge_max ([04:336,338], two words) over 32 blank tiles.",
+        "Why: shows how much life the monster just hit has left.",
+        "In: n/a (data).",
+        "Out: n/a.",
+        "Clobbers: n/a."
+      ],
+      "WeaponDescHeaderText": [
+        "Description window header for weapons: the window with 'Lev:' and 'Strength:'.",
+        "",
+        "When: ChooseFromEquipmentList for item ids 1-8.",
+        "Sees: a 22 x 8 window at $408 with 'Lev:' at $4AA and 'Strength:' at $50A; the record then prints the minimum level and the strength bar.",
+        "Why: weapons show the minimum swing level and the Strength bonus.",
+        "In: n/a (data).",
+        "Out: n/a.",
+        "Clobbers: n/a."
+      ],
+      "ArmorDescHeaderText": [
+        "Description window header for armors: the window with 'Defence :'.",
+        "",
+        "When: ChooseFromEquipmentList for item ids 9-$10.",
+        "Sees: the window at $408 with 'Defence :' at $50A.",
+        "Why: armors show the Defence bonus.",
+        "In: n/a (data).",
+        "Out: n/a.",
+        "Clobbers: n/a."
+      ],
+      "PlainDescHeaderText": [
+        "Description window header without stats: the blank window only.",
+        "",
+        "When: ChooseFromEquipmentList for ids $11 and up, ChooseItemSlot for every item.",
+        "Sees: the empty 22 x 8 window at $408; the record prints the name and text.",
+        "Why: magic and items have no level or bar.",
+        "In: n/a (data).",
+        "Out: n/a.",
+        "Clobbers: n/a."
+      ],
+      "DescriptionTextList": [
+        "Pointer table of the 65 item description strings, indexed by item id.",
+        "",
+        "When: ChooseFromEquipmentList and ChooseItemSlot (index = id x 2, long read).",
+        "Sees: the description window text under the cursor.",
+        "Why: one pointer per id so any item can be described without a search.",
+        "In: n/a (data). 65 words, entry 0 = the empty window (DescEmpty), entries $01-$40 = the items in id order (weapons, armors, magic, then the 40 grid items; Desc names follow the walkthrough names).",
+        "Out: n/a. The record layout, stub records and the stat tables are in the lib_menus block note.",
+        "Clobbers: n/a."
+      ],
+      "DescEmpty": [
+        "Description of the empty slot (id 0): the blank 22 x 8 window only.",
+        "",
+        "When: DescriptionTextList[0], for a slot the player does not own.",
+        "Sees: an empty description window.",
+        "Why: an empty slot has nothing to say.",
+        "In: n/a (data).",
+        "Out: n/a.",
+        "Clobbers: n/a."
+      ],
+      "DescPsychoSword": [
+        "Description of the Psycho Sword (id $02).",
+        "",
+        "When: the cursor is on the Psycho Sword.",
+        "Sees: 'Lev 5', one strength bar and 'Invincible monsters temporarily paralyzed'; items.md lists no special effect for it (OQ-I009-3).",
+        "Why: text for the weapon; the effect is in the combat code (engine_scheduler_sprites_combat_collision).",
+        "In: n/a (data).",
+        "Out: n/a.",
+        "Clobbers: n/a."
+      ],
+      "DescElementalMail": [
+        "Description of the Elemental Mail (id $0F).",
+        "",
+        "When: the cursor is on the Elemental Mail.",
+        "Sees: the defence bar and 'Protects <player name> from the damage zones' ([02:2] = the string at $1B92).",
+        "Why: the text is built with the name the player typed.",
+        "In: n/a (data).",
+        "Out: n/a.",
+        "Clobbers: n/a."
+      ],
+      "DescPhoenix": [
+        "Description of the Phoenix spell (id $18).",
+        "",
+        "When: the cursor is on the Phoenix.",
+        "Sees: 'Necessary GEM : 2' and 'Phoenix will join <player name>' ([02:2] = the string at $1B92).",
+        "Why: see DescElementalMail.",
+        "In: n/a (data).",
+        "Out: n/a.",
+        "Clobbers: n/a."
+      ],
+      "DescVipCard": [
+        "Description of the VIP Card (id $29).",
+        "",
+        "When: the cursor is on the VIP Card.",
+        "Sees: 'You may go wherever you wish within the Magridd Castle'; items.md says the card opens the Right Tower (OQ-I009-1).",
+        "Why: item text.",
+        "In: n/a (data).",
+        "Out: n/a.",
+        "Clobbers: n/a."
+      ],
+      "DescMastersEmblemA": [
+        "Description of Master's Emblem A (id $2A); it carries the [::] marker that the stubs for B-H jump to.",
+        "",
+        "When: the cursor is on Emblem A.",
+        "Sees: 'If you collect 8 of these, you will become an expert at magic'; walkthrough: all eight give access to the Magic Bell.",
+        "Why: the eight emblems share one text; only the name line differs.",
+        "In: n/a (data).",
+        "Out: n/a.",
+        "Clobbers: n/a."
+      ],
+      "DescMastersEmblemB": [
+        "Description stub of Master's Emblem B (id $2B): prints the name and jumps into DescMastersEmblemA at its [::] marker.",
+        "",
+        "When: the cursor is on Emblem B; the stubs C-H (ids $2C-$31) are the same.",
+        "Sees: the common emblem text.",
+        "Why: saves 50 bytes per emblem.",
+        "In: n/a (data).",
+        "Out: n/a.",
+        "Clobbers: n/a."
+      ],
+      "DescRedHotMirror": [
+        "Description of the Red-Hot Mirror (id $32); it carries the [::] marker for the Red-Hot Ball and Stick stubs.",
+        "",
+        "When: the cursor is on the Mirror (the Ball and Stick, ids $33 and $34, jump into it).",
+        "Sees: 'If you obtain all three symbols, the Phoenix will join you' (walkthrough: the three items summon the Phoenix).",
+        "Why: the three items share one text.",
+        "In: n/a (data).",
+        "Out: n/a.",
+        "Clobbers: n/a."
+      ],
+      "DescStrangeBottle": [
+        "Description of the Strange Bottle (id $39).",
+        "",
+        "When: the cursor is on the Strange Bottle.",
+        "Sees: 'You will not lose any GEMs should your life meter reach' and nothing after it (the Medical Herb text ends 'reaches 0', OQ-I009-2).",
+        "Why: item text.",
+        "In: n/a (data).",
+        "Out: n/a.",
+        "Clobbers: n/a."
+      ],
+      "DescBrownStone": [
+        "Description of the Brown Stone (id $3A); it carries the [::] marker for the Green, Blue, Silver, Purple and Black Stones.",
+        "",
+        "When: the cursor is on a stone (ids $3B-$3F jump into this text).",
+        "Sees: 'World of Evil will appear once you have collected 6 of these'.",
+        "Why: the six stones share one text.",
+        "In: n/a (data).",
+        "Out: n/a.",
+        "Clobbers: n/a."
+      ],
+      "NameIndexCells": [
+        "64 words holding 1 to $40: the index cells the description records pass to [TBL].",
+        "",
+        "When: every description record uses [TBL:&asciistring_list_014F74,&NameIndexCells + 2 x (id - 1)].",
+        "Sees: the item name on the first line of the description window.",
+        "Why: the [TBL] code reads its string number from memory, so a table of the numbers lets a string print a fixed name.",
+        "In: n/a (data). Entry k = k + 1.",
+        "Out: n/a.",
+        "Clobbers: n/a."
+      ],
+      "GearStatTable": [
+        "Strength and Defence bonus of the gear by item id: two rows of 17 bytes.",
+        "",
+        "When: RecalcGearStats (4 reads) and the bar codes [0B:26,&GearStatTable + id] and [0B:27,&GearStatTable + $11 + id] of the description records (16).",
+        "Sees: the strength and defence bars, and the sum in the status screen.",
+        "Why: data, so the numbers and the bar lengths come from one table.",
+        "In: n/a (data). Row 0, offset = weapon id (1-8): 1, 2, 3, 4, 6, 8, 10, 12 (walkthrough items.md Strength +1 .. +12). Row 1, offset $11 + armor id (9-$10): 1, 2, 3, 4, 6, 8, 10, 12. All other bytes 0.",
+        "Out: n/a.",
+        "Clobbers: n/a."
+      ],
+      "WeaponMinLevelBcd": [
+        "Minimum player level of the eight weapons as packed BCD words: 1, 5, 11, 15, 16, 19, 22, 24.",
+        "",
+        "When: the sword code in player_core compares it with player_level_bcd (and clears the B press when the level is lower); the weapon description records print it.",
+        "Sees: 'Lev' in the weapon description window; a weapon below its level is not swung (walkthrough items.md weapon table, Minimum Level).",
+        "Why: data, one word per weapon, index (id - 1) x 2.",
+        "In: n/a (data).",
+        "Out: n/a.",
+        "Clobbers: n/a."
+      ]
+    },
+    "comments": {
+      "71932": { "text": "High byte of joy_pressed: $80 B, $40 Y, $20 Select or X, $10 Start, $08 Up, $04 Down, $02 Left, $01 Right", "expect": "LDA" },
+      "71949": { "text": "A (low byte bit 7) acts only when no direction is down", "expect": "BIT" },
+      "71981": { "text": "Strength and defence level parts are clamped to 12 for the display and restored after the print (OQ-I009-6)", "expect": "LDA" },
+      "72028": { "text": "Wait until A is released (M = 8: A holds the low byte of joy_pressed)", "expect": "JSR" },
+      "72040": { "text": "Any of A, B, Y or a direction (not Start, not Select or X)", "expect": "BIT" },
+      "72075": { "text": "Consume the latch bits of B, Y (high byte) and A, X (low byte) so this press does not act in the field", "expect": "LDA" },
+      "72111": { "text": "WaitVBlank let the NMI increment frame_counter; undo it so the frame clock stands still while the screen is open", "expect": "DEX" },
+      "72139": { "text": "Next soul line: 21 bytes ($15) per string", "expect": "ADC" },
+      "72146": { "text": "Stop at the first byte after the five soul lines", "expect": "CPY" },
+      "72152": { "text": "The talk script runs with NMI off and drives its own frames", "expect": "DisableNmi" },
+      "72164": { "text": "A = facing code from the player's animation id; carry set = animation id $2C or more, no probe (OQ-I009-7)", "expect": "JSL" },
+      "72180": { "text": "Facing 0 (up) probes first at (x+8, y-$10)", "expect": "BEQ" },
+      "72197": { "text": "Facing 2: probe point (x+$10, y-8)", "expect": "LDA" },
+      "72230": { "text": "Facing 3: probe point (x, y-8)", "expect": "LDA" },
+      "72326": { "text": "Facing 0 only, nothing found: when the tile type two tiles up is 6 (OQ-I009-7) a second probe at (x+8, y-$20) follows", "expect": "CMP" },
+      "72359": { "text": "Facing 1: probe point (x+8, y)", "expect": "LDA" },
+      "72388": { "text": "Walk the run order from actor_list_tail through the $3E links; X = 0 ends it", "expect": "LDA" },
+      "72397": { "text": "$16 bit $0040: the actor can be talked to (OQ-I009-17)", "expect": "BIT" },
+      "72408": { "text": "0 <= point x - actor x <= width: x is the left edge", "expect": "CMP" },
+      "72422": { "text": "-height <= point y - actor y <= 0: y is the bottom edge", "expect": "ADC" },
+      "72441": { "text": "$30,X = talk script address (Cop17_SetOwnParam); 0 = nothing to say", "expect": "LDA" },
+      "72449": { "text": "$16 bit $0008: turn to face the player first", "expect": "BIT" },
+      "72456": { "text": "Build a call frame so the script's final RTL returns to ReturnFromTalk: bank $02 and ReturnFromTalk - 1, then the script bank and script address - 1; the RTL below enters the script", "expect": "LDA" },
+      "72465": { "text": "Script bank: byte +$D of the actor's meta entry ($38,X)", "expect": "meta_tables_008000" },
+      "72478": { "text": "Save the whole slot ($40 bytes) to $1A1E: MVN copies X (slot) to Y ($1A1E)", "expect": "LDY" },
+      "72492": { "text": "New animation id, step 0, then redraw the frame (SetActorAnimFrame)", "expect": "AND" },
+      "72528": { "text": "Copy the saved slot back: X = $1A1E, Y = the slot pulled from the stack", "expect": "LDX" },
+      "72548": { "text": "6 x (anim / 6) = the first animation of the NPC's group of six", "expect": "JSL" },
+      "72571": { "text": "Facing 3 needs the flip bit set, facing 2 clear: toggle only when it differs (an unflipped side view looks left)", "expect": "LDA" },
+      "72599": { "text": "No HDMA while the menu is open", "expect": "STZ" },
+      "72610": { "text": "BG2 map at VRAM $5C00 (the icon page, uploaded from $7F7800)", "expect": "LDA" },
+      "72620": { "text": "Main screen: BG2 and BG3 only", "expect": "LDA" },
+      "72631": { "text": "Save the four scroll words and zero the live ones; the menu pages are drawn from 0", "expect": "LDX" },
+      "72700": { "text": "Consume the latch bits of B and Y ($032B = high byte of joy_release_latch) and clear the pad: the closing press must not act in the field", "expect": "LDA" },
+      "72741": { "text": "Back to the scene's own video settings (shadow bytes of the scene loader)", "expect": "LDA" },
+      "72772": { "text": "Overwrites the whole CGRAM buffer, including the colours RestoreSceneBgGfxAndPalette just wrote, so the spell palette is loaded after it", "expect": "JSR" },
+      "72787": { "text": "Magic changed: kill all projectiles (the old spell's actors) and clear $0433 and $0434 (OQ-I009-11)", "expect": "JSL" },
+      "72813": { "text": "One game frame so the field is drawn again before the screen is lit", "expect": "JSL" },
+      "72837": { "text": "vram_upload_flags: bit 0 = BG3 page, bit 1 = BG2 icon page ($7F7800 to VRAM $5C00)", "expect": "LDA" },
+      "72871": { "text": "ChooseMenuRow input: X = cursor cell of row 0 ($48A), B = start row 0, A = 4 rows", "expect": "LDX" },
+      "72887": { "text": "Row 0 weapons, 1 armor, 2 magic, 3 items", "expect": "CMP" },
+      "72899": { "text": "8 slots, list base $1B1E (weapons)", "expect": "LDA" },
+      "73139": { "text": "Start the cursor on the equipped slot (bit 7); if none is marked, slot 0 gets the marker", "expect": "LDA" },
+      "73179": { "text": "Header by id: 1-8 weapon (level, strength), 9-$10 armor (defence), above that the plain window", "expect": "CMP" },
+      "73202": { "text": "Description string of the item under the cursor (index = id; 0 = empty)", "expect": "LDA" },
+      "73214": { "text": "Wait until all buttons are up (returns the high byte of joy_pressed), blinking the marker", "expect": "JSR" },
+      "73230": { "text": "Right, Left, Down, Up are bits 0-3 of the high byte; Start and Select or X are skipped; Y (bit 6) and B (bit 7) confirm", "expect": "LSR" },
+      "73305": { "text": "Two columns of four, column-major: Right = +4, Left = -4, Down = +1, Up = -1", "expect": "ADC" },
+      "73428": { "text": "Marker shown for 24 of every 32 calls, hidden for 8", "expect": "CMP" },
+      "73463": { "text": "+$11: the defence half of the table (17 bytes per row)", "expect": "GearStatTable" },
+      "73587": { "text": "N = bit 7 of the slot byte: it reached X.high through XBA and TAX, PHP saved N and PLP restores it after PLB changed the flags", "expect": "BMI" },
+      "73622": { "text": "Attribute bits $0C = palette 3; the next three cells flip it: EOR $40 (H), EOR $C0 (V without H), EOR $40 (H and V)", "expect": "ORA" },
+      "73644": { "text": "A.low = slot byte again; mask the marker, id x 8 = index of the 4-word icon record", "expect": "XBA" },
+      "73883": { "text": "Four rows of ten, row-major: Down = +10, Up = -10, Right = +1, Left = -1", "expect": "ADC" },
+      "74586": { "text": "Tile 0 with the priority bit", "expect": "LDA" },
+      "74602": { "text": "BG3 upload bit, but DBR is $7F here: this sets bit 0 of $7F:03B8, not vram_upload_flags (OQ-I027-1)", "expect": "TSB" },
+      "74634": { "text": "Same TSB as in ClearBg3Page: reaches $7F:03B8 with DBR = $7F (OQ-I027-1)", "expect": "TSB" }
+    }
+  },
+
+  "system/engine_boot_main_loop.asm": {
+    "comments": {
+      "89": { "text": "Per-frame reset: dp$42 (HDMA shadow) = 0, dp$44 = $10 (channel 4), dp$46 = $40 ($4340), dp$48 = $6000", "expect": "JSL" },
+      "125": { "text": "HUD: the enemy gauge and the parts flagged in hud_dirty_flags; nothing at all in locations $0F-$12", "expect": "JSL" }
+    }
+  }
+}

@@ -1,0 +1,652 @@
+{
+  "_note": "I042a: block notes for the files merged, split or renamed by I042a/b/c_blocks.json, and part notes for the routines named by apply-I042*_names.json. Evidence: the extracted asm (extract:lt), engine_boot_main_loop and lib_boot_and_scene_init (call order), cop_script_flow_flags (Cop1F_StepRandom, Cop03/04/1B/91), cop_actor_fields_animation (CopA5, Cop80/82), cop_conditions (CopAD), docs/wram-memory-map.md ($1A7E, $1A9E, $1ADE, souls_flags bits), docs/walkthrough/items.md (the soul names), the audit file-pair counts of I042. Open points: questions/I042_questions.md.",
+
+  "library/lib_map_scroll_and_redraw.asm": {
+    "blockNote": { "edit": [
+      { "find": "Camera aim: one routine, AimCameraAtPlayer (file offsets 65536-65640, SNES $02:8000-$8068, bank 02).",
+        "with": [
+          "Camera aim, scroll streaming and the sweep redraw: everything that keeps the BG1 and BG2 maps on screen (file offsets 65536-67162 and 69354-69929, SNES $02:8000-$865A and $02:8EEA-$9129; SweepStepTable at 93741-94860; bank 02).",
+          "",
+          "One file because the main loop, the NMI and the scene init call all three parts and the parts need nothing but lib_arithmetic. The sections below keep the notes of the three routines in file order: the camera aim, the scroll streaming, the sweep redraw.",
+          "",
+          "Camera aim: one routine, AimCameraAtPlayer (file offsets 65536-65640, SNES $02:8000-$8068, bank 02)."
+        ] }
+    ] }
+  },
+
+  "library/lib_map_tile_patches.asm": {
+    "blockNote": { "edit": [
+      { "find": "Metatile writers: put one metatile into the map and, when it is on screen, queue it for VRAM (file offsets 67313-67770, SNES $02:86F1-$88BA, bank 02).",
+        "with": [
+          "Run-time and scene-load changes of the metatile maps (code at file offsets 67313-68053 and 69930-71316, SNES $02:86F1-$89D5 and $02:912A-$9694; tables at 94861-95787; bank 02).",
+          "",
+          "One file because all of it writes the BG1 and BG2 metatile maps or the tile type map, uses lib_map_index_helpers (30 lines of the file mention it) and is driven by the same data tables (data_lair_records, data_plate_lists, data_chest_lists, data_exit_lists, FlagMapPatchTable). The parts are: SetMetatileBg1 and SetMetatileBg1Bg2 (one metatile), ApplyMapPatchRect, CopyMapRectFromSlab, CopyMapRectFromStaging and CopyMapRectFromStagingBothLayers (rectangle copies), the scene-load patches that InitSceneState runs (SetHeldLairTileType, ApplyReleasedLairRects, ApplyLairStatesToScene, InitPlateVariantAtEntry, InitExitListOffset, ShowOpenedChests, ApplyFlagMapPatches) and the two tables FlagMapPatchTable and MapPatchRectsAndMapSizes. The sections below keep the notes of the three former files.",
+          "",
+          "Metatile writers: put one metatile into the map and, when it is on screen, queue it for VRAM (file offsets 67313-67770, SNES $02:86F1-$88BA, bank 02)."
+        ] },
+      { "find": "four release-scene routines that no batch has annotated yet (70389-71037)",
+        "with": "the five scene-load patches ApplyReleasedLairRects, SetHeldLairTileType, InitPlateVariantAtEntry, InitExitListOffset and ShowOpenedChests (70389-71037)" },
+      { "find": "- The routines from ApplyReleasedLairRects to ShowOpenedChests (ApplyReleasedLairRects, SetHeldLairTileType with its sub-label InitPlateVariantAtEntry, InitExitListOffset, ShowOpenedChests) belong to no function-map batch and stay unannotated here (OQ-I029-1).",
+        "with": "- ApplyReleasedLairRects, SetHeldLairTileType (with the sub-label InitPlateVariantAtEntry), InitExitListOffset and ShowOpenedChests are read from the code only; no scene was traced with them at run time (OQ-I042-4). InitSceneState calls them in the order SetHeldLairTileType, ApplyReleasedLairRects, ApplyLairStatesToScene, InitPlateVariantAtEntry, InitExitListOffset, ShowOpenedChests, ApplyFlagMapPatches." }
+    ] },
+    "partNotes": {
+      "SetHeldLairTileType": [
+        "Writes tile type 1 into the tile type map at the cell of every lair record whose state byte has bits 7 and 6 set.",
+        "",
+        "When: InitSceneState, the first of the scene-load patches.",
+        "Sees: n/a; the effect of tile type 1 on the actors is not traced (OQ-I042-4).",
+        "Why: the tile type map is rebuilt at every scene load (BuildTileTypeMap), so the cells that a lair state marks have to be written again.",
+        "In: long call; lair_state (512 bytes), LairRecords (32 bytes each), location_id, the switch bit array at $1ADE.",
+        "Out: for every lair_state byte with bits 7 and 6 set, scanned from index $1FF down to 0, whose record belongs to location_id and whose switch bit (word at record +1E; no test when 0; bit set required) is set: the cell of the record's tile position (+2, +3) is found with PixelToMapIndex. Record with a rectangle (+6 or +7 non-zero): tile_type_map = 1 at that cell. Record without rectangle and +1 = 0: tile_type_map = 1 at that cell and at the next two cells at a stride of map_width_pages x map_height_pages x 256 (stopping at $4000). Record without rectangle and +1 non-zero: the cell is moved by +1 x that product first, then tile_type_map = 1. The stride arithmetic is open (OQ-I042-4).",
+        "Clobbers: A, X, Y, dp$00, $01, $16, $18."
+      ],
+      "InitPlateVariantAtEntry": [
+        "Starts the plate variant state of the scene and applies the variant when the player enters standing on a pressed plate.",
+        "",
+        "When: InitSceneState, after ApplyLairStatesToScene.",
+        "Sees: a room that alternates between two map variants (slabs 2 and 3) shows the right one at once when the player arrives on its plate.",
+        "Why: plate_variant is zeroed at every scene entry; a plate already pressed (its bit set in the array at $1A9E) must show its variant before the first frame.",
+        "In: long call; location_id, player_tile_x and player_tile_y, PlateListPointers (4-byte entries: x, y, record index word; $FF terminator).",
+        "Out: plate_variant = 0, plate_lists_ofs = location_id x 4, plate_list_ofs = the offset of the location's plate list. If an entry matches the player's tile and its bit in $1A9E is set: the record's first 8 bytes go to release_* ($1C6D), release_slab = 2, CopyMapRectFromSlab runs, plate_variant flips and plate_list_ofs moves to the other list of the pair.",
+        "Clobbers: A, X, Y, dp$16, $18 (and the release_* cells)."
+      ],
+      "ApplyReleasedLairRects": [
+        "Copies the map rectangle of every released lair of this location onto the freshly loaded map.",
+        "",
+        "When: InitSceneState, the second scene-load patch (after SetHeldLairTileType, before ApplyLairStatesToScene).",
+        "Sees: the rooms that a released lair or a held NPC opened stay open when the player returns.",
+        "Why: the loader rebuilds the map from the ROM at every scene change, so every permanent change is applied again.",
+        "In: long call; location_id, LairRecords (32 bytes, $FF terminator), the released-lair bit array at $1A9E (one bit per record index; OQ-I042-4).",
+        "Out: for every record of location_id whose bit is set and that has a rectangle (+6 or +7 non-zero): the first 8 bytes go to release_* ($1C6D, MVN); with +E/+F non-zero the rectangle is copied from the staging place at (+E, +F) x 16 (CopyMapRectFromStaging, or CopyMapRectFromStagingBothLayers when bit 0 of +8 is set), otherwise from slab 3 (CopyMapRectFromSlab).",
+        "Clobbers: A, X, Y, dp$04, $0C, $16, $18 (and the release_* cells and what the copy routines use)."
+      ],
+      "InitExitListOffset": [
+        "Stores the offset of this location's exit list.",
+        "",
+        "When: InitSceneState, after InitPlateVariantAtEntry.",
+        "Sees: n/a.",
+        "Why: CheckExitRegions walks the exit list every frame and needs its start inside data_exit_lists.",
+        "In: long call; location_id.",
+        "Out: exit_list_ofs = ExitListPointers[location_id] - ExitListPointers.",
+        "Clobbers: A, X (M = 8 on return)."
+      ],
+      "ShowOpenedChests": [
+        "Turns the closed-chest tile of every chest already opened into the open-chest tile.",
+        "",
+        "When: InitSceneState, the last of the chest and exit set-ups before ApplyFlagMapPatches.",
+        "Sees: chests the player emptied stay open after a scene change.",
+        "Why: the map is rebuilt from the ROM, where every chest is closed ($FB).",
+        "In: long call; location_id, ChestListPointers (6-byte entries: x, y, id with bit 7 = also on BG2; $FF terminator), the chest bit array at $1A7E.",
+        "Out: chest_list_ofs = the offset of the location's chest list; for every entry whose bit (id and $7F) is set the cells of the entry's column in the BG1 map ($7E8000), from (x, y - 1) down to the map end ($4000), that hold $FB become $FC, and in the BG2 map ($7EC000) too when id bit 7 is set. Nothing is queued for VRAM (the scene is drawn after).",
+        "Clobbers: A, X, Y, dp$00-$02, $16, $18."
+      ]
+    }
+  },
+
+  "library/lib_hdma_window_effects.asm": {
+    "blockNote": [
+      "HDMA effects of the main loop and the four Soul window effects (file offsets 71317-71773, SNES $02:9695-$985D, bank 02).",
+      "",
+      "=== BG3 SCROLL HDMA ===",
+      "QueueBg3ScrollHdma is called at the end of each of the five sub-frame runners of the main loop (engine_boot_main_loop). In every location except $10-$12 (location_id - $10 below 3) it queues Bg3ScrollHdmaTable for PPU register $12 (BG3VOFS, a byte written twice per line) on the next free HDMA channel (lib_system_helpers.QueueHdmaDirect). The table covers 48 lines: scroll offset -4 for 20 lines, 0 for 12, +4 for 12, then +3, +2, +1 and 0 for one line each. HDMA has to be queued again every frame (ResetHdmaQueue empties the queue at the start of each work phase), which is why the call repeats. What the table is for is open (OQ-I042-1).",
+      "",
+      "=== SOUL WINDOW EFFECTS ===",
+      "RunSoulOfLightEffect, RunSoulOfRealityEffect, RunSoulOfDetectionEffect and RunSoulOfShieldEffect are actor scripts: each is the script address of meta entries of WorldMetaPointers (flags $2010, EffectAnims). Each tests its bit in souls_flags ($1B82: $02 Light, $10 Reality, $08 Detection, $04 Shield, see docs/wram-memory-map.md and OQ-I006-10) and returns at once while the soul is not recruited, so the actor polls every frame. Once the bit is set it writes the window and colour-math registers of its soul one time:",
+      "- Light ($02): W12SEL = 0, W34SEL = 0, WOBJSEL = $30, CGWSEL = $12.",
+      "- Reality ($10): W12SEL = $20 (and its shadow w12sel_shadow), W34SEL = 0, WOBJSEL = 0, bg2_offset_x and bg2_offset_y = 1.",
+      "- Detection ($08): W12SEL = $20 (and the shadow), W34SEL = 0, WOBJSEL = 1, bg2_offset_x and bg2_offset_y = 1.",
+      "- Shield ($04): W12SEL = $33 (and the shadow), W34SEL = 0, WOBJSEL = 0, TMW = 0, TSW = 3, CGWSEL = $82, and it spawns the Soul of Shield sweep (COP B0, engine_player_death_and_actor_helpers.DestroyHazardsNearOrb).",
+      "All four then fall into BuildSoulOrbCircleWindow. Its first command is COP 91 (Cop91_SetEntryHere), so from the next frame on the actor runs only the circle rebuild.",
+      "",
+      "=== THE CIRCLE ===",
+      "BuildSoulOrbCircleWindow takes the soul orb actor (soul_orb_actor, $03A0) and turns its position into screen coordinates (x - scroll_bg1_x + 8 clamped to 0-$FF, y - scroll_bg1_y - 8 clamped to 0-$DF). It writes two HDMA tables to $7E:7000 and $7E:7800: for each pair of scanlines the left and right edge of window 1 from data_engine_tables.CircleHalfWidths (a circle of radius $40 pixels around the orb), clipped to the screen, closed by a full-width line and a zero terminator. Both tables are queued for PPU registers $26 (WH0) and $27 (WH1). What each soul does with that window (which layers it clips) is not decoded here (OQ-I042-2).",
+      "",
+      "=== NOTES ===",
+      "- The extraction has no reference to the four entries from code; they are reached through the meta entries of WorldMetaPointers (the 4 table references)."
+    ],
+    "partNotes": {
+      "QueueBg3ScrollHdma": [
+        "Queues the BG3 vertical scroll HDMA table, except in locations $10-$12.",
+        "",
+        "When: five call sites in engine_boot_main_loop, once per sub-frame runner (every frame).",
+        "Sees: BG3 gets a scroll offset of -4, 0 and +4 in horizontal bands of the screen (see the block note).",
+        "Why: HDMA is per frame; the queue is emptied at the start of every work phase, so the table is queued again every frame. The purpose of the table is open (OQ-I042-1).",
+        "In: long call; location_id.",
+        "Out: nothing in locations $10-$12; otherwise one HDMA channel is programmed for register $12 in direct mode with Bg3ScrollHdmaTable.",
+        "Clobbers: A, B (and what QueueHdmaDirect uses)."
+      ],
+      "Bg3ScrollHdmaTable": [
+        "The BG3 vertical scroll HDMA table (direct mode, register $12 written twice per line).",
+        "",
+        "When: QueueBg3ScrollHdma.",
+        "Sees: a scroll offset of -4 for 20 lines, 0 for 12, +4 for 12, then +3, +2, +1, 0 for one line each (48 lines in all).",
+        "Why: see QueueBg3ScrollHdma.",
+        "In: n/a (data): 22 bytes, each group a line count and the scroll word (low, high): 14 FC FF, 0C 00 00, 0C 04 00, 01 03 00, 01 02 00, 01 01 00, 01 00 00, then 00 (end).",
+        "Out: n/a.",
+        "Clobbers: n/a."
+      ],
+      "RunSoulOfLightEffect": [
+        "Soul of Light effect actor: sets the window registers once the soul is recruited, then follows the soul orb with a circle window.",
+        "",
+        "When: the script of a WorldMetaPointers meta entry; runs every frame, and returns at once while souls_flags bit $02 is clear.",
+        "Sees: with the Soul of Light the circle window around the soul orb appears (the walkthrough says it lets the player see in the dark areas of Woods of GreenWood B1F and Lostside; what the window clips is OQ-I042-2).",
+        "Why: the effect belongs to the scene, not to the player actor, so it lives in a scene actor that checks the soul bit itself.",
+        "In: actor entry (returns with RTL), X = actor slot; souls_flags.",
+        "Out: bit clear: RTL. Bit set: W12SEL = 0, W34SEL = 0, WOBJSEL = $30, CGWSEL = $12 (8-bit writes, then M = 16) and a branch to BuildSoulOrbCircleWindow.",
+        "Clobbers: A, P."
+      ],
+      "RunSoulOfRealityEffect": [
+        "Soul of Reality effect actor: sets the window registers once the soul is recruited, then follows the soul orb with a circle window.",
+        "",
+        "When: the script of a WorldMetaPointers meta entry; runs every frame, and returns at once while souls_flags bit $10 is clear.",
+        "Sees: with the Soul of Reality the circle window around the soul orb appears (the walkthrough says the light orb lights up hidden passages in the Castle of King Magridd; what the window clips is OQ-I042-2).",
+        "Why: as RunSoulOfLightEffect.",
+        "In: actor entry (returns with RTL), X = actor slot; souls_flags.",
+        "Out: bit clear: RTL. Bit set: W12SEL = $20 (and w12sel_shadow), W34SEL = 0, WOBJSEL = 0, bg2_offset_x = bg2_offset_y = 1, then a branch to BuildSoulOrbCircleWindow.",
+        "Clobbers: A, P."
+      ],
+      "RunSoulOfDetectionEffect": [
+        "Soul of Detection effect actor: sets the window registers once the soul is recruited, then follows the soul orb with a circle window.",
+        "",
+        "When: the script of a WorldMetaPointers meta entry; runs every frame, and returns at once while souls_flags bit $08 is clear.",
+        "Sees: with the Soul of Detection the circle window around the soul orb appears (the walkthrough says the soul shows the invisible enemies of the model towns in Leo's Laboratory; what the window clips is OQ-I042-2).",
+        "Why: as RunSoulOfLightEffect.",
+        "In: actor entry (returns with RTL), X = actor slot; souls_flags.",
+        "Out: bit clear: RTL. Bit set: W12SEL = $20 (and w12sel_shadow), W34SEL = 0, WOBJSEL = 1, bg2_offset_x = bg2_offset_y = 1, then a branch to BuildSoulOrbCircleWindow.",
+        "Clobbers: A, P."
+      ],
+      "RunSoulOfShieldEffect": [
+        "Soul of Shield effect actor: sets the window registers once the soul is recruited, starts the hazard sweep and follows the soul orb with a circle window.",
+        "",
+        "When: the script of a WorldMetaPointers meta entry; runs every frame, and returns at once while souls_flags bit $04 is clear.",
+        "Sees: with the Soul of Shield the circle window around the soul orb appears and a sweep actor is spawned that clears hazards near the orb; the walkthrough says the soul protects against the magma and lava bombs of Durean (OQ-I042-2).",
+        "Why: as RunSoulOfLightEffect.",
+        "In: actor entry (returns with RTL), X = actor slot; souls_flags.",
+        "Out: bit clear: RTL. Bit set: W12SEL = $33 (and w12sel_shadow), W34SEL = 0, WOBJSEL = 0, TMW = 0, TSW = 3, CGWSEL = $82, COP B0 spawns engine_player_death_and_actor_helpers.DestroyHazardsNearOrb (flags $2010), then BuildSoulOrbCircleWindow.",
+        "Clobbers: A, P."
+      ],
+      "BuildSoulOrbCircleWindow": [
+        "Builds the two HDMA tables of a circle window around the soul orb and queues them for window 1.",
+        "",
+        "When: the shared tail of the four soul effect actors; every frame after the first (COP 91 sets it as the re-entry address).",
+        "Sees: a circle of radius $40 pixels follows the soul orb.",
+        "Why: window 1 edges per scanline come from a table, so a circle needs two tables rebuilt as the orb moves; HDMA is per frame.",
+        "In: X = actor slot (COP rule), M = 16; soul_orb_actor ($03A0), scroll_bg1_x and scroll_bg1_y.",
+        "Out: dp$16 / $18 = the orb's screen position (clamped), the left and right edge tables at $7E:7000 and $7E:7800 (entries: a line count of 2, the edge byte; closed by a one-line full-width entry and a zero), both queued with QueueHdmaDirect for registers $26 and $27; PLX; RTL.",
+        "Clobbers: A, Y, dp$0C, $16, $18 (X restored)."
+      ]
+    }
+  },
+
+  "library/lib_choice_menus.asm": {
+    "blockNote": { "edit": [
+      { "find": "Menu row chooser (file offsets 74040-74368, SNES $02:A138-$A280, bank 02; the cursor offset table is at 74359-74368).",
+        "with": [
+          "Choice menus of bank 02: the row chooser, the question window chooser and the cursor blink they share (file offsets 74040-74537, SNES $02:A138-$A329).",
+          "",
+          "One file because ChooseMenuRow (with ChooseMenuRowAtTable and TitleMenuCursorOffsets) and RunChoiceMenu both blink their cursor through BlinkChoiceCursor, which nothing else calls. Callers: lib_menus (ChooseMenuRow), engine_title_file_select (ChooseMenuRowAtTable, the file select) and cop_items_stats_text (RunChoiceMenu, the question windows of Cop1A_ChoiceMenu). The sections below keep the notes of the former files in file order.",
+          "",
+          "Menu row chooser (file offsets 74040-74368, SNES $02:A138-$A280, bank 02; the cursor offset table is at 74359-74368)."
+        ] }
+    ] }
+  },
+
+  "library/lib_menu_screen_setup.asm": {
+    "blockNote": { "edit": [
+      { "find": "Menu graphics and palette loaders (file offsets 74774-74832, SNES $02:A416-$A44F, bank 02).",
+        "with": [
+          "Menu screen setup of bank 02: the BG2 menu screen (SetupMenuBg2Screen), the menu tile groups (ExpandMenuTileGroups), the menu graphics and palette loaders, the item page palette, the scene graphics restore and the equipped magic graphics (file offsets 74539-74575, 74640-74989 and the loaders up to the end of the file, SNES $02:A32B-$A34F and $02:A390-$A4ED).",
+          "",
+          "One file because SetupMenuBg2Screen calls LoadMenuBg2Graphics, LoadMenuPalette and ExpandMenuTileGroups together, and the other parts load or restore the graphics and palettes that a menu replaces. Callers: engine_title_file_select (SetupMenuBg2Screen), lib_menus (LoadMenuBg2Graphics, LoadMenuPalette, LoadItemPagePalette, RestoreSceneBgGfxAndPalette, LoadEquippedMagicGfx), lib_boot_and_scene_init (RestoreSceneBgGfxAndPalette, LoadEquippedMagicGfx) and gv_front_end (RestoreSceneBgGfxAndPalette). The sections below keep the notes of the loaders; SetupMenuBg2Screen and ExpandMenuTileGroups have part notes.",
+          "",
+          "Menu graphics and palette loaders (file offsets 74774-74832, SNES $02:A416-$A44F, bank 02)."
+        ] }
+    ] },
+    "partNotes": {
+      "SetupMenuBg2Screen": [
+        "Switches to the BG2 menu screen: registers, graphics, palette and tile groups.",
+        "",
+        "When: EnterFileSelect (engine_title_file_select), with the screen blanked.",
+        "Sees: the menu background (BG2 at VRAM $5C00, characters at $2000, main screen BG2 and BG3) replaces the field.",
+        "Why: one call sets up what every full-screen menu needs before its text is printed.",
+        "In: long call; the screen blanked.",
+        "Out: BG2SC = $5C, BG12NBA = $20, TM = $06, CGADSUB = 0, BGMODE = 9, then LoadMenuBg2Graphics, LoadMenuPalette and ExpandMenuTileGroups; P restored.",
+        "Clobbers: A, X, Y."
+      ],
+      "ExpandMenuTileGroups": [
+        "Expands the menu tile group map into the BG2 tilemap buffer.",
+        "",
+        "When: SetupMenuBg2Screen.",
+        "Sees: the menu background tiles (icons and frames) appear once the buffer is uploaded.",
+        "Why: the menu background is stored as one byte per 2 x 2 tile group; each group is a record of four tile words (IconTileRecords).",
+        "In: near call (RTS); DBR is set to $7F inside.",
+        "Out: for every byte of MenuTileGroupMap the four words of IconTileRecords[byte] are written as a 2 x 2 block at $7F:7800 (two rows $40 bytes apart, $800 bytes in all); vram_upload_flags bit 1 is set so the NMI uploads the buffer; P and DBR restored.",
+        "Clobbers: A, X, Y, dp$00-$02."
+      ]
+    }
+  },
+
+  "library/lib_name_entry_and_staff_roll.asm": {
+    "blockNote": { "edit": [
+      { "find": "Name entry screen (file offsets 74990-75353 code, 83037-83222 strings; SNES $02:A4EE-$A658 and $02:C45D-$C515, bank 02).",
+        "with": [
+          "The two text screens that the story scripts call: the name entry screen (RunNameEntryScreen) and the staff roll scroller (ScrollStaffRollText) (name entry code at file offsets 74990-75353 and strings at 83037-83222, SNES $02:A4EE-$A658 and $02:C45D-$C515; staff roll code at 75471-75625, SNES $02:A6CF-$A768; bank 02).",
+          "",
+          "One file because both are small interactive text screens with their own loop and one caller each: RunNameEntryScreen from cop_items_stats_text, ScrollStaffRollText from the credits actor of gv_front_end. The sections below keep the notes of the two former files in file order.",
+          "",
+          "Name entry screen (file offsets 74990-75353 code, 83037-83222 strings; SNES $02:A4EE-$A658 and $02:C45D-$C515, bank 02)."
+        ] }
+    ] }
+  },
+
+  "library/lib_system_helpers.asm": {
+    "blockNote": { "edit": [
+      { "find": "HDMA channel queue and the NMI and vblank switches (file offsets 71774-71931 and 78220-78280, SNES $02:985E-$98FB and $02:B18C-$B1C8, bank 02).",
+        "with": [
+          "System helpers of bank 02: the HDMA channel queue, the NMI and vblank switches with the screen-on step, and the boot PPU layout (file offsets 71774-71931, 78198-78280 and 80602-80678, SNES $02:985E-$98FB, $02:B176-$B1C8 and $02:BADA-$BB26).",
+          "",
+          "The parts are ResetHdmaQueue, QueueHdmaIndirect, QueueHdmaDirect, EnableDisplayAndNmi, ForceBlankNmiOff, EnableNmi, DisableNmi, WaitVBlank and ApplyBootPpuLayout. EnableDisplayAndNmi (called by lib_menus) joined the NMI and vblank switches it belongs with; ApplyBootPpuLayout (called by engine_boot_main_loop at boot, after InitHardwareAndClearWram) joined as the other PPU-setup routine (it was the one-routine file lib_013ADA; it could not stay in the loader file and InitHardwareAndClearWram could not leave it, OQ-I042-7). The sections below keep the notes of the parts: the queue and the switches, then the boot layout.",
+          "",
+          "HDMA channel queue and the NMI and vblank switches (file offsets 71774-71931 and 78220-78280, SNES $02:985E-$98FB and $02:B18C-$B1C8, bank 02)."
+        ] }
+    ] }
+  },
+
+  "library/lib_hud.asm": {
+    "blockNote": { "edit": [
+      { "find": "HUD update and enemy gauge (file offsets 75353-75470, SNES $02:A659-$A6CE, bank 02).",
+        "with": "HUD update, enemy gauge and the HUD strings (UpdateHud at file offsets 75353-75470, SNES $02:A659-$A6CE; HudRepeatCounts and HudFrameText with the enemy gauge strings at 83724-83848, SNES $02:C70C-$C788; bank 02). UpdateHud is the only reader of the strings, so they live in this file." }
+    ] }
+  },
+
+  "library/lib_menus.asm": {
+    "blockNote": { "edit": [
+      { "find": "Field menus and screens (status and souls, talk, equipment and item menu), their HUD text and the item descriptions (code at file offsets 71932-73976, SNES $02:98FC-$A0F8, plus helpers at 74576-74639, 74730-74773 and 78198-78219; text and tables at 83313-83848 85876-86757 (ItemNameList and the item names) and 87358-90589; bank 02).",
+        "with": "Field menus and screens (status and souls, equipment and item menu), their menu text and the item descriptions (code at file offsets 71932-72151 and 72599-73976, SNES $02:98FC-$99D7 and $02:9B97-$A0F8, plus helpers at 74576-74639 and 74730-74773; text and tables at 83313-83723, 85876-86757 (ItemNameList and the item names) and 87358-90589; bank 02). The talk routines (72152-72598) are in lib_field_talk, the HUD strings in lib_hud and EnableDisplayAndNmi in lib_system_helpers." },
+      { "find": "=== TALKING ===", "until": "=== INVENTORY TABLE AND SLOT BYTE ===", "with": "" },
+      { "find": "=== HUD TEXT, GEAR AND DESCRIPTIONS ===", "with": "=== MENU TEXT, GEAR AND DESCRIPTIONS ===" },
+      { "find": "ItemMenuFrameText, the HUD strings (HudFrameText .. EnemyGaugeText with the repeat counts in HudRepeatCounts) and the description headers",
+        "with": "ItemMenuFrameText and the description headers (the HUD strings HudFrameText .. EnemyGaugeText with the repeat counts in HudRepeatCounts are in lib_hud)" }
+    ] }
+  },
+
+  "library/lib_field_talk.asm": {
+    "blockNote": [
+      "Field talk: the B-button interaction that starts the script of an NPC in front of the player (file offsets 72152-72598, SNES $02:99D8-$9B96, bank 02).",
+      "",
+      "=== MODEL ===",
+      "RunTalkInteraction (B) disables NMI, runs FindAndTalkToActorInFront and enables NMI: the script drives its own frames. The probe point depends on the facing code (from lib_player_helpers.GetPlayerFacing): code 0 (x+8, y-$10), 1 (x+8, y), 2 (x+$10, y-8), 3 (x, y-8) relative to the player's (x, y); facing 0 probes a second point two tiles up when the tile type there is 6. FindTalkableActorAt walks the actors from actor_list_tail through the $3E links and accepts the first one whose $16 has bit $0040 and whose box contains the point (x is the left edge, y the bottom edge, $10 and $12 width and height). ActivateTalkTarget needs $30,X (the script address, stored by Cop17_SetOwnParam, for example the first actor of gv_village_actors_018000) and calls it through an RTL frame: pushed bank $02 and ReturnFromTalk - 1, then the script bank (byte +$D of the actor's meta entry at $38,X) and $30,X - 1. With $16 bit $0008 the NPC first turns to face the player: TalkFacingPlayer copies the whole slot ($40 bytes) to $1A1E, ChooseFacingAnim picks the animation, the script runs, RestoreTalkedActor copies the slot back. So $16 bit $0040 = talkable and bit $0008 = turn to face the player (OQ-I005-14, OQ-I009-17).",
+      "",
+      "=== NOTES ===",
+      "- The only entry is RunTalkInteraction: DispatchFieldButtons (lib_menus) branches to it with one BRL when B is pressed. GetPlayerFacing and FlipActorX come from lib_player_helpers. The parts are RunTalkInteraction, FindAndTalkToActorInFront, FindTalkableActorAt (with the sub-labels ActivateTalkTarget and TalkFacingPlayer), RestoreTalkedActor, ReturnFromTalk and ChooseFacingAnim."
+    ]
+  },
+
+  "library/lib_boot_and_scene_init.asm": {
+    "blockNote": { "edit": [
+      { "find": "Scene change: the loader, the transitions, the iris, the tile type map and the scene state init (file offsets 161518-162065 and 162229-162514, SNES $04:F6EE-$F911 and $F9B5-$FAD2, bank 04).",
+        "with": [
+          "Boot and scene change of bank 04: the boot graphics buffers (LoadBootGraphicsBuffers), the sort bucket reset (ResetSortBuckets), the BG3 clear (ClearBg3Buffer), the switch owner reset, the tile type map build (BuildTileTypeMap, FillTileTypeMap), the scene change (ChangeSceneIfRequested), the transitions with the iris (PlayTransitionOut, PlayTransitionIn, RunIrisTransition), the engine state init (InitFixedState) and the scene state init (InitSceneState).",
+          "",
+          "One file because all of it runs only at reset or at a scene change: ResetSortBuckets is called by LoadBootGraphicsBuffers (gv_front_end boot actor) and InitSceneState, InitSceneState calls the map and tile patches, and the other entries are called from engine_boot_main_loop (InitFixedState, ChangeSceneIfRequested) and gv_front_end (ClearBg3Buffer, 22 call sites). The sections below keep the notes of the former files: boot graphics, sort buckets, scene change and fixed state.",
+          "",
+          "Scene change: the loader, the transitions, the iris, the tile type map and the scene state init (file offsets 161518-162065 and 162229-162514, SNES $04:F6EE-$F911 and $04:F9B5-$FAD2, bank 04)."
+        ] }
+    ] }
+  },
+
+  "library/lib_main_loop_helpers.asm": {
+    "blockNote": { "edit": [
+      { "find": "Request of the animated background tile strip and its four VRAM destinations (file offsets 160291-160351, SNES $04:F223-$F25F, bank 04).",
+        "with": [
+          "Per-frame helpers of the main loop in bank 04: QueueAnimatedTileStrip, HandlePauseBanner and WaitFrameForStart (file offsets 160291-160351 and 161138-161260, SNES $04:F223-$F25F and $04:F572-$F5EC).",
+          "",
+          "One file because both routines are called by engine_boot_main_loop only (QueueAnimatedTileStrip from five places, HandlePauseBanner once) and WaitFrameForStart is the wait of the pause loop. The sections below keep the notes of the two former files in file order.",
+          "",
+          "Request of the animated background tile strip and its four VRAM destinations (file offsets 160291-160351, SNES $04:F223-$F25F, bank 04)."
+        ] }
+    ] }
+  },
+
+  "library/lib_player_helpers.asm": {
+    "blockNote": { "edit": [
+      { "find": "Facing code of the player and the horizontal flip of an actor (file offsets 160724-160760, SNES $04:F3D4-$F3F8, bank 04).",
+        "with": [
+          "Player helpers of bank 04: the facing code (GetPlayerFacing), the actor flip (FlipActorX), the weapon pose (ApplyPlayerWeaponPose), the pay-out of pending heal and EXP (DrainPendingHeal, DrainPendingExp) and the EXP and Gem counters (AddExp, AddGems, SubtractGems) (file offsets 160724-161517, SNES $04:F3D4-$F6ED).",
+          "",
+          "One file of routines that read or change the player's state and are called from several subsystems: lib_field_talk (GetPlayerFacing, FlipActorX), lib_tile_triggers_and_lair_return (GetPlayerFacing, AddGems), lib_menus and lib_boot_and_scene_init (ApplyPlayerWeaponPose), lib_hud (DrainPendingHeal, DrainPendingExp), engine_combat_hits (AddExp), cop_items_stats_text (AddGems, SubtractGems) and engine_spawn_lairs_death_drops (AddGems). The part that holds ApplyPlayerWeaponPose keeps its branch target in the same file. The sections below keep the notes of the former files in file order.",
+          "",
+          "Facing code of the player and the horizontal flip of an actor (file offsets 160724-160760, SNES $04:F3D4-$F3F8, bank 04)."
+        ] }
+    ] }
+  },
+
+  "library/lib_arithmetic.asm": {
+    "blockNote": { "edit": [
+      { "find": "; the neighbours SignExtendByte, ArithmeticShiftRight and StepRandomState up to file offset 78449 are not annotated yet and are outside batch A5)",
+        "with": "; the neighbours SignExtendByte, ArithmeticShiftRight and StepRandomState at 78334-78349, 78350-78356 and 78406-78449 have part notes of their own)" }
+    ] },
+    "partNotes": {
+      "SignExtendByte": [
+        "Sign-extends the byte in A.low into the 16-bit accumulator.",
+        "",
+        "When: no call site in the extraction (OQ-I042-3).",
+        "Sees: n/a.",
+        "Why: signed bytes (velocities, offsets) are added to 16-bit positions, which needs $FF in the high byte for a negative value (inferred; no caller).",
+        "In: long call; any M; A.low = the byte.",
+        "Out: A.low unchanged, B = $FF when bit 7 of A.low is set, otherwise $00; P restored.",
+        "Clobbers: B."
+      ],
+      "ArithmeticShiftRight": [
+        "Shifts A right by one bit and keeps the sign bit.",
+        "",
+        "When: no call site in the extraction (OQ-I042-3).",
+        "Sees: n/a.",
+        "Why: LSR would turn a negative value positive; this halves a signed value (inferred; no caller).",
+        "In: long call; A in the current width. The routine tests the N flag as the caller left it (BMI), it does not reload A, so N must describe A.",
+        "Out: N set: SEC, ROR (the sign stays); N clear: LSR. Carry = the bit shifted out.",
+        "Clobbers: A, carry."
+      ],
+      "StepRandomState": [
+        "Steps the 17-byte random generator and returns one random byte.",
+        "",
+        "When: no call site in the extraction; Cop1F_StepRandom (cop_script_flow_flags) contains the same loops and is what the scripts use (OQ-I042-3).",
+        "Sees: n/a.",
+        "Why: an additive generator: it needs no multiplication and keeps its state in WRAM ($0301-$0311, rng_state).",
+        "In: long call; any M; X and Y are saved.",
+        "Out: M = 8, X = 16 inside: for X = 15 down to 1 rng_state[X] += rng_state[X+1] with the carry running through the bytes, then rng_state[$10] is incremented with the carry running up toward rng_state[1]; A (16-bit, high byte 0) = rng_state+1 ($0302); P, X and Y restored.",
+        "Clobbers: A."
+      ]
+    }
+  },
+
+  "system/engine_actor_scheduler_and_sprites.asm": {
+    "blockNote": { "edit": [
+      { "find": "Actor scheduler, draw list sort, OAM builder, animation, combat and tile collision (file offsets 1445-4782, SNES $00:85A5-$92AD, bank 00).",
+        "with": "Actor scheduler, draw list sort, OAM builder and animation (file offsets 1445-2611, SNES $00:85A5-$8A33, bank 00). The hit rules are in engine_combat_hits (2612-3879) and the tile collision in engine_tile_collision (3880-4782); the scheduler reaches the collision through two references and nothing else of the two files." },
+      { "find": "=== COMBAT ===", "until": "=== COLLISION ===", "with": "" },
+      { "find": "=== COLLISION ===", "until": "=== ENEMY GAUGE ===", "with": "" },
+      { "find": "\n\n=== ENEMY GAUGE ===\nA hit on a monster without $16 bit $0001 sets enemy_gauge_hp ($0336) to its HP, enemy_gauge_max ($0338) to the meta entry HP (+2) and enemy_gauge_timer ($0330) to $80. The HUD update (UpdateHud) draws the gauge string EnemyGaugeText ([04:336,338]) once, counts the timer down by 2 per frame and erases the gauge when it reaches 0.", "with": "" }
+    ] }
+  },
+
+  "system/engine_combat_hits.asm": {
+    "blockNote": [
+      "Hit detection and damage: the player's sword, magic and projectiles against actors, and the player's contact with monsters and pickups (file offsets 2612-3879, SNES $00:8A34-$8F27, bank 00).",
+      "",
+      "=== MODEL ===",
+      "DetectHitSourceCollisions pairs every listed actor with $16 bit $0080 (and none of $0D00) against every actor without $EEC0 whose box overlaps and whose sprite rectangles overlap (TestSpriteOverlap); sources with $16 bit $0020 go to ApplyProjectileHit, the others to ApplySwordHit. DetectPlayerContact tests the player's hurt box against actors without $25C0 and calls ApplyContactDamageOrPickup. The rules below are read from the code; the item names are those of the walkthrough (docs/walkthrough/items.md). The only caller of the file is engine_boot_main_loop (two references).",
+      "",
+      "=== RULES ===",
+      "- Equipment ids: equipped_weapon $1B5E (2 Psycho Sword, 3 Critical Sword, 5 Zantetsu Sword, 6 Spirit Sword, 7 Recovery Sword, 8 Soul Blade), equipped_armor $1B60 ($0D Mystic Armor, $0E Light Armor), equipped_magic $1B62 ($18 Phoenix), equipped_bracelet $1B64 ($35 Power, $36 Shield, $37 Super).",
+      "- Sword damage = max(1, attack_current $1B8C - monster defence (meta entry +1)); Power and Super Bracelet double it. Monster HP is $25; a hit that does not leave HP above 0 kills (or leaves 1 HP when $1A bit $0100).",
+      "- Immunity classes ($1A): $0400 metal is hurt only by the Zantetsu Sword, $0800 spirit only by the Spirit Sword, $0200 special only by the Soul Blade (which hurts everything). Metal deflects with sound $4C, the other two ignore the hit silently.",
+      "- Damage to the player = max(1, monster attack - 1 - defense_current $1B8E); Shield and Super Bracelet halve it. Light Armor blocks the hit when attack x 1.5 is below $1B8E (sound $0C). Mystic Armor sets the hit stun counter to -64 instead of -32.",
+      "- Hit stun: $26 = -8 for monsters, $FFE0 or $FFC0 for the player; while $16 bit $0800 is set the stunned player only picks things up.",
+      "- Differences from the walkthrough are in OQ-I005-1 (Super Bracelet), -2 (Critical Sword), -3 (Psycho Sword).",
+      "",
+      "=== ENEMY GAUGE ===",
+      "A hit on a monster without $16 bit $0001 sets enemy_gauge_hp ($0336) to its HP, enemy_gauge_max ($0338) to the meta entry HP (+2) and enemy_gauge_timer ($0330) to $80 (SetEnemyGauge). The HUD update (lib_hud.UpdateHud) draws the gauge string EnemyGaugeText ([04:336,338]) once, counts the timer down by 2 per frame and erases the gauge when it reaches 0."
+    ]
+  },
+
+  "system/engine_tile_collision.asm": {
+    "blockNote": [
+      "Tile collision and actor motion: moving an actor against the tile type map, the single-point probe and the velocity step (file offsets 3880-4782, SNES $00:8F28-$92AE, bank 00).",
+      "",
+      "=== MODEL ===",
+      "MoveActorWithTileCollision moves x first (CollideEast or CollideWest), then y (CollideSouth or CollideNorth), each probing the tile types in the rows or columns the actor's width and height cover. GetTileType reads tile_type_map ($7F8000): index = ((y / 16) x map_width_pages + x / 16) x 256 + (y and 15) x 16 + (x and 15) for tile coordinates; a type byte with a high nibble set (Cop15_BlockOwnTiles ORs $F0) or an index of $4000 or more reads as $0F (blocked). Blocked: $00 or $02 snapped to a multiple of 16, velocity zeroed, $16 bit $0004 set. Tile type codes are in OQ-I005-8; the east and south routines have no boundary pre-check (OQ-I005-12).",
+      "",
+      "=== NOTES ===",
+      "- The callers are engine_actor_scheduler_and_sprites (two references, the actor step) and player_core (one); the file includes lib_arithmetic only. The parts are MoveActorWithTileCollision, CollideEast, CollideWest, CollideSouth, CollideNorth, ProbeTileAtVelocity (the one-point test for an actor whose width or height has bit 3 set), GetTileType and ApplyActorVelocity."
+    ]
+  },
+
+  "system/engine_spc_ipl_upload.asm": {
+    "blockNote": [
+      "SPC700 upload code, the SPC engine block and a sine-moving actor (file offsets 1044134-1047708, SNES $1F:EEA6-$FC9C, bank 1F).",
+      "",
+      "=== SPC UPLOAD ===",
+      "UploadSpcDriver runs once at start-up (the boot actor of gv_front_end): it sends SpcEngineBlock with SendSpcIplBlocks (the IPL ROM boot protocol: after reset the SPC700 waits for $BBAA in APUIO0/1, then takes records of a length word, a destination word and the bytes, acknowledged by a counter in APUIO0; a record of length 0 ends the transfer and the IPL ROM jumps to its destination), waits two vblanks, writes $FF to APUIO0, sends data_spc_driver.SpcDriverBlock with UploadSpcStream and stores the SPC address after that block in $0320. UploadSpcStream is also the upload of every song (MusicLoadUpload in engine_spawn_lairs_death_drops, UploadSceneMusic in lib_scene_asset_loader): the pointer to the block list is in dp$29-$2B. The block formats are not decoded (OQ-I042-6).",
+      "",
+      "=== SINE WAVE MOVER ===",
+      "RunSineWaveMover and the labels up to StepSineSwayXMirrored (file offsets 1044134-1044411) are not upload code but an actor script that sits in front of it. CopA5_JumpByFlipState picks one of four variants by the sprite's flip bits (none, flip X, flip Y, both). Each variant waits until the actor is on screen (COP AD, operand $10), waits $78 frames, then runs seven passes of a loop (COP 03/04, one frame per pass): a trail actor (RunSineWaveMoverTrail, COP B0, flags $0200) is spawned, y moves by $30,X (plus for NoFlip and FlipY, minus for FlipX and FlipXY) and x by half of a sine sample minus 12 (StepSineSwayX; the mirrored step for FlipY and FlipXY), and $30,X grows by $10 each pass, so the actor accelerates; then the cycle starts again. The actor has no reference in the extraction (OQ-I042-5); the names describe the code only.",
+      "",
+      "=== NOTES ===",
+      "- SpcEngineBlock is the data part at the end: an IPL stream of one record (length $0B47 = 2887 bytes, destination $0400), the data and a closing record of length 0."
+    ],
+    "partNotes": {
+      "UploadSpcDriver": [
+        "Uploads the SPC engine and the driver block to the sound chip.",
+        "",
+        "When: once at start-up, from the boot actor of gv_front_end (code_0066DE), after the SPC reset.",
+        "Sees: the sound chip starts running its program; music and sound effects work afterwards.",
+        "Why: the SPC700 has no program after reset; the CPU has to send it.",
+        "In: long call; M = 8, X = 16.",
+        "Out: dp$29-$2B = SpcEngineBlock sent with SendSpcIplBlocks; two vblanks; APUIO0 = $FF; dp$29-$2B = data_spc_driver.SpcDriverBlock, $0320 = $3000, sent with UploadSpcStream; $0320 = dp$02 + dp$08 (the SPC address after the last block).",
+        "Clobbers: A, X, dp$02 and the work cells of the two upload routines."
+      ],
+      "UploadSpcStream": [
+        "Sends the block list that dp$29-$2B points to into the SPC700.",
+        "",
+        "When: UploadSpcDriver (the driver block), MusicLoadUpload (engine_spawn_lairs_death_drops, a song by track) and UploadSceneMusic (lib_scene_asset_loader, the song of a scene).",
+        "Sees: the sound chip receives new data; the music changes after the upload.",
+        "Why: songs and the driver are sent as data, not as part of the SPC program.",
+        "In: long call; M = 8 (set inside), dp$29-$2B = the list, $0320 = SPC destination base; NMI off (it waits for vblanks).",
+        "Out: SendSpcIplBlocks runs first on the list; then two vblanks, APUIO0 = $FF and the $BBAA handshake; then the list is read as a count byte and one skip byte per block, the records are taken from a table that is walked through dp$2C-$2E starting at $07:8000 (record = a length word and its bytes, destination counting up from $0320), each record is sent with the counter protocol in APUIO0, and a record of length 0 is sent last; dp$2E = $7E at the end; P and Y restored. Read from the code only; the formats are not decoded (OQ-I042-6).",
+        "Clobbers: A, X, dp$00-$0E, $2C-$2E."
+      ],
+      "SendSpcIplBlocks": [
+        "Sends records to the SPC700 IPL ROM with the boot protocol.",
+        "",
+        "When: UploadSpcDriver (SpcEngineBlock) and the first step of UploadSpcStream.",
+        "Sees: n/a.",
+        "Why: after reset the SPC700 runs only its IPL ROM, which accepts records and jumps to the destination of a record of length 0.",
+        "In: near call (RTS); dp$29-$2B = the list, Y = 0 at the start of the list; the routine sets 16-bit registers itself.",
+        "Out: waits for $BBAA in APUIO0/1, answers $CC; for every record (length word, destination word, bytes) sends the destination to APUIO2/3, 1 or 0 to APUIO1 (0 = start the program at the destination), the bytes in pairs with the counter in APUIO0; ends after the record of length 0 with APUIO2 = 0; X and P restored.",
+        "Clobbers: A, Y."
+      ],
+      "SpcEngineBlock": [
+        "The IPL stream with the SPC700 program that is sent first at start-up.",
+        "",
+        "When: UploadSpcDriver, once.",
+        "Sees: nothing directly; the music and sound effects run on it.",
+        "Why: the SPC700 needs its program from the CPU.",
+        "In: n/a (data): 2895 bytes: the length word $0B47 (2887 bytes), the destination word $0400, the 2887 data bytes and a closing record (length 0, start address). The program is not disassembled here.",
+        "Out: n/a.",
+        "Clobbers: n/a."
+      ],
+      "RunSineWaveMover": [
+        "Four-way actor script: waits until on screen, then moves with growing speed and a sine sway while spawning a trail.",
+        "",
+        "When: no reference in the extraction; it is not a meta entry script or a spawn target of any file (OQ-I042-5).",
+        "Sees: not located at run time.",
+        "Why: CopA5_JumpByFlipState picks the variant from the sprite's flip bits ($1C bits 14-15, cleared by the command): none, flip X, flip Y, both.",
+        "In: actor entry, X = actor slot.",
+        "Out: a jump to SineWaveMoverNoFlip, SineWaveMoverFlipX, SineWaveMoverFlipY or SineWaveMoverFlipXY.",
+        "Clobbers: A, Y."
+      ],
+      "SineWaveMoverNoFlip": [
+        "Start of the no-flip variant: wait until on screen, then $78 frames.",
+        "",
+        "When: RunSineWaveMover (no flip), and again at the end of every cycle (SineWaveMoverNoFlipNext).",
+        "Sees: n/a (see RunSineWaveMover).",
+        "Why: the object only moves once it can be seen.",
+        "In: actor entry, X = actor slot.",
+        "Out: COP AD (operand $10), then COP 1B to SineWaveMoverNoFlipStep after $78 frames.",
+        "Clobbers: A, Y."
+      ],
+      "SineWaveMoverNoFlipStep": [
+        "One cycle of the no-flip variant: seven frames of motion, y plus.",
+        "",
+        "When: $78 frames after SineWaveMoverNoFlip.",
+        "Sees: n/a (see RunSineWaveMover).",
+        "Why: each pass spawns a trail actor and moves the object; $30,X grows by $10 per pass.",
+        "In: actor entry, X = actor slot (Y holds the actor's field base, as the COP dispatch leaves it).",
+        "Out: $30,X = 0, BRK #$5D (a sound request), COP 03 for 7 passes: each pass spawns RunSineWaveMoverTrail (COP B0, flags $0200), y = y + $30,X, StepSineSwayX, then COP 1B to SineWaveMoverNoFlipNext after 1 frame.",
+        "Clobbers: A."
+      ],
+      "SineWaveMoverNoFlipNext": [
+        "Loop end of the no-flip variant.",
+        "",
+        "When: after every pass of SineWaveMoverNoFlipStep.",
+        "Sees: n/a.",
+        "Why: COP 04 repeats the pass until seven have run; then the cycle restarts.",
+        "In: actor entry, X = actor slot.",
+        "Out: COP 04 (loop next), then BRA SineWaveMoverNoFlip after the seventh pass.",
+        "Clobbers: A, Y."
+      ],
+      "SineWaveMoverFlipX": [
+        "Start of the flip-X variant: wait until on screen, then $78 frames.",
+        "",
+        "When: RunSineWaveMover (flip X only), and again at the end of every cycle.",
+        "Sees: n/a (see RunSineWaveMover).",
+        "Why: as SineWaveMoverNoFlip.",
+        "In: actor entry, X = actor slot.",
+        "Out: COP AD (operand $10), then COP 1B to SineWaveMoverFlipXStep after $78 frames.",
+        "Clobbers: A, Y."
+      ],
+      "SineWaveMoverFlipXStep": [
+        "One cycle of the flip-X variant: seven frames of motion, y minus.",
+        "",
+        "When: $78 frames after SineWaveMoverFlipX.",
+        "Sees: n/a (see RunSineWaveMover).",
+        "Why: as SineWaveMoverNoFlipStep, moving the other way.",
+        "In: actor entry, X = actor slot (Y holds the actor's field base, as the COP dispatch leaves it).",
+        "Out: $30,X = 0, BRK #$5D, COP 03 for 7 passes: trail spawn, y = y - $30,X, StepSineSwayX, COP 1B to SineWaveMoverFlipXNext after 1 frame.",
+        "Clobbers: A."
+      ],
+      "SineWaveMoverFlipXNext": [
+        "Loop end of the flip-X variant.",
+        "",
+        "When: after every pass of SineWaveMoverFlipXStep.",
+        "Sees: n/a.",
+        "Why: as SineWaveMoverNoFlipNext.",
+        "In: actor entry, X = actor slot.",
+        "Out: COP 04, then BRA SineWaveMoverFlipX after the seventh pass.",
+        "Clobbers: A, Y."
+      ],
+      "SineWaveMoverFlipY": [
+        "Start of the flip-Y variant: wait until on screen, then $78 frames.",
+        "",
+        "When: RunSineWaveMover (flip Y only), and again at the end of every cycle.",
+        "Sees: n/a (see RunSineWaveMover).",
+        "Why: as SineWaveMoverNoFlip.",
+        "In: actor entry, X = actor slot.",
+        "Out: COP AD (operand $10), then COP 1B to SineWaveMoverFlipYStep after $78 frames.",
+        "Clobbers: A, Y."
+      ],
+      "SineWaveMoverFlipYStep": [
+        "One cycle of the flip-Y variant: seven frames of motion, y plus, mirrored sway.",
+        "",
+        "When: $78 frames after SineWaveMoverFlipY.",
+        "Sees: n/a (see RunSineWaveMover).",
+        "Why: as SineWaveMoverNoFlipStep with the sway mirrored.",
+        "In: actor entry, X = actor slot (Y holds the actor's field base, as the COP dispatch leaves it).",
+        "Out: $30,X = 0, BRK #$5D, COP 03 for 7 passes: trail spawn, y = y + $30,X, StepSineSwayXMirrored, COP 1B to SineWaveMoverFlipYNext after 1 frame.",
+        "Clobbers: A."
+      ],
+      "SineWaveMoverFlipYNext": [
+        "Loop end of the flip-Y variant.",
+        "",
+        "When: after every pass of SineWaveMoverFlipYStep.",
+        "Sees: n/a.",
+        "Why: as SineWaveMoverNoFlipNext.",
+        "In: actor entry, X = actor slot.",
+        "Out: COP 04, then BRA SineWaveMoverFlipY after the seventh pass.",
+        "Clobbers: A, Y."
+      ],
+      "SineWaveMoverFlipXY": [
+        "Start of the flip-X-and-Y variant: wait until on screen, then $78 frames.",
+        "",
+        "When: RunSineWaveMover (both flip bits), and again at the end of every cycle.",
+        "Sees: n/a (see RunSineWaveMover).",
+        "Why: as SineWaveMoverNoFlip.",
+        "In: actor entry, X = actor slot.",
+        "Out: COP AD (operand $10), then COP 1B to SineWaveMoverFlipXYStep after $78 frames.",
+        "Clobbers: A, Y."
+      ],
+      "SineWaveMoverFlipXYStep": [
+        "One cycle of the flip-X-and-Y variant: seven frames of motion, y minus, mirrored sway.",
+        "",
+        "When: $78 frames after SineWaveMoverFlipXY.",
+        "Sees: n/a (see RunSineWaveMover).",
+        "Why: as SineWaveMoverFlipXStep with the sway mirrored.",
+        "In: actor entry, X = actor slot (Y holds the actor's field base, as the COP dispatch leaves it).",
+        "Out: $30,X = 0, BRK #$5D, COP 03 for 7 passes: trail spawn, y = y - $30,X, StepSineSwayXMirrored, COP 1B to SineWaveMoverFlipXYNext after 1 frame.",
+        "Clobbers: A."
+      ],
+      "SineWaveMoverFlipXYNext": [
+        "Loop end of the flip-X-and-Y variant.",
+        "",
+        "When: after every pass of SineWaveMoverFlipXYStep.",
+        "Sees: n/a.",
+        "Why: as SineWaveMoverNoFlipNext.",
+        "In: actor entry, X = actor slot.",
+        "Out: COP 04, then BRA SineWaveMoverFlipXY after the seventh pass.",
+        "Clobbers: A, Y."
+      ],
+      "RunSineWaveMoverTrail": [
+        "Trail actor of the sine wave mover: plays animation $29 once and removes itself.",
+        "",
+        "When: spawned by every pass of the Step labels with COP B0 (flags $0200).",
+        "Sees: a short effect at the mover's position.",
+        "Why: leaves an effect behind the moving object.",
+        "In: actor entry, X = actor slot.",
+        "Out: COP 80 (animation $29), COP 82 (wait until it ends), COP 86 (kill self), RTL.",
+        "Clobbers: A, Y."
+      ],
+      "StepSineSwayX": [
+        "Moves the actor's x by a sine sample and advances the sway counter.",
+        "",
+        "When: the Step labels of the no-flip and flip-X variants, once per pass.",
+        "Sees: the object sways sideways while it moves along y.",
+        "Why: the sample is half of a byte of data_engine_tables.SineTable at ($30,X + $10), minus 12, so the sway is centred.",
+        "In: near call (RTS); X = actor slot, Y = the actor's field base, $30,X = the counter.",
+        "Out: x ($0000,Y) += SineTable[$30,X + $10] / 2 - 12; $30,X += $10; Y preserved.",
+        "Clobbers: A."
+      ],
+      "StepSineSwayXMirrored": [
+        "As StepSineSwayX with the sway mirrored.",
+        "",
+        "When: the Step labels of the flip-Y and flip-X-and-Y variants, once per pass.",
+        "Sees: the object sways the other way.",
+        "Why: the mirrored variants of the mover.",
+        "In: near call (RTS); X = actor slot, Y = the actor's field base, $30,X = the counter.",
+        "Out: x ($0000,Y) += 12 - SineTable[$30,X + $10] / 2; $30,X += $10; Y preserved.",
+        "Clobbers: A."
+      ]
+    }
+  },
+
+  "system/unreferenced_stubs_bank1f.asm": {
+    "blockNote": [
+      "Two kill-self stubs in bank 1F (file offsets 1040320-1040322 and 1042281-1042283, SNES $1F:DFC0 and $1F:E769).",
+      "",
+      "=== MODEL ===",
+      "Each stub is COP 86 (Cop86_KillSelf) and RTL: an actor script that ends the actor at once. No reference to either label exists in the extraction, so no 2-byte reference pins them; they stay in bank 1F because they started there and nothing moves across banks. 'Unreferenced' is a static statement (OQ-I020-4)."
+    ],
+    "partNotes": {
+      "KillSelfStubA": [
+        "Actor script that kills its actor at once (first stub of bank 1F).",
+        "",
+        "When: no reference in the extraction (OQ-I020-4).",
+        "Sees: n/a.",
+        "Why: a placeholder script (inferred).",
+        "In: actor entry, X = actor slot.",
+        "Out: COP 86 (Cop86_KillSelf), RTL.",
+        "Clobbers: A, Y."
+      ],
+      "KillSelfStubB": [
+        "Actor script that kills its actor at once (second stub of bank 1F).",
+        "",
+        "When: no reference in the extraction (OQ-I020-4).",
+        "Sees: n/a.",
+        "Why: a placeholder script (inferred).",
+        "In: actor entry, X = actor slot.",
+        "Out: COP 86 (Cop86_KillSelf), RTL.",
+        "Clobbers: A, Y."
+      ]
+    }
+  }
+}

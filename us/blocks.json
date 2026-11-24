@@ -18,9 +18,19 @@
                 "HandleVBlank": { "start": 834, "end": 1445, "type": "Code" }
             }
         },
-        "engine_scheduler_sprites_combat_collision": {
+        "engine_actor_scheduler_and_sprites": {
             "parts": {
-                "HandleIrq": { "start": 1445, "end": 4783, "type": "Code" }
+                "HandleIrq": { "start": 1445, "end": 2612, "type": "Code" }
+            }
+        },
+        "engine_combat_hits": {
+            "parts": {
+                "DetectHitSourceCollisions": { "start": 2612, "end": 3880, "type": "Code" }
+            }
+        },
+        "engine_tile_collision": {
+            "parts": {
+                "MoveActorWithTileCollision": { "start": 3880, "end": 4783, "type": "Code" }
             }
         },
         "engine_spawn_lairs_death_drops": {
@@ -62,7 +72,7 @@
                 "WatchForLevelUp": { "start": 12118, "end": 12293, "type": "Code" }
             }
         },
-        "engine_003005": {
+        "engine_player_death_and_actor_helpers": {
             "parts": {
                 "CheckPlayerDeath": { "start": 12293, "end": 12383, "type": "Code" },
                 "HoldActorUntilReleased": { "start": 12383, "end": 12717, "type": "Code" }
@@ -219,14 +229,14 @@
         },
         "unreferenced_stubs_bank1f": {
             "parts": {
-                "code_0FDFC0": { "start": 1040320, "end": 1040323, "type": "Code" },
-                "code_0FE769": { "start": 1042281, "end": 1042284, "type": "Code" }
+                "KillSelfStubA": { "start": 1040320, "end": 1040323, "type": "Code" },
+                "KillSelfStubB": { "start": 1042281, "end": 1042284, "type": "Code" }
             }
         },
         "engine_spc_ipl_upload": {
             "parts": {
-                "code_0FEEA6": { "start": 1044134, "end": 1044814, "type": "Code" },
-                "spc_0FF14E": { "start": 1044814, "end": 1047709, "type": "Binary(10)" }
+                "RunSineWaveMover": { "start": 1044134, "end": 1044814, "type": "Code" },
+                "SpcEngineBlock": { "start": 1044814, "end": 1047709, "type": "Binary(10)" }
             }
         }
     },
@@ -402,7 +412,7 @@
                 "gv_obj_bg2_scroll_drift_01B1F7": { "start": 111095, "end": 111130, "type": "Code" }
             }
         },
-        "gv_enemy_0FAA49": {
+        "gv_enemy_green_humanoid": {
             "parts": {
                 "gv_enemy_green_humanoid_0FAA49": { "start": 1026633, "end": 1026703, "type": "Code" }
             }
@@ -508,7 +518,7 @@
                 "gw_ripple_offsets_01EB82": { "start": 125826, "end": 125890, "type": "Word" }
             }
         },
-        "w1_actor_01E4BB": {
+        "gw_actor_fixed_gem_pickup": {
             "parts": {
                 "gw_actor_fixed_gem_pickup_01E4BB": { "start": 124091, "end": 124099, "type": "Code" }
             }
@@ -639,12 +649,12 @@
                 "se_effect_bg2_scroll_follow_0FA7A1": { "start": 1025953, "end": 1025988, "type": "Code" }
             }
         },
-        "w2_actor_0FA6F5": {
+        "w2_effect_player_overlay": {
             "parts": {
                 "w2_effect_player_overlay_0FA6F5": { "start": 1025781, "end": 1025953, "type": "Code" }
             }
         },
-        "w2_shared_0FA945": {
+        "w2_obj_fairy_idle_loop": {
             "parts": {
                 "w2_obj_fairy_idle_loop_0FA945": { "start": 1026373, "end": 1026633, "type": "Code" }
             }
@@ -659,7 +669,7 @@
                 "se_enemy_yellow_seahorse_0FBE81": { "start": 1031809, "end": 1031973, "type": "Code" }
             }
         },
-        "se_enemy_0FBB78": {
+        "se_unused_enemy_drifting": {
             "parts": {
                 "se_unused_enemy_drifting_0FBB78": { "start": 1031032, "end": 1031075, "type": "Code" }
             }
@@ -769,13 +779,13 @@
                 "ms_enemy_green_blob_0FD1E5": { "start": 1036773, "end": 1036917, "type": "Code" }
             }
         },
-        "ms_enemy_0FCFD6": {
+        "ms_enemy_ice_maker": {
             "scene": "mountain_of_souls_dungeon",
             "parts": {
                 "ms_enemy_ice_maker_0FCFD6": { "start": 1036246, "end": 1036376, "type": "Code" }
             }
         },
-        "ms_enemy_0FD058": {
+        "ms_enemy_ice_crystal": {
             "scene": "snow_mountain",
             "parts": {
                 "ms_enemy_ice_crystal_0FD058": { "start": 1036376, "end": 1036571, "type": "Code" }
@@ -987,7 +997,7 @@
                 "we_data_ending_tm_curtain_hdma_0055F5": { "start": 22005, "end": 22012, "type": "Binary" }
             }
         },
-        "w6_actor_01EC4B": {
+        "we_obj_master_shrine_event": {
             "scene": "up_above",
             "parts": {
                 "we_obj_master_shrine_event_01EC4B": { "start": 126027, "end": 126573, "type": "Code" },
@@ -1005,7 +1015,7 @@
                 "we_data_bg2_vofs_wobble_table_01F0CF": { "start": 127183, "end": 127311, "type": "Word" }
             }
         },
-        "w6_actor_01F14F": {
+        "we_fx_battle_bg2_hofs_bands": {
             "scene": "deathtolls_shrine",
             "parts": {
                 "we_fx_battle_bg2_hofs_bands_01F14F": { "start": 127311, "end": 127482, "type": "Code" }
@@ -1152,15 +1162,10 @@
         }
     },
     "library": {
-        "lib_010000": {
+        "lib_map_scroll_and_redraw": {
             "order": -1,
             "parts": {
-                "AimCameraAtPlayer": { "start": 65536, "end": 65641, "type": "Code" }
-            }
-        },
-        "lib_map_streaming": {
-            "order": -1,
-            "parts": {
+                "AimCameraAtPlayer": { "start": 65536, "end": 65641, "type": "Code" },
                 "ScrollCameraByDelta": { "start": 65641, "end": 65803, "type": "Code" },
                 "BuildScrollStrips": { "start": 65803, "end": 66062, "type": "Code" },
                 "RedrawBackgroundsAtEntry": { "start": 66062, "end": 66351, "type": "Code" },
@@ -1169,7 +1174,9 @@
                 "CopyMetatileColumn": { "start": 66585, "end": 66662, "type": "Code" },
                 "CopyMetatileRow": { "start": 66662, "end": 66735, "type": "Code" },
                 "ScaleByRatio": { "start": 66735, "end": 66941, "type": "Code" },
-                "UploadScrollStrips": { "start": 66941, "end": 67163, "type": "Code" }
+                "UploadScrollStrips": { "start": 66941, "end": 67163, "type": "Code" },
+                "StepSweepRedraw": { "start": 69354, "end": 69930, "type": "Code" },
+                "SweepStepTable": { "start": 93741, "end": 94861, "type": "Binary(20)" }
             }
         },
         "lib_animation": {
@@ -1180,16 +1187,18 @@
                 "CopyFrameData": { "start": 67277, "end": 67313, "type": "Code" }
             }
         },
-        "lib_0109D6_part1": {
+        "lib_map_tile_patches": {
             "order": -1,
             "parts": {
-                "SetMetatileBg1": { "start": 67313, "end": 67771, "type": "Code" }
-            }
-        },
-        "lib_0108BB": {
-            "order": -1,
-            "parts": {
+                "SetMetatileBg1": { "start": 67313, "end": 67771, "type": "Code" },
                 "ApplyMapPatchRect": { "start": 67771, "end": 68054, "type": "Code" },
+                "CopyMapRectFromSlab": { "start": 69930, "end": 70389, "type": "Code" },
+                "ApplyReleasedLairRects": { "start": 70389, "end": 70549, "type": "Code" },
+                "SetHeldLairTileType": { "start": 70549, "end": 70864, "type": "Code" },
+                "InitExitListOffset": { "start": 70864, "end": 70884, "type": "Code" },
+                "ShowOpenedChests": { "start": 70884, "end": 71038, "type": "Code" },
+                "ApplyLairStatesToScene": { "start": 71038, "end": 71317, "type": "Code" },
+                "FlagMapPatchTable": { "start": 94861, "end": 95492, "type": "unk13" },
                 "MapPatchRectsAndMapSizes": { "start": 95492, "end": 95788, "type": "unk14" }
             }
         },
@@ -1205,36 +1214,12 @@
                 "LocationAreaScene": { "start": 95788, "end": 96048, "type": "Word" }
             }
         },
-        "lib_map_sweep_redraw": {
+        "lib_hdma_window_effects": {
             "order": -1,
             "parts": {
-                "StepSweepRedraw": { "start": 69354, "end": 69930, "type": "Code" },
-                "SweepStepTable": { "start": 93741, "end": 94861, "type": "Binary(20)" }
-            }
-        },
-        "lib_scene_map_patches": {
-            "order": -1,
-            "parts": {
-                "CopyMapRectFromSlab": { "start": 69930, "end": 70389, "type": "Code" },
-                "code_0112F5": { "start": 70389, "end": 70549, "type": "Code" },
-                "code_011395": { "start": 70549, "end": 70864, "type": "Code" },
-                "code_0114D0": { "start": 70864, "end": 70884, "type": "Code" },
-                "code_0114E4": { "start": 70884, "end": 71038, "type": "Code" },
-                "ApplyLairStatesToScene": { "start": 71038, "end": 71317, "type": "Code" },
-                "FlagMapPatchTable": { "start": 94861, "end": 95492, "type": "unk13" }
-            }
-        },
-        "lib_011695": {
-            "order": -1,
-            "parts": {
-                "code_011695": { "start": 71317, "end": 71341, "type": "Code" },
-                "binary_0116AD": { "start": 71341, "end": 71363, "type": "Binary" }
-            }
-        },
-        "lib_0116C3": {
-            "order": -1,
-            "parts": {
-                "code_0116C3": { "start": 71363, "end": 71774, "type": "Code" }
+                "QueueBg3ScrollHdma": { "start": 71317, "end": 71341, "type": "Code" },
+                "Bg3ScrollHdmaTable": { "start": 71341, "end": 71363, "type": "Binary" },
+                "RunSoulOfLightEffect": { "start": 71363, "end": 71774, "type": "Code" }
             }
         },
         "lib_system_helpers": {
@@ -1243,26 +1228,26 @@
                 "ResetHdmaQueue": { "start": 71774, "end": 71790, "type": "Code" },
                 "QueueHdmaIndirect": { "start": 71790, "end": 71868, "type": "Code" },
                 "HdmaDmapByRegister": { "start": 71868, "end": 71932, "type": "Binary" },
+                "EnableDisplayAndNmi": { "start": 78198, "end": 78220, "type": "Code" },
                 "ForceBlankNmiOff": { "start": 78220, "end": 78242, "type": "Code" },
                 "EnableNmi": { "start": 78242, "end": 78263, "type": "Code" },
-                "WaitVBlank": { "start": 78263, "end": 78281, "type": "Code" }
+                "WaitVBlank": { "start": 78263, "end": 78281, "type": "Code" },
+                "ApplyBootPpuLayout": { "start": 80602, "end": 80679, "type": "Code" }
             }
         },
         "lib_menus": {
             "order": -1,
             "parts": {
-                "DispatchFieldButtons": { "start": 71932, "end": 73977, "type": "Code" },
+                "DispatchFieldButtons": { "start": 71932, "end": 72152, "type": "Code" },
+                "OpenEquipmentMenu": { "start": 72599, "end": 73977, "type": "Code" },
                 "ClearBg3Page": { "start": 74576, "end": 74640, "type": "Code" },
                 "SaveCgramBuffer": { "start": 74730, "end": 74774, "type": "Code" },
-                "EnableDisplayAndNmi": { "start": 78198, "end": 78220, "type": "Code" },
                 "StatusScreenText": { "start": 83313, "end": 83531, "type": "ASCIIString" },
                 "SoulOfLightText": { "start": 83531, "end": 83552, "type": "ASCIIString" },
                 "SoulOfShieldText": { "start": 83552, "end": 83573, "type": "ASCIIString" },
                 "SoulOfDetectionText": { "start": 83573, "end": 83594, "type": "ASCIIString" },
                 "SoulOfRealityText": { "start": 83594, "end": 83615, "type": "ASCIIString" },
                 "EquipMenuFrameText": { "start": 83615, "end": 83724, "type": "ASCIIString" },
-                "HudRepeatCounts": { "start": 83724, "end": 83726, "type": "&Binary" },
-                "HudFrameText": { "start": 83726, "end": 83849, "type": "ASCIIString" },
                 "ItemNameList": { "start": 85876, "end": 86758, "type": "&ASCIIString" },
                 "WeaponDescHeaderText": { "start": 87358, "end": 87410, "type": "ASCIIString" },
                 "DescriptionTextList": { "start": 87410, "end": 90412, "type": "&ASCIIString" },
@@ -1271,72 +1256,50 @@
                 "WeaponMinLevelBcd": { "start": 90574, "end": 90590, "type": "Word" }
             }
         },
-        "lib_0109D6_part3": {
+        "lib_field_talk": {
+            "order": -1,
+            "parts": {
+                "RunTalkInteraction": { "start": 72152, "end": 72599, "type": "Code" }
+            }
+        },
+        "lib_inventory_store": {
             "order": -1,
             "parts": {
                 "StoreInventoryEntry": { "start": 73977, "end": 74040, "type": "Code" }
             }
         },
-        "lib_0118FC_part2": {
+        "lib_choice_menus": {
             "order": -1,
             "parts": {
                 "ChooseMenuRow": { "start": 74040, "end": 74359, "type": "Code" },
-                "TitleMenuCursorOffsets": { "start": 74359, "end": 74369, "type": "Word" }
-            }
-        },
-        "lib_012281": {
-            "order": -1,
-            "parts": {
-                "RunChoiceMenu": { "start": 74369, "end": 74507, "type": "Code" }
-            }
-        },
-        "lib_shared_01230B": {
-            "order": -1,
-            "parts": {
+                "TitleMenuCursorOffsets": { "start": 74359, "end": 74369, "type": "Word" },
+                "RunChoiceMenu": { "start": 74369, "end": 74507, "type": "Code" },
                 "BlinkChoiceCursor": { "start": 74507, "end": 74539, "type": "Code" }
             }
         },
-        "lib_01232B": {
+        "lib_menu_screen_setup": {
             "order": -1,
             "parts": {
-                "code_01232B": { "start": 74539, "end": 74576, "type": "Code" }
-            }
-        },
-        "lib_shared_012390": {
-            "order": -1,
-            "parts": {
-                "code_012390": { "start": 74640, "end": 74730, "type": "Code" }
-            }
-        },
-        "lib_shared_012416": {
-            "order": -1,
-            "parts": {
-                "LoadMenuBg2Graphics": { "start": 74774, "end": 74832, "type": "Code" }
-            }
-        },
-        "lib_0118FC_part5": {
-            "order": -1,
-            "parts": {
+                "SetupMenuBg2Screen": { "start": 74539, "end": 74576, "type": "Code" },
+                "ExpandMenuTileGroups": { "start": 74640, "end": 74730, "type": "Code" },
+                "LoadMenuBg2Graphics": { "start": 74774, "end": 74832, "type": "Code" },
                 "LoadItemPagePalette": { "start": 74832, "end": 74990, "type": "Code" }
             }
         },
-        "lib_name_entry": {
+        "lib_name_entry_and_staff_roll": {
             "order": -1,
             "parts": {
                 "RunNameEntryScreen": { "start": 74990, "end": 75353, "type": "Code" },
+                "ScrollStaffRollText": { "start": 75471, "end": 75625, "type": "Code" },
                 "NameEntryFrameText": { "start": 83037, "end": 83222, "type": "ASCIIString" }
             }
         },
-        "lib_0118FC_part6": {
+        "lib_hud": {
             "order": -1,
             "parts": {
-                "UpdateHud": { "start": 75353, "end": 75471, "type": "Code" }
-            }
-        },
-        "lib_0126CF": {
-            "order": -1,
-            "parts": {
-                "ScrollStaffRollText": { "start": 75471, "end": 75625, "type": "Code" }
+                "UpdateHud": { "start": 75353, "end": 75471, "type": "Code" },
+                "HudRepeatCounts": { "start": 83724, "end": 83726, "type": "&Binary" },
+                "HudFrameText": { "start": 83726, "end": 83849, "type": "ASCIIString" }
             }
         },
         "lib_text_render": {
@@ -1358,16 +1321,10 @@
             "parts": {
                 "Multiply8x8": { "start": 78289, "end": 78312, "type": "Code" },
                 "DivideWordByByte": { "start": 78312, "end": 78334, "type": "Code" },
-                "code_0131FE": { "start": 78334, "end": 78350, "type": "Code" },
-                "code_01320E": { "start": 78350, "end": 78357, "type": "Code" },
+                "SignExtendByte": { "start": 78334, "end": 78350, "type": "Code" },
+                "ArithmeticShiftRight": { "start": 78350, "end": 78357, "type": "Code" },
                 "ByteToPackedBcd": { "start": 78357, "end": 78406, "type": "Code" },
-                "code_013246": { "start": 78406, "end": 78450, "type": "Code" }
-            }
-        },
-        "lib_013ADA": {
-            "order": -1,
-            "parts": {
-                "ApplyBootPpuLayout": { "start": 80602, "end": 80679, "type": "Code" }
+                "StepRandomState": { "start": 78406, "end": 78450, "type": "Code" }
             }
         },
         "lib_banner_texts": {
@@ -1394,23 +1351,23 @@
                 "ComputeSlotChecksum": { "start": 160110, "end": 160159, "type": "Code" }
             }
         },
-        "lib_02719F": {
+        "lib_boot_and_scene_init": {
             "parts": {
-                "LoadBootGraphicsBuffers": { "start": 160159, "end": 160291, "type": "Code" }
+                "LoadBootGraphicsBuffers": { "start": 160159, "end": 160291, "type": "Code" },
+                "ResetSortBuckets": { "start": 160352, "end": 160375, "type": "Code" },
+                "ClearBg3Buffer": { "start": 161518, "end": 162066, "type": "Code" },
+                "InitFixedState": { "start": 162066, "end": 162229, "type": "Code" },
+                "InitSceneState": { "start": 162229, "end": 162515, "type": "Code" }
             }
         },
-        "lib_027223": {
+        "lib_main_loop_helpers": {
             "parts": {
                 "QueueAnimatedTileStrip": { "start": 160291, "end": 160344, "type": "Code" },
-                "AnimatedStripVramDests": { "start": 160344, "end": 160352, "type": "Word" }
+                "AnimatedStripVramDests": { "start": 160344, "end": 160352, "type": "Word" },
+                "HandlePauseBanner": { "start": 161138, "end": 161261, "type": "Code" }
             }
         },
-        "lib_shared_027260": {
-            "parts": {
-                "ResetSortBuckets": { "start": 160352, "end": 160375, "type": "Code" }
-            }
-        },
-        "lib_027277": {
+        "lib_unused_sine_wave_tables": {
             "parts": {
                 "FillSineWaveTables": { "start": 160375, "end": 160440, "type": "Code" }
             }
@@ -1430,39 +1387,15 @@
                 "TestBitInArray": { "start": 160674, "end": 160724, "type": "Code" }
             }
         },
-        "lib_player_facing": {
+        "lib_player_helpers": {
             "parts": {
                 "GetPlayerFacing": { "start": 160724, "end": 160747, "type": "Code" },
-                "FlipActorX": { "start": 160747, "end": 160761, "type": "Code" }
-            }
-        },
-        "lib_027781_part1": {
-            "parts": {
-                "ApplyPlayerWeaponPose": { "start": 160761, "end": 160866, "type": "Code" }
-            }
-        },
-        "lib_027572": {
-            "parts": {
-                "HandlePauseBanner": { "start": 161138, "end": 161261, "type": "Code" }
-            }
-        },
-        "lib_player_stats": {
-            "parts": {
+                "FlipActorX": { "start": 160747, "end": 160761, "type": "Code" },
+                "ApplyPlayerWeaponPose": { "start": 160761, "end": 160866, "type": "Code" },
                 "DrainPendingHeal": { "start": 161261, "end": 161300, "type": "Code" },
                 "DrainPendingExp": { "start": 161300, "end": 161445, "type": "Code" },
                 "AddGems": { "start": 161445, "end": 161481, "type": "Code" },
                 "SubtractGems": { "start": 161481, "end": 161518, "type": "Code" }
-            }
-        },
-        "lib_scene_change_init": {
-            "parts": {
-                "ClearBg3Buffer": { "start": 161518, "end": 162066, "type": "Code" },
-                "InitSceneState": { "start": 162229, "end": 162515, "type": "Code" }
-            }
-        },
-        "lib_027912": {
-            "parts": {
-                "InitFixedState": { "start": 162066, "end": 162229, "type": "Code" }
             }
         }
     },

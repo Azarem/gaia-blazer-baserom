@@ -1,0 +1,15 @@
+[
+    {"op":"merge","blocks":["lib_010000","lib_map_streaming","lib_map_sweep_redraw"],"into":"lib_map_scroll_and_redraw","notes":"join","row":"I042-A1"},
+    {"op":"merge","blocks":["lib_0109D6_part1","lib_0108BB","lib_scene_map_patches"],"into":"lib_map_tile_patches","notes":"join","row":"I042-A2"},
+    {"op":"merge","blocks":["lib_011695","lib_0116C3"],"into":"lib_hdma_window_effects","notes":"join","row":"I042-A3"},
+    {"op":"merge","blocks":["lib_0118FC_part2","lib_012281","lib_shared_01230B"],"into":"lib_choice_menus","notes":"join","row":"I042-A4"},
+    {"op":"merge","blocks":["lib_01232B","lib_shared_012390","lib_shared_012416","lib_0118FC_part5"],"into":"lib_menu_screen_setup","notes":"join","row":"I042-A5"},
+    {"op":"merge","blocks":["lib_name_entry","lib_0126CF"],"into":"lib_name_entry_and_staff_roll","notes":"join","row":"I042-A6"},
+    {"op":"move-part","part":"EnableDisplayAndNmi","from":"lib_menus","to":"lib_system_helpers","row":"I042-A7"},
+    {"op":"move-part","parts":["HudRepeatCounts","HudFrameText"],"from":"lib_menus","to":"lib_0118FC_part6","row":"I042-A8"},
+    {"op":"rename","block":"lib_0118FC_part6","to":"lib_hud","row":"I042-A8"},
+    {"op":"rename","block":"lib_0109D6_part3","to":"lib_inventory_store","row":"I042-A9"},
+    {"op":"merge","blocks":["lib_system_helpers","lib_013ADA"],"into":"lib_system_helpers","notes":"join","row":"I042-A10"},
+    {"op":"split-part","part":"DispatchFieldButtons","at":72152,"name":"RunTalkInteraction","to":"lib_field_talk","create":{"group":"library","order":-1},"row":"I042-A11"},
+    {"op":"split-part","part":"RunTalkInteraction","at":72599,"name":"OpenEquipmentMenu","to":"lib_menus","row":"I042-A11"}
+]

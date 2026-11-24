@@ -1,0 +1,46 @@
+[
+  { "address": 71317, "old": "code_011695", "new": "QueueBg3ScrollHdma", "row": "I042-E01" },
+  { "address": 71341, "old": "binary_0116AD", "new": "Bg3ScrollHdmaTable", "row": "I042-E02" },
+  { "address": 71363, "old": "code_0116C3", "new": "RunSoulOfLightEffect", "row": "I042-E03" },
+  { "address": 71394, "old": "code_0116E2", "new": "RunSoulOfRealityEffect", "row": "I042-E04" },
+  { "address": 71431, "old": "code_011707", "new": "RunSoulOfDetectionEffect", "row": "I042-E05" },
+  { "address": 71470, "old": "code_01172E", "new": "RunSoulOfShieldEffect", "row": "I042-E06" },
+  { "address": 71517, "old": "loc_01175D", "new": "BuildSoulOrbCircleWindow", "row": "I042-E07" },
+
+  { "address": 70389, "old": "code_0112F5", "new": "ApplyReleasedLairRects", "row": "I042-E08" },
+  { "address": 70549, "old": "code_011395", "new": "MarkHeldLairTilesSolid", "row": "I042-E09" },
+  { "address": 70725, "old": "code_011445", "new": "InitPlateVariantAtEntry", "row": "I042-E10" },
+  { "address": 70864, "old": "code_0114D0", "new": "InitExitListOffset", "row": "I042-E11" },
+  { "address": 70884, "old": "code_0114E4", "new": "ShowOpenedChests", "row": "I042-E12" },
+
+  { "address": 78334, "old": "code_0131FE", "new": "SignExtendByte", "row": "I042-E13" },
+  { "address": 78350, "old": "code_01320E", "new": "ArithmeticShiftRight", "row": "I042-E14" },
+  { "address": 78406, "old": "code_013246", "new": "StepRandomState", "row": "I042-E15" },
+
+  { "address": 74539, "old": "code_01232B", "new": "SetupMenuBg2Screen", "row": "I042-E16" },
+  { "address": 74640, "old": "code_012390", "new": "ExpandMenuTileGroups", "row": "I042-E17" },
+
+  { "address": 1044134, "old": "code_0FEEA6", "new": "RunSineWaveMover", "row": "I042-E18" },
+  { "address": 1044144, "old": "code_0FEEB0", "new": "SineWaveMoverDown", "row": "I042-E19" },
+  { "address": 1044153, "old": "code_0FEEB9", "new": "SineWaveMoverDownStep", "row": "I042-E20" },
+  { "address": 1044187, "old": "code_0FEEDB", "new": "SineWaveMoverDownNext", "row": "I042-E21" },
+  { "address": 1044191, "old": "code_0FEEDF", "new": "SineWaveMoverUp", "row": "I042-E22" },
+  { "address": 1044200, "old": "code_0FEEE8", "new": "SineWaveMoverUpStep", "row": "I042-E23" },
+  { "address": 1044234, "old": "code_0FEF0A", "new": "SineWaveMoverUpNext", "row": "I042-E24" },
+  { "address": 1044238, "old": "code_0FEF0E", "new": "SineWaveMoverDownMirrored", "row": "I042-E25" },
+  { "address": 1044247, "old": "code_0FEF17", "new": "SineWaveMoverDownMirroredStep", "row": "I042-E26" },
+  { "address": 1044281, "old": "code_0FEF39", "new": "SineWaveMoverDownMirroredNext", "row": "I042-E27" },
+  { "address": 1044285, "old": "code_0FEF3D", "new": "SineWaveMoverUpMirrored", "row": "I042-E28" },
+  { "address": 1044294, "old": "code_0FEF46", "new": "SineWaveMoverUpMirroredStep", "row": "I042-E29" },
+  { "address": 1044328, "old": "code_0FEF68", "new": "SineWaveMoverUpMirroredNext", "row": "I042-E30" },
+  { "address": 1044332, "old": "code_0FEF6C", "new": "RunSineWaveMoverTrail", "row": "I042-E31" },
+  { "address": 1044340, "old": "code_0FEF74", "new": "StepSineSwayX", "row": "I042-E32" },
+  { "address": 1044374, "old": "code_0FEF96", "new": "StepSineSwayXMirrored", "row": "I042-E33" },
+  { "address": 1044412, "old": "code_0FEFBC", "new": "UploadSpcDriver", "row": "I042-E34" },
+  { "address": 1044469, "old": "code_0FEFF5", "new": "UploadSpcStream", "row": "I042-E35" },
+  { "address": 1044710, "old": "code_0FF0E6", "new": "SendSpcIplBlocks", "row": "I042-E36" },
+  { "address": 1044814, "old": "spc_0FF14E", "new": "SpcEngineBlock", "row": "I042-E37" },
+
+  { "address": 1040320, "old": "code_0FDFC0", "new": "KillSelfStubA", "row": "I042-E38" },
+  { "address": 1042281, "old": "code_0FE769", "new": "KillSelfStubB", "row": "I042-E39" }
+]

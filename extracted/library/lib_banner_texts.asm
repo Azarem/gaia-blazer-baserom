@@ -2,7 +2,7 @@
 ; 
 ; === MODEL ===
 ; Level up: LevelUpText prints 'LEVEL UP !' (control code 03:24 = attribute) at BG3 offset $216 when the player gains a level (player_spells_level_up); LevelUpClearText overprints the same cells with ten blank glyphs.
-; Pause banner (lib_027572, once per frame from the main loop): when Start is pressed it pauses the music and, unless A is held, prints LocationBannerText: a 24x2 window at $186 and then the name of the current location, chosen by [TBL:&LocationNameList,1C6A]. The control code reads the WORD at $1C6A and uses it as the string number; $1C6B is never written, so the number is location_id (OQ-I011-11). When no_combat_scene is 0 it also prints LairCounterText: a 12x4 window at $51E with 'Monster Lair / Remaining' and two BCD digits of lairs_left converted to lair_count_bcd ($1B80). PauseCloseText erases both windows when the player resumes. The walkthrough confirms the lair count: 'the number of Monster Lairs in the area can be found by pressing the Start Button' (01-in-the-beginning.md).
+; Pause banner (lib_main_loop_helpers, once per frame from the main loop): when Start is pressed it pauses the music and, unless A is held, prints LocationBannerText: a 24x2 window at $186 and then the name of the current location, chosen by [TBL:&LocationNameList,1C6A]. The control code reads the WORD at $1C6A and uses it as the string number; $1C6B is never written, so the number is location_id (OQ-I011-11). When no_combat_scene is 0 it also prints LairCounterText: a 12x4 window at $51E with 'Monster Lair / Remaining' and two BCD digits of lairs_left converted to lair_count_bcd ($1B80). PauseCloseText erases both windows when the player resumes. The walkthrough confirms the lair count: 'the number of Monster Lairs in the area can be found by pressing the Start Button' (01-in-the-beginning.md).
 ; 
 ; === LOCATION NAMES ===
 ; LocationNameList holds 128 words (the address of the name of each location id) followed by the 128 name strings, in id order. Ids without a scene profile have a name that is a single terminator byte (25-27, 35-3B, 48-4F, 5D-63, 74-77, 7E, 7F). The ids 0F-13 have a profile but an empty name (no banner). Names are centred with a [14:n] blank run and printed with the intro font, in which the apostrophe prints as a blank and the period as '-' (so the extract shows 'Leo s Paintings' and 'St- Elles Shrine').
@@ -40,7 +40,7 @@ LevelUpClearText |[09][CUR:216]██████████|
 
 ; Prints the pause banner with the name of the current location.
 ; 
-; When: lib_027572, when Start is pressed and A is not held.
+; When: lib_main_loop_helpers, when Start is pressed and A is not held.
 ; Sees: a two-row window at the top with the name of the place ('Grass Valley highlands', 'Leo s Laboratory').
 ; Why: the player can see where they are; the name is data, not code.
 ; In: PrintTextString with Y = this string; location_id = the string number ([TBL] reads the word at $1C6A).
@@ -51,7 +51,7 @@ LocationBannerText |[CUR:216][14:A][CUR:186][07:18,2][TBL:&LocationNameList,1C6A
 
 ; Prints the Monster Lair counter of the pause banner.
 ; 
-; When: lib_027572, when Start is pressed, A is not held and no_combat_scene is 0.
+; When: lib_main_loop_helpers, when Start is pressed, A is not held and no_combat_scene is 0.
 ; Sees: 'Monster Lair Remaining nn': how many lairs are left to release in this area.
 ; Why: the walkthrough tells the player to press Start for the count.
 ; In: PrintTextString with Y = this string; lair_count_bcd ($1B80) = the two BCD digits of lairs_left.
@@ -62,7 +62,7 @@ LairCounterText |[CUR:51E][07:C,4]Monster Lair[N][N]Remaining [06:2,1B80]|
 
 ; Erases the pause banner windows.
 ; 
-; When: lib_027572, when the player resumes.
+; When: lib_main_loop_helpers, when the player resumes.
 ; Sees: both windows vanish.
 ; Why: closes the banner and the counter in one print.
 ; In: PrintTextString with Y = this string.

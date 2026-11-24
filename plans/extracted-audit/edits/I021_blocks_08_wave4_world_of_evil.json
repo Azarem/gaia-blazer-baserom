@@ -1,0 +1,23 @@
+[
+  {
+    "op": "merge",
+    "blocks": ["we_boss_deathtoll_mage", "we_shrine_actor_004F4D", "we_boss_deathtoll_demon"],
+    "into": "we_deathtolls_shrine_actors",
+    "row": "W4-WE01",
+    "note": "scene deathtolls_shrine, bank 0: Deathtoll the mage (196 lines), the shrine actor 004F4D (54) and Deathtoll the demon (372, three parts, entry in rewrites.json at offset 21331 keyed by offset). 622 lines. Bank 0 because the parts started there; nothing moves across banks."
+  },
+  {
+    "op": "merge",
+    "blocks": ["w6_actor_01EE6D", "w6_actor_01EECA", "w6_actor_01EEF3", "w6_actor_01F063"],
+    "into": "we_evil_world_actors",
+    "row": "W4-WE02",
+    "note": "scene evil_world, bank 3 (408 lines)."
+  },
+  {
+    "op": "merge",
+    "blocks": ["we_enemy_0FEA1D", "we_enemy_0FEB95", "we_enemy_0FECD9", "we_enemy_0FED09", "we_enemy_0FED8F", "we_enemy_0FEEA5"],
+    "into": "we_evil_world_enemies",
+    "row": "W4-WE03",
+    "note": "scene evil_world, bank 1F: six enemy scripts (604 lines; we_enemy_0FEEA5 is one byte, the last block before engine_spc_ipl_upload in bank 1F). we_enemy_0FED09 uses the return-address helper code_002D67 (bank 0); we_enemy_0FED8F reads the sine table of data_00F9F7 (bank 1, pinned)."
+  }
+]

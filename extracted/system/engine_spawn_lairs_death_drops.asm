@@ -11,7 +11,7 @@
 ; 
 ; === NOTES ===
 ; - Names: the lair actor (SpawnLairActor) is the invisible object that runs the lair script and counts the monsters left in $2E and $2F; the monsters it spawns are made by the scripts that follow (batch A2).
-; - A Monster Lair in the walkthrough loses its shield when its monsters are dead and shows a green switch; the tile $FE written by the lair code is that switch (see lib_scene_map_patches).
+; - A Monster Lair in the walkthrough loses its shield when its monsters are dead and shows a green switch; the tile $FE written by the lair code is that switch (see lib_map_tile_patches).
 ; 
 ; === LAIR SCRIPTS (A2) ===
 ; A lair actor (SpawnLairActor) runs one of six scripts, chosen by the script word of its record (+$10 of LairRecords; the reference counts in OQ-I006-5). All six start with RequireLairTile (the script only runs while the map byte under the lair is $FD, an intact lair, OQ-I006-23), then repeat: COP 91 (entry), wait while the lair is off screen ($16 bit $8000, set by CullAndSortActors), wait while no free actor slot exists (COP 27 retries next frame), BRK #$53, SpawnLairMonster, DelayBetweenSpawns, and SyncLairCount (each frame it compares the monsters left, $2E, with the last value seen, $2F). When $2E reaches 0, SealLair writes tile $FE (the green switch), plays an effect and ends the lair actor.
@@ -35,15 +35,15 @@
 ; RunEnding (SNES $00:D354): shows EndingTextDefeated, then EndingTextStaySingular when souls_flags and $1F is exactly 1 (only the Magician soul, OQ-I006-10) or EndingTextStayPlural otherwise (the singular text jumps into the plural one with [JMP]), clears souls_flags, waits, shows EndingTextWorldFades while RunEndingEffect runs, sets an event flag (COP 09 operand $9F02), writes text_delay ($1B84) = 6 and $031E = 1 and warps with Cop10 to scene 7 of area 0 (OQ-I006-11). KillAllProjectiles is used by the menu code (lib_menus) when the equipped magic changed.
 ; 
 ; === PICKUPS (A2) ===
-; RunSmallGemPickup, RunMediumGemPickup and RunLargeGemPickup play animation 04, 05 or 06, then animation 09, 0A or 0B for a count of 4 (COP 81/83) and remove themselves, so an uncollected Gem disappears. ApplyGemPickup reads the current animation id ($1E): 06 and 0B give 10 Gems, 05 and 0A give 5, 04 and 09 give 1, any other id gives 10 (RunFixedGemPickup, a never-ending pickup with animation 07 spawned by w1_actor_01E4BB, OQ-I006-8). The Gems are added in BCD to gems_low and gems_high by lib_player_stats.AddGems and BRK #$4D is requested.
+; RunSmallGemPickup, RunMediumGemPickup and RunLargeGemPickup play animation 04, 05 or 06, then animation 09, 0A or 0B for a count of 4 (COP 81/83) and remove themselves, so an uncollected Gem disappears. ApplyGemPickup reads the current animation id ($1E): 06 and 0B give 10 Gems, 05 and 0A give 5, 04 and 09 give 1, any other id gives 10 (RunFixedGemPickup, a never-ending pickup with animation 07 spawned by gw_actor_fixed_gem_pickup, OQ-I006-8). The Gems are added in BCD to gems_low and gems_high by lib_player_helpers.AddGems and BRK #$4D is requested.
 ; 
 ; === MUSIC LOAD AND RESPAWN (A3) ===
 ; Music load. Cop31 (FadeAndLoadMusic) and Cop32 (StopAndLoadMusic) spawn an actor whose script is the chain below; $30 of that actor is the track number, an index into MusicPointerTable of data_engine_tables (21 long pointers, 3 bytes each). Every step ends with COP 27 or COP 1B, so the steps are one or more frames apart and the game keeps running between them. APUIO0 ($2140) is the CPU-to-SPC port; the command meanings come from docs/audio/spc-disassembly.md (DispatchCommand).
 ;   MusicLoadSendFade: writes $F1 (the SPC's HandleFadeIn handler in that document) and waits (MusicLoadWaitFadeAck) until APUIO0 reads $F1 back, answers with $01 and waits (MusicLoadWaitSilence) until the port reads 0.
 ;   MusicLoadSendStop (Cop32 starts here): writes $F0 (StopAllChannels) and waits (MusicLoadWaitStopped) until the port reads 0, then COP 1B waits 2 frames.
-;   MusicLoadUpload: writes $FF (the SPC's boot handshake handler), copies MusicPointerTable[$30] to dp$29-$2B and $0422/$0424, waits for vblank, switches NMI off (lib_system_helpers.DisableNmi), runs engine_spc_ipl_upload.code_0FEFF5 (the song data goes through the IPL transfer), waits for vblank and switches NMI on again (EnableNmi); COP 1B waits 2 frames.
-;   MusicLoadFinish: writes $01, clears boss_fight_active ($0458, incremented by the boss scripts when the fight starts and read by the switch-tile code in lib_tile_triggers_and_lair_return) and kills the actor (COP 86). The meaning of the $F1 / $01 / 0 sequence is inferred from the wait loops (OQ-I025-2); the track numbers used are listed in cop_script_flow_flags (OQ-I025-3).
-; Respawn. RespawnOrKillActor is the tail of FinishEnemyDeath for enemies without a lair: with $1A bit $1000 clear the actor is killed (COP 86); with it set the actor stays dead until it has been off screen ($16 bit $8000) for $0258 + 1 frames ($26 counts down; on screen the count waits), then InitActorFromPlacement re-creates it in the same slot from its placement record ($3A).
+;   MusicLoadUpload: writes $FF (the SPC's boot handshake handler), copies MusicPointerTable[$30] to dp$29-$2B and $0422/$0424, waits for vblank, switches NMI off (lib_system_helpers.DisableNmi), runs engine_spc_ipl_upload.UploadSpcStream (the song data goes through the IPL transfer), waits for vblank and switches NMI on again (EnableNmi); COP 1B waits 2 frames.
+;   MusicLoadFinish: writes $01, clears boss_fight_active ($0458, incremented by the boss scripts when the fight starts and read by the switch-tile code in lib_tile_triggers_and_lair_return) and kills the actor (COP 86). The $F1 / $01 / 0 sequence is explained from the SPC side in docs/code/spc-interface.md (OQ-I025-2): $F1 starts a fade-out, the echo $F1 confirms it, the $01 replaces the command because the SPC runs a command of $F0 or more on every tick, and the port reads 0 when the fade has ended; the track numbers used are listed in cop_script_flow_flags (OQ-I025-3).
+; Respawn. RespawnOrKillActor is the tail of FinishEnemyDeath for enemies without a lair: with $1A bit $1000 clear the actor is killed (COP 86); with it set the actor stays dead until it has been off screen ($16 bit $8000) for $0258 + 1 frames ($26 counts down; on screen the count waits), then InitActorFromPlacement re-creates it in the same slot from its placement record ($3A). No code in extracted/ sets $1A bit $1000, so by static reading the respawn branch is never taken (OQ-I044-6).
 ---------------------------------------------
 
 ?BANK 00
@@ -53,12 +53,12 @@
 ?INCLUDE 'data_lair_formations'
 ?INCLUDE 'data_lair_records'
 ?INCLUDE 'data_scene_placements'
-?INCLUDE 'engine_scheduler_sprites_combat_collision'
+?INCLUDE 'engine_actor_scheduler_and_sprites'
 ?INCLUDE 'engine_spc_ipl_upload'
-?INCLUDE 'lib_0109D6_part1'
 ?INCLUDE 'lib_arithmetic'
 ?INCLUDE 'lib_map_index_helpers'
-?INCLUDE 'lib_player_stats'
+?INCLUDE 'lib_map_tile_patches'
+?INCLUDE 'lib_player_helpers'
 ?INCLUDE 'lib_system_helpers'
 ?INCLUDE 'WorldMetaPointers'
 
@@ -116,25 +116,25 @@ InitActorPool {
     STX $4A
     LDA #$0800
 
-  loc_0012BA:
+  FillFreeSlotStack:
     STA $0000, X
     INX 
     INX 
     CLC 
     ADC #$0040
     CPX #$1880
-    BNE loc_0012BA
+    BNE FillFreeSlotStack
     LDX #$0800
     STX $actor_list_tail
     LDA #$0000
     TAX 
 
-  loc_0012D2:
+  ClearActorPoolLoop:
     STA $0800, X
     INX 
     INX 
     CPX #$1000
-    BNE loc_0012D2
+    BNE ClearActorPoolLoop
     PLP 
     RTL 
 }
@@ -162,25 +162,25 @@ SpawnSceneActors {
     SEP #$20
     LDX #$0000
 
-  loc_0012F5:
+  FindPlacementIndexRow:
     LDA $&data_scene_placements.ScenePlacementIndex, X ; ScenePlacementIndex: 4-byte records (area, scene, pointer to the placement list); a first byte of $80 or more ends the table
-    BMI loc_001312
+    BMI SpawnSceneActorsDone
     CMP $area_current
-    BNE loc_00130C
+    BNE NextPlacementIndexRow
     LDA $&data_scene_placements.ScenePlacementIndex+1, X
     CMP $scene_current
-    BNE loc_00130C
+    BNE NextPlacementIndexRow
     JSR $&SpawnPlacementList
-    BRA loc_001312
+    BRA SpawnSceneActorsDone
 
-  loc_00130C:
+  NextPlacementIndexRow:
     INX 
     INX 
     INX 
     INX 
-    BRA loc_0012F5
+    BRA FindPlacementIndexRow
 
-  loc_001312:
+  SpawnSceneActorsDone:
     PLP 
     RTL 
 }
@@ -202,7 +202,7 @@ SpawnPlacementList {
     LDA $&data_scene_placements.ScenePlacementIndex+2, X
     STA $29
     JSL $@cop_core.PopFreeSlot
-    BRA loc_00133C
+    BRA InitPlacementActor
 
 ; Reads the next placement record byte: $FF ends the list (RTS); otherwise allocates the next actor and links it in front of the previous one.
 
@@ -210,17 +210,17 @@ SpawnPlacementList {
     LDA [$29]
     AND #$00FF
     CMP #$00FF
-    BNE loc_001330
+    BNE LinkPlacementActor
     RTS 
 
-  loc_001330:
+  LinkPlacementActor:
     JSL $@cop_core.PopFreeSlot
     TYA 
     STA $003E, X          ; Link: the old actor's $3E = new slot (toward the head), the new actor's $3C = old (toward the tail)
     TXA 
     STA $003C, Y
 
-  loc_00133C:
+  InitPlacementActor:
     STY $actor_list_head
     TYX 
     LDA $29
@@ -234,7 +234,7 @@ SpawnPlacementList {
     BEQ NextPlacement
     LDA $warp_dest_x
     ORA $warp_dest_y      ; warp_dest_x and warp_dest_y both 0: keep the placement position
-    BEQ loc_001399
+    BEQ PublishPlayerPosition
     LDA $warp_dest_x
     STA $0000, X
     LDA $warp_dest_y
@@ -244,7 +244,7 @@ SpawnPlacementList {
     LDA $warp_dest_anim
     STA $001E, X
     STZ $0020, X
-    JSL $@engine_scheduler_sprites_combat_collision.SetActorAnimFrame
+    JSL $@engine_actor_scheduler_and_sprites.SetActorAnimFrame
     STZ $0014, X
     LDA $warp_dest_x
     STZ $warp_dest_x
@@ -261,7 +261,7 @@ SpawnPlacementList {
     LSR 
     STA $player_tile_y
 
-  loc_001399:
+  PublishPlayerPosition:
     LDA $0000, X
     STA $player_x
     LDA $0002, X
@@ -277,7 +277,7 @@ SpawnPlacementList {
 ; Sees: the actor starts with the right position, graphics, HP and script.
 ; Why: the meta entry holds the per-monster-type data (attack, defence, HP, EXP, animation, script).
 ; In: X = new slot, $3A,X = record pointer in bank $01.
-; Out: position = tile x 16 and tile y x 16 + 16; $1C = record bits $C100 or $0372; meta entry = $03B0 + type x 14: $38 pointer, $25 HP (+2), $1E animation (+5), $24 bank (+A), $36 script bank (+D), $16 flags (+6) or $8000, $22 animation table (+8), $18 script (+B); extents from SetActorAnimFrame, or a 16x16 box for actors with $16 bit $2000 and not $0040; $14, $04, $06 = 0.
+; Out: position = tile x 16 and tile y x 16 + 16; $1C = record bits ($C100) or scene_sprite_attr (the word stored at $0372: the scene's sprite priority); meta entry = $03B0 + type x 14: $38 pointer, $25 HP (+2), $1E animation (+5), $24 bank (+A), $36 script bank (+D), $16 flags (+6) or $8000, $22 animation table (+8), $18 script (+B); extents from SetActorAnimFrame, or a 16x16 box for actors with $16 bit $2000 and not $0040; $14, $04, $06 = 0.
 ; Clobbers: A, X (= slot on return), Y.
 
 InitActorFromPlacement {
@@ -301,7 +301,7 @@ InitActorFromPlacement {
     ADC #$0010
     STA $0002, Y
     PLA 
-    AND #$C100            ; Flags word: $C000 (flips) and $0100 pass to $1C; the default attribute $0372 is ORed in
+    AND #$C100            ; Flags word: $C000 (flips) and $0100 pass to $1C; scene_sprite_attr (the word at $0372, the scene's sprite priority) is ORed in
     ORA $scene_sprite_attr
     STA $001C, Y
     SEP #$20
@@ -334,20 +334,20 @@ InitActorFromPlacement {
     TYX 
     LDA $0016, X
     BIT #$0040
-    BNE loc_001441
+    BNE PlacementAnimFrame
     BIT #$2000
-    BEQ loc_001441
+    BEQ PlacementAnimFrame
     LDA #$0010            ; Hidden actors without $0040: no animation, a 16x16 default box (size and extents set directly)
     STA $000C, X
     STA $000A, X
     STZ $0008, X
     STZ $000E, X
-    BRA loc_001445
+    BRA PlacementClearMotion
 
-  loc_001441:
-    JSL $@engine_scheduler_sprites_combat_collision.SetActorAnimFrame
+  PlacementAnimFrame:
+    JSL $@engine_actor_scheduler_and_sprites.SetActorAnimFrame
 
-  loc_001445:
+  PlacementClearMotion:
     STZ $0014, X
     STZ $0004, X
     STZ $0006, X
@@ -361,7 +361,7 @@ InitActorFromPlacement {
 ; Sees: nothing by itself (the actor is hidden); its script releases the lair's monsters, and when they are all dead the lair opens (green switch).
 ; Why: a lair is a script actor with a monster counter: lair_state survives scene changes and the actor is rebuilt from it.
 ; In: X = lair index (byte table $7F0203), Y = lair record offset in LairRecords (32 bytes per record).
-; Out: new actor allocated before the head (SpawnActorBefore), $16 = $A000 (off screen and hidden), $34 = lair index, position (+$C x 16, (+$D + 1) x 16), $1C and $30 = (+$16 or $0100 or $0372), script $18 (+$10) and $36 (+$12), $2E and $2F = lair state byte, $26 = +$14, meta entry from +$15 ($38, $25, $1E, $24, $22), size and extents 16, $32 = 0.
+; Out: new actor allocated before the head (SpawnActorBefore), $16 = $A000 (off screen and hidden), $34 = lair index, position (+$C x 16, (+$D + 1) x 16), $1C and $30 = (+$16 or $0100 or scene_sprite_attr, the word stored at $0372), script $18 (+$10) and $36 (+$12), $2E and $2F = lair state byte, $26 = +$14, meta entry from +$15 ($38, $25, $1E, $24, $22), size and extents 16, $32 = 0.
 ; Clobbers: A, X, Y restored; P restored.
 
 SpawnLairActor {
@@ -775,7 +775,7 @@ RequireLairTile {
 ; Sees: the lair's shield disappears in a puff with a sound and the green switch tile shows (walkthrough: 'the switch beneath the lair'). The switch then releases the NPC or opens the path.
 ; Why: lair_state is already 0, so the lair stays open after a scene change.
 ; In: X = lair actor (position $00, $02 - 16, record index $34).
-; Out: waits until the VRAM write queue is empty; writes tile $FE at the lair position through lib_0109D6_part1.SetMetatileBg1Bg2 or SetMetatileBg1 (chosen by record byte +8); $16 = $0310; effect animation 01 with BRK #$83; COP 86. Never returns to the caller (entered with JMP).
+; Out: waits until the VRAM write queue is empty; writes tile $FE at the lair position through lib_map_tile_patches.SetMetatileBg1Bg2 or SetMetatileBg1 (chosen by record byte +8); $16 = $0310; effect animation 01 with BRK #$83; COP 86. Never returns to the caller (entered with JMP).
 ; Clobbers: A, X, Y, dp$16, $18.
 
 SealLair {
@@ -803,12 +803,12 @@ SealLair {
     LDA $&data_lair_records.LairRecords+8, X ; Record byte +8 picks the map-patch routine (SetMetatileBg1Bg2 or SetMetatileBg1); both write tile $FE
     BEQ loc_0028A0
     LDA #$FE
-    JSL $@lib_0109D6_part1.SetMetatileBg1Bg2
+    JSL $@lib_map_tile_patches.SetMetatileBg1Bg2
     BRA loc_0028A6
 
   loc_0028A0:
     LDA #$FE
-    JSL $@lib_0109D6_part1.SetMetatileBg1
+    JSL $@lib_map_tile_patches.SetMetatileBg1
 
   loc_0028A6:
     PLX 
@@ -927,14 +927,14 @@ DelayBetweenSpawns {
 ; Sees: a small cloud where the monster arrives (animation 00 of the effects bank), then the monster is standing there stunned for a moment.
 ; Why: hides the pop-in and lets the monster arrive with its own graphics.
 ; In: X = new monster ($38 = meta entry).
-; Out: $16 = $0300, flip bits saved in $30, $1C = $0372 while the puff plays; then flags = meta +6 or $8800, $26 = 60, and the shared half of LoadMonsterFromMeta (BRA loc_00296A) loads graphics and script.
+; Out: $16 = $0300, flip bits saved in $30, $1C = scene_sprite_attr (the word stored at $0372) while the puff plays; then flags = meta +6 or $8800, $26 = 60, and the shared half of LoadMonsterFromMeta (BRA loc_00296A) loads graphics and script.
 ; Clobbers: A, Y.
 
 RunMonsterAppearPuff {
     COP [A8] ( #$8000, #0E )
     LDA #$0300
     STA $0016, X
-    LDA $001C, X          ; Keep the monster's flip bits in $30 while the puff uses $0372 as its $1C
+    LDA $001C, X          ; Keep the monster's flip bits in $30 while the puff uses scene_sprite_attr (the word at $0372) as its $1C
     STA $0030, X
     LDA $scene_sprite_attr
     STA $001C, X
@@ -984,7 +984,7 @@ LoadMonsterFromMeta {
     STA $0018, X
     DEC                   ; RTS trick: with the bank and script - 1 pushed, the final RTL jumps straight into the monster's script
     PHA 
-    JSL $@engine_scheduler_sprites_combat_collision.SetActorAnimFrame
+    JSL $@engine_actor_scheduler_and_sprites.SetActorAnimFrame
     STZ $0004, X
     STZ $0006, X
     RTL 
@@ -1432,21 +1432,21 @@ RunBossExplosion {
 KillAllOtherActors {
     PHX 
     LDA $actor_list_tail
-    BRA loc_002C6C
+    BRA KillOthersTest
 
-  loc_002C69:
+  KillOthersNext:
     LDA $003E, X
 
-  loc_002C6C:
+  KillOthersTest:
     TAX 
-    BEQ loc_002C7B
+    BEQ KillOthersDone
     LDA $0016, X
     BIT #$24D0            ; Keep actors with any of $2000, $0400, $0080, $0040, $0010 in $16 (the player group, dying actors); kill the rest
-    BNE loc_002C69
+    BNE KillOthersNext
     COP [86]
-    BRA loc_002C69
+    BRA KillOthersNext
 
-  loc_002C7B:
+  KillOthersDone:
     PLX 
     RTS 
 }
@@ -1465,21 +1465,21 @@ KillAllProjectiles {
     PHX 
     REP #$20
     LDA $actor_list_tail
-    BRA loc_002C89
+    BRA KillProjectilesTest
 
-  loc_002C86:
+  KillProjectilesNext:
     LDA $003E, X
 
-  loc_002C89:
+  KillProjectilesTest:
     TAX 
-    BEQ loc_002C98
+    BEQ KillProjectilesDone
     LDA $0016, X
     BIT #$0020            ; $16 bit $0020 marks projectiles; each one is killed
-    BEQ loc_002C86
+    BEQ KillProjectilesNext
     COP [86]
-    BRA loc_002C86
+    BRA KillProjectilesNext
 
-  loc_002C98:
+  KillProjectilesDone:
     PLX 
     PLP 
     RTL 
@@ -1489,7 +1489,7 @@ KillAllProjectiles {
 ; Step 1 of a music change started by Cop31: sends command $F1 to the SPC.
 ; 
 ; When: first script of the actor spawned by Cop31_FadeAndLoadMusic.
-; Sees: the running music is told to fade (the SPC handler is HandleFadeIn in docs/audio/spc-disassembly.md; the direction of the fade is not verified, OQ-I025-2).
+; Sees: the running music is told to fade (the SPC handler is HandleFadeIn in docs/audio/spc-disassembly.md; a fade-out: the SPC counts $31 down from $7F, scales the volume with it and stops at 0; docs/code/spc-interface.md).
 ; Why: the SPC must be quiet before a new song can be uploaded through the IPL.
 ; In: X = the spawned actor, $30 = track number.
 ; Out: APUIO0 = $F1; COP 27 continues at MusicLoadWaitFadeAck next frame.
@@ -1508,7 +1508,7 @@ MusicLoadSendFade {
 ; 
 ; When: every frame after MusicLoadSendFade until the echo arrives (RTL re-runs it).
 ; Sees: nothing.
-; Why: handshake: the command is only taken as delivered when the SPC returns it.
+; Why: handshake: the command is only taken as delivered when the SPC returns it; the answer $01 is needed because the SPC runs a command of $F0 or more again on every tick while the port holds it, which would restart the fade each time.
 ; In: X = actor.
 ; Out: APUIO0 = $F1: APUIO0 = $01 and COP 27 continues at MusicLoadWaitSilence; otherwise RTL.
 ; Clobbers: A.
@@ -1522,7 +1522,7 @@ MusicLoadWaitFadeAck {
 
   loc_002CB4:
     SEP #$20
-    LDA #$01              ; Answer $01; the port reads 0 again when the SPC has finished (inferred from the wait loop)
+    LDA #$01              ; Answer $01: the SPC runs a command of $F0 or more on every tick while the port holds it, so $F1 must not stay; the port reads 0 when the fade has ended
     STA $APUIO0
     REP #$20
     COP [27] ( &MusicLoadWaitSilence )
@@ -1533,7 +1533,7 @@ MusicLoadWaitFadeAck {
 ; 
 ; When: every frame after the answer $01.
 ; Sees: nothing; the old music is already fading or silent.
-; Why: the port returns to 0 when the SPC has finished the fade (inferred, OQ-I025-2).
+; Why: at the end of the fade the SPC sets its current command to 0 and runs StopAllChannels, so the port reads 0 (docs/code/spc-interface.md).
 ; In: X = actor.
 ; Out: APUIO0 = 0: branches to MusicLoadSendStop; otherwise RTL.
 ; Clobbers: A.
@@ -1590,9 +1590,9 @@ MusicLoadWaitStopped {
 ; 
 ; When: 2 frames after the SPC reported stopped.
 ; Sees: the new music starts shortly after; the upload itself runs with NMI off, so the game stalls for a moment.
-; Why: this is the only way to change songs: the SPC program and the song data are transferred through the IPL protocol (engine_spc_ipl_upload).
+; Why: this is the only way to change songs: the song records and samples go through the SPC's own copy of the IPL receive loop, entered by the $FF command (engine_spc_ipl_upload); the boot ROM is not used again.
 ; In: X = actor, $30 = track number.
-; Out: APUIO0 = $FF; $30 = 0; the long pointer MusicPointerTable[track] is in dp$29-$2B and $0422/$0424; vblank wait, NMI off, code_0FEFF5 upload, vblank wait, NMI on; COP 1B continues at MusicLoadFinish after 2 frames.
+; Out: APUIO0 = $FF; $30 = 0; the long pointer MusicPointerTable[track] is in dp$29-$2B and $0422/$0424; vblank wait, NMI off, UploadSpcStream upload, vblank wait, NMI on; COP 1B continues at MusicLoadFinish after 2 frames.
 ; Clobbers: A, Y; DP $29-$2B; X preserved (PHX/PLX).
 
 MusicLoadUpload {
@@ -1618,7 +1618,7 @@ MusicLoadUpload {
     SEP #$20
     JSL $@lib_system_helpers.WaitVBlank
     JSL $@lib_system_helpers.DisableNmi ; NMITIMEN = $01: NMI off while the song goes through the IPL; EnableNmi switches it back on
-    JSL $@engine_spc_ipl_upload.code_0FEFF5
+    JSL $@engine_spc_ipl_upload.UploadSpcStream
     JSL $@lib_system_helpers.WaitVBlank
     JSL $@lib_system_helpers.EnableNmi
     REP #$20
@@ -1631,7 +1631,7 @@ MusicLoadUpload {
 ; 
 ; When: 2 frames after the upload.
 ; Sees: the new song plays.
-; Why: the $01 byte lets the SPC leave its handshake; boss_fight_active is cleared because the boss track change marks the end of the boss fight.
+; Why: the SPC leaves the transfer with last song 0, so the $01 starts song 1, the song just uploaded; boss_fight_active is cleared because the boss track change marks the end of the boss fight.
 ; In: X = actor.
 ; Out: APUIO0 = $01, boss_fight_active ($0458) = 0, COP 86 kills the actor.
 ; Clobbers: A.
@@ -1648,8 +1648,8 @@ MusicLoadFinish {
 ; Last step of an enemy's death without a lair: kills it, or lets it come back later.
 ; 
 ; When: FinishEnemyDeath (BRL) for actors with $32 = 0.
-; Sees: the enemy is gone; a respawning enemy returns as a fresh copy after the player has left it off screen for about 10 seconds.
-; Why: ordinary field enemies come back, scripted ones (and bosses) do not; $1A bit $1000 decides.
+; Sees: the enemy is gone. With $1A bit $1000 set it would return as a fresh copy after the player has left it off screen for about 10 seconds; no code in extracted/ sets that bit (OQ-I044-6), so by static reading every enemy without a lair is killed here.
+; Why: $1A bit $1000 is the switch between a field enemy that comes back and a scripted actor or boss that does not.
 ; In: X = dying actor, $3A = its placement record.
 ; Out: $1A bit $1000 clear: COP 86. Set: $26 = $0258, COP 91; each frame while $16 bit $8000 (off screen) is set $26 is decremented and when it goes negative InitActorFromPlacement re-creates the actor in this slot; on screen nothing counts.
 ; Clobbers: A, Y.
@@ -1657,25 +1657,25 @@ MusicLoadFinish {
   RespawnOrKillActor:
     LDA $001A, X
     BIT #$1000
-    BEQ loc_002D64
+    BEQ RespawnKill
     LDA #$0258            ; $0258 = 600: with the post-decrement test the actor returns after 601 off-screen frames
     STA $0026, X
     COP [91]              ; From here the actor re-enters at the next instruction every frame (resume pointer = address after this COP)
     LDA $0016, X
     BIT #$8000
-    BNE loc_002D59
+    BNE RespawnCountDown
     RTL 
 
-  loc_002D59:
+  RespawnCountDown:
     DEC $0026, X
-    BMI loc_002D5F
+    BMI RespawnRebuild
     RTL 
 
-  loc_002D5F:
+  RespawnRebuild:
     JSL $@InitActorFromPlacement
     RTL 
 
-  loc_002D64:
+  RespawnKill:
     COP [86]
     RTL 
 }
@@ -1683,7 +1683,7 @@ MusicLoadFinish {
 
 ; A Gem that lies on the ground until it is taken.
 ; 
-; When: spawned with COP 85 by w1_actor_01E4BB (Greenwood).
+; When: spawned with COP 85 by gw_actor_fixed_gem_pickup (Greenwood).
 ; Sees: a Gem that stays; touching it gives 10 Gems (OQ-I006-8).
 ; Why: fixed rewards need a pickup that never times out.
 ; In: X = the pickup. Out: $16 = $4000 (pickup), animation 07 forever; ApplyGemPickup removes it.
@@ -1767,7 +1767,7 @@ RunLargeGemPickup {
 ; Sees: a pickup sound and the Gem counter in the HUD rises; the pickup is gone.
 ; Why: one routine for the three sizes, chosen by the pickup's current animation id ($1E).
 ; In: X = pickup (called with JSL).
-; Out: BRK #$4D; amount = 10 for animation 06 and 0B and for any unknown id, 5 for 05 and 0A, 1 for 04 and 09; lib_player_stats.AddGems adds it in BCD to gems_low and gems_high; hud_dirty_flags bit $0010 set; $16 bit $2000 set; COP 86.
+; Out: BRK #$4D; amount = 10 for animation 06 and 0B and for any unknown id, 5 for 05 and 0A, 1 for 04 and 09; lib_player_helpers.AddGems adds it in BCD to gems_low and gems_high; hud_dirty_flags bit $0010 set; $16 bit $2000 set; COP 86.
 ; Clobbers: A; P and Y restored.
 
 ApplyGemPickup {
@@ -1801,7 +1801,7 @@ ApplyGemPickup {
     LDA #$0001
 
   loc_002F3E:
-    JSL $@lib_player_stats.AddGems ; A = Gems in BCD, added to gems_low and gems_high with a cap
+    JSL $@lib_player_helpers.AddGems ; A = Gems in BCD, added to gems_low and gems_high with a cap
     LDA #$0010
     TSB $hud_dirty_flags  ; HUD bit $0010: Gems changed (OQ-I006-18)
     LDA $0016, X
@@ -1860,7 +1860,7 @@ RunEnding {
     COP [04]
     COP [09] ( #$9F02 )   ; Cop09_SetOrClearFlag: set event flag byte $1F bit 2 (operand $9F02, bit 15 = set)
     LDA #$0006
-    STA $text_delay       ; text_delay = 6: frames per printed glyph from now on (a new game sets 3, lib_027912; OQ-I028-1)
+    STA $text_delay       ; text_delay = 6: frames per printed glyph from now on (InitFixedState sets 3 once at boot, lib_boot_and_scene_init; OQ-I028-1)
     LDA #$0001
     STA $scene_variant
     COP [10] ( #$0700, #01, #$0070, #$0060 ) ; Cop10_SetNextScene: scene_next = 7 (area 0), warp animation 1, x = $70, y = $60 (OQ-I006-11)

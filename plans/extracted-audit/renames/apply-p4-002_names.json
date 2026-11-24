@@ -1,0 +1,4 @@
+[
+  { "address": 22644, "old": "Cop0A_InventoryCall", "new": "Cop0A_SetInventoryIfEmpty", "row": "P4-COP-0A" },
+  { "address": 22664, "old": "Cop0B_InventoryClear", "new": "Cop0B_ClearInventoryEntry", "row": "P4-COP-0B" }
+]

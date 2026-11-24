@@ -2,7 +2,7 @@
 ; 
 ; === WHAT RUNS HERE ===
 ; Meta type $38 of MetaMountainOfSouls (attack 16, defence 12, HP 79, EXP $0400 = 400; the monster of lair record $103 in the room A0BS07, location $44). The script is a loop of rounds; its own $30 counts the rounds left (2 at the start and after each full cycle).
-; - Setup: exit_list_ofs is cleared, boss_fight_active is incremented, boss_actor = X, COP 9F adds 8 to X, and engine_003005.RunBossMapPatch is spawned with patch id 2 (written to its $30).
+; - Setup: exit_list_ofs is cleared, boss_fight_active is incremented, boss_actor = X, COP 9F adds 8 to X, and engine_player_death_and_actor_helpers.RunBossMapPatch is spawned with patch id 2 (written to its $30).
 ; - One round: Poseidon is submerged ($16 |= $0300: not hittable) and three rise splashes (ms_boss_poseidon_rise_splash_004528) are spawned 21 frames apart; ms_boss_poseidon_spray_spawner_0045F5 sprays water; he surfaces (animation $0A, $0300 cleared). A random side (bit 15 of rng_state+1: clear = left, set = right) gets the triple fireball (ms_boss_poseidon_fireball_triple_004497, two more fireballs spawned by the first) and a spear thrust (ms_boss_poseidon_spear_left_004487 / _right_00448F). A second random side gets another spear thrust, then the pair of homing fireballs (ms_boss_poseidon_fireball_homing_004532 and _004546); he dives ($0300 set again), sprays and plays animation $08 or $09.
 ; - End of round: when $30 is 1 the round is the last one: he turns toward the room's side (flip by his x >= $F0), four dive splashes follow and animation $15 plays; then $30 is reset to 2 and the cycle restarts. Otherwise a random flip, four dive splashes, animation $14, DEC $30 and the next round.
 ; - The walkthrough (chapter 5) lists the attacks in order: 'Triple fireball', 'Spear thrust (may do twice)' and 'Double fireball; one or both of these will home in on you'; the script has exactly those, in that order (the fireball and the first spear on one random side, the second spear on another random side, then the homing pair).
@@ -13,7 +13,7 @@
 
 ?BANK 00
 
-?INCLUDE 'engine_003005'
+?INCLUDE 'engine_player_death_and_actor_helpers'
 
 !rng_state                      0301
 !boss_actor                     039A
@@ -37,7 +37,7 @@ ms_boss_poseidon_004299 {
     INC $boss_fight_active
     STX $boss_actor
     COP [9F] ( #$0008 )   ; adds 8 to the actor's X
-    COP [85] ( @engine_003005.RunBossMapPatch ) ; spawns the boss map patch actor; its $30 = 2 is the patch id
+    COP [85] ( @engine_player_death_and_actor_helpers.RunBossMapPatch ) ; spawns the boss map patch actor; its $30 = 2 is the patch id
     LDA #$0002
     STA $0030, Y
 

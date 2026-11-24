@@ -63,6 +63,6 @@ SaveSlotMenuText |[CUR:88][07:16,16][CUR:14A]Please choose a record[CUR:218]Name
 ; Sees: on each slot line the saved name, the level and the area number.
 ; Why: the text renderer already knows how to print a name, a BCD value and a word, so the line is a string of control codes.
 ; In: PrintTextString with Y = the slot's template.
-; Out: [CUR:o1][02:3] (the slot name at $0447), [CUR:o2][06:2,0450] (the level), [CUR:o3][06:1,0452] and the end byte; the offsets are $2D4, $2E8 and $2F2 for slot 1, plus $C0 per slot.
+; Out: [CUR:o1][02:3] (the slot name at $0447), [CUR:o2][06:2,0450] (the level), [CUR:o3][06:1,0452] (one BCD digit: the low nibble of saved_scene, the world number 1-7) and the end byte; the offsets are $2D4, $2E8 and $2F2 for slot 1, plus $C0 per slot.
 
 SaveSlotLineTemplates #01D402020301E8020602500401F2020601520400019403020301A8030602500401B203060152040001540402030168040602500401720406015204000114050203012805060250040132050601520400

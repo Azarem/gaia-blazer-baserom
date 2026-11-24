@@ -1,0 +1,102 @@
+
+> @gaialabs/blazer-baserom@0.1.1 audit
+> node src/index.ts audit --top=25
+
+Audit of C:\Work\gaia-blazer-baserom\extracted (704 .asm files, tagged extraction; blocks.json: 704 blocks in 11 groups)
+
+Coverage by group (auto% = auto-named labels / all labels; pnote% = labels with a part note; comm% = commented instructions)
+group              blocks  lines  instr   top   sub   auto%  bnote  pnote%  comm%  refs out  refs in
+-----------------  ------  -----  -----  ----  ----  ------  -----  ------  -----  --------  -------
+common                125  18420  11143  1500   821  100.0%  0/125    0.0%   0.0%       451      267
+cop_handlers          110   2918   1636   119   104   51.6%  1/110    4.5%   0.0%       229      260
+grass_valley           52   2952   1431   399    41  100.0%   0/52    0.0%   0.0%       174      214
+greenwood              57   3340   1672   421    32  100.0%   0/57    0.0%   0.0%       192      180
+leos_lab               37   1747    810   242    22  100.0%   0/37    0.0%   0.0%       108      104
+library               139  13161   8286   668   743  100.0%  0/139    0.1%   0.0%       612      703
+magridds_castle        45   2333   1194   307    15  100.0%   0/45    0.0%   0.0%       166      151
+mountain_of_souls      42   2589   1306   271    59  100.0%   0/42    0.0%   0.0%       146      150
+st_elles               54   2994   1551   328    60  100.0%   0/54    0.0%   0.0%       164      158
+system                 36  16699   4087  1771   307  100.0%   3/36    0.7%   0.0%      1283     1335
+world_of_evil           7    593    282    21     5  100.0%    0/7    0.0%   0.0%         6        9
+TOTAL                 704  67746  33398  6047  2209   98.7%  4/704    0.3%   0.0%      3531     3531
+
+Labels: 6047 top-level + 2209 sub = 8256; auto-named 5938 + 2209 = 8147; named 109
+Notes: 4 block notes, 26 part notes on extracted labels (26 stored), 0 stored comments, 0 commented instructions of 33398
+Blocks: 704 (6 movable), 789 parts in blocks.json
+References: 16249 (12718 inside a file, 3531 across files in 1514 file pairs)
+
+Top 25 fan-in labels (references from other files)
+label                    file                       refs  files
+-----------------------  -------------------------  ----  -----
+code_0026F3              engine_0026F3               156      1
+code_00299D              engine_0026F3               150    137
+code_00271B              engine_0026F3               139      1
+code_002752              engine_0026F3               107      1
+asciistring_01B988       w0_shared_01B988            106     35
+asciistring_01EC46       w1_shared_01EBC2             95     34
+asciistring_0270DF       w5_shared_02706C             87     33
+code_001D3B              engine_routines_001D3B       80      1
+asciistring_02251E       w3_shared_02249A             75     31
+asciistring_list_014F74  lib_shared_014F74            73      4
+data_00BA0D              data_00BA0D                  71     10
+asciistring_0FAA44       w2_shared_0FA945             70     37
+table_068000             table_068000                 69      1
+loc_0064BF               cop_handler_006473           68     66
+code_0029E8              common_actor_0029E8          65      1
+asciistring_023FA3       w4_shared_023F33             58     29
+code_012769              lib_shared_012769            58     13
+code_00305F              engine_003005                54     27
+meta_tables_008000       meta_tables_008000           41      7
+code_0272B8              lib_027462_part1             40     23
+code_0131B7              lib_shared_0131B7            39      9
+loc_001A65               common_actor_001A28_part1    32      1
+loc_0064C1               cop_handler_006473           29     29
+code_0276EE              lib_027781_part2             24      4
+code_01B161              w0_shared_01B161             22     21
+
+Top 25 fan-in files
+file                       group              refs  files  labels
+-------------------------  -----------------  ----  -----  ------
+engine_0026F3              system              567    138       6
+engine_routines_001D3B     system              273      1      25
+cop_handler_006473         cop_handlers        140    102      10
+w0_shared_01B988           grass_valley        106     35       1
+w1_shared_01EBC2           greenwood           101     38       5
+w2_shared_0FA945           st_elles             94     42       7
+w5_shared_02706C           magridds_castle      90     34       4
+lib_shared_012769          library              82     18       5
+w3_shared_02249A           mountain_of_souls    80     34       5
+lib_shared_014F74          library              73      4       1
+data_00BA0D                system               71     10       1
+table_068000               system               69      1       1
+common_actor_0029E8        common               65      1       1
+w4_shared_023F33           leos_lab             64     33       5
+engine_003005              system               61     34       4
+w0_shared_01B161           grass_valley         44     21       2
+engine_000000              system               43     19      10
+data_00F9F7                system               42     19      16
+meta_tables_008000         system               41      7       1
+lib_027462_part1           library              40     23       1
+common_actor_001A28_part1  common               39      2       2
+lib_shared_0131B7          library              39      9       1
+engine_0065A7              system               29     21       7
+lib_027781_part2           library              28      4       4
+w3_shared_022289           mountain_of_souls    28     21       2
+
+Cross-file references, group -> group (rows reference columns; diagonal = between two files of the same group)
+from \ to          common  cop_handlers  grass_valley  greenwood  leos_lab  library  magridds_castle  mountain_of_souls  st_elles  system  world_of_evil
+-----------------  ------  ------------  ------------  ---------  --------  -------  ---------------  -----------------  --------  ------  -------------
+common                 35             .             .          .         .      107                .                  .         .     309              .
+cop_handlers            1           151             .          .         .       35                .                  .         .      42              .
+grass_valley            .             .           141          .         .       11                .                  .         .      22              .
+greenwood               .             .            20        130         .        9                .                  .         .      33              .
+leos_lab                .             .             3          .        69        5                .                  6         .      25              .
+library                 1             .             .          .         .      414                .                  .         .     197              .
+magridds_castle         .             .             2          .         .        6              110                 11         .      37              .
+mountain_of_souls       .             .             2          .         .        5                .                 94         .      45              .
+st_elles                .             .             4          .         .        8                .                  .       104      48              .
+system                230           109            42         50        35      100               41                 39        54     577              6
+world_of_evil           .             .             .          .         .        3                .                  .         .       .              3
+
+Findings (1)
+  - 2-byte references from other files target movable block(s), whose bank is chosen by the packer (bank-base hazard R-2): meta_tables_008000 (35), spc_030000 (1), data_04F000 (5), asset_list_028000 (1), string_lookup_080000 (2)

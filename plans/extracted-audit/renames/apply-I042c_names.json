@@ -1,0 +1,3 @@
+[
+  { "address": 70549, "old": "MarkHeldLairTilesSolid", "new": "SetHeldLairTileType", "row": "I042-E44" }
+]

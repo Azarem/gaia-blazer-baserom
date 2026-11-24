@@ -10,8 +10,8 @@
 
 ?BANK 00
 
-?INCLUDE 'lib_0109D6_part3'
 ?INCLUDE 'lib_arithmetic'
+?INCLUDE 'lib_inventory_store'
 ?INCLUDE 'lib_system_helpers'
 ?INCLUDE 'lib_text_render'
 
@@ -220,7 +220,7 @@ DebugApplyItem {
     AND #$0F
     CLC 
     ADC $01, S
-    JSL $@lib_0109D6_part3.StoreInventoryEntry
+    JSL $@lib_inventory_store.StoreInventoryEntry
     PLA 
     STZ $0484
     RTS 

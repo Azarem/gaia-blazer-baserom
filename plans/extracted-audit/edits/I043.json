@@ -1,0 +1,40 @@
+{
+  "_note": "I043: corrections to stale statements found while writing docs/code/boot-nmi-main-loop.md. Evidence: engine_boot_main_loop (the six ResetHdmaQueue and five QueueAnimatedTileStrip call sites), data_scene_asset_lists (asset8 < #10 > / #11 / #12 are the first commands of the records of area 0 scenes $0A, $0B, $0C and no other record has them; ApplySceneProfile stores that byte in location_id), gv_front_end (scene $0A title, $0B ending, $0C boot). Open points: questions/I043_questions.md.",
+
+  "library/lib_system_helpers.asm": {
+    "partNotes": {
+      "ResetHdmaQueue": { "edit": [
+        { "find": "(RunMainLoop, RunReducedLoop, the two scene-change paths and the sub-frame wrapper: 6 call sites)",
+          "with": "(RunMainLoop, RunReducedLoop, RunReturnLoop and the three sub-frame runners: 6 call sites, all in engine_boot_main_loop)" }
+      ] }
+    }
+  },
+
+  "library/lib_main_loop_helpers.asm": {
+    "blockNote": { "edit": [
+      { "find": "five calls in one frame (the main loop and four wait loops of the front end)",
+        "with": "several calls in one frame" }
+    ] },
+    "partNotes": {
+      "QueueAnimatedTileStrip": { "edit": [
+        { "find": "once per frame from the end of the main loop and from the wait loops of the front end (5 call sites in engine_boot_main_loop)",
+          "with": "once per frame at the end of the work phase of RunMainLoop, RunReturnLoop and the three sub-frame runners (5 call sites in engine_boot_main_loop)" },
+        { "find": "water, lava and similar background tiles move",
+          "with": "animated background tiles move" }
+      ] }
+    }
+  },
+
+  "system/engine_boot_main_loop.asm": {
+    "blockNote": { "edit": [
+      { "find": "(unnamed scenes of the Up Above area, OQ-I001-6; the boot scene 00/0C should be location $12, OQ-I005-21)",
+        "with": "(by static reading the three front-end scenes: title 00/0A = $10, ending 00/0B = $11, boot 00/0C = $12, because the first asset8 command of each record in data_scene_asset_lists is that value and ApplySceneProfile stores it in location_id; runtime check OQ-I043-2)" }
+    ] },
+    "partNotes": {
+      "RunReducedLoop": { "edit": [
+        { "find": "OQ-I001-6 leaves $11 and $12 open",
+          "with": "by static reading $11 is the ending scene 00/0B and $12 the boot scene 00/0C, OQ-I043-2" }
+      ] }
+    }
+  }
+}

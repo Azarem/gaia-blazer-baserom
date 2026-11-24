@@ -10,7 +10,7 @@
 ; 
 ; === NOTES ===
 ; - Location 5A (the second room the ROM calls 'A dream 1') points at the list of location 56 (ExitListLoc56, two rows to area $0D scene 1 and area $0E scene 2), while the empty list ExitListUnreferenced right after ExitListLoc59 has no reader. Every other dream room has an empty list, so the pointer looks like a slip (OQ-I033-5).
-; - structs.json declares the exit row as 11 Bytes; +7 and +9 are 16-bit reads (retype proposal in FM-A11 4.17).
+; - structs.json declares the exit row as 11 Bytes; +7 and +9 are 16-bit reads (retype decision: OQ-I033-10; the layouts are in docs/code/data-tables.md, section Row layouts).
 ---------------------------------------------
 
 ?BANK 01

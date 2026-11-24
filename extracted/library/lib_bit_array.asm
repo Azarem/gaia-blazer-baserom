@@ -5,7 +5,7 @@
 ; The arrays the callers pass in Y: $1A7E chests opened (bit = chest id & $7F), $1A9E lairs released (bit = lair index), $1ADE switches set (bit = switch id); $1A5E is event_flags, and the arrays at $1A7E, $1A9E and $1ADE lie inside the range that holds the event flags and the saved progress image ($1A5E-$1C57).
 ; 
 ; === NOTES ===
-; - Callers: SetBitInArray 7 sites (lib_tile_triggers_and_lair_return 5, engine_003005 2), TestBitInArray 11 sites (lib_scene_map_patches 5, cop_script_flow_flags 3, lib_tile_triggers_and_lair_return 2, engine_003005 1).
+; - Callers: SetBitInArray 7 sites (lib_tile_triggers_and_lair_return 5, engine_player_death_and_actor_helpers 2), TestBitInArray 11 sites (lib_map_tile_patches 5, cop_script_flow_flags 3, lib_tile_triggers_and_lair_return 2, engine_player_death_and_actor_helpers 1).
 ; - ClearBitInArray has no caller (OQ-I013-12).
 ---------------------------------------------
 
@@ -17,7 +17,7 @@
 
 ; Sets one bit of a bit array.
 ; 
-; When: when a lair is released, a switch is pressed or a chest is opened (lib_tile_triggers_and_lair_return 5 sites, engine_003005 2 sites).
+; When: when a lair is released, a switch is pressed or a chest is opened (lib_tile_triggers_and_lair_return 5 sites, engine_player_death_and_actor_helpers 2 sites).
 ; Sees: nothing directly; the bit is what later keeps the lair open, the switch pressed and the chest empty.
 ; Why: lets the progress arrays use one bit per object, so a save slot stays small.
 ; In: JSL; A = bit number (& $3FF), Y = array address.

@@ -1,7 +1,7 @@
 ; The Tin Doll, the boss of the Laboratory Dungeon, with its fireballs, its 'flower' and the meteor rain (file offsets 18009-19437, SNES $00:C659-$CBED, bank 00).
 ; 
 ; === ROLE ===
-; Meta type $1E, spawned by lair record $12F (RunLairFormation, one monster, lair in location $59 at tile ($16,$17)); it has no placement row. MetaLeosLab: attack $16, defence $0F, HP $59 (89), EXP $0800. The release frees the doll Marie (record +9 names her), who then gives the Purple Stone (ll_npc_marie_purple_stone_0234EC). The script starts the fight like the other bosses: exit_list_ofs = 0, boss_fight_active + 1, boss_actor = X, and spawns engine_003005.RunBossMapPatch with patch id 3 (it blocks the pad while the map changes).
+; Meta type $1E, spawned by lair record $12F (RunLairFormation, one monster, lair in location $59 at tile ($16,$17)); it has no placement row. MetaLeosLab: attack $16, defence $0F, HP $59 (89), EXP $0800. The release frees the doll Marie (record +9 names her), who then gives the Purple Stone (ll_npc_marie_purple_stone_0234EC). The script starts the fight like the other bosses: exit_list_ofs = 0, boss_fight_active + 1, boss_actor = X, and spawns engine_player_death_and_actor_helpers.RunBossMapPatch with patch id 3 (it blocks the pad while the map changes).
 ; - DISCREPANCY: the bestiary gives 80 HP (ROM: 89; OQ-I033-1) and Metal = No, but the script sets $1A bit $0400, the class that only the Zantetsu Sword hurts, in its start routine (OQ-I038-2).
 ; 
 ; === STATE MACHINE (static reading) ===
@@ -18,7 +18,7 @@
 
 ?BANK 00
 
-?INCLUDE 'engine_003005'
+?INCLUDE 'engine_player_death_and_actor_helpers'
 ?INCLUDE 'shared_actor_helpers_bank0'
 
 !rng_state                      0301
@@ -46,7 +46,7 @@ ll_boss_tin_doll_004659 {
     LDA $001A, X
     ORA #$0400            ; $1A bit $0400: metal class, hurt only by the Zantetsu Sword (the bestiary says Metal = No: OQ-I038-2)
     STA $001A, X
-    COP [85] ( @engine_003005.RunBossMapPatch )
+    COP [85] ( @engine_player_death_and_actor_helpers.RunBossMapPatch )
     LDA #$0003            ; patch id 3: written to $30 of the RunBossMapPatch actor that COP 85 just spawned (Y)
     STA $0030, Y
     BRL ll_boss_tin_doll_go_top_00477D

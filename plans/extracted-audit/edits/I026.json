@@ -1,0 +1,679 @@
+{
+  "_note": "I026: batch A4 (library 0100-0111: camera and scroll streaming, metatile writers, map patch rectangles, tile triggers, lair release, sweep redraw, animation record stepper, inventory store, NPC name list). Names applied first by plans/extracted-audit/renames/apply-I026_names.json; WRAM mnemonics (ratio_x_bg1 .. sweep_origin_y) added to us/mnemonics.json by hand. Sources: plans/doc-audit/function-map/FM-A4.md re-read against the code, walkthrough chapters 01-03 for the lair, switch, chest and NPC release facts. Comment addresses are the ; {n} tags of extract:lt; every comment carries an expect guard. BuildScrollStrips is mis-decoded (OQ-I026-1): its part note carries the real disassembly and it has no inline comments. The A4 routines of lib_scene_map_patches are annotated here; its other routines (code_0112F5, code_011395 and following) are outside A4.",
+
+  "library/lib_010000.asm": {
+    "blockNote": [
+      "Camera aim: one routine, AimCameraAtPlayer (file offsets 65536-65640, SNES $02:8000-$8068, bank 02).",
+      "",
+      "The camera follows the player without smoothing: AimCameraAtPlayer converts 'where the camera should be' into the signed deltas scroll_delta_x and scroll_delta_y, and ScrollCameraByDelta (lib_map_streaming) applies them in the same frame. The whole scroll model is in the lib_map_streaming block note."
+    ],
+    "partNotes": {
+      "AimCameraAtPlayer": [
+        "Computes how far the camera must move to centre on the player and stores it as the scroll deltas.",
+        "",
+        "When: every frame from the player code (player_core), in every sub-frame of the scene loader (RunSubFrameLoader), and from the Grass Valley name-entry actor.",
+        "Sees: the screen follows the player and stops at the map edges (the walkthrough's rooms scroll only as far as the map goes).",
+        "Why: keeps the scroll logic in one place: this routine only says where to go, ScrollCameraByDelta does the clamping to the map and the strip requests.",
+        "In: none (native mode; M and X are set to 16 bits inside). Reads player_x, player_y, scroll_bg1_x, scroll_bg1_y, map_width_px, map_height_px, view_height_px.",
+        "Out: scroll_delta_x = target x - scroll_bg1_x with target x = player_x - $70, limited to 0 .. map_width_px - $100; scroll_delta_y likewise with player_y - $80 and the view height view_height_px ($E0 or $100) in place of $100. The scroll itself is not changed.",
+        "Clobbers: A, X, Y (P restored)."
+      ]
+    },
+    "comments": {
+      "65551": { "text": "Target x: the player's x minus $70, so the player sits a little left of the centre of the 256-pixel view", "expect": "SBC" },
+      "65584": { "text": "Delta = target - current scroll: the camera snaps to its target in one frame (no easing)", "expect": "SBC" }
+    }
+  },
+
+  "library/lib_map_streaming.asm": {
+    "blockNote": [
+      "Scroll streaming: camera update, strip building and strip upload (file offsets 65641-67162, SNES $02:8069-$865A, bank 02).",
+      "",
+      "=== SCREEN MODEL ===",
+      "BG1 and BG2 each show a map that is larger than their VRAM tilemap (64 x 64 tiles = 512 x 512 pixels). A map is a grid of 16 x 16 pixel metatiles stored one byte per metatile at $7E8000 (BG1) and $7EC000 (BG2), in pages of 256 bytes (16 x 16 metatiles = 256 x 256 pixels): page = (y >> 8) x map_width_pages + (x >> 8), cell = ((y >> 4) and 15) x 16 + ((x >> 4) and 15). map_width_px ($0342, word) is map_width_pages x 256; map_height_px likewise. A metatile definition is 8 bytes (four tile words: top-left, top-right, bottom-left, bottom-right) at $7E2000 (BG1) and $7E2800 (BG2). Bit 9 of a tile word is not a tile bit: it is the solid flag of that quarter, the mask $FDFF removes it before the word reaches VRAM, and SetMetatileBg1 gathers the four flags into the low nibble of the tile_type_map byte ($7F8000).",
+      "The per-layer tables are word pairs indexed by X = 0 (BG1) or X = 4 (BG2): scroll_bg1_x/y and scroll_bg2_x/y, map_width_px/map_height_px, the parallax ratios ratio_x_bg1 .. ratio_y_bg2, map_base_bg1/2 ($8000, $C000), tilemap_vram_bg1/2 ($6000, $7000), tile_defs_bg1/2, tile_mask_bg1/2, tile_attr_bg1/2 and the strip buffers strip_col_bg1 .. strip_row_bg2. The scene loader fills them (lib_027912, lib_scene_asset_loader).",
+      "",
+      "=== ONE FRAME ===",
+      "Work phase (NMI off): AimCameraAtPlayer stores scroll_delta_x/y; ScrollCameraByDelta adds them to scroll_bg1_x/y (clamped to the map), derives BG2 from BG1 through the ratios (UpdateLayerScrollX/Y) and sets a request bit in scroll_requests ($0396: $80 = BG1 column, $40 = BG1 row, $20 = BG2 column, $10 = BG2 row) whenever the scroll crosses a 16-pixel line (bit 4 of the position changed); BuildScrollStrips tests and clears each bit and builds the strip for it (BuildColumnStrip / BuildRowStrip), then zeroes scroll_delta_x/y. In the NMI, UploadMapStripBuffers calls UploadScrollStrips for the BG1 pair and the BG2 pair of buffers.",
+      "A strip record is 258 bytes in bank $7E: a word (the VRAM address of the strip, 0 = empty) and four blocks of 64 bytes. A column strip is one metatile column of the whole tilemap height: 2 tile columns x 64 tiles, written with VMAIN $81 (increment 32 words); a row strip is one metatile row of the whole width: 2 tile rows x 64 tiles, written with VMAIN $80. The blocks go to the VRAM address, address + 1 (or + $20), + $800 (or + $400) and + $801 (or + $420): the four 32 x 32 tile screens of a 64 x 64 tilemap. Buffer addresses: BG1 column $3000, BG1 row $3102, BG2 column $3204, BG2 row $3306.",
+      "A column strip goes at the right edge of the view (scroll x + $100) for a positive delta and at the left edge (scroll x) for a negative one; a row strip likewise below (scroll y + $100) or above. FillColumnStripBuffer / FillRowStripBuffer read 2 pages along the strip (the second is the next page, wrapping at the end of the map for columns) and CopyMetatileColumn / CopyMetatileRow expand 16 metatiles into 2 x 2 tiles each, applying the layer's tile mask and attribute.",
+      "",
+      "=== ENTRY REDRAW ===",
+      "RedrawBackgroundsAtEntry (called once by the scene change code, not for location $10) places the camera on the player, derives BG2, wraps the BG2 scroll into its map and then builds and uploads 32 column strips per layer (32 x 16 px = the whole 512-pixel tilemap width), one strip at a time through UploadScrollStrips with NMI off.",
+      "",
+      "=== NOTES ===",
+      "- ScaleByRatio computes scroll x numerator / divisor: the ratio word has the numerator in its low byte and the divisor in its high byte (using the PPU multiplier $211B/$211C and the hardware divider $4204/$4206), so $0201 is half speed and $0101 is the same speed.",
+      "- BuildScrollStrips is mis-decoded by the extractor (OQ-I005-7, OQ-I026-1): read its part note for the real code.",
+      "- scroll_bg1_x/y and scroll_bg2_x/y are positions in map pixels; the NMI writes them to the PPU scroll registers (WriteScrollRegisters; bg_scroll_swap exchanges the two pairs between BG1 and BG2)."
+    ],
+    "partNotes": {
+      "ScrollCameraByDelta": [
+        "Moves BG1 by scroll_delta_x/y within the map and brings BG2 along; requests new strips when a 16-pixel line was crossed.",
+        "",
+        "When: every game frame (main loop, return loop and every sub-frame runner), after AimCameraAtPlayer.",
+        "Sees: the map scrolls with the player and the parallax layer behind it moves at its own speed.",
+        "Why: the scroll position, the strip requests and the BG2 position must change together.",
+        "In: scroll_delta_x, scroll_delta_y (signed words). M and X are set to 16 bits inside (PHP / PLP).",
+        "Out: scroll_bg1_x/y = old + delta, limited to 0 .. map size - view size ($100 wide, view_height_px high). scroll_requests gets $80 (x) or $40 (y) when bit 4 of the position changed. BG2: if ratio_x_bg2 is non-zero UpdateLayerScrollX runs with request bit $20, if ratio_y_bg2 is non-zero UpdateLayerScrollY with $10 (X = 4). The deltas are not cleared here (BuildScrollStrips does).",
+        "Clobbers: A, X (P restored)."
+      ],
+      "BuildScrollStrips": [
+        "Builds the strips for every request bit in scroll_requests, then clears the scroll deltas. The extractor decodes it wrongly (OQ-I005-7, OQ-I026-1); the listing below the label is not the code.",
+        "",
+        "Real code (M = 1 on entry; bytes read at file offsets 65803-65890):",
+        "  LDA #$80; TRB scroll_requests; BEQ next; LDX #0; JSR BuildColumnStrip   (BG1 column)",
+        "  LDA #$40; TRB scroll_requests; BEQ next; LDX #0; JSR BuildRowStrip      (BG1 row)",
+        "  LDX bg2_delta_x; STX scroll_delta_x; LDX bg2_delta_y; STX scroll_delta_y   (BG2 uses its own deltas)",
+        "  LDA #$20; TRB scroll_requests; BEQ next; LDX #4; LDA map_width_pages,X; CMP #3; BCC next; JSR BuildColumnStrip   (BG2 column, only when the BG2 map is at least 3 pages wide)",
+        "  LDA #$10; TRB scroll_requests; BEQ next; LDX #4; LDA map_height_pages,X; CMP #3; BCC next; JSR BuildRowStrip      (BG2 row, at least 3 pages high)",
+        "  LDX #0; STX scroll_delta_x; STX scroll_delta_y; RTL",
+        "",
+        "When: every game frame after ScrollCameraByDelta.",
+        "Sees: the new column or row of the map appears at the screen edge in the same frame's NMI.",
+        "Why: the strip is built in the work phase and uploaded by the NMI, which has no time to read the map.",
+        "In: M = 1 (callers); scroll_requests, the deltas and bg2_delta_x/y set by ScrollCameraByDelta.",
+        "Out: strip records filled for the requested layers; scroll_delta_x/y = 0. A BG2 map narrower than 3 pages is never streamed (it fits the tilemap and was drawn whole at entry).",
+        "Clobbers: A, X, Y, dp $00-$0A, $16, $18, $29 (through the strip builders)."
+      ],
+      "BuildColumnStrip": [
+        "Builds the column strip of layer X for the sign of scroll_delta_x.",
+        "",
+        "When: BuildScrollStrips for request bits $80 (X = 0) and $20 (X = 4).",
+        "Sees: one new column of metatiles at the right (or left) screen edge.",
+        "Why: gathers the layer's parameters into the DP block the buffer filler expects.",
+        "In: X = 0 (BG1) or 4 (BG2); scroll_delta_x (zero = nothing to do).",
+        "Out: M = 1. dp$16 = (scroll x + $100 for a positive delta, scroll x for a negative one) and $0FF0; $18 = scroll y and $0F00; $00 = tilemap VRAM base, $02 = map base, $04 = map_width_px (the row stride of pages), $06 = attribute word (tile_attr high byte x 256), $08 = end of the map data (map base + pages), $0A = tile mask, $29 = tile definition table. FillColumnStripBuffer then fills the layer's column record.",
+        "Clobbers: A, X, Y, dp $00-$0A, $16, $18, $29."
+      ],
+      "BuildRowStrip": [
+        "Builds the row strip of layer X for the sign of scroll_delta_y.",
+        "",
+        "When: BuildScrollStrips for request bits $40 (X = 0) and $10 (X = 4).",
+        "Sees: one new row of metatiles at the bottom (or top) screen edge.",
+        "Why: same parameter set as BuildColumnStrip, for the vertical direction.",
+        "In: X = 0 or 4; scroll_delta_y (zero = nothing to do).",
+        "Out: M = 1. dp$16 = scroll x and $0F00; $18 = (scroll y + $100 for a positive delta, scroll y for a negative one) and $0FF0; the rest as in BuildColumnStrip; FillRowStripBuffer fills the layer's row record.",
+        "Clobbers: A, X, Y, dp $00-$0A, $16, $18, $29."
+      ],
+      "RedrawBackgroundsAtEntry": [
+        "Places the camera on the player and draws both backgrounds completely.",
+        "",
+        "When: once per scene change (lib_scene_change_init), except in location $10 (the Mode 7 title scene).",
+        "Sees: the room is already fully drawn when the screen fades in.",
+        "Why: the strip streaming only adds edges, so a new scene needs a full draw first.",
+        "In: player_x, player_y, map sizes, per-layer tables set by the scene loader.",
+        "Out: scroll_bg1_x = player_x - $70 and scroll_bg1_y = player_y - $90 (limited to the map), BG2 scroll from UpdateLayerScrollX/Y with request bit 0 (the ratio, plus bg2_offset), reduced modulo the map size; then for X = 0 and X = 4, 32 passes of FillColumnStripBuffer + UploadScrollStrips advance dp$16 by 16 pixels each. $0392 and $0394 are written (map width and height divided by 16) and never read (OQ-I026-5).",
+        "Clobbers: A, X, Y, dp $00-$0A, $0E, $16, $18, $29, $32-$37; DMA channel 2 and VMAIN are used directly (NMI is off)."
+      ],
+      "FillColumnStripBuffer": [
+        "Fills one column record: the VRAM address and the four 64-byte blocks of tiles.",
+        "",
+        "When: BuildColumnStrip and RedrawBackgroundsAtEntry.",
+        "Sees: nothing by itself; the NMI uploads the result.",
+        "Why: turns map metatiles into the exact tile order the DMA writes down the tilemap.",
+        "In: X = buffer address (strip_col_bg1/2), dp $00-$0A, $16, $18, $29 as set by BuildColumnStrip; DBR is set to $7E inside.",
+        "Out: word at X = VRAM address (tilemap base + $400 when bit 8 of x is set + ((x >> 3) and $1E)); then the first page and the second page of the column are expanded by CopyMetatileColumn into the blocks (the order depends on bit 8 of $18, the vertical half the strip starts in; the second page wraps to the start of the map data at its end).",
+        "Clobbers: A, X, Y (P and B saved)."
+      ],
+      "FillRowStripBuffer": [
+        "Fills one row record: the VRAM address and the four 64-byte blocks of tiles.",
+        "",
+        "When: BuildRowStrip.",
+        "Sees: nothing by itself; the NMI uploads the result.",
+        "Why: same as FillColumnStripBuffer for rows.",
+        "In: X = buffer address (strip_row_bg1/2), dp $00-$0A, $16, $18, $29 as set by BuildRowStrip; DBR is set to $7E inside.",
+        "Out: word at X = VRAM address (tilemap base + row ((y and $F0) x 4 + $800 when bit 8 of y is set)); the first page and the page to its right (+ $100 in the map) are expanded by CopyMetatileRow (the order depends on bit 8 of $16). No wrap at the end of the map for the second page.",
+        "Clobbers: A, X, Y (P and B saved)."
+      ],
+      "CopyMetatileColumn": [
+        "Expands 16 metatiles of a page column into tile words for a column record.",
+        "",
+        "When: FillColumnStripBuffer, up to 4 times per strip.",
+        "Sees: nothing by itself.",
+        "Why: a column strip stores the left tile column of the 16 metatiles first (32 words), then the right tile column.",
+        "In: Y = map offset of the first metatile (the next one is + $10), X = buffer position; dp $06 attribute, $0A mask, $29 definition table; DBR = $7E.",
+        "Out: per metatile 4 words (definition AND mask OR attribute): top-left to X, bottom-left to X + 2, top-right to X + $40, bottom-right to X + $42; X advances 4 per metatile. X and Y are restored on exit.",
+        "Clobbers: A, dp $0E."
+      ],
+      "CopyMetatileRow": [
+        "Expands 16 metatiles of a page row into tile words for a row record.",
+        "",
+        "When: FillRowStripBuffer, up to 4 times per strip.",
+        "Sees: nothing by itself.",
+        "Why: a row strip stores the top tile row of the 16 metatiles first (32 words), then the bottom tile row.",
+        "In: Y = map offset of the first metatile (the next one is + 1), X = buffer position; dp $06, $0A, $29; DBR = $7E.",
+        "Out: per metatile 4 words: top-left to X, top-right to X + 2, bottom-left to X + $40, bottom-right to X + $42; X advances 4 per metatile. X and Y are restored on exit.",
+        "Clobbers: A, dp $0E."
+      ],
+      "ScaleByRatio": [
+        "Multiplies a scroll position by a ratio word: A x numerator / divisor.",
+        "",
+        "When: UpdateLayerScrollX and UpdateLayerScrollY (BG2 parallax).",
+        "Sees: the background behind the map moves slower than the map in front (the ratio $0201 is half speed).",
+        "Why: uses the PPU multiplier ($211B/$211C) for A x numerator and the hardware divider for the division.",
+        "In: A = position (16 bits), Y = ratio word (low byte numerator, high byte divisor).",
+        "Out: A = quotient (16 bits).",
+        "Clobbers: A (P and Y saved); the divider result registers."
+      ],
+      "UpdateLayerScrollX": [
+        "Sets the x scroll of layer X from BG1's scroll through the layer's ratio and requests a column strip when a 16-pixel line was crossed.",
+        "",
+        "When: ScrollCameraByDelta (BG2, X = 4) and RedrawBackgroundsAtEntry.",
+        "Sees: the BG2 layer drifts with the map.",
+        "Why: BG2's position is a function of BG1's, so only BG1 is scrolled directly.",
+        "In: A = the request bit to set (16 bits), X = 0 or 4. Reads scroll_bg1_x, ratio_x_bg1/2, map_width_px,X and bg2_offset_x.",
+        "Out: scroll_bg1_x,X = scaled position, clamped to map_width_px - $100 when the layer's map is at least $300 pixels wide, plus bg2_offset_x; scroll_requests |= A when bit 4 of the position changed; bg2_delta_x = new - old position.",
+        "Clobbers: none (A, Y and P saved)."
+      ],
+      "UpdateLayerScrollY": [
+        "Sets the y scroll of layer X from BG1's scroll through the layer's ratio and requests a row strip when a 16-pixel line was crossed.",
+        "",
+        "When: ScrollCameraByDelta (BG2, X = 4) and RedrawBackgroundsAtEntry.",
+        "Sees: the BG2 layer drifts with the map.",
+        "Why: same as UpdateLayerScrollX for y.",
+        "In: A = the request bit to set (16 bits), X = 0 or 4. Reads scroll_bg1_y, ratio_y_bg1/2, map_height_px,X, view_height_px and bg2_offset_y.",
+        "Out: scroll_bg1_y,X = scaled position, clamped to map_height_px - view_height_px for maps at least $300 pixels high, plus bg2_offset_y; scroll_requests |= A when bit 4 changed; bg2_delta_y = new - old.",
+        "Clobbers: none (A, Y and P saved)."
+      ],
+      "UploadScrollStrips": [
+        "Sends a column record and a row record to VRAM by DMA channel 2 and empties them.",
+        "",
+        "When: the NMI (UploadMapStripBuffers, once for the BG1 pair and once for the BG2 pair) and RedrawBackgroundsAtEntry.",
+        "Sees: the new map edge appears.",
+        "Why: the map must reach VRAM during vblank; an empty record (address word 0) costs nothing.",
+        "In: dp $32 = column record pointer (bank in $34), dp $35 = row record pointer (bank in $37).",
+        "Out: for each non-empty record: VMAIN = $81 (column) or $80 (row), four DmaStripChunk transfers to the record's address, + 1 / + $20, + $800 / + $400 and + $801 / + $420, then the record's address word is zeroed.",
+        "Clobbers: A, X (X is made 8-bit by the routine; P restored)."
+      ],
+      "DmaStripChunk": [
+        "Starts one 64-byte DMA of a strip block to VRAM.",
+        "",
+        "When: UploadScrollStrips, 4 times per record.",
+        "Sees: nothing by itself.",
+        "Why: the common part of the four block transfers.",
+        "In: VMADDL and A1T2L set by the caller; X flag = 8-bit.",
+        "Out: DMA channel 2: mode 1 (two registers), B-bus $2118, source bank $7E, 64 bytes, started with MDMAEN = 4.",
+        "Clobbers: X (8 bits)."
+      ]
+    },
+    "comments": {
+      "65704": { "text": "Request bit $80: a BG1 column strip is needed (the scroll crossed a 16-pixel line in x)", "expect": "LDA" },
+      "65770": { "text": "Request bit $40: a BG1 row strip is needed", "expect": "LDA" },
+      "65776": { "text": "X = 4: the BG2 entries of the per-layer word-pair tables", "expect": "LDX" },
+      "66162": { "text": "Layer loop: X = 0 (BG1), then 4 (BG2)", "expect": "LDX" },
+      "66300": { "text": "32 column strips of 16 pixels = the 512-pixel width of the 64 x 64 tilemap", "expect": "LDA" },
+      "66603": { "text": "Metatile definition word ($29 = the layer's table, 8 bytes per metatile: TL, TR, BL, BR); the mask drops bit 9 (solid flag), $06 adds the attribute", "expect": "LDA" },
+      "66757": { "text": "Position x numerator from the PPU multiplier; the divisor is the high byte of the ratio", "expect": "LDY" },
+      "66816": { "text": "Clamp only when the layer's map is at least 3 pages wide", "expect": "CMP" },
+      "66846": { "text": "Request bit passed in A by the caller ($20 column, $10 row for BG2)", "expect": "TSB" },
+      "66855": { "text": "How far the layer moved this frame (BuildScrollStrips uses it as the BG2 delta)", "expect": "STA" },
+      "66948": { "text": "VMAIN $81: step 32 words after the high byte = write down a column", "expect": "STX" },
+      "66996": { "text": "+ $800: the lower screen of the 64 x 64 tilemap", "expect": "ADC" },
+      "67038": { "text": "A zero address word marks the record as empty", "expect": "STA" },
+      "67042": { "text": "VMAIN $80: step 1 word = write along a row", "expect": "STX" }
+    }
+  },
+
+  "library/lib_animation.asm": {
+    "blockNote": [
+      "Record stepper used by the animation COP commands Cop92-Cop95 (file offsets 67163-67312, SNES $02:865B-$86F0, bank 02).",
+      "",
+      "=== MODEL ===",
+      "An actor field set drives a list of 6-byte records: $1E = animation id, $20 = step, $24 = data bank. The word list at $8000 of that bank (one word per animation id) points to the records. NextFrameRecord loads the record of the current step into the actor's work fields; CopyFrameData copies the bytes the record points to into WRAM bank $7F.",
+      "Record (6 bytes): +0 duration (0 = end of the animation), +1 word source address (bank $24,X) -> $08,X, +3 byte x 2 -> $0A,X (destination offset), +4 byte -> $0C,X (byte count - 1 for the block move), +5 byte -> $0E,X and $14,X (the wait reload). The tick counter $26,X = duration - 1.",
+      "The destination is bank $7F offset $0A,X, i.e. the CGRAM shadow $7F0000 (two bytes per colour) when the offset is a colour index x 2; a count byte of 2 (three bytes) adds $200 to the offset, which lands on coldata_buffer ($7F0200, the three COLDATA bytes). This makes the stepper a colour animation, but nothing in the code names it, so it is inferred from the destination (OQ-I026-3).",
+      "",
+      "=== NOTES ===",
+      "- The block move runs through a RAM stub at $1C5C built by the scene init (lib_027912): PHB, MVN, PLB, RTS. CopyFrameData patches its two bank operands (wram_copy_stub+2): destination $7F, source = the actor's data bank."
+    ],
+    "partNotes": {
+      "NextFrameRecord": [
+        "Loads the next record of the actor's animation into its work fields.",
+        "",
+        "When: Cop92_StartAnimation, Cop93, Cop94_AnimTick and Cop95 (not SetActorAnimFrame, which has its own stepper).",
+        "Sees: the next step of the animation starts.",
+        "Why: keeps the record format in one place.",
+        "In: X = actor; $1E = animation id, $20 = step, $24 = data bank.",
+        "Out: carry clear: $26 = duration - 1, $08 = source address, $0A = destination offset, $0C = byte count - 1, $0E and $14 = reload, $20 incremented; when the count byte is 2 then $0B is incremented twice ($0A + $200). Carry set: the duration was 0 (end): $20 = 0, nothing loaded.",
+        "Clobbers: A, Y (B and P restored)."
+      ],
+      "CopyFrameData": [
+        "Copies the current record's bytes to WRAM bank $7F and advances the source pointer.",
+        "",
+        "When: after NextFrameRecord, and on every tick of Cop94 / Cop95.",
+        "Sees: the colours of the animation change (inferred, OQ-I026-3).",
+        "Why: the NMI uploads the WRAM shadow, so the stepper only has to fill it.",
+        "In: X = actor; $08 = source address, $0A = destination offset, $0C = byte count - 1, $24 = data bank. M = 16 (the extractor override was fixed: the code runs with a 16-bit accumulator).",
+        "Out: bytes copied to $7F:$0A (MVN through wram_copy_stub); $08,X = the source address after the block. X is preserved.",
+        "Clobbers: A, Y (B saved)."
+      ]
+    },
+    "comments": {
+      "67203": { "text": "Duration 0 = end of the animation: the step is reset and carry is set", "expect": "BEQ" },
+      "67260": { "text": "Count byte 2: destination + $200 = coldata_buffer instead of the palette shadow", "expect": "INC" },
+      "67288": { "text": "Patch the MVN operands of the RAM stub: destination bank $7F, source bank = the actor's data bank", "expect": "STA" },
+      "67303": { "text": "Runs the stub PHB / MVN / PLB / RTS (A = count - 1, X = source, Y = destination)", "expect": "JSR" }
+    }
+  },
+
+  "library/lib_0109D6_part1.asm": {
+    "blockNote": [
+      "Metatile writers: put one metatile into the map and, when it is on screen, queue it for VRAM (file offsets 67313-67770, SNES $02:86F1-$88BA, bank 02).",
+      "",
+      "=== MODEL ===",
+      "Both routines (1) turn the pixel position in dp$16 / $18 into a map offset (lib_map_index_helpers.code_0272B8), (2) store the metatile id in the BG1 map ($7E8000) and, for SetMetatileBg1Bg2, also in the BG2 map ($7EC000), (3) rewrite the tile_type_map byte ($7F8000) from the definition (the solid flag, bit 9, of the four tile words gives bits 0 to 3: top-left, top-right, bottom-left, bottom-right) and (4) when the metatile lies in the view plus 16 pixels, write four (VRAM address, tile word) entries per layer to vram_write_queue ($1C7B, 4 bytes per entry, 16 per metatile) and a zero terminator; the NMI (FlushVramWriteQueue) draws them.",
+      "The queue is overwritten from its start: callers either wait for it to be empty first (SealLair) or call right after the NMI has emptied it (the tile triggers).",
+      "Callers: SealLair (green switch $FE), CheckPlayerTileTriggers / TryOpenChest (open chest $FC) and ReleaseLairAtSwitch's own map write (it writes the map bytes directly)."
+    ],
+    "partNotes": {
+      "SetMetatileBg1": [
+        "Writes one metatile into the BG1 map and queues its four tiles for VRAM.",
+        "",
+        "When: SealLair (lair with record byte +8 = 0) and TryOpenChest (chest with bit 7 of its id clear).",
+        "Sees: a tile of the room changes: the green switch appears under a cleared lair, a chest opens.",
+        "Why: one routine keeps the map, the collision byte and the screen in step.",
+        "In: A (8 bits) = metatile id; dp$16 / $18 = pixel position of the metatile (multiples of 16); M = 1.",
+        "Out: $7E8000 + offset = id; tile_type_map[offset] = the four solid flags of the definition (the whole byte is replaced, so the block bits $F0 are cleared); if on screen vram_write_queue holds 4 entries and a terminator.",
+        "Clobbers: A (X, P restored)."
+      ],
+      "SetMetatileBg1Bg2": [
+        "Same as SetMetatileBg1 for a tile that exists on both layers: BG1 and BG2.",
+        "",
+        "When: SealLair (lair with record byte +8 non-zero) and TryOpenChest (chest with bit 7 of its id set).",
+        "Sees: the same tile change, on both backgrounds.",
+        "Why: some rooms draw a tile on both layers; changing only one would leave the other visible.",
+        "In: as SetMetatileBg1.",
+        "Out: $7E8000 and $7EC000 + offset = id; tile_type_map as above (from the BG1 definition); 8 queue entries (BG1 at the tilemap address, BG2 at the same offset + $1000) and a terminator, when on screen.",
+        "Clobbers: A (X, P restored)."
+      ]
+    },
+    "comments": {
+      "67436": { "text": "Collision type: bit 9 of the four tile words (TL, TR, BL, BR) becomes bits 0-3; the byte is replaced", "expect": "STA" },
+      "67452": { "text": "On-screen test (unsigned): inside the 256-pixel view plus a 16-pixel margin, else nothing is queued", "expect": "CMP" },
+      "67476": { "text": "Queue entries (VRAM address, tile word): top-left, top-right, bottom-left (+ $20), bottom-right", "expect": "STA" },
+      "67494": { "text": "Terminator of the VRAM write queue", "expect": "STZ" }
+    }
+  },
+
+  "library/lib_0108BB.asm": {
+    "blockNote": [
+      "Map patch rectangles: copy a rectangle of the map to another place, and the table that holds the five boss-room patches followed by the map sizes (ApplyMapPatchRect: file offsets 67771-68053, SNES $02:88BB-$89D5; MapPatchRectsAndMapSizes: 95492-95787, SNES $02:F504-$F62B; bank 02).",
+      "",
+      "=== MODEL ===",
+      "ApplyMapPatchRect copies a rectangle of metatiles (and their tile_type_map bytes) inside the BG1 map: from the source rectangle given in the record's pixel words +4 / +6 to the destination given by +0 / +1 (metatile units), width +2, height +3; then every copied cell that is on screen is queued for VRAM (16 bytes per cell in vram_write_queue, zero terminator). It is the boss-room patch: RunBossMapPatch (engine_003005) calls it with the id 0-4 stored by five boss scripts (whether the patch closes or opens the room is OQ-I024-3).",
+      "",
+      "=== TABLE ===",
+      "MapPatchRectsAndMapSizes holds two tables back to back in one 296-byte part: 5 patch records of 8 bytes (entries 00-04 of the extracted rows) and, from byte $28, 128 pairs (map_width_pages, map_height_pages) indexed by location_id x 2, read by lib_scene_change_init (OQ-I026-2: the part should be split in blocks.json).",
+      "Patch record: +0 destination x, +1 destination y (metatiles), +2 width, +3 height (metatiles), +4 word source x, +6 word source y (pixels)."
+    ],
+    "partNotes": {
+      "ApplyMapPatchRect": [
+        "Copies a rectangle of BG1 metatiles (and their collision bytes) to another place and redraws what is on screen.",
+        "",
+        "When: ApplyBossMapPatch (engine_003005), once per boss room, with the patch id 0-4 from the boss script.",
+        "Sees: part of the boss room changes at the moment the fight starts or ends (a door opens or closes, OQ-I024-3).",
+        "Why: the changed room is prebuilt elsewhere in the same map, so the patch only has to copy cells.",
+        "In: A (16 bits) = patch id (0-4); M = 16.",
+        "Out: for every cell of the width x height rectangle: $7E8000 and tile_type_map at the destination = the cells at the source; on-screen cells queued (4 entries each) and a terminator word 0. BG2 is not touched.",
+        "Clobbers: A, Y, dp $00, $02, $0C, $0E, $16, $18 (X restored)."
+      ],
+      "MapPatchRectsAndMapSizes": [
+        "Five boss map patch records followed by the per-location map size table.",
+        "",
+        "When: ApplyMapPatchRect reads the records (id x 8); lib_scene_change_init reads the sizes (location_id x 2 + $28) into map_width_pages and map_height_pages.",
+        "Sees: the boss room patch and the size of every scene's map.",
+        "Why: both are small constant tables of this file's code; the size table has 128 entries (unused locations hold 0, 0).",
+        "In: n/a (data).",
+        "Out: n/a. Patch ids 0 and 4 are identical (OQ-I024-3).",
+        "Clobbers: n/a."
+      ]
+    },
+    "comments": {
+      "67777": { "text": "Record = id x 8: +0 / +1 destination, +2 / +3 size (metatiles), +4 / +6 source position (pixels)", "expect": "LDA" },
+      "67855": { "text": "Source cell: its metatile and collision byte are read here and stored at the destination cell", "expect": "LDA" },
+      "67867": { "text": "X = map offset of the destination cell (dp$16 / $18)", "expect": "JSL" },
+      "67898": { "text": "Only cells inside the view (plus a 16-pixel margin) are queued for VRAM", "expect": "BCS" }
+    }
+  },
+
+  "library/lib_0109D6_part3.asm": {
+    "blockNote": [
+      "Inventory store (file offsets 73977-74039, SNES $02:A0F9-$A137, bank 02).",
+      "",
+      "The inventory / progress table is the byte array inventory ($1B1E): entry n (1-based) is at $1B1E + n - 1, bits 0-6 hold the value (the entry number when owned), bit 7 is the 'equipped' flag (OQ-I006-2). StoreInventoryEntry is the only writer used by the item scripts (Cop0A_GiveItemIfNotOwned) and by the chest code (TryOpenChest)."
+    ],
+    "partNotes": {
+      "StoreInventoryEntry": [
+        "Stores an entry number into the inventory table, keeping the equipped flag.",
+        "",
+        "When: Cop0A_GiveItemIfNotOwned (item given by a script or shop), TryOpenChest (item chests) and the unused DebugApplyItem.",
+        "Sees: the item or progress entry is in the inventory afterwards; if the old entry was equipped (bit 7) the new value is also copied to equipped_bracelet.",
+        "Why: entries from $19 upward are upgrades that replace the old value while keeping the equipped flag, so the table stores them with an OR.",
+        "In: A (8 bits) = entry number n; M = 1.",
+        "Out: n below $19: inventory[n - 1] = n. n from $19: inventory[n - 1] = (old bit 7) OR n; if bit 7 was set equipped_bracelet = n. Then, when the old value (bit 7 masked) was $38, heal_pending = player_max_hp - player_hp (OQ-I026-7: it tests the old value, not the new one).",
+        "Clobbers: A, Y (P restored)."
+      ]
+    },
+    "comments": {
+      "74023": { "text": "Tests the OLD value of the entry (OQ-I026-7); $38 is the Medical Herb", "expect": "CMP" }
+    }
+  },
+
+  "library/lib_tile_triggers_and_lair_return.asm": {
+    "blockNote": [
+      "Tile triggers under the player, the Monster Lair release and the NPC return trip (code at file offsets 68054-69353, SNES $02:89D6-$8EE9; NpcNameStrings 86758-86863 (53 words) and its strings, SNES $02:D2E6; LocationAreaScene 95788, SNES $02:F62C; bank 02).",
+      "",
+      "=== TILE TRIGGERS ===",
+      "CheckPlayerTileTriggers runs every frame at the start of the work phase. When the player stands on the 16-pixel grid (both coordinates have zero low nibbles) it reads the BG1 metatile at (player_x, player_y - 16): $FE (the green switch, written by SealLair) releases a lair (ReleaseLairAtSwitch, not while boss_fight_active), otherwise a pressure plate (TriggerVariantPlate) and then a chest in front of the player (TryOpenChest) are tried. The exit regions (CheckExitRegions) are tested every frame, aligned or not. Any trigger that fires zeroes the player's velocity ($04, $06). Special metatile ids: $FD intact lair, $FE green switch, $FF cleared switch, $FB closed chest, $FC open chest.",
+      "Lists: chests table_00A9DE (6-byte rows, from chest_list_ofs), exit regions table_00AC96 (11-byte rows, from exit_list_ofs), plates table_00B69A (4-byte rows, from plate_list_ofs); every list ends with an $FF byte. The offsets are set by the scene loader.",
+      "",
+      "=== LAIR RECORD (32 bytes in data_00BA0D) ===",
+      "Fields as used by this file (bytes 0-7 are copied to $1C6D-$1C74 for the rectangle routines): +0 location of the freed NPC's home ($FF/$80+ ends the table), +1 slab number (0-3), +2 / +3 the NPC's home tile (x, y), +4 / +5 x, y and +6 / +7 width, height of the rectangle (metatiles), +8 layer flag (0 = BG1 only, bit 0 = also BG2), +9 NPC name index (NpcNameStrings), +A state bits ORed into lair_state, +B location of the lair, +C / +D lair tile (x, y; the switch appears here), +E / +F x, y of the staging rectangle (both 0 = the lair frees an NPC; otherwise the lair opens a path), +$10-$12 lair script, +$13 monster count, +$1D warp animation, +$1E release switch word (bit index in $1ADE). The part note of data_00BA0D is not written yet.",
+      "",
+      "=== RELEASE MODEL ===",
+      "When the last monster of a lair dies SealLair turns the lair tile into the green switch $FE. Stepping on it (ReleaseLairAtSwitch) finds the lair record, turns the switch into $FF, decrements lairs_left and then does one of two things. If +E / +F are non-zero it opens a path: lair_state = +A or $80, bit n is set in the switch array $1ADE and the released array $1A9E, and the staging rectangle is copied to the rectangle at +4 / +5 (CopyMapRectFromStaging, or ...BothLayers when bit 0 of +8 is set) while the sweep redraw (StepSweepRedraw, 35 frames per layer through RunSubFrameMapSweep) shows it. If they are zero it frees an NPC: lair_state = +A or $C0 and, when the NPC's home is the current location, the home tile gets type 1; otherwise the player is sent to the NPC's home: the return point (area, scene, x, y - 16) is saved, warp_dest is set to the home tile, area_next / scene_next come from LocationAreaScene, transition_type = $80, return_record = the lair index and return_active is incremented. In the home scene the return loop runs RunLairReleaseOnReturn every frame: when the player stands on the type 1 tile PlayLairReleaseScene prints '<name> released', steps the NPC through the slabs 0-3 and sets the arrays; otherwise it prints '<name> cannot be recalled yet!'. When the return loop ends the player is warped back (RunReturnLoop). The walkthrough agrees: freeing an NPC, opening a path or a chest by the switch beneath a lair (02-grass-valley.md lines 47, 51, 238; 03-greenwood.md line 339).",
+      "Bits of lair_state ($7F0203 + lair index): $80 = released, $40 = the NPC's return is pending (cleared by PlayLairReleaseScene and by HoldActorUntilReleased).",
+      "",
+      "=== NOTES ===",
+      "- Arrays used here: $1A7E bit (chest id and $7F) = chest already opened; $1A9E bit n = lair n released; $1ADE bit n = switch n set. lib_bit_array.code_027348 sets bit A of the array at Y, code_0273A2 tests it (carry = set).",
+      "- The ROM text 'recieved' (asciistring_016216) is kept as printed; the extractor prints an apostrophe as a space in some names (OQ-I008-14, OQ-I008-15).",
+      "- The names of NpcNameStrings are printed through the text code [TBL:&NpcNameStrings,03C8] with text_arg set to the name index."
+    ],
+    "partNotes": {
+      "CheckPlayerTileTriggers": [
+        "Tests the tile under the player for a lair switch, a pressure plate, a chest or an exit region.",
+        "",
+        "When: every frame of the main loop, before the actors run.",
+        "Sees: stepping on the green switch frees an NPC or opens a path; walking into a room edge or door changes scene; a chest opens when the player faces it.",
+        "Why: the triggers are map data (tiles and region lists), not actor scripts, so the engine polls them once per frame.",
+        "In: M = 1; player_x, player_y, player_tile_x/y; boss_fight_active.",
+        "Out: a trigger fired: the player actor's $04 and $06 (velocity) are zeroed. ReleaseLairAtSwitch, TriggerVariantPlate and TryOpenChest play their own scenes with sub-frames; CheckExitRegions sets area_next, scene_next and warp_dest_*.",
+        "Clobbers: A, X, Y, dp $00-$06, $16, $18."
+      ],
+      "TryOpenChest": [
+        "Opens the chest above the player when the player faces up and the chest has not been opened.",
+        "",
+        "When: CheckPlayerTileTriggers, when the tile under the player is not a switch and no plate fired.",
+        "Sees: the chest tile opens, the message box shows 'Nothing inside', '<item> recieved' or 'found N GEMs' (the walkthrough: chests with Gems or items, 02-grass-valley.md line 47).",
+        "Why: chest data is a list (table_00A9DE), so any room can hold chests without an actor.",
+        "In: M = 1. Row of table_00A9DE (6 bytes): +0 x, +1 y of the tile the player stands on, +2 chest id (bit 7 = tile on both layers; the low 7 bits index the array $1A7E), +3 content (0 = empty, $FF = Gems, otherwise the inventory entry), +4 word Gem amount.",
+        "Out: carry clear = nothing happened. Carry set = the chest opened: the tile at (player_x, player_y - $20) must be $FB, becomes $FC (SetMetatileBg1 or ...Bg1Bg2), the chest bit is set, BRK #$15, the text box opens (code_013140 with A = $1E); an item goes through StoreInventoryEntry (BRK #$9E); Gems go through lib_player_stats.code_0276A5 with hud_dirty_flags |= $10 (BRK #$8D); an empty chest prints 'Nothing inside'. text_arg carries the entry or the amount.",
+        "Clobbers: A, X, Y, text_arg."
+      ],
+      "CheckExitRegions": [
+        "Warps the player when it stands inside an exit region of the room.",
+        "",
+        "When: CheckPlayerTileTriggers, every frame (also when the player is not on the 16-pixel grid).",
+        "Sees: walking through a doorway, a room edge or a ladder starts the next scene.",
+        "Why: exits are rectangles in a list (table_00AC96), so the room needs no script for them.",
+        "In: M = 1; exit_list_ofs (0 = no list). Row (11 bytes): +0 x, +1 y, +2 width, +3 height (tiles), +4 area, +5 scene, +6 arrival animation, +7 word arrival x, +9 word arrival y; an $FF byte ends the list.",
+        "Out: no match: carry clear. A match needs the player's tile inside the rectangle and then its pixel position inside the rectangle shrunk by 15 pixels: area_next, scene_next, warp_dest_anim, warp_dest_x and warp_dest_y are set and carry is set.",
+        "Clobbers: A, X, Y, dp $00-$06 (P restored)."
+      ],
+      "TriggerVariantPlate": [
+        "Applies the next map variant when the player steps on an active pressure plate.",
+        "",
+        "When: CheckPlayerTileTriggers, when the tile under the player is not a switch.",
+        "Sees: part of the room changes with a sweep when the player steps on a plate of a released lair, and the next plate takes over.",
+        "Why: a room alternates between two map variants (slabs 2 and 3) driven by plate_variant.",
+        "In: M = 1; plate_list_ofs. Row of table_00B69A (4 bytes): +0 x, +1 y of the plate tile, +2 word lair record index (also the bit number in $1A9E).",
+        "Out: carry clear = no plate at the player's tile, or its bit in $1A9E is clear (the plate is inactive until the lair is released). Carry set: the lair record's bytes 0-7 are copied to $1C6D, release_slab = plate_variant + 2, CopyMapRectFromSlab, a 35-frame BG1 sweep; then plate_variant is toggled and plate_list_ofs is taken from the entry of the other variant in the pair at plate_lists_ofs.",
+        "Clobbers: A, X, Y, dp $0E, $10, $16, $18 and the rectangle variables $1C62-$1C75."
+      ],
+      "ReleaseLairAtSwitch": [
+        "Releases the lair whose green switch the player stands on: opens a path or frees an NPC.",
+        "",
+        "When: CheckPlayerTileTriggers, when the tile at (player_x, player_y - 16) is $FE and no boss fight is running.",
+        "Sees: the switch disappears; either a stretch of the room changes with a sweep (a path opens) or the screen changes to the NPC's home (the NPC goes home).",
+        "Why: all lair rewards are rows of data_00BA0D, so one routine serves every lair.",
+        "In: M = 1; X = map offset of the switch tile (dp$00 keeps it); player_tile_x/y; location_id.",
+        "Out: no matching record (location, tile): nothing. Otherwise: lairs_left decremented (if non-zero), the switch tile = $FF in BG1 (and BG2 when +8 is non-zero), then the path or NPC case described in the block note; the NPC case for a home elsewhere ends with return_active incremented and RTL.",
+        "Clobbers: A, X, Y, dp $00, $16, $18 and the rectangle variables $1C6D-$1C75."
+      ],
+      "PlayLairReleaseScene": [
+        "Plays the 'NPC released' scene in the NPC's home location.",
+        "",
+        "When: RunLairReleaseOnReturn, when the player stands on the type 1 tile.",
+        "Sees: the message '<name> released', then the NPC's spot is redrawn in four steps with a sweep each (the walkthrough: the freed NPC returns home).",
+        "Why: lets the home scene show what the player did elsewhere.",
+        "In: M = 1; player_tile_x/y; location_id. Record = the one whose +0 is this location and +2 / +3 are the player's tile (the table ends at a first byte of $80 or more).",
+        "Out: text_arg = record +9, the message printed, the lair's bit $40 cleared, release_slab = 0-3 in turn with CopyMapRectFromSlab and a 35-frame BG1 sweep each (only one frame when the rectangle width is 0); the arrays $1A9E and $1ADE get the lair's bit set. A block that computes the NPC tile's map offset + 4 map sizes is dead (OQ-I026-6).",
+        "Clobbers: A, X, Y, dp $00, $01, $16, $18 and the rectangle variables."
+      ],
+      "RunLairReleaseOnReturn": [
+        "Per-frame hook of the return loop: starts the release scene or reports that the NPC cannot be recalled yet.",
+        "",
+        "When: every frame of RunReturnLoop.",
+        "Sees: after the warp to the NPC's home scene, the release message appears; if the player is not on the home tile the text says the NPC cannot be recalled yet.",
+        "Why: the return loop is generic; this hook ties it to the lair that started the trip (return_record).",
+        "In: player_x, player_y, return_record (the routine sets M itself).",
+        "Out: the tile under the player has type 1: PlayLairReleaseScene runs. Otherwise text_arg = the name index of record return_record and 'cannot be recalled yet!' is printed.",
+        "Clobbers: A, X, Y, text_arg."
+      ],
+      "NpcNameStrings": [
+        "Pointer table of the 53 NPC and object names used in the release and chest messages.",
+        "",
+        "When: the text code [TBL:&NpcNameStrings,03C8] with text_arg = the name index (lair record +9).",
+        "Sees: '<name> released', '<name> cannot be recalled yet!'; the names are the freed NPC's description ('an old man', 'Lisa', 'The village Chief', 'a dog, Turbo', 'King Magridd', 'Dr-Leo', 'the doll, Marie' ...).",
+        "Why: the message is shared, only the name changes.",
+        "In: n/a (data). 53 words (index $00-$34), each the address of an ASCII string a few lines below.",
+        "Out: n/a. Spelling differences with the walkthrough are OQ-I008-14 and OQ-I008-15.",
+        "Clobbers: n/a."
+      ],
+      "LocationAreaScene": [
+        "Table of the (area, scene) pair of every location id.",
+        "",
+        "When: ReleaseLairAtSwitch, to warp to the NPC's home location (record +0).",
+        "Sees: the destination of the return trip.",
+        "Why: the lair record stores the location id, the scene loader wants area and scene.",
+        "In: n/a (data). 130 words indexed by location_id x 2: low byte = area, high byte = scene; unused locations hold 0.",
+        "Out: n/a.",
+        "Clobbers: n/a."
+      ]
+    },
+    "comments": {
+      "68060": { "text": "The switch, plate and chest tests run only on the 16-pixel grid; the exit regions are tested every frame", "expect": "AND" },
+      "68075": { "text": "The player's tile is at y - 16 (the position is the feet)", "expect": "SBC" },
+      "68090": { "text": "$FE = the green switch left by SealLair", "expect": "CMP" },
+      "68094": { "text": "No lair release during a boss fight", "expect": "LDA" },
+      "68128": { "text": "A trigger fired: the player's velocity (dx, dy) is zeroed", "expect": "STZ" },
+      "68141": { "text": "Carry set = no facing direction; A = 0 is the up direction (the chest is above the player)", "expect": "BCS" },
+      "68215": { "text": "$FB = closed chest; SetMetatile writes $FC (open)", "expect": "CMP" },
+      "68231": { "text": "Tests bit (id and $7F) of the chest array $1A7E: carry = already opened", "expect": "JSL" },
+      "68246": { "text": "Bit 7 of the id: the chest tile exists on both layers", "expect": "BMI" },
+      "68277": { "text": "Content byte: 0 = empty chest, $FF = Gems (amount at +4), anything else = the inventory entry", "expect": "BEQ" },
+      "68358": { "text": "Tile test: player tile - region origin, unsigned, must be below the size", "expect": "CMP" },
+      "68456": { "text": "Pixel test: the region shrunk by 15 pixels, so the warp starts only when the player is well inside", "expect": "SBC" },
+      "68474": { "text": "Destination of the exit: area, scene, arrival animation, x and y from the region row", "expect": "LDA" },
+      "68540": { "text": "Bit n of $1A9E (lair n released): a plate works only after its lair was released", "expect": "JSL" },
+      "68567": { "text": "Copies record bytes 0-7 to $1C6D-$1C74 (slab, rectangle)", "expect": "MVN" },
+      "68578": { "text": "Slab = plate_variant + 2 (the variant slabs are 2 and 3)", "expect": "STA" },
+      "68586": { "text": "Starts the sweep at step 1", "expect": "STA" },
+      "68589": { "text": "sweep_bg1 = 1: the sweep redraws BG1 (0 redraws BG2)", "expect": "INC" },
+      "68592": { "text": "35 frames = the 35 sweep steps", "expect": "LDA" },
+      "68651": { "text": "Record search: +B = location, +C / +D = lair tile; the table ends at an $FF in byte 0", "expect": "LDA" },
+      "68696": { "text": "One lair less in this location (read by the pause code)", "expect": "LDA" },
+      "68713": { "text": "The switch tile becomes $FF (cleared)", "expect": "STA" },
+      "68720": { "text": "Record byte +8 non-zero: the lair tile is on BG2 too", "expect": "STA" },
+      "68725": { "text": "+E / +F = the staging rectangle; both zero = the lair frees an NPC instead of opening a path", "expect": "LDA" },
+      "68743": { "text": "lair_state = +A or $80: released, no monsters left (the path case)", "expect": "STA" },
+      "68753": { "text": "Sets bit n (the lair index) in the switch array $1ADE, then in the released array $1A9E", "expect": "JSL" },
+      "68820": { "text": "+8: 0 = BG1 only, bit 0 = both layers", "expect": "LDA" },
+      "68844": { "text": "Sweep 1 of 2: BG2 (sweep_bg1 is still 0)", "expect": "STA" },
+      "68872": { "text": "Sweep 2 of 2: BG1", "expect": "INC" },
+      "68895": { "text": "lair_state = +A or $C0: released, the NPC's return is pending (the NPC case)", "expect": "STA" },
+      "68942": { "text": "Type 1 on the NPC's home tile: RunLairReleaseOnReturn looks for it", "expect": "STA" },
+      "68953": { "text": "The home is elsewhere: save the return point (area, scene, x, y - 16) and warp to the NPC", "expect": "STA" },
+      "69027": { "text": "Area and scene of the NPC's home location (word per location: low byte area, high byte scene)", "expect": "LDA" },
+      "69046": { "text": "The lair record index, read by Cop30 in the home scene", "expect": "STY" },
+      "69049": { "text": "Starts the return trip: the main loop switches to RunReturnLoop", "expect": "INC" },
+      "69097": { "text": "Record +9: the NPC name index for the message", "expect": "LDA" },
+      "69127": { "text": "Clears bit 6: the NPC's return is no longer pending", "expect": "AND" },
+      "69222": { "text": "Rectangle width 0: nothing to copy, one frame only", "expect": "LDA" },
+      "69265": { "text": "Slabs 0-3 in turn", "expect": "CMP" },
+      "69315": { "text": "Type 1 under the player: the marker ReleaseLairAtSwitch left on the NPC's home tile", "expect": "CMP" },
+      "69346": { "text": "'<name> cannot be recalled yet!'", "expect": "LDY" }
+    }
+  },
+
+  "library/lib_map_sweep_redraw.asm": {
+    "blockNote": [
+      "Sweep redraw: redraws the visible map line by line from the map data (code at file offsets 69354-69929, SNES $02:8EEA-$9129; SweepStepTable 93741-94860, SNES $02:EE2D-$F28C; bank 02).",
+      "",
+      "=== MODEL ===",
+      "After a map rectangle was copied (lair release, plate, NPC release scenes) the screen still shows the old tiles. The sweep step counter sweep_step ($1C75, a word) walks from 1 to 35; StepSweepRedraw is called once per frame by RunSubFrameMapSweep and, while sweep_step is non-zero, redraws one line of 16 metatiles of the 17 x 17 view (the visible map area measured from the 16-pixel aligned scroll origin sweep_origin_x/y) into vram_write_queue. The order is in SweepStepTable: columns and rows alternate outwards from the middle (column 7, row 7, column 8, row 8, column 6, row 6, ...), the last steps cover the 17th column and row because the scroll is not aligned to 16 pixels. sweep_bg1 chooses the layer: non-zero = BG1 (tilemap $6000, map $7E8000, definitions $7E2000), zero = BG2 (tilemap $7000, map $7EC000, definitions $7E2800). After step 35 the counter returns to 0 (idle).",
+      "The callers start a sweep with sweep_step = 1 and sweep_bg1 = 1 and then call RunSubFrameMapSweep 35 times; a two-layer release does a BG2 sweep first (sweep_bg1 = 0) and a BG1 sweep after it.",
+      "",
+      "=== NOTES ===",
+      "- SweepStepTable: 35 steps x 32 bytes: 16 x indexes (0-$10) then 16 y indexes. Even steps are columns (x constant, y = 0-$F), odd steps rows."
+    ],
+    "partNotes": {
+      "StepSweepRedraw": [
+        "Queues one line of the sweep redraw for the current step and advances the step.",
+        "",
+        "When: every sub-frame of RunSubFrameMapSweep (so while a lair, plate or NPC release scene runs).",
+        "Sees: the changed part of the map wipes in from the middle of the screen outwards.",
+        "Why: the copied map cells are drawn a line at a time so that the VRAM write queue is never overfull and the wipe is visible.",
+        "In: sweep_step (0 = idle, returns at once), sweep_bg1, scroll_bg1_x/y; M = 1 (the routine widens it).",
+        "Out: 16 metatiles of the step queued (16 bytes each, terminator 0) from the map of the layer; sweep_step incremented, reset to 0 after step 35. sweep_origin_x/y = the scroll rounded down to 16.",
+        "Clobbers: A, X, Y, dp $0C, $16, $18 (P restored)."
+      ],
+      "LookupBg1TileAndVramAddr": [
+        "Returns the definition offset and the VRAM tilemap address of the BG1 metatile at a pixel position.",
+        "",
+        "When: StepSweepRedraw (BG1 pass), once per metatile.",
+        "Sees: nothing by itself.",
+        "Why: the sweep needs the map byte (which metatile) and where its top-left tile lives in the 64 x 64 tilemap.",
+        "In: dp$16 / $18 = pixel position in the map (multiples of 16 for y); M = 16.",
+        "Out: X = metatile id x 8 (offset in the definition table), A = VRAM word address of its top-left tile (base $6000 + ((y and $F8) x 4) + ((x and $F8) / 8) + $400 when bit 8 of x + $800 when bit 8 of y).",
+        "Clobbers: A, X."
+      ],
+      "LookupBg2TileAndVramAddr": [
+        "Same as LookupBg1TileAndVramAddr for BG2.",
+        "",
+        "When: StepSweepRedraw (BG2 pass).",
+        "Sees: nothing by itself.",
+        "Why: BG2 has its own map ($7EC000) and tilemap base ($7000).",
+        "In: as LookupBg1TileAndVramAddr.",
+        "Out: X = metatile id x 8 from $7EC000; A = VRAM address with base $7000.",
+        "Clobbers: A, X."
+      ],
+      "SweepStepTable": [
+        "The 35 steps of the sweep: the cell indexes of each line.",
+        "",
+        "When: StepSweepRedraw reads step n at (n - 1) x 32.",
+        "Sees: the wipe pattern: a column, then a row, widening from the middle.",
+        "Why: data, not code, so the pattern can be changed without touching the routine.",
+        "In: n/a (data). Bytes 0-$F = x indexes (metatile columns of the view, 0-$10), bytes $10-$1F = y indexes; the cell is origin + index x 16.",
+        "Out: n/a. The last entry (22) is a row of x 1-$10 at y $10.",
+        "Clobbers: n/a."
+      ]
+    },
+    "comments": {
+      "69360": { "text": "sweep_bg1 non-zero: BG1 pass; zero: the BG2 pass further down", "expect": "LDA" },
+      "69377": { "text": "Screen origin rounded down to a whole metatile", "expect": "AND" },
+      "69396": { "text": "(step - 1) x 32 = the row of SweepStepTable", "expect": "ASL" },
+      "69402": { "text": "16 metatiles per step (one line of the view)", "expect": "LDA" },
+      "69407": { "text": "x index of the cell here, y index at + $10", "expect": "LDA" },
+      "69539": { "text": "After step 35 the sweep is over (the counter goes back to 0)", "expect": "CMP" }
+    }
+  },
+
+  "library/lib_scene_map_patches.asm": {
+    "blockNote": [
+      "Map rectangle copies of the release scenes, then the scene-entry replay routines (the three copies CopyMapRectFromSlab, CopyMapRectFromStaging and CopyMapRectFromStagingBothLayers are at file offsets 69930-70388, SNES $02:912A-$92F4, bank 02; the routines from code_0112F5 on and unk13_01728D are not annotated yet: they are outside batch A4).",
+      "",
+      "=== MODEL ===",
+      "The rectangle is given by the copied lair record bytes in $1C6D-$1C74: release_slab ($1C6E), release_npc_x/y ($1C6F-$1C70), release_rect_x/y ($1C71-$1C72, the destination in metatiles) and release_rect_w/h ($1C73-$1C74). A slab is an alternative full-size copy of the map stored behind the live map in the $7E8000 region: slab k starts k x (map size in bytes) after the live map; its cells are copied onto the same cells of the live map (CopyMapRectFromSlab). The staging copies instead read from a rectangle of the live map itself whose position the caller put in dp$16 / $18 (record +E / +F) and write to release_rect_x/y.",
+      "CopyMapRectFromSlab keeps the high nibble of the live collision byte (the actor block bits $F0) and takes the low nibble from the slab; the staging copies replace the whole byte. A width or height of $80 or more would hang on a BCS to itself (the guard before the loops); the shipped records never do that.",
+      "Nothing is queued for VRAM by these routines: the sweep redraw (StepSweepRedraw) draws the result."
+    ],
+    "partNotes": {
+      "CopyMapRectFromSlab": [
+        "Copies a rectangle of metatiles and collision bytes from a map slab onto the live BG1 map.",
+        "",
+        "When: PlayLairReleaseScene (slabs 0-3), TriggerVariantPlate (slab 2 or 3) and the scene-entry replay of freed NPCs (slab 3).",
+        "Sees: after the sweep, the NPC's spot or the plate's part of the room shows its new state.",
+        "Why: each state of the room is a prebuilt slab, so the change is a copy.",
+        "In: M = 1 (it widens inside); release_slab, release_rect_x/y/w/h.",
+        "Out: for each cell of the rectangle: the live $7E8000 byte = the slab's byte; the live tile_type_map byte = (live byte and $F0) OR the slab's byte. BG2 is not changed.",
+        "Clobbers: A, X, dp $0E, $10, $16, $18, $1C64-$1C68 (P restored). RTS."
+      ],
+      "CopyMapRectFromStaging": [
+        "Copies a rectangle inside the live BG1 map from a staging position to the target rectangle.",
+        "",
+        "When: ReleaseLairAtSwitch (path case, bit 0 of record +8 clear) and the scene-entry replay of released lairs.",
+        "Sees: after the sweep, a path or a room part is open.",
+        "Why: the opened state is stored in a hidden part of the map and copied into view when the lair is released.",
+        "In: dp$16 / $18 = pixel position of the staging rectangle (record +E / +F x 16); release_rect_x/y/w/h = the target and size; M = 1.",
+        "Out: for each cell: the target's $7E8000 byte and whole tile_type_map byte = the staging cell's. BG2 is not changed.",
+        "Clobbers: A, X, dp $0E, $10, $16, $18, $1C62-$1C68 (P restored). RTS."
+      ],
+      "CopyMapRectFromStagingBothLayers": [
+        "As CopyMapRectFromStaging, and the BG1 metatile is also written to BG2.",
+        "",
+        "When: ReleaseLairAtSwitch (path case, bit 0 of record +8 set) and the scene-entry replay of released lairs.",
+        "Sees: a path opens on both background layers.",
+        "Why: the tile exists on both layers (see SetMetatileBg1Bg2).",
+        "In: as CopyMapRectFromStaging.",
+        "Out: as CopyMapRectFromStaging; additionally $7EC000 at the target = the same id.",
+        "Clobbers: as CopyMapRectFromStaging."
+      ]
+    },
+    "comments": {
+      "69933": { "text": "Rectangle origin x in metatiles (record +4) x 16 = pixels", "expect": "LDA" },
+      "69983": { "text": "Slab k starts k x (map size) after the live map: offset = slab x pages x 256 (only the low byte of the page count is used)", "expect": "LDA" },
+      "70094": { "text": "Source: the position the caller left in dp$16 / $18 (record +E / +F)", "expect": "JSL" },
+      "70128": { "text": "Target: the rectangle origin of the record (+4 / +5)", "expect": "JSL" }
+    }
+  },
+
+  "system/engine_boot_main_loop.asm": {
+    "blockNote": {
+      "edit": [
+        { "find": "CheckPlayerTileTriggers (return-point store)", "with": "CheckPlayerTileTriggers (lair switch, pressure plate, chest and exit regions under the player)" },
+        { "find": "BuildScrollStrips with the wrong M flag (OQ-I005-7)", "with": "BuildScrollStrips with the wrong M flag (OQ-I005-7, OQ-I026-1)" }
+      ]
+    },
+    "partNotes": {
+      "RunSubFrameMapSweep": {
+        "edit": [
+          { "find": "8 call sites in the return-point and lair-return code (CheckPlayerTileTriggers, RunLairReleaseOnReturn).", "with": "8 call sites in the lair release code (TriggerVariantPlate 1, ReleaseLairAtSwitch 4, PlayLairReleaseScene 3)." }
+        ]
+      },
+      "RunReturnLoop": {
+        "edit": [
+          { "find": "When: return_active is set by actor scripts of worlds 2 and 3 (OQ-I005-17).", "with": "When: return_active is incremented by ReleaseLairAtSwitch (the freed NPC's home is in another location) and set by actor scripts of worlds 2 and 3 (OQ-I005-17); in the home scene every frame of this loop calls RunLairReleaseOnReturn." }
+        ]
+      }
+    },
+    "comments": {
+      "85": { "text": "Tile triggers under the player (lair switch, plate, chest, exit regions), before the actors run", "expect": "JSL" }
+    }
+  },
+
+  "cop_handlers/cop_items_stats_text.asm": {
+    "partNotes": {
+      "Cop0A_GiveItemIfNotOwned": {
+        "edit": [
+          { "find": "(not annotated yet)", "with": "(see its part note)" }
+        ]
+      }
+    }
+  },
+
+  "cop_handlers/cop_actor_fields_animation.asm": {
+    "blockNote": {
+      "edit": [
+        { "find": "CopyFrameData = draw)", "with": "CopyFrameData = copies the record's bytes to WRAM bank $7F, a colour animation, OQ-I026-3)" }
+      ]
+    },
+    "partNotes": {
+      "Cop92_StartAnimation": {
+        "edit": [
+          { "find": "(NextFrameRecord advance, CopyFrameData draw)", "with": "(NextFrameRecord advance, CopyFrameData copy, OQ-I026-3)" }
+        ]
+      }
+    }
+  }
+}

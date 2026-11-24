@@ -10,14 +10,14 @@
 ;   4. DisableNmi: everything below is the work phase and runs with NMI off.
 ;   5. CheckPlayerTileTriggers (lair switch, pressure plate, chest and exit regions under the player), ResetHdmaQueue (per-frame reset: HDMA shadow dp$42 = 0 and dp$44-dp$48).
 ;   6. RunActors, CullAndSortActors, DetectHitSourceCollisions, DetectPlayerContact, CheckPlayerDeath (death check and automatic Medical Herb), ScrollCameraByDelta and BuildScrollStrips (scroll), BuildOamFromActors.
-;   7. HUD (UpdateHud, which skips locations $0F-$12 entirely, including the heal and EXP drains; code_011695), QueueAnimatedTileStrip (queues one animated tile strip), EnableNmi, back to step 1.
+;   7. HUD (UpdateHud, which skips locations $0F-$12 entirely, including the heal and EXP drains; QueueBg3ScrollHdma), QueueAnimatedTileStrip (queues one animated tile strip), EnableNmi, back to step 1.
 ; 
 ; === VARIANTS ===
-; RunReducedLoop: location_id $10-$12 (unnamed scenes of the Up Above area, OQ-I001-6; the boot scene 00/0C should be location $12, OQ-I005-21). Runs DisableNmi, ResetHdmaQueue, RunActors, CullAndSortActors, BuildOamFromActors and EnableNmi only: no menu, no hit tests, no HUD.
+; RunReducedLoop: location_id $10-$12 (by static reading the three front-end scenes: title 00/0A = $10, ending 00/0B = $11, boot 00/0C = $12, because the first asset8 command of each record in data_scene_asset_lists is that value and ApplySceneProfile stores it in location_id; runtime check OQ-I043-2). Runs DisableNmi, ResetHdmaQueue, RunActors, CullAndSortActors, BuildOamFromActors and EnableNmi only: no menu, no hit tests, no HUD.
 ; RunReturnLoop: low byte of return_active non-zero. Same as the main loop without menu, hit tests and scroll update, and Start, Select and X are cleared; after one frame it loops over RunSubFrame (WaitReturnDone) while bit 7 of $03FC is set, then adds player_max_hp / 8 to heal_pending, calls WaitFrames with A = $78, sets transition_type = $80, copies return_area, return_scene, return_x and return_y into area_next, scene_next, warp_dest_x and warp_dest_y, enables NMI and jumps back to RunMainLoop (OQ-I005-17).
 ; 
 ; === SUB-FRAMES ===
-; RunSubFrameLoader, RunSubFrameMapSweep and RunSubFrame run one complete game frame from inside a script, a menu, the text renderer or the scene loader. They set subframe_active ($03A6) to 1 while the work phase runs: RunActorList then runs only actors whose $16 bit $0010 is set, so a modal routine keeps its own actors alive while the rest of the game stands still. The player actor code and w2_actor_0FA6F5 also read $03A6.
+; RunSubFrameLoader, RunSubFrameMapSweep and RunSubFrame run one complete game frame from inside a script, a menu, the text renderer or the scene loader. They set subframe_active ($03A6) to 1 while the work phase runs: RunActorList then runs only actors whose $16 bit $0010 is set, so a modal routine keeps its own actors alive while the rest of the game stands still. The player actor code and w2_effect_player_overlay also read $03A6.
 ; 
 ; === WRAM ===
 ; return_active $03FB (word read, low byte = flag), return_area $03FD, return_scene $03FF, return_x $0401, return_y $0403; scene_next $0318 (word) and area_next $0319; warp_dest_x $037C, warp_dest_y $037E; transition_type $03E3; heal_pending $043B; subframe_active $03A6; scene_loading $0462 (HUD skipped while non-zero in RunSubFrameLoader).
@@ -29,20 +29,16 @@
 
 ?BANK 00
 
-?INCLUDE 'engine_003005'
-?INCLUDE 'engine_scheduler_sprites_combat_collision'
-?INCLUDE 'lib_010000'
-?INCLUDE 'lib_011695'
-?INCLUDE 'lib_0118FC_part6'
-?INCLUDE 'lib_013ADA'
-?INCLUDE 'lib_027223'
-?INCLUDE 'lib_027572'
-?INCLUDE 'lib_027912'
-?INCLUDE 'lib_map_streaming'
-?INCLUDE 'lib_map_sweep_redraw'
+?INCLUDE 'engine_actor_scheduler_and_sprites'
+?INCLUDE 'engine_combat_hits'
+?INCLUDE 'engine_player_death_and_actor_helpers'
+?INCLUDE 'lib_boot_and_scene_init'
+?INCLUDE 'lib_hdma_window_effects'
+?INCLUDE 'lib_hud'
+?INCLUDE 'lib_main_loop_helpers'
+?INCLUDE 'lib_map_scroll_and_redraw'
 ?INCLUDE 'lib_menus'
 ?INCLUDE 'lib_scene_asset_loader'
-?INCLUDE 'lib_scene_change_init'
 ?INCLUDE 'lib_system_helpers'
 ?INCLUDE 'lib_text_render'
 ?INCLUDE 'lib_tile_triggers_and_lair_return'
@@ -90,19 +86,19 @@ BootGame {
     PHA 
     PLB 
     JSL $@lib_scene_asset_loader.InitHardwareAndClearWram
-    JSL $@lib_013ADA.ApplyBootPpuLayout
-    JSL $@lib_027912.InitFixedState
-    JSL $@lib_scene_change_init.ClearBg3Buffer
+    JSL $@lib_system_helpers.ApplyBootPpuLayout
+    JSL $@lib_boot_and_scene_init.InitFixedState
+    JSL $@lib_boot_and_scene_init.ClearBg3Buffer
     LDX #$000C
     STX $scene_next
     JSL $@lib_system_helpers.EnableNmi
-    JSL $@lib_scene_change_init.ChangeSceneIfRequested
+    JSL $@lib_boot_and_scene_init.ChangeSceneIfRequested
 
 ; One game frame (steps in the block note): wait for vblank, scene loader, menu and pause, then the work phase with NMI off. Entered from BootGame, RunReducedLoop and RunReturnLoop; every pass ends with EnableNmi and a jump back here.
 
   RunMainLoop:
     JSL $@lib_system_helpers.WaitVBlank ; Wait for vblank. NMI is on here, so HandleVBlank runs inside this wait; every game frame starts here
-    JSL $@lib_scene_change_init.ChangeSceneIfRequested ; Scene loader: acts only when the low byte of scene_next is non-zero
+    JSL $@lib_boot_and_scene_init.ChangeSceneIfRequested ; Scene loader: acts only when the low byte of scene_next is non-zero
     LDA $location_id
     SEC 
     SBC #$10              ; location_id - $10 below 3 (locations $10-$12): reduced loop, no menu, hit tests or HUD (OQ-I005-21)
@@ -111,36 +107,36 @@ BootGame {
     LDA $return_active    ; Low byte non-zero: a return to the stored return point is running (RunReturnLoop)
     BNE RunReturnLoop
     JSL $@lib_menus.DispatchFieldButtons ; Menu (Select or X) and pause (Start) run first, with NMI still on
-    JSL $@lib_027572.HandlePauseBanner
+    JSL $@lib_main_loop_helpers.HandlePauseBanner
     JSL $@lib_system_helpers.DisableNmi ; NMI off: the work phase below relocates S in the sort and OAM code, so no NMI may run (OQ-I005-20)
     JSL $@lib_tile_triggers_and_lair_return.CheckPlayerTileTriggers ; Tile triggers under the player (lair switch, plate, chest, exit regions), before the actors run
     JSL $@lib_system_helpers.ResetHdmaQueue ; Per-frame reset: dp$42 (HDMA shadow) = 0, dp$44 = $10 (channel 4), dp$46 = $40 ($4340), dp$48 = $6000
-    JSL $@engine_scheduler_sprites_combat_collision.RunActors
-    JSL $@engine_scheduler_sprites_combat_collision.CullAndSortActors
-    JSL $@engine_scheduler_sprites_combat_collision.DetectHitSourceCollisions
-    JSL $@engine_scheduler_sprites_combat_collision.DetectPlayerContact
-    JSL $@engine_003005.CheckPlayerDeath ; Death check and automatic Medical Herb
-    JSL $@lib_map_streaming.ScrollCameraByDelta ; Scroll and camera updates (BuildScrollStrips tests and clears the scroll request bits in $0396)
-    JSL $@lib_map_streaming.BuildScrollStrips
-    JSL $@engine_scheduler_sprites_combat_collision.BuildOamFromActors
-    JSL $@lib_0118FC_part6.UpdateHud ; HUD: the enemy gauge and the parts flagged in hud_dirty_flags; nothing at all in locations $0F-$12
-    JSL $@lib_011695.code_011695
-    JSL $@lib_027223.QueueAnimatedTileStrip ; Queues one animated background tile strip for the NMI (not in locations $0F-$12)
+    JSL $@engine_actor_scheduler_and_sprites.RunActors
+    JSL $@engine_actor_scheduler_and_sprites.CullAndSortActors
+    JSL $@engine_combat_hits.DetectHitSourceCollisions
+    JSL $@engine_combat_hits.DetectPlayerContact
+    JSL $@engine_player_death_and_actor_helpers.CheckPlayerDeath ; Death check and automatic Medical Herb
+    JSL $@lib_map_scroll_and_redraw.ScrollCameraByDelta ; Scroll and camera updates (BuildScrollStrips tests and clears the scroll request bits in $0396)
+    JSL $@lib_map_scroll_and_redraw.BuildScrollStrips
+    JSL $@engine_actor_scheduler_and_sprites.BuildOamFromActors
+    JSL $@lib_hud.UpdateHud ; HUD: the enemy gauge and the parts flagged in hud_dirty_flags; nothing at all in locations $0F-$12
+    JSL $@lib_hdma_window_effects.QueueBg3ScrollHdma
+    JSL $@lib_main_loop_helpers.QueueAnimatedTileStrip ; Queues one animated background tile strip for the NMI (not in locations $0F-$12)
     JSL $@lib_system_helpers.EnableNmi ; NMI on again; the loop returns to WaitVBlank
     BRA RunMainLoop
 
 ; Frame for location_id $10-$12: actors, sort and OAM only (no menu, hit tests, HUD or return-point store).
 ; 
 ; When: every frame while location_id is $10, $11 or $12 (OQ-I005-21).
-; Sees: the scenes that need no player input handling (location $10 is where the title code runs; OQ-I001-6 leaves $11 and $12 open).
+; Sees: the scenes that need no player input handling (location $10 is where the title code runs; by static reading $11 is the ending scene 00/0B and $12 the boot scene 00/0C, OQ-I043-2).
 ; Why: those scenes have no player-driven combat or menu, so the loop skips that work.
 
   RunReducedLoop:
     JSL $@lib_system_helpers.DisableNmi
     JSL $@lib_system_helpers.ResetHdmaQueue
-    JSL $@engine_scheduler_sprites_combat_collision.RunActors
-    JSL $@engine_scheduler_sprites_combat_collision.CullAndSortActors
-    JSL $@engine_scheduler_sprites_combat_collision.BuildOamFromActors
+    JSL $@engine_actor_scheduler_and_sprites.RunActors
+    JSL $@engine_actor_scheduler_and_sprites.CullAndSortActors
+    JSL $@engine_actor_scheduler_and_sprites.BuildOamFromActors
     JSL $@lib_system_helpers.EnableNmi
     BRL RunMainLoop
 
@@ -156,12 +152,12 @@ BootGame {
     JSL $@lib_tile_triggers_and_lair_return.RunLairReleaseOnReturn
     JSL $@lib_system_helpers.ResetHdmaQueue
     STZ $joy_pressed+1    ; Drops Start, Select and X so the menu and pause cannot open while the return runs
-    JSL $@engine_scheduler_sprites_combat_collision.RunActors
-    JSL $@engine_scheduler_sprites_combat_collision.CullAndSortActors
-    JSL $@engine_scheduler_sprites_combat_collision.BuildOamFromActors
-    JSL $@lib_0118FC_part6.UpdateHud
-    JSL $@lib_011695.code_011695
-    JSL $@lib_027223.QueueAnimatedTileStrip
+    JSL $@engine_actor_scheduler_and_sprites.RunActors
+    JSL $@engine_actor_scheduler_and_sprites.CullAndSortActors
+    JSL $@engine_actor_scheduler_and_sprites.BuildOamFromActors
+    JSL $@lib_hud.UpdateHud
+    JSL $@lib_hdma_window_effects.QueueBg3ScrollHdma
+    JSL $@lib_main_loop_helpers.QueueAnimatedTileStrip
     JSL $@lib_system_helpers.EnableNmi
     JSL $@lib_system_helpers.WaitVBlank
     JSL $@lib_system_helpers.DisableNmi
@@ -219,19 +215,19 @@ RunSubFrameLoader {
     JSL $@lib_system_helpers.DisableNmi
     INC $subframe_active  ; subframe_active = 1: RunActorList now runs only actors with $16 bit $0010
     JSL $@lib_system_helpers.ResetHdmaQueue
-    JSL $@engine_scheduler_sprites_combat_collision.RunActors
-    JSL $@engine_scheduler_sprites_combat_collision.CullAndSortActors
-    JSL $@lib_010000.AimCameraAtPlayer
-    JSL $@lib_map_streaming.ScrollCameraByDelta
-    JSL $@lib_map_streaming.BuildScrollStrips
-    JSL $@engine_scheduler_sprites_combat_collision.BuildOamFromActors
+    JSL $@engine_actor_scheduler_and_sprites.RunActors
+    JSL $@engine_actor_scheduler_and_sprites.CullAndSortActors
+    JSL $@lib_map_scroll_and_redraw.AimCameraAtPlayer
+    JSL $@lib_map_scroll_and_redraw.ScrollCameraByDelta
+    JSL $@lib_map_scroll_and_redraw.BuildScrollStrips
+    JSL $@engine_actor_scheduler_and_sprites.BuildOamFromActors
     LDA $scene_loading    ; HUD skipped while $0462 is non-zero (set by the iris transition in the scene loader)
-    BNE loc_00015D
-    JSL $@lib_0118FC_part6.UpdateHud
-    JSL $@lib_011695.code_011695
+    BNE LoaderAfterHud
+    JSL $@lib_hud.UpdateHud
+    JSL $@lib_hdma_window_effects.QueueBg3ScrollHdma
 
-  loc_00015D:
-    JSL $@lib_027223.QueueAnimatedTileStrip
+  LoaderAfterHud:
+    JSL $@lib_main_loop_helpers.QueueAnimatedTileStrip
     STZ $subframe_active
     JSL $@lib_system_helpers.EnableNmi
     JSL $@lib_system_helpers.WaitVBlank
@@ -266,15 +262,15 @@ RunSubFrameMapSweep {
     PLB 
     INC $subframe_active
     JSL $@lib_system_helpers.ResetHdmaQueue
-    JSL $@engine_scheduler_sprites_combat_collision.RunActors
-    JSL $@engine_scheduler_sprites_combat_collision.CullAndSortActors
-    JSL $@lib_map_streaming.ScrollCameraByDelta
-    JSL $@lib_map_streaming.BuildScrollStrips
-    JSL $@engine_scheduler_sprites_combat_collision.BuildOamFromActors
-    JSL $@lib_0118FC_part6.UpdateHud
-    JSL $@lib_011695.code_011695
-    JSL $@lib_027223.QueueAnimatedTileStrip
-    JSL $@lib_map_sweep_redraw.StepSweepRedraw
+    JSL $@engine_actor_scheduler_and_sprites.RunActors
+    JSL $@engine_actor_scheduler_and_sprites.CullAndSortActors
+    JSL $@lib_map_scroll_and_redraw.ScrollCameraByDelta
+    JSL $@lib_map_scroll_and_redraw.BuildScrollStrips
+    JSL $@engine_actor_scheduler_and_sprites.BuildOamFromActors
+    JSL $@lib_hud.UpdateHud
+    JSL $@lib_hdma_window_effects.QueueBg3ScrollHdma
+    JSL $@lib_main_loop_helpers.QueueAnimatedTileStrip
+    JSL $@lib_map_scroll_and_redraw.StepSweepRedraw
     JSL $@lib_system_helpers.EnableNmi
     JSL $@lib_system_helpers.WaitVBlank
     JSL $@lib_system_helpers.DisableNmi
@@ -292,7 +288,7 @@ RunSubFrameMapSweep {
 ; Runs one complete game frame with NMI off before and after (actors, sort, scroll, OAM, HUD, tile strip), without the map sweep.
 ; 
 ; When: 4 call sites: WaitReturnDone, the text helpers WaitFrames and RunFrameReadButtons, and ScrollStaffRollText.
-; Sees: actors keep animating while text prints or a return waits.
+; Sees: while text prints or a return waits, the hero and the other actors with $16 bit $0010 keep running; every other actor is skipped (FilterSubFrameActor).
 ; Why: a routine that must wait several frames calls this instead of returning to the main loop.
 ; In: NMI must be off (OQ-I005-20); M = 1; DBR is set to $01 and restored.
 ; Out: one vblank passed; NMI off again. subframe_active is 1 during the work phase.
@@ -310,14 +306,14 @@ RunSubFrame {
     PLB 
     INC $subframe_active
     JSL $@lib_system_helpers.ResetHdmaQueue
-    JSL $@engine_scheduler_sprites_combat_collision.RunActors
-    JSL $@engine_scheduler_sprites_combat_collision.CullAndSortActors
-    JSL $@lib_map_streaming.ScrollCameraByDelta
-    JSL $@lib_map_streaming.BuildScrollStrips
-    JSL $@engine_scheduler_sprites_combat_collision.BuildOamFromActors
-    JSL $@lib_0118FC_part6.UpdateHud
-    JSL $@lib_011695.code_011695
-    JSL $@lib_027223.QueueAnimatedTileStrip
+    JSL $@engine_actor_scheduler_and_sprites.RunActors
+    JSL $@engine_actor_scheduler_and_sprites.CullAndSortActors
+    JSL $@lib_map_scroll_and_redraw.ScrollCameraByDelta
+    JSL $@lib_map_scroll_and_redraw.BuildScrollStrips
+    JSL $@engine_actor_scheduler_and_sprites.BuildOamFromActors
+    JSL $@lib_hud.UpdateHud
+    JSL $@lib_hdma_window_effects.QueueBg3ScrollHdma
+    JSL $@lib_main_loop_helpers.QueueAnimatedTileStrip
     JSL $@lib_system_helpers.EnableNmi
     JSL $@lib_system_helpers.WaitVBlank
     JSL $@lib_system_helpers.DisableNmi

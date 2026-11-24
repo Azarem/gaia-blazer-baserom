@@ -1,0 +1,373 @@
+{
+  "_note": "I033: PC annotate batch A11 (data and tables): the 20 data blocks of the former FM-A11 (meta lists, scene placements, chest / exit / plate lists, lair records, formations, scene variant rules, the engine byte and word tables, the scene asset list, the SPC block, iris frames, menu palettes, the six animation banks and the dictionary). The files hold no instructions, so there are no comments and no mnemonics: everything is in block notes and part notes. Names applied first by plans/extracted-audit/renames/apply-I033_names.json (285 rows) and apply-I033b_names.json (2 renames: the two effect banks, once the consumers were read); the blocks were renamed by plans/extracted-audit/edits/I033_blocks.json and I033b_blocks.json (WorldMetaPointers keeps its label as block name: see OQ-I033-14). The 97 placement lists, the 97 exit lists, the 37 chest lists and the 6 plate lists carry names (PlacementAaaSss, ExitListLocLL, ChestListLocLL, PlateListLocLLVv) and are described by the note of their pointer or index table; the 112 formation lists, the 265 step lists and 951 frame leaves keep their auto names (index tags in the pointer tables). Sources: plans/doc-audit/function-map/FM-A11.md re-read against the consumers, docs/walkthrough/enemy-bestiary.md and level-up.md, the consumer notes of the lair, chest, exit, plate and menu code.",
+
+  "system/WorldMetaPointers.asm": {
+    "blockNote": [
+      "Actor meta tables: the 7-word world pointer table and the seven lists of 14-byte actor types, 469 entries in all (file offsets 32768-39347, SNES $01:8000-$99B3, bank 00; 6580 bytes).",
+      "",
+      "=== MODEL ===",
+      "Every actor placed in a scene, every lair monster and the player is an instance of a meta type: one 14-byte row that gives its stats, first animation, animation table and script. There is one list per world (world_index 0-6: Grass Valley, GreenWood, St. Elles, Mountain of Souls, Leo's Laboratory, Magridd's Castle, World of Evil), so a type number means something different in each world: type $1F is the Metal Mantis in world 0 and a Mini Race Car in world 4. SpawnSceneActors stores the offset of the world's list in $03B0; every consumer reads its row at WorldMetaPointers + $03B0 + type x 14 (listings show $&WorldMetaPointers+N,Y with DBR $01 or $81). The type number comes from a placement row (+3, the PlacementAaaSss lists) or from a lair record (+$15, LairRecords).",
+      "",
+      "=== ENTRY LAYOUT (14 bytes) ===",
+      "+0 attack, +1 defence, +2 HP (a binary byte), +3 word EXP (BCD), +5 animation id, +6 word flags (becomes $16; $8000 is added at spawn), +8 word animation table, +A animation bank, +B word script, +D script bank. +8..+A is the 3-byte Address field of structs.json and +B..+D the @Code field. Damage (comments in the combat code): the player's hit on a monster is max(1, attack_current - monster defence (+1)); a monster's hit on the player is attack (+0) - 1 - defense_current, at least 0. The EXP word is added in BCD by KillTarget and drawn as digits by RunEnemyDeath.",
+      "HP is binary and EXP is BCD: the bestiary values of docs/walkthrough/enemy-bestiary.md match this reading for every enemy that could be matched (for example Metal Mantis 50 HP and 50 EXP = bytes $32 and $0050).",
+      "",
+      "=== WHAT THE OPERANDS SAY ===",
+      "Animation table (+8..+A): 358 of the 469 entries use $7E3800 (the sprite map the scene loader expanded into WRAM: the step lists of ordinary actors travel with the scene), 69 use PaletteAnimLists (bank $0D, the colour animations: mostly types $01-$0F of every list, 14, 14, 13, 15, 5, 3 and 5 types in worlds 0-6; none of the enemies), 7 use PlayerAnims (entry 0 of every world, the hero), 4 use EffectAnims and 31 have $000000 (the actor selects its own table with COP A8). Flags word (+6): $2010 95 times, $2040 87, $0040 49, $0000 43, $2048 39, $2050 38, $1000 22, $3040 21 and 28 more values with fewer entries.",
+      "Entry 0 of every list is the hero: attack 1, defence 2, HP 3, animation 0, flags $1180, table PlayerAnims, script InitPlayerActor. The seven copies are identical (the stats are not used; the player's own stats live in the $1B.. fields).",
+      "",
+      "=== ENEMY TYPES (matched by stats) ===",
+      "The ROM names nothing. The part notes of the seven lists name the enemy types by matching HP and EXP against the walkthrough bestiary (inferred). Where the bestiary gives several enemies the same stats the ids cannot be told apart this way and the note says so. The four bosses whose ROM HP differs from the bestiary, the world 6 Purple Bull and the types that match no bestiary row are OQ-I033-1 to OQ-I033-4.",
+      "",
+      "=== NOTES ===",
+      "- The names MetaGrassValley .. MetaWorldOfEvil label the list starts; a type number is the index of a row inside its list, so type $1F of world 0 is MetaGrassValley + 31 x 14.",
+      "- engine_0026F3.code_00296A loads +5 as a word (so the low byte of the flags becomes the high byte of the animation id): harmless for rows whose flags low byte is 0 (OQ-I014-5).",
+      "- Consumers: SpawnSceneActors (list offset), InitActorFromPlacement, SpawnLairActor, SpawnLairMonster, RunMonsterAppearPuff, LoadMonsterFromMeta, ApplySwordHit, ApplyProjectileHit, ApplyContactDamageOrPickup, KillTarget, RunEnemyDeath, SetEnemyGauge, HoldActorUntilReleased, FindTalkableActorAt."
+    ],
+    "partNotes": {
+      "WorldMetaPointers": "The seven world pointers: one word per world_index, each the bank-$01 address of that world's meta list.\n\nWhen: SpawnSceneActors reads word world_index x 2 once per scene load and keeps (word - $8000) in $03B0; the type offset is then added by every spawn.\nSees: the same type number gives a different actor in each world (type $1F is the Metal Mantis in Grass Valley and a Mini Race Car in Leo's Laboratory).\nWhy: the worlds share the type-number space of the placement and lair records, so each list only needs the types of its own world.\nIn: n/a (data): 7 words, $&MetaGrassValley, $&MetaGreenwood, $&MetaStElles, $&MetaMountainOfSouls, $&MetaLeosLab, $&MetaMagriddsCastle, $&MetaWorldOfEvil (file offsets 32768-32781).\nOut: lists of 95, 81, 87, 68, 55, 62 and 21 entries (469 in all, 14 bytes each).\nClobbers: n/a (data).",
+      "MetaGrassValley": "World 0 (Grass Valley): 95 meta entries, types $00-$5E (file offsets 32782-34111).\n\nWhen: world_index 0: the village, the Underground Castle, Leo's Paintings, the dream rooms and the intro scenes.\nSees: the Grass Valley monsters, NPCs and objects.\nWhy: see the block note; the list is the type space of this world.\nIn: n/a (data); row = list + type x 14.\nOut: type $00 the hero. Enemy types matched by HP and EXP with the bestiary (inferred): $1F Metal Mantis (boss, HP 50, EXP 50; it is the monster of lair record $09, see LairRecords), $20, $22, $23 and $24 (HP 3, EXP 1: the bestiary gives Blue Liquid, Fly, Green Humanoid and Walking Bush the same stats, so the four ids cannot be assigned), $21 Yellow Humanoid, $25 Blue Torch, $26 Yellow Knight, $27 Metal Crawler, $28 and $2E Purple Bird (two types), $29 Green Torch. The other types are NPCs and objects.\nClobbers: n/a (data).",
+      "MetaGreenwood": "World 1 (GreenWood): 81 meta entries (file offsets 34112-35245).\n\nWhen: world_index 1: the Woods of GreenWood, the mole and squirrel scenes, Lostside a marsh, the three shrines and the dream rooms 23 and 24.\nSees: the GreenWood monsters, NPCs and objects.\nWhy: see the block note.\nIn: n/a (data); row = list + type x 14.\nOut: type $00 the hero. Enemy types matched by HP and EXP (inferred): $2C Water Lizard, $2D Mud Man, $2E Walking Plant, $2F Stone Statue, $30 Purple Flower (the Bee shares its stats), $33 Spirit Ball, $35 Ghost Head or Green Lizard Man (same stats), $3D Elemental Statues (boss: HP 50 and EXP 30 per statue, three of them; the monster of lair record $50), $48 Fire Man, $49 Metal Scorpion. $31 (EXP $3000), $37 (HP 12, EXP 12) and $38 (HP 15, EXP 15) match no bestiary row (OQ-I033-3).\nClobbers: n/a (data).",
+      "MetaStElles": "World 2 (St. Elles): 87 meta entries (file offsets 35246-36463).\n\nWhen: world_index 2: St. Elles shrine, the Seabed Sanctuary, the secret caves, Southerta, Durean, the ghost ship and the seabed.\nSees: the St. Elles monsters, NPCs and objects.\nWhy: see the block note.\nIn: n/a (data); row = list + type x 14.\nOut: type $00 the hero. Enemy types matched by HP and EXP (inferred): $32 Sea Urchin, $34 Jellyfish, $35 Hermit Crab, $36 Manta Ray, $37 Yellow Seahorse, $3A Walking Tree, $3B Monster Rock, $3C Purple Fish, $3D Ape, $3E Metal Ape, $3F Tornadic Eagle, $41 Floating Skull (boss; ROM HP 69, the bestiary says 70: OQ-I033-1; the monster of lair record $B6), $44 and $46 Purple Worms (two types).\nClobbers: n/a (data).",
+      "MetaMountainOfSouls": "World 3 (Mountain of Souls): 68 meta entries (file offsets 36464-37415).\n\nWhen: world_index 3: the Soul's Sanctuary, the mountain north slope, Aurora's Ridge, the lake of Lune, Poseidon, the snow mountain and the ice field.\nSees: the Mountain of Souls monsters, NPCs and objects.\nWhy: see the block note.\nIn: n/a (data); row = list + type x 14.\nOut: type $00 the hero. Enemy types matched by HP and EXP (inferred): $2D Green Lizard, $2E Undead Caribou, $2F Yeti, $30 Fire Bat, $32 Purple Wizard, $33 Red Wizard, $34 Ice Maker, $36 Cave Bat, $37 Green Blob, $38 Poseidon (boss; ROM HP 79, the bestiary says 70: OQ-I033-1; the monster of lair record $103). $31 (EXP $2000) and $35 (EXP $4000) match no bestiary row (OQ-I033-3).\nClobbers: n/a (data).",
+      "MetaLeosLab": "World 4 (Leo's Laboratory): 55 meta entries (file offsets 37416-38185).\n\nWhen: world_index 4: the laboratory, the attic, the mice nest, the basement, the power plant and the town models.\nSees: the laboratory monsters, NPCs and objects.\nWhy: see the block note.\nIn: n/a (data); row = list + type x 14.\nOut: type $00 the hero. Enemy types matched by HP and EXP (inferred): $1E Tin Doll (boss; ROM HP 89, the bestiary says 80: OQ-I033-1; the monster of lair record $12F), $1F Mini Race Car, $20 Mini Bulldozer, $21 Mini Helicopter, $22 Ball Worm, $24 Sweeper Bot, $25 Toy Soldier, $28 Catapult, $29 Spike Launcher. $27 (HP 24, EXP 175) is the nearest to the Toy Calvary (29 HP, 175 EXP); $26 (HP 20, EXP 170) and $23 (EXP $1000) match nothing (OQ-I033-3).\nClobbers: n/a (data).",
+      "MetaMagriddsCastle": "World 5 (Magridd's Castle): 62 meta entries (file offsets 38186-39053).\n\nWhen: world_index 5: the castle, the towers, the torture chamber, the basement, the dock and the deck.\nSees: the castle monsters, NPCs and objects.\nWhy: see the block note.\nIn: n/a (data); row = list + type x 14.\nOut: type $00 the hero. Enemy types matched by HP and EXP (inferred): $09 Demon Falcon (boss; ROM HP 99, the bestiary says 90: OQ-I033-1; the monster of lair record $195), $0C Bouncing Ball, $0D Wraithe, $0E Green Snake, $11 Purple Knight, $12 Red Knight, $15 Mimic, $16 Bronze Robot, $17 Chess Knight. $0A (HP 5, EXP 800) and $10 (HP 23, EXP 750) match no bestiary row (OQ-I033-3).\nClobbers: n/a (data).",
+      "MetaWorldOfEvil": "World 6 (World of Evil): 21 meta entries (file offsets 39054-39347).\n\nWhen: world_index 6: the shrine, the World of Evil, the Dazzling Space and the battle with Deathtoll.\nSees: the last world's monsters and Deathtoll.\nWhy: see the block note.\nIn: n/a (data); row = list + type x 14.\nOut: type $00 the hero. Enemy types matched by HP and EXP (inferred): $09 Deathtoll (first form: HP 99, EXP 0), $0A Purple Bull (HP 45, EXP 2,700; the bestiary says 23 HP: OQ-I033-2), $0B Firefly, $0C Wall Tile, $11 Deathtoll (final form: HP 100, defence $FF). The two forms add up to 199 HP and the bestiary says 200 HP in total (OQ-I033-1).\nClobbers: n/a (data)."
+    }
+  },
+
+  "system/data_scene_placements.asm": {
+    "blockNote": [
+      "Scene placement tables: the index of 97 scenes and the 97 actor lists it points to (file offsets 39348-43485, SNES $01:99B4-$A9DD, bank 00; 389 + 3749 bytes).",
+      "",
+      "=== MODEL ===",
+      "SpawnSceneActors scans ScenePlacementIndex for the first 4-byte row whose area and scene equal area_current and scene_current (a first byte of $80 or more ends the scan) and hands the row's list to SpawnPlacementList. A scene is one row; the 97 rows are exactly the 97 scenes of the scene profile list (lib_scene_profile_data) and of the asset list (SceneAssetLists, minus its dummy first record).",
+      "",
+      "=== ROWS ===",
+      "Index row (4 bytes): +0 area, +1 scene, +2 word &list. List row (4 bytes): +0 x tile, +1 y tile, +2 flags byte (bits 7 and 6 flip Y and X; bit 0 is passed to $1C as $0100), +3 meta type (WorldMetaPointers). Position = x tile x 16, y tile x 16 + 16. A list ends with a byte of $FF. The first row of every list is the hero (meta type 0): its tile is the start position of the scene when no warp_dest is set.",
+      "913 rows in all (97 hero rows and 816 actors); the longest list is PlacementA06S01 with 33 rows. The lists are named PlacementAaaSss after the (area, scene) of their index row, both in hex: PlacementA05S02 is area 5, scene 2.",
+      "",
+      "=== AREAS ===",
+      "22 areas ($00-$15) with 13, 4, 3, 6, 6, 10, 1, 5, 4, 2, 1, 7, 3, 5, 5, 2, 1, 4, 7, 3, 3 and 2 scenes. docs/areas-and-scenes.md names them and maps (area, scene) to the location_id used by the chest, exit and plate lists.",
+      "",
+      "=== NOTES ===",
+      "- Lair monsters are not listed here: they come from LairRecords (the lair actor spawns them), so the 'enemies' of a scene are the placement list plus the lairs of its location.",
+      "- structs.json names the index row unk1 and the list row unk2; the 97 lists keep the unk2 type with the delimiter $FF."
+    ],
+    "partNotes": {
+      "ScenePlacementIndex": "The scene placement index: one row per scene, ending in a first byte of $80 or more.\n\nWhen: SpawnSceneActors, once per scene load, scans it from the top.\nSees: every actor of the scene (NPCs, objects, chests' guards and wandering monsters) standing at its tile when the scene appears.\nWhy: the scene's actors are data in 97 lists, so one routine spawns any scene.\nIn: n/a (data). Row (4 bytes): area, scene, word &list (a PlacementAaaSss list in the same bank). The consumer compares area_current and scene_current in order and takes the first match.\nOut: the list address, which SpawnPlacementList walks (4-byte rows until $FF; InitActorFromPlacement for each). 97 rows, 388 bytes, plus a terminator byte.\nClobbers: n/a (data)."
+    }
+  },
+
+  "system/data_chest_lists.asm": {
+    "blockNote": [
+      "Chest lists: the 128-word pointer table by location_id and the lists of 6-byte chest rows (file offsets 43486-44181, SNES $01:A9DE-$AC95, bank 00; 256 + 440 bytes).",
+      "",
+      "=== MODEL ===",
+      "TryOpenChest (lib_tile_triggers_and_lair_return) and the scene init code in lib_scene_map_patches read chest_list_ofs, the list of the current location, which the scene loader takes from ChestListPointers[location_id x 2]. A chest is not an actor: the map holds the chest tile ($FB closed, $FC open) and the list says which tile belongs to which chest, what it holds and which bit of the chest array remembers that it was opened.",
+      "Row (6 bytes): +0 x, +1 y of the tile the player stands on (the chest tile is one above, y - 1); +2 chest id (bits 0-6 = the bit number in the array $1A7E, bit 7 = the tile is also edited on BG2); +3 content (0 empty, $FF Gems, any other value an inventory entry); +4 word Gem amount (BCD, little-endian: the bytes 12 00 are 12 Gems). A list ends with $FF.",
+      "",
+      "=== WHAT IS HERE ===",
+      "97 of the 128 location ids have a list; the 31 ids without a scene (25-27, 35-3B, 48-4F, 5D-63, 74-77, 7E, 7F) hold $0000. Of the 97, 60 share ChestListEmpty (a single $FF byte) and 37 have their own label: 36 with chests (67 chests in all: 1 to 4 per room) and ChestListLoc0A, an empty list of its own (Tulip's Dream) that duplicates the shared one. Names are ChestListLocLL with LL = location_id in hex.",
+      "Locations with chests (ROM location names): 03 Treasure room, 05 and 06 the Underground Castle, 08 Leo's Paintings, 0D Trial room, 15 Woods of GreenWood, 16 A mole's hole, 1A-1C Water Shrine, 1D-1F Fire Shrine, 20 Light Shrine, 29 Seabed Sanctuary, 2B Secret Cave, 2E Southerta, 2F Shore reef of Rockbird, 30 Durean, 32 A ghost ship, 34 Seabed of St. Elles, 3E Mountain North slope, 3F Aurora's Ridge, 47 Ice field of Laynole, 51 Leo's Laboratory, 58 the power plant, 5B and 5C Model of a town, 66 the torture chamber, 67 and 68 the castle basement, 6E and 6F the right tower, 79 and 7A World of Evil, 7B Dazzling Space.",
+      "Checked against the walkthrough: the chest of the Trial room (ChestListLoc0D) holds item 1, the Sword of Life (01-in-the-beginning.md); the chest in the Underground Castle (ChestListLoc05) holds the 12 Gems of 02-grass-valley.md.",
+      "",
+      "=== NOTES ===",
+      "- The bit number is a 7-bit value, so a chest id is below 128; $1A7E lies inside the first switch array ($1A5E + $20) and is the chest-opened array."
+    ],
+    "partNotes": {
+      "ChestListPointers": "The chest list pointers: 128 words by location_id.\n\nWhen: the scene loader (chest_list_ofs) and TryOpenChest.\nSees: nothing by itself; the chests of the room open when the player walks into them from below.\nWhy: any room can hold chests without an actor script.\nIn: n/a (data): word at location_id x 2: the bank-$01 address of the location's list, or $0000 for the 31 ids without a scene.\nOut: 97 non-zero words: 60 point to ChestListEmpty (locations 00-02, 04, 07, 09, 0B, 0C, 0E-14, 17-19, 21-24, 28, 2A, 2C, 2D, 31, 33, 3C, 3D, 40-46, 50, 52-57, 59, 5A, 64, 65, 69-6D, 70-73, 78, 7C, 7D), 0A to ChestListLoc0A, 36 to their own list.\nClobbers: n/a (data).",
+      "ChestListEmpty": "The shared empty chest list: one $FF byte.\n\nWhen: 60 locations point here (see ChestListPointers).\nSees: a room without chests.\nWhy: one terminator serves every room without chests.\nIn: n/a (data).\nOut: an immediate end of the list.\nClobbers: n/a (data).",
+      "ChestListLoc0A": "An empty chest list of its own for location 0A (Tulip's Dream).\n\nWhen: location 0A.\nSees: no chest.\nWhy: unknown; ChestListEmpty would do (a duplicate $FF byte).\nIn: n/a (data).\nOut: an immediate end of the list.\nClobbers: n/a (data).",
+      "ChestListLoc0D": "The chest of the Trial room (location 0D): 1 row.\n\nWhen: location 0D, the first room of the game.\nSees: the chest in front of the player yields the Sword of Life (walkthrough 01-in-the-beginning.md).\nWhy: the first weapon is a normal chest, so the tutorial teaches the chest.\nIn: n/a (data). Row: x 4, y 5, id 0, content 1 (the Sword of Life), Gems 0.\nOut: one row, then $FF.\nClobbers: n/a (data).",
+      "ChestListLoc05": "The chests of the Underground Castle, west part (location 05): 3 rows.\n\nWhen: location 05.\nSees: a chest with 12 Gems (walkthrough 02-grass-valley.md) and two chests with items.\nWhy: see the block note.\nIn: n/a (data). Rows: (x 27, y 18) id 1 content $FF = Gems, 12 BCD Gems; (25, 37) id 2 content $38; (68, 20) id 3 content $1C.\nOut: three rows, then $FF.\nClobbers: n/a (data)."
+    }
+  },
+
+  "system/data_exit_lists.asm": {
+    "blockNote": [
+      "Exit lists: the 128-word pointer table by location_id and 97 lists of 11-byte exit rows (file offsets 44182-46745, SNES $01:AC96-$B699, bank 00; 256 + 2308 bytes).",
+      "",
+      "=== MODEL ===",
+      "CheckExitRegions (lib_tile_triggers_and_lair_return) runs every frame with exit_list_ofs, the list of the current location, which the scene loader takes from ExitListPointers[location_id x 2]. An exit is a rectangle of tiles; when the player stands inside it (the tile inside, then the pixel position inside the rectangle shrunk by 15 pixels) the scene change starts: area_next, scene_next, warp_dest_anim, warp_dest_x and warp_dest_y are stored and the transition begins. So doors, room edges, ladders and portals are data, not scripts.",
+      "Row (11 bytes): +0 x, +1 y, +2 width, +3 height (tiles), +4 area_next, +5 scene_next, +6 warp_dest_anim, +7 word warp_dest_x, +9 word warp_dest_y (pixels). A list ends with $FF. Example: the Trial room list holds one row, x 4, y 10, 1 x 1 tiles, to area 0 scene 1, animation 3, at (96, 96).",
+      "",
+      "=== WHAT IS HERE ===",
+      "97 of the 128 ids have a pointer (the 31 without a scene hold $0000, as in the chest table). 78 lists have rows (201 in all; 21 lists have 1 row, 28 have 2, 15 have 3, 5 have 4, 2 have 5, 4 have 6, 2 have 7 and 1 has 11), 18 lists are a single $FF byte and one more (ExitListUnreferenced) is empty and not referenced. Names are ExitListLocLL with LL = location_id in hex.",
+      "The 18 empty lists are the places the player leaves by a script, not by walking: the dream rooms (0A Tulip's, 0E Lisa's, 23 Bird's, 24 Stump's, 2D the dolphin's, 33 Servas', 40 the old man's, 43 the mushroom's, 55 the cat's, 69 and 73 the soldier's: 'A dream 1' and the others), the five intro scenes 0F-13, 72 the deck (the Demon Falcon's room) and 7D the battle with Deathtoll.",
+      "",
+      "=== NOTES ===",
+      "- Location 5A (the second room the ROM calls 'A dream 1') points at the list of location 56 (ExitListLoc56, two rows to area $0D scene 1 and area $0E scene 2), while the empty list ExitListUnreferenced right after ExitListLoc59 has no reader. Every other dream room has an empty list, so the pointer looks like a slip (OQ-I033-5).",
+      "- structs.json declares the exit row as 11 Bytes; +7 and +9 are 16-bit reads (retype proposal in FM-A11 4.17)."
+    ],
+    "partNotes": {
+      "ExitListPointers": "The exit list pointers: 128 words by location_id.\n\nWhen: the scene loader (exit_list_ofs), then CheckExitRegions every frame.\nSees: nothing by itself; walking into a doorway, a room edge or a ladder starts the next scene.\nWhy: exits are rectangles in a per-location list, so no scene needs a script for them.\nIn: n/a (data): word at location_id x 2: the bank-$01 address of the list, or $0000 for the 31 ids without a scene.\nOut: 97 non-zero words and 96 distinct lists: locations 56 and 5A share ExitListLoc56, and ExitListUnreferenced has no pointer.\nClobbers: n/a (data).",
+      "ExitListLoc0D": "The exit of the Trial room (location 0D): 1 row.\n\nWhen: location 0D, the first room.\nSees: walking onto the exit tile starts area 0 scene 1 with animation 3 at pixel (96, 96).\nWhy: see the block note.\nIn: n/a (data). Row: x 4, y 10, width 1, height 1, area_next 0, scene_next 1, warp_dest_anim 3, warp_dest_x $0060, warp_dest_y $0060.\nOut: one row, then $FF.\nClobbers: n/a (data).",
+      "ExitListLoc56": "The exit list of location 56 (Basement of Laboratory), also used by location 5A (A dream 1): 2 rows.\n\nWhen: locations 56 and 5A.\nSees: in 56 two exits lead to scene 1 of area $0D and scene 2 of area $0E; in 5A the same rectangles would exist in a dream room that has no such doors (OQ-I033-5).\nWhy: unknown for 5A; see the block note.\nIn: n/a (data). Rows: (x 29, y 59, 1 x 1) to area $0D scene 1 animation 1 at ($00F0, $0120); (59, 8, 1 x 1) to area $0E scene 2 animation 0 at ($01C0, $0040).\nOut: two rows, then $FF.\nClobbers: n/a (data).",
+      "ExitListUnreferenced": "An empty exit list (one $FF byte) that no pointer uses.\n\nWhen: never read.\nSees: nothing.\nWhy: it sits right after ExitListLoc59 where the pointer of location 5A, a dream room, would be expected (OQ-I033-5).\nIn: n/a (data).\nOut: an immediate end of the list.\nClobbers: n/a (data)."
+    }
+  },
+
+  "system/data_plate_lists.asm": {
+    "blockNote": [
+      "Plate lists: the 256-word pointer table and 6 lists of 4-byte pressure plate rows, plus the shared empty list (file offsets 46746-47628, SNES $01:B69A-$BA0C, bank 00; 512 + 371 bytes).",
+      "",
+      "=== MODEL ===",
+      "A pressure plate is a tile that switches a room between two map variants after a lair was released. TriggerVariantPlate (lib_tile_triggers_and_lair_return) reads plate_list_ofs, which the scene loader takes from the word at ($03AA = location_id x 4) + plate_variant x 2 of this table; plate_lists_ofs keeps the address of the pair. The index is therefore location_id x 2 + variant (0 or 1): the two lists of a pair are the plates of variant 0 and variant 1, and stepping on an active plate of the current variant applies the lair record's slab and toggles the variant, so the next plate takes over.",
+      "Row (4 bytes): +0 x, +1 y of the plate tile, +2 word lair record index (the bit number in the released array $1A9E: the plate is inactive until that lair has been released). A list ends with $FF.",
+      "",
+      "=== WHAT IS HERE ===",
+      "Only three rooms have plates: location 01 (Grass Valley, the highlands: PlateListLoc01V0 with 17 rows and PlateListLoc01V1 with 12), location 29 (the Seabed Sanctuary: V0 with 19 rows, V1 with 10) and location 65 (the Castle of King Magridd: V0 with 23 rows, V1 with 10). The rows of one list name only a few lair records (for example PlateListLoc01V0 uses records 2 and 6 in its first rows). 188 of the 256 words point to PlateListEmpty (one $FF byte), 62 are $0000 (the 31 ids without a scene, two words each) and 6 point to the lists above."
+    ],
+    "partNotes": {
+      "PlateListPointers": "The plate list pointers: 256 words, location_id x 2 + variant.\n\nWhen: the scene loader (plate_list_ofs, plate_lists_ofs) and TriggerVariantPlate after every plate.\nSees: nothing by itself; the room changes when an active plate is stepped on.\nWhy: two lists per location let the plates alternate between the two map variants.\nIn: n/a (data): word at (location_id x 2 + variant) x 2.\nOut: 6 words point to the plate lists of locations 01, 29 and 65, 188 to PlateListEmpty and 62 are $0000.\nClobbers: n/a (data).",
+      "PlateListEmpty": "The shared empty plate list: one $FF byte.\n\nWhen: 188 pointer words use it (every location with a scene except 01, 29 and 65).\nSees: a room without plates.\nWhy: one terminator serves all.\nIn: n/a (data).\nOut: an immediate end of the list.\nClobbers: n/a (data).",
+      "PlateListLoc01V0": "Plates of variant 0 in location 01 (Grass Valley, the highlands): 17 rows.\n\nWhen: location 01 while plate_variant is 0.\nSees: stepping on a plate whose lair is released changes part of the room.\nWhy: see the block note.\nIn: n/a (data). Row: x, y, word lair record index.\nOut: 17 rows, then $FF.\nClobbers: n/a (data).",
+      "PlateListLoc01V1": "Plates of variant 1 in location 01 (Grass Valley, the highlands): 12 rows.\n\nWhen: location 01 while plate_variant is 1.\nSees: as PlateListLoc01V0, the second state.\nWhy: see the block note.\nIn: n/a (data). Row: x, y, word lair record index.\nOut: 12 rows, then $FF.\nClobbers: n/a (data).",
+      "PlateListLoc29V0": "Plates of variant 0 in location 29 (Seabed Sanctuary): 19 rows.\n\nWhen: location 29 while plate_variant is 0.\nSees: as PlateListLoc01V0.\nWhy: see the block note.\nIn: n/a (data). Row: x, y, word lair record index.\nOut: 19 rows, then $FF.\nClobbers: n/a (data).",
+      "PlateListLoc29V1": "Plates of variant 1 in location 29 (Seabed Sanctuary): 10 rows.\n\nWhen: location 29 while plate_variant is 1.\nSees: as PlateListLoc01V0.\nWhy: see the block note.\nIn: n/a (data). Row: x, y, word lair record index.\nOut: 10 rows, then $FF.\nClobbers: n/a (data).",
+      "PlateListLoc65V0": "Plates of variant 0 in location 65 (Castle of King Magridd): 23 rows.\n\nWhen: location 65 while plate_variant is 0.\nSees: as PlateListLoc01V0.\nWhy: see the block note.\nIn: n/a (data). Row: x, y, word lair record index.\nOut: 23 rows, then $FF.\nClobbers: n/a (data).",
+      "PlateListLoc65V1": "Plates of variant 1 in location 65 (Castle of King Magridd): 10 rows.\n\nWhen: location 65 while plate_variant is 1.\nSees: as PlateListLoc01V0.\nWhy: see the block note.\nIn: n/a (data). Row: x, y, word lair record index.\nOut: 10 rows, then $FF.\nClobbers: n/a (data)."
+    }
+  },
+
+  "system/data_lair_records.asm": {
+    "blockNote": [
+      "Lair and release records: 420 records of 32 bytes and a $FF terminator (file offsets 47629-61069, SNES $01:BA0D-$EE8D, bank 00; 13441 bytes). The record index is the switch number of the whole game.",
+      "",
+      "=== MODEL ===",
+      "A Monster Lair is a patch of the map ($FD intact, $FE green switch, $FF cleared) that spits out monsters; killing them all opens the switch, and stepping on it releases something: an NPC that goes home (the walkthrough: 'the switch beneath the lair will release the tool shop's owner') or a stretch of map (a path opens). One record describes both halves: where the lair is and what it spawns (+B..+15), and what the release does (+0..+A, +E, +F, +1D, +1E). Record n is also switch n: bit n of the switch array $1ADE and of the released array $1A9E, and byte n of lair_state ($7F0203 + n) is its monster counter. The records are not sorted by location.",
+      "",
+      "=== RECORD (32 bytes) ===",
+      "+0 home location (where the released NPC lives; $FF/$80+ ends the table) | +1 slab number (0-3, the alternative map copy shown by the release) | +2, +3 home tile x, y | +4, +5 rectangle x, y (metatiles) | +6, +7 rectangle width, height (0 / 0 writes one type-1 tile) | +8 layer (non-zero: BG2 as well) | +9 name index (the NPC's name in NpcNameStrings) | +A low bits of lair_state after the release ($80 path, $C0 NPC) | +B lair location | +C, +D lair tile x, y (the switch appears here) | +E, +F staging rectangle x, y | +10 word script, +12 script bank (@Code) | +13 monster count (the initial lair_state) | +14 spawn interval (RunLairRespawn, RunLairSpawnAll: $14 = 3 x $26 - 1) or formation index (RunLairFormation: $26 x 2 into FormationPointers) | +15 meta type | +16 word attribute bits ($4000, $8000 or $C000: flips) | +18, +1A words, +1C byte: always 0, no reader | +1D warp_dest_anim | +1E word gate switch (a bit of $1ADE; 0 = none).",
+      "The first 8 bytes (+0..+7) are copied by MVN to $1C6D-$1C74 (release_slab, release_npc_x/y, release_rect_x/y/w/h) when a release runs. +E / +F both 0 means the lair frees an NPC; otherwise it opens a path.",
+      "",
+      "=== WHAT IS HERE ===",
+      "Scripts: 156 RunLairRespawn, 139 RunLairSpawnAll, 107 RunLairFormation, 8 RunLairProximity, 7 RunLairSpawnAllFlipping and 3 records without a script (monster count 0): records $32, $74 and $75, whose home and lair location is a dream room (0E Lisa's, 23 Bird's, 24 Stump's): switches that no lair actor ever drives.",
+      "15 records are identical fillers: home and lair location $63 (a location without a scene), count 1, interval 1, meta type $FF, RunLairRespawn: $26, $27, $2D, $35, $104-$108, $12B, $12C, $146, $156, $157 and $194. Nothing finds them (no scene has location $63), so they only keep the numbering of the switches.",
+      "The record index is the switch number everywhere: placement scripts test switch n with COP 14 and COP 3B (HoldActorUntilReleased waits for the lair of record n), and SceneVariantRules names six boss lairs by their index.",
+      "Walkthrough check (record $09, the first boss lair): home location 04 (the village chief's room), lair location 0C (Monster in the paintings), lair tile (2, 3), RunLairFormation, 1 monster of meta type $1F (the Metal Mantis, MetaGrassValley). The walkthrough 02-grass-valley.md: 'After beating the Metal Mantis, go onto the northwestern switch that was once underneath the monster lair. You'll end up freeing the village chief'. The other five boss lairs are records $50 (home 15, lair location 22, three Elemental Statues, type $3D), $B6 (home 29, lair 32, Floating Skull, type $41), $103 (home 3D, lair 44, Poseidon, type $38), $12F (home 53, lair 59, Tin Doll, type $1E) and $195 (home 65, lair 72, Demon Falcon, type $09).",
+      "Record $00 (home and lair location 0D, the Trial room): 4 monsters of meta type $20, RunLairRespawn.",
+      "",
+      "=== NOTES ===",
+      "- Consumers: SpawnLairActor and ApplyLairStatesToScene (spawn and state replay), SealLair, ReleaseLairAtSwitch, PlayLairReleaseScene and RunLairReleaseOnReturn (release), TriggerVariantPlate (plates), HoldActorUntilReleased and Cop3B_JumpIfSwitchSetElseHold (the freed NPCs), InitFixedState (copies +13 to $7F0203 + n).",
+      "- structs.json declares unk8 with 16 Bytes, @Code, 3 Bytes and 5 Words; +14 is a byte and +1D a byte read (retype proposal in FM-A11 4.17).",
+      "- The existing note of RunLairRespawn says '156 of the 417 lair records': 417 is the number of records that have a script."
+    ],
+    "partNotes": {
+      "LairRecords": "The 420 lair and release records: the monster lairs of the game and what stepping on their switch releases.\n\nWhen: read at scene load (ApplyLairStatesToScene walks all records with a running index; SpawnLairActor builds each live lair), by the release code when the player steps on a green switch, and by the NPC and plate scripts through the record index.\nSees: the monsters of a Monster Lair come out one at a time, in a row or in a set pattern; when the last dies a green switch appears; stepping on it frees an NPC (who walks home) or opens part of the room.\nWhy: all lairs share a few scripts, so each lair is only a row of data; the same row also says what the release does, so one routine serves them all.\nIn: n/a (data). 32-byte records at LairRecords + n x 32 (n = the lair index = the switch number); layout in the block note.\nOut: the first 8 bytes go to $1C6D-$1C74 for the release rectangle; +B..+D place the lair, +10..+15 give its script, count, interval or formation and meta type; lair_state[n] starts as +13.\nClobbers: n/a (data)."
+    }
+  },
+
+  "system/data_lair_formations.asm": {
+    "blockNote": [
+      "Lair formations: the 112-word pointer table and 112 lists of 6-byte monster rows (file offsets 61070-63897, SNES $01:EE8E-$F999, bank 00; 224 + 2604 bytes; 434 rows).",
+      "",
+      "=== MODEL ===",
+      "RunLairFormation (the script of 107 lair records) places all monsters of a lair at once instead of one after the other. The index is in the lair actor's $26 (the record's +14); the list is the word at FormationPointers + $26 x 2. For each of the lair's monsters (count in $0C, the live count taken from the record's +13) it reads one row: word x, word y, word flip bits (ORed into $1C after AND $3FFF) and spawns the monster at that position with no appear puff.",
+      "Rows (6 bytes): +0 word x, +2 word y (pixels), +4 word OR bits for $1C (flip bits $4000 and $8000, so a formation can be mirrored). Lists have no terminator: the monster count ends the walk, so every list must have at least as many rows as the lair has monsters.",
+      "",
+      "=== NOTES ===",
+      "- The 112 lists keep their auto names (unk9_00EF6E ...): they are named by index in FormationPointers ($00-$6F), which is what the lair records use.",
+      "- Check: 224 + 434 x 6 = 2828 bytes."
+    ],
+    "partNotes": {
+      "FormationPointers": "The formation pointers: 112 words indexed by a lair record's +14.\n\nWhen: RunLairFormation, once when the lair first runs.\nSees: a group of monsters standing in a set pattern (some mirrored) the moment the lair opens.\nWhy: the timed lair scripts cannot place monsters at exact positions.\nIn: n/a (data): word at index x 2 = the bank-$01 address of a list of 6-byte rows (x word, y word, flip bits word).\nOut: 112 lists of 434 rows in all; no list terminator (the lair's monster count ends the walk).\nClobbers: n/a (data)."
+    }
+  },
+
+  "system/data_scene_variant_rules.asm": {
+    "blockNote": [
+      "Scene variant rules: 23 rows of 4 bytes and a terminator (file offsets 63898-63990, SNES $01:F99A-$F9F6, bank 00; 93 bytes).",
+      "",
+      "=== MODEL ===",
+      "LookupSceneVariant (lib_scene_map_patches) is called by ApplySceneProfile when scene_variant is still 0. It walks this table for a row of the current location whose switch bit is set in the switch array $1ADE and, if there is one, stores the row's variant in scene_variant ($031E). The variant picks the music of the scene (the music commands of the asset list carry a variant byte).",
+      "Row (4 bytes): +0 location_id (a first byte of $80 or more ends the table), +1 word switch number (a bit of $1ADE), +3 variant. The switch numbers are lair record indices (LairRecords): the six values are the boss lairs, one per world: $0009 the Metal Mantis (world 0), $0050 the Elemental Statues (1), $00B6 the Floating Skull (2), $0103 Poseidon (3), $012F the Tin Doll (4) and $0195 the Demon Falcon (5). The record of each switch has the world's boss as its monster (meta type $1F, $3D, $41, $38, $1E, $09).",
+      "",
+      "=== ROWS ===",
+      "Rows per world: world 0 locations 01, 02, 03, 04 (variant 2) and 0C (variant 0); world 1 locations 15, 16, 17, 18 (variant 2) and 22 (0); world 2 locations 29, 2C (2) and 32 (0); world 3 locations 3D (2) and 44 (0); world 4 locations 51, 52, 53, 54 (2) and 59 (0); world 5 locations 65 (2), 72 (0) and 71 (1). The variant-0 rows are the six boss rooms, the rooms whose scene profile adds 2 to the variant (byte 11 = $C0-$C5, lib_scene_profile_data): after the boss lair is released the boss room goes back to variant 0 and the other rooms of the world change to variant 2 (the Castle of King Magridd's dock, 71, to variant 1). The story that fits: the boss music of the room before the boss falls and the music of the world after it (inferred; OQ-I011-5). World 6 has no row.",
+      "",
+      "=== NOTES ===",
+      "- Bit n of $1ADE is set by the release code (ReleaseLairAtSwitch for a path, PlayLairReleaseScene for an NPC, which runs once the player has returned to the NPC's home scene), so the rooms change after the release, not at the moment the boss dies."
+    ],
+    "partNotes": {
+      "SceneVariantRules": "The scene variant rules: which rooms change their music variant once a boss lair has been released.\n\nWhen: LookupSceneVariant, once per scene load, when the scene profile left scene_variant at 0.\nSees: probably a change of music in the rooms of a world once its boss lair has been released, the boss room going back to its normal tune (inferred, OQ-I033-13).\nWhy: the boss and post-boss music depend on a switch, not on the room, so they are data rows keyed by location and switch.\nIn: n/a (data). Row (4 bytes): location_id, word switch number ($1ADE bit = the lair record index of the world's boss lair), variant. A first byte of $80 or more ends the table.\nOut: scene_variant = the variant of the first row of this location whose switch is set; 23 rows, 5 per world for worlds 0, 1 and 4, 3 for worlds 2 and 5, 2 for world 3.\nClobbers: n/a (data)."
+    }
+  },
+
+  "system/data_engine_tables.asm": {
+    "blockNote": [
+      "Engine tables: 16 small tables read all over the engine (file offsets 63991-65091, SNES $01:F9F7-$FE43, bank 00; 1101 bytes).",
+      "",
+      "=== WHAT IS HERE ===",
+      "Menu positions: WeaponIconPositions, ArmorIconPositions, MagicIconPositions (8 words each: the BG offsets of the icons of the equipment page) and ItemIconPositions (40 words: the item grid), read by DrawEquipIconRows and DrawItemIconGrid.",
+      "Bit and direction tables: SwitchBitMasks (8 bytes $01-$80: the mask of bit n and 7 for every bit array), PlayerFacingByAnim and PlayerMoveDirByAnim (44 bytes each, by the player's animation id: 0 up, 1 down, 2 right, 3 left; ids $2C and up are not valid), WeaponYOffsetByAnim (44 words: the weapon sprite's y offset by animation, 0 or 1 pixel).",
+      "Colour and music: GaugeColorLadder (13 BGR555 words: the colour of the HP and enemy gauge in steps of 10 units, dark blue below 50 up to white from 100), MusicPointerTable (21 long pointers to the song data), MagicGraphicsPointers (8 long pointers into graphics_07B000) and MagicPalettePointers (8 long pointers into palette_07D000, 32 bytes each).",
+      "Level-up and geometry: LevelExpThresholds (51 rows of 2 BCD words), SineTable plus SineTableTail (one 320-byte signed sine) and CircleHalfWidths (128 bytes).",
+      "",
+      "=== NOTES ===",
+      "- The file keeps the extraction's split of the sine (SineTable 64 bytes, SineTableTail 256 bytes): they are one table and the split is only a boundary of the extraction.",
+      "- Each part note names its consumers."
+    ],
+    "partNotes": {
+      "WeaponIconPositions": "BG offsets of the 8 weapon icons on the equipment page.\n\nWhen: DrawEquipIconRows (7 call sites of the equipment menu).\nSees: the eight sword icons in two rows of four.\nWhy: the page layout is data, so the icon loop is one routine for weapons, armor and magic.\nIn: n/a (data): 8 words, index = the inventory slot.\nOut: $018C, $020C, $028C, $030C (the first column, four rows) and $0190, $0210, $0290, $0310 (the second column): byte offsets in the BG2 buffer; each step of 4 is one 2 x 2 icon.\nClobbers: n/a (data).",
+      "ArmorIconPositions": "BG offsets of the 8 armor icons on the equipment page.\n\nWhen: DrawEquipIconRows.\nSees: the armor icons next to the weapons.\nWhy: see WeaponIconPositions.\nIn: n/a (data): 8 words, index = the inventory slot.\nOut: the byte offsets of the icons in the BG2 buffer.\nClobbers: n/a (data).",
+      "MagicIconPositions": "BG offsets of the 8 magic icons on the equipment page.\n\nWhen: DrawEquipIconRows.\nSees: the spell icons below the armor.\nWhy: see WeaponIconPositions.\nIn: n/a (data): 8 words, index = the inventory slot.\nOut: the byte offsets of the icons in the BG2 buffer.\nClobbers: n/a (data).",
+      "ItemIconPositions": "BG offsets of the 40 item icons of the item page.\n\nWhen: DrawItemIconGrid (6 call sites of the item menu).\nSees: the item grid of the inventory.\nWhy: see WeaponIconPositions.\nIn: n/a (data): 40 words, index = the item slot ($1B36 + n); the first values are $018C, $0190, $0194, $0198, $019C.\nOut: the byte offset of each icon's top-left cell in the BG2 buffer (DrawInventoryIcon).\nClobbers: n/a (data).",
+      "SwitchBitMasks": "The eight single-bit masks $01 to $80.\n\nWhen: TestBitInArray, SetBitInArray and ClearBitInArray (lib_bit_array), for every switch, flag and chest array.\nSees: a chest stays open, a lair stays released, an event stays done.\nWhy: a table lookup of 1 << (n and 7) avoids a shift loop.\nIn: n/a (data): index = bit number and 7.\nOut: the byte mask.\nClobbers: n/a (data).",
+      "PlayerFacingByAnim": "The direction the player faces for each of his 44 animation ids.\n\nWhen: GetPlayerFacing (talk, chests), ApplyPlayerWeaponPose and RunFlameBall.\nSees: the hero talks to or opens what is in front of him, whatever pose he is in.\nWhy: the facing is derived from the animation id, so every walking, standing and attack pose maps to one of four directions.\nIn: n/a (data): 44 bytes, index = animation id $1E of the player ($2C and up are not valid).\nOut: 0 up, 1 down, 2 right, 3 left. The idle ids $00-$03 give down, up, left, right.\nClobbers: n/a (data).",
+      "PlayerMoveDirByAnim": "The direction of movement for each of the player's 44 animation ids.\n\nWhen: GetMoveDirectionOfAnim (SlideAroundCorner).\nSees: nothing directly; the sidestep and backstep poses move in a direction other than their facing.\nWhy: facing and movement direction are separate tables, so the crab-walk poses can face one way and move another.\nIn: n/a (data): 44 bytes, index = animation id.\nOut: 0 up, 1 down, 2 right, 3 left.\nClobbers: n/a (data).",
+      "WeaponYOffsetByAnim": "The vertical offset of the weapon sprite for each of the player's 44 animation ids.\n\nWhen: FinishPlayerMove every frame, and one scene actor of the Underground Castle.\nSees: the sword bobs one pixel with the walking steps.\nWhy: the weapon is its own actor and follows the hero's pose from a table.\nIn: n/a (data): 44 words, index = animation id x 2.\nOut: 0 or 1 pixel.\nClobbers: n/a (data).",
+      "GaugeColorLadder": "The colours of the HP and enemy gauge by tens of units.\n\nWhen: DrawGaugeBar, whenever the HUD HP bar or the enemy bar is drawn.\nSees: a bar that changes from dark blue (below 50) through lighter steps to white at 100 and more; it shows the tens above 50 that the bar's 25 tiles cannot (walkthrough level-up.md).\nWhy: the HP can exceed what the bar shows, so the colour carries the extra.\nIn: n/a (data): 13 BGR555 words, index = floor(units / 10); the entries are $79E0 (five times), $7AE0, $5FC0, $03D7, $03DE, $3FDE and $7BDE (three times).\nOut: the colour stored in cgram_buffer (colour 10 or 14). A value of 130 or more reads past the table (OQ-I010-5).\nClobbers: n/a (data).",
+      "MusicPointerTable": "The 21 long pointers to the song data.\n\nWhen: MusicLoadUpload, with the track number of the music-load actor ($30) as the index.\nSees: the music of a scene or a boss after a change.\nWhy: the songs are uploaded to the sound chip one at a time, so the game only needs the address of each.\nIn: n/a (data): 3-byte pointers, index = track number 0-20.\nOut: the long address copied to dp$29-$2B for the IPL upload (engine_spc_ipl_upload.code_0FEFF5).\nClobbers: n/a (data).",
+      "MagicGraphicsPointers": "The graphics source of each of the 8 spells.\n\nWhen: LoadEquippedMagicGfx, when the equipped magic changes.\nSees: the effect tiles of the equipped spell.\nWhy: only one spell's graphics fit in VRAM, so they are swapped.\nIn: n/a (data): 8 long pointers, index = equipped_magic - $11.\nOut: graphics_07B000 + 0, 0, $800, $1000, $1000, $1800, $1800, $800 (each $800 bytes are DMAed to VRAM word $2600; some spells share graphics).\nClobbers: n/a (data).",
+      "MagicPalettePointers": "The palette of each of the 8 spells.\n\nWhen: LoadEquippedMagicGfx.\nSees: the colours of the equipped spell.\nWhy: see MagicGraphicsPointers.\nIn: n/a (data): 8 long pointers, index = equipped_magic - $11.\nOut: palette_07D000 + $20 x n (32 bytes each, copied to cgram_buffer + $160).\nClobbers: n/a (data).",
+      "LevelExpThresholds": "The EXP thresholds of the 50 levels.\n\nWhen: WatchForLevelUp, every frame.\nSees: the level rises when the hero's EXP reaches the next value (walkthrough level-up.md: 100, 280, 580, 1,000, ... up to 99,999,999; the level cap is 50).\nWhy: the thresholds are irregular, so a table replaces a formula.\nIn: n/a (data): 51 rows of 4 bytes at level x 4: two words, the high word first, each 4 BCD digits (row 1 = $0000, $0100 = 100; row 47 = $7200, $0000 = 72,000,000). Row 0 is unused; rows 49 and 50 are $9999, $9999.\nOut: player_exp_next and its high word. All 49 thresholds of the walkthrough's level-up table match the values here.\nClobbers: n/a (data).",
+      "SineTable": "The start of the 320-byte signed sine: 256 values of 127 x sin(2 pi x i / 256) and 64 more for the cosine.\n\nWhen: RunSoulOrbController (the orb's orbit), BuildRotationMatrix and BuildRotationMatrixAlt (the Mode 7 rotation), FillSineWaveTables (dead code) and a few boss scripts of the World of Evil.\nSees: the soul orb circling the hero, the rotating Mode 7 maps.\nWhy: a lookup avoids computing sines on the 65816.\nIn: n/a (data): signed bytes, index = angle (0-255, 256 = a full turn); cosine = the entry at angle + 64, which is why the table runs 64 bytes past the end.\nOut: this part holds the first 64 entries: $00, $03, $06, $09 ... rising towards $7F; the rest is SineTableTail.\nClobbers: n/a (data).",
+      "SineTableTail": "The rest of the 320-byte sine: entries 64 to 319.\n\nWhen: as SineTable.\nSees: as SineTable.\nWhy: the extraction splits the table at this label; it is one table with SineTable.\nIn: n/a (data): signed bytes; entry 64 is $7F, the peak.\nOut: the descending half and the negative half of the sine, then the 64 entries the cosine needs.\nClobbers: n/a (data).",
+      "CircleHalfWidths": "The half-width of a circle for each of its 128 rows.\n\nWhen: code_0116C3 (lib_0116C3), the circle drawing routine (not yet annotated).\nSees: a round shape, probably the iris or a circular window (inferred).\nWhy: the width of each row of a circle is data, so no square root is needed.\nIn: n/a (data): 128 bytes, index = row; the first values are $00, $04, $0A, $0F, $12, $15, $18, $1A.\nOut: the half-width in pixels.\nClobbers: n/a (data)."
+    }
+  },
+
+  "system/data_scene_asset_lists.asm": {
+    "blockNote": [
+      "Scene asset lists: 98 records, one per scene, with the load commands of each scene (file offsets 163840-167937, SNES $05:8000-$9001, bank 02; 4098 bytes).",
+      "",
+      "=== MODEL ===",
+      "LoadSceneAssets (lib_scene_asset_loader) calls FindSceneRecord to find the record of area_current and scene_current in this list (dp$2F-$31 points at it) and runs its commands: graphics, palette, tileset, tilemap, asset8 (scene profile or jump), meta4, music and spritemap, each with its operand bytes, ending with a 00 byte. The layout of the commands and the shared segments (65 jumps to 37 labels) are the subject of the block note of lib_scene_asset_loader.",
+      "Counts over the whole list: 47 spritemap, 65 music, 200 asset8, 135 tilemap, 62 tileset, 109 palette and 107 graphics commands, none of meta4. The first record (area $53, scene $59) is a dummy without commands; the other 97 are exactly the 97 scenes of ScenePlacementIndex. The list has no end sentinel (OQ-I011-3)."
+    ],
+    "partNotes": {
+      "SceneAssetLists": "The asset list: 98 records of area, scene, commands and a 00 end.\n\nWhen: LoadSceneAssets on every scene change, from InitSceneState.\nSees: after the call the new scene's graphics, palette, tile definitions, maps, music and sprite map are loaded.\nWhy: scenes are data, so one list and one handler per command replace a loader routine per scene.\nIn: n/a (data): record = byte area, byte scene, the commands (each a one-bit command byte and its operands), 00. The pointers inside are long addresses of compressed assets.\nOut: the commands drive the loaders; the record of scene (0, 1) opens the list after the dummy ($53, $59).\nClobbers: n/a (data)."
+    }
+  },
+
+  "system/data_spc_driver.asm": {
+    "blockNote": [
+      "SPC700 sound driver block as uploaded at boot (file offsets 196608-198414, SNES $06:8000-$870E, bank 03; 1807 bytes).",
+      "",
+      "=== MODEL ===",
+      "engine_spc_ipl_upload (code_0FEFBC) first uploads spc_0FF14E, writes $FF to APUIO0 and then uploads this block through the same upload routine (code_0FEFF5) with $0320 = $3000. The song data of MusicPointerTable is uploaded by the same routine later, one song at a time (MusicLoadUpload). The block is an IPL transfer stream: it starts with the length word $004E and the destination word $2E00 and continues with the data; its contents were not disassembled in this audit (the sound engine is documented elsewhere), so the name rests on its place in the boot sequence."
+    ],
+    "partNotes": {
+      "SpcDriverBlock": "The block uploaded to the sound chip at boot after the loader.\n\nWhen: code_0FEFBC in engine_spc_ipl_upload, once, at the start of the game.\nSees: nothing directly; the game's music and sound effects depend on it.\nWhy: the SPC700 runs its own program, so the CPU has to send it.\nIn: n/a (data): 1807 bytes, an upload stream whose first words are $004E (a length) and $2E00 (a destination).\nOut: read by code_0FEFF5 with dp$29-$2B = this address and $0320 = $3000.\nClobbers: n/a (data)."
+    }
+  },
+
+  "system/data_iris_and_icon_tiles.asm": {
+    "blockNote": [
+      "Iris frames and the 2x2 icon tile records (file offsets 294912-295423 and 296960-297983, SNES $09:8000-$81FF and $09:8800-$8BFF, bank 04; 512 + 1024 bytes).",
+      "",
+      "=== WHAT IS HERE ===",
+      "IrisFrames: 32 frames of 16 bytes (an 8 x 8 tile mask in 2 bits per pixel each), written one per step by the iris transition into VRAM word $4000 (RunIrisTransition in lib_scene_change_init): the iris closes (frames $1E down to 0) and opens (0 up to $1F) over about a second. IconTileRecords: 128 records of 8 bytes, one per inventory icon: 4 words of BG tilemap entries (top-left, top-right, bottom-left, bottom-right) of a 2 x 2 icon, read by DrawInventoryIcon with the item id and $7F x 8."
+    ],
+    "partNotes": {
+      "IrisFrames": "The 32 tile masks of the iris transition.\n\nWhen: PlayTransitionIn and PlayTransitionOut, once per step of the iris (transition types $80 and up: the return trips).\nSees: a circle that closes in on the screen and opens again.\nWhy: the iris is a tile whose shape changes every step; the shapes are data.\nIn: n/a (data): 16 bytes per frame (2 bits per pixel), offset ((2 x type + bit 4 of iris_frame) << 8) | ((iris_frame and $0F) << 4); the type's bit 7 drops out of the 8-bit add, so only these 512 bytes are used by the shipped game.\nOut: the frame is written to VRAM word $4000 and the two sub-frames run.\nClobbers: n/a (data).",
+      "IconTileRecords": "The 128 icon records of 4 tilemap words.\n\nWhen: DrawInventoryIcon (the equipment and item pages) and code_012390 in lib_shared_012390.\nSees: the inventory icons.\nWhy: every icon is four tiles; a record per icon makes the draw routine one loop.\nIn: n/a (data): 8 bytes per record, index = item id and $7F: four words: top-left, top-right, bottom-left, bottom-right (BG2 tilemap entries).\nOut: written to the BG2 page at $7F7800 + the icon's offset (and the next row, +$40).\nClobbers: n/a (data)."
+    }
+  },
+
+  "system/data_menu_palettes_and_groups.asm": {
+    "blockNote": [
+      "Menu palettes and the tile group map (file offsets 323584-324511, SNES $09:F000-$F39F, bank 04; 256 + 256 + 256 + 160 bytes).",
+      "",
+      "=== WHAT IS HERE ===",
+      "ItemPagePalette and MenuBgPalette are 256-byte palettes (CGRAM colours 0-127) copied into cgram_buffer for the item page and the rest of the menus. MenuTileGroupMap is a 16 x 16 map of group numbers (x 8 indexes IconTileRecords) used by code_012390 (lib_shared_012390). MenuSpellPalettes holds the palettes 11-15 (160 bytes, cgram_buffer + $160) restored after a menu closes."
+    ],
+    "partNotes": {
+      "ItemPagePalette": "The item page palette: 256 bytes, colours 0-127.\n\nWhen: LoadItemPagePalette, every time the item page is shown (DrawItemPage).\nSees: the item icons and page frame in their own colours.\nWhy: the icons need other colours than the equipment page.\nIn: n/a (data): 128 BGR555 words.\nOut: copied to cgram_buffer (colours 0-127) with MVN.\nClobbers: n/a (data).",
+      "MenuBgPalette": "The menu palette: 256 bytes, colours 0-127.\n\nWhen: LoadMenuPalette (OpenEquipmentMenu, RedrawEquipmentPage and lib_01232B).\nSees: the menu colours on the next NMI upload.\nWhy: the CGRAM buffer is uploaded by the NMI, so loading the palette is a copy.\nIn: n/a (data): 128 BGR555 words.\nOut: copied to cgram_buffer ($7F:0000).\nClobbers: n/a (data).",
+      "MenuTileGroupMap": "A 16 x 16 map of tile group numbers for the icon records.\n\nWhen: code_012390 (lib_shared_012390), when it draws a block of icon tiles.\nSees: a block of icon tiles drawn in one pass.\nWhy: the group number selects the icon record (group x 8 into IconTileRecords).\nIn: n/a (data): 256 bytes, row-major.\nOut: the group number of each cell.\nClobbers: n/a (data).",
+      "MenuSpellPalettes": "The spell palettes 11-15: 160 bytes.\n\nWhen: RestoreSceneBgGfxAndPalette, after a menu or a scene load.\nSees: the field's spell and effect colours return after the menu.\nWhy: the menu overwrites part of the palette, so the field's colours are put back.\nIn: n/a (data): 80 BGR555 words.\nOut: copied to cgram_buffer + $160.\nClobbers: n/a (data)."
+    }
+  },
+
+  "system/data_anim_player_unarmed.asm": {
+    "blockNote": [
+      "Animation bank $0A: the hero's animations without a weapon (file offsets 327680-330951, SNES $0A:8000-$8CC7, bank 05; 3272 bytes).",
+      "",
+      "=== MODEL ===",
+      "An animation bank is read through the actor's table pointer ($22, base $8000) and bank ($24): the word list at $8000 holds one pointer per animation id ($1E), each pointing to a step list; the actor's step counter ($20) selects the step, 8 bytes each: word duration, word dx, word dy, word &frame, with $FFFF ending the list (SetActorAnimFrame in engine_scheduler_sprites_combat_collision loads one step per call). A frame is a leaf: a 12-byte header (the box edges, width and height) followed by the sprite map of the pieces. This bank has 26 lists (ids $00-$19), 116 steps and 64 frame leaves. The hero uses it when he has no weapon or the scene has no combat (ApplyPlayerWeaponPose sets $24 = $0A).",
+      "The lists are named by index in the pointer table and the leaves by address; they keep their auto names."
+    ],
+    "partNotes": {
+      "PlayerUnarmedAnims": "The animation list of the unarmed hero: 26 pointers.\n\nWhen: the animator reads it for every step of the player actor with $24 = $0A.\nSees: the hero walks and stands without his sword in towns and before he has a weapon.\nWhy: the animations of an actor are data, not code, so one animator drives every actor.\nIn: n/a (data): 26 words, index = animation id $1E; each points to a list of 8-byte steps (duration, dx, dy, &frame) ending with $FFFF.\nOut: the step and its frame leaf (12-byte header, then the sprite map).\nClobbers: n/a (data)."
+    }
+  },
+
+  "system/data_anim_player.asm": {
+    "blockNote": [
+      "Animation bank $0B: the hero's animations with a weapon, and the animation table of meta entry 0 of every world (file offsets 360448-365595, SNES $0B:8000-$941B, bank 05; 5148 bytes).",
+      "",
+      "=== MODEL ===",
+      "Same format as bank $0A (data_anim_player_unarmed): a pointer list by animation id, 8-byte steps of duration, dx, dy and &frame, frame leaves with a 12-byte header and a sprite map. This bank has 44 lists (ids $00-$2B), the hero's armed poses: standing, the four walks (six steps of duration 3, dx or dy of 2 pixels per frame in the first step), the crab-walk poses, the sword thrusts and swings and the death. The 44 ids are those of PlayerFacingByAnim. 7 meta entries (entry 0 of every world) point their animation table at it; ApplyPlayerWeaponPose sets $24 = $0B for the armed hero."
+    ],
+    "partNotes": {
+      "PlayerAnims": "The animation list of the armed hero: 44 pointers.\n\nWhen: the animator reads it for every step of the player actor with $24 = $0B (the normal case in the field).\nSees: the hero stands, walks, sidesteps, thrusts and swings, and dies.\nWhy: see PlayerUnarmedAnims.\nIn: n/a (data): 44 words, index = animation id $1E ($00-$2B); each points to a list of 8-byte steps (duration, dx, dy, &frame) ending with $FFFF.\nOut: the step and its frame leaf. Walk steps carry dx or dy of 2 pixels per frame (static reading, OQ-I014-1).\nClobbers: n/a (data)."
+    }
+  },
+
+  "system/data_anim_weapon_overlay.asm": {
+    "blockNote": [
+      "Animation bank $0C: the weapon sprite that follows the hero (file offsets 393216-395765, SNES $0C:8000-$89F5, bank 06; 2550 bytes).",
+      "",
+      "=== MODEL ===",
+      "Same format as bank $0A. The weapon is its own actor (player_weapon_actor, $039E) whose $24 is $0C; its animation id follows the hero's, so the blade is drawn in the pose of each swing. 44 lists (ids $00-$2B), 120 steps and 42 frame leaves."
+    ],
+    "partNotes": {
+      "WeaponOverlayAnims": "The animation list of the weapon sprite: 44 pointers.\n\nWhen: the animator reads it for the weapon actor (RunWeaponLayer).\nSees: the blade or the staff drawn on top of the hero in every pose, thrust and swing.\nWhy: the weapon is a second sprite so it can be layered over or under the hero.\nIn: n/a (data): 44 words, index = animation id; each points to a list of 8-byte steps ending with $FFFF.\nOut: the step and its frame leaf.\nClobbers: n/a (data)."
+    }
+  },
+
+  "system/data_anim_palette_cycles.asm": {
+    "blockNote": [
+      "Animation bank $0D: colour animations, 80 lists of 6-byte copy steps (file offsets 425984-440319, SNES $0D:8000-$B7FF, bank 06; 14336 bytes).",
+      "",
+      "=== MODEL ===",
+      "Not sprite animations: the lists are read by the record stepper of lib_animation (COPs 92-95, 9D, 9E) which copies bytes into WRAM bank $7F. A step is 6 bytes: +0 hold count (0 ends the list), +1 word source address (in this bank), +3 destination colour (x 2 = the offset in the CGRAM shadow $7F0000), +4 length - 1, +5 delay. The data fit palette cycling: the source blocks are runs of BGR555 words, and consecutive steps rotate the same colours by one position (for example the leaf at $0680C5 is E749 2B52 8F5E 3273 ..., the next one 2B52 E749 2B52 8F5E ...), written to the same colour index ($71 in that list) every time. Length - 1 is always odd (whole colours) except $02: the 53 steps with destination $00 and 3 bytes ($20 $40 $80 and similar triples) write the three COLDATA bytes of the fixed colour (lib_animation: coldata_buffer at $7F0200), a colour fade of the backdrop.",
+      "Destination colours in use include $21, $31, $51, $71, $58, $57, $70, $A1, $91, $81; lengths 3 to 30 bytes (up to 15 colours); hold counts are mostly 1 (614 of 686 steps); delays 0-13 frames. 80 lists, 686 steps, 593 leaves.",
+      "69 meta entries (WorldMetaPointers: mostly the types $01-$0F of every world, none of the enemies) use this bank as their animation table, so each is an actor whose 'animation' is a colour cycle; which scene effect each one runs was not traced. FM-A4 and FM-A11 called the lists 'VRAM copy lists'; the destination and the data say colours (OQ-I033-6, a DISCREPANCY with the earlier function map; OQ-I026-3 is the same question seen from the stepper).",
+      "The lists are named by index in the pointer table (80 words), the leaves by address; they keep their auto names."
+    ],
+    "partNotes": {
+      "PaletteAnimLists": "The colour animation lists: 80 pointers by animation id.\n\nWhen: the record stepper (lib_animation: NextFrameRecord and CopyFrameData) reads a list step by step for actors with $24 = $0D (69 meta entries).\nSees: colours that rotate through a run of shades and fades of the backdrop colour; which scene effects these are was not traced.\nWhy: cycling a few palette entries is cheaper than redrawing tiles, so the animation is a list of colour blocks.\nIn: n/a (data): 80 words, index = animation id $1E; each points to 6-byte steps (hold, &source, destination colour, length - 1, delay) ending with a hold of 0.\nOut: the source block (2 to 30 bytes, whole BGR555 colours, or 3 COLDATA bytes) is copied to $7F:offset (destination x 2); $26 = hold - 1, delay to $14 and $0E.\nClobbers: n/a (data)."
+    }
+  },
+
+  "system/data_anim_effects.asm": {
+    "blockNote": [
+      "Animation bank $0E: the shared effect animations (file offsets 458752-460526, SNES $0E:8000-$86EE, bank 07; 1775 bytes).",
+      "",
+      "=== MODEL ===",
+      "Same format as bank $0A. 17 lists (animation ids $00-$10), 83 steps and 28 frame leaves for the effects shared by many scenes: animation 00 and 02 the appear puffs (RunMonsterAppearPuff, RunAppearPuff), 03 the death puff (RunEnemyDeath), $10 the puff that replaces a hazard (RunHazardPuff). Actors select it with COP A8 #$8000, #$0E (RunAppearPuff and the other effect scripts) or through 4 meta entries (+8..+A = this bank)."
+    ],
+    "partNotes": {
+      "EffectAnims": "The animation list of the shared effects: 17 pointers.\n\nWhen: the animator reads it for actors with $24 = $0E (the appear and death puffs, hazard puffs and a few scene effects).\nSees: the small clouds where monsters and actors appear and die.\nWhy: the puffs are the same in every scene, so they live in one bank.\nIn: n/a (data): 17 words, index = animation id; each points to 8-byte steps ending with $FFFF.\nOut: the step and its frame leaf.\nClobbers: n/a (data)."
+    }
+  },
+
+  "system/data_anim_magic.asm": {
+    "blockNote": [
+      "Animation bank $0F: the animations of the hero's spells and the Phoenix shots (file offsets 491520-500833, SNES $0F:8000-$A461, bank 07; 9314 bytes).",
+      "",
+      "=== MODEL ===",
+      "Same format as bank $0A. 54 lists (ids $00-$35), 264 steps and 124 frame leaves. Only 8 scripts select it, each with COP A8 #$8000, #$0F: seven in player_spells_level_up (the spell actors and their children) and the shared start of the four Phoenix shot scripts in player_core. The Flame Pillar, for example, plays animation $1C, then $1B twenty times and $1D (OQ-I014-8 asks for the total time). The graphics of the equipped spell are swapped into VRAM by LoadEquippedMagicGfx (MagicGraphicsPointers)."
+    ],
+    "partNotes": {
+      "MagicAnims": "The animation list of the spell effects: 54 pointers.\n\nWhen: the animator reads it for the spell and Phoenix projectile actors (the scripts that select bank $0F with COP A8).\nSees: the effects of the seven spells and of the Phoenix shots.\nWhy: the effects need their own big set of frames, kept apart from the shared puffs.\nIn: n/a (data): 54 words, index = animation id; each points to 8-byte steps ending with $FFFF.\nOut: the step and its frame leaf.\nClobbers: n/a (data)."
+    }
+  },
+
+  "system/data_dictionary.asm": {
+    "blockNote": [
+      "The text dictionary: 128 words of 12 bytes (file offsets 524288-525823, SNES $10:8000-$85FF, bank 08; 1536 bytes).",
+      "",
+      "=== MODEL ===",
+      "A string byte of $80 or more is a dictionary word: the text renderers (ExpandDictionaryWord in the menu text, ExpandDialogueWord in dialogue, through ReadTextByte and ReadDialogueByte) print entry (byte and $7F) and a blank. Each entry is 12 bytes, the word padded with zero bytes. The 128 entries are common words (all, and, back, because, ...) and a few names: $0A King, $0B Leo, $0C Liesa, $0D Magridd, $06 Deathtole, $10 Stone. Entries $00-$15 are capitalised, $16-$7F lower case (so $01 is 'A' and $17 'a'); the fragments '-ll', 's', 'm' and 't' ($3F, $57, $46, $65) complete contractions.",
+      "ROM spelling against the walkthrough: entry $06 reads 'Deathtole' (OQ-I010-2) and the walkthrough writes 'Deathtoll'; entry $0C reads 'Liesa' and the walkthrough writes 'Lisa' (OQ-I033-7)."
+    ],
+    "partNotes": {
+      "Dictionary": "The dictionary of 128 common words, 12 bytes each.\n\nWhen: every string byte of $80 or more in dialogue, menus and item names.\nSees: the word typed out followed by a blank.\nWhy: dialogue and menu text repeat common words, so each is stored once and referenced by one byte.\nIn: n/a (data): entry = byte and $7F; 12 bytes: the characters, then zero padding.\nOut: up to 12 characters of the entry are drawn.\nClobbers: n/a (data)."
+    }
+  }
+}

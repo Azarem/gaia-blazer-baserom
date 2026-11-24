@@ -1,0 +1,3 @@
+[
+  { "address": 159353, "old": null, "new": "code_026E79", "row": "P3-3.1", "note": "branch target inside code_026E75 (was loc_026E79 before the split); w5_actor_026E9D reaches it with BRL from another block, and a cross-block branch does not create the sub-label, so it needs a names entry" }
+]

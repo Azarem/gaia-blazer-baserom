@@ -6,7 +6,7 @@
 ; The destination is bank $7F offset $0A,X, i.e. the CGRAM shadow $7F0000 (two bytes per colour) when the offset is a colour index x 2; a count byte of 2 (three bytes) adds $200 to the offset, which lands on coldata_buffer ($7F0200, the three COLDATA bytes). This makes the stepper a colour animation, but nothing in the code names it, so it is inferred from the destination (OQ-I026-3).
 ; 
 ; === NOTES ===
-; - The block move runs through a RAM stub at $1C5C built by the scene init (lib_027912): PHB, MVN, PLB, RTS. CopyFrameData patches its two bank operands (wram_copy_stub+2): destination $7F, source = the actor's data bank.
+; - The block move runs through a RAM stub at $1C5C built by the scene init (lib_boot_and_scene_init): PHB, MVN, PLB, RTS. CopyFrameData patches its two bank operands (wram_copy_stub+2): destination $7F, source = the actor's data bank.
 ---------------------------------------------
 
 ?INCLUDE 'WorldMetaPointers'

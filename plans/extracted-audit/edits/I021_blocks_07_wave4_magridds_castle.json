@@ -1,0 +1,58 @@
+[
+  {
+    "op": "merge",
+    "blocks": ["w5_shared_026DF2", "w5_shared_02706C"],
+    "into": "mc_return_prompt_and_chest_hint_texts",
+    "row": "W4-MC01",
+    "note": "no scene (OQ-I020-5), bank 4: w5_shared_026DF2 (the treasure chest hint string plus code_026E75, which asks 'return to the outside of Magridd Castle?' and spawns the scene change) is the BRL target of w5_actor_026E9D (castle_dungeon file) and the COP [17] target of w5_actor_026DD7 (castle_towers file); it reads the answer strings and the 5-byte tail of w5_shared_02706C by 2-byte references (90 references from 33 files to the tail). 42 lines."
+  },
+  {
+    "op": "rename",
+    "block": "w5_shared_02623C",
+    "to": "mc_unreferenced_string_stub_02623C",
+    "row": "W4-MC02",
+    "note": "one 4-byte string that only jumps to the shared tail asciistring_0270DF. No reference to asciistring_02623C in the extraction (placement-audit 4.8). Left as a block of its own; static statement only (OQ-I021-2)."
+  },
+  {
+    "op": "merge",
+    "blocks": ["mc_give_mobile_key_dr_leo", "w5_actor_025B1A", "w5_actor_025CA6", "w5_actor_026A4E", "w5_actor_026D61", "w5_actor_026D76", "w5_actor_026D80", "w5_actor_026F48", "w5_actor_026F53", "w5_actor_026F57", "w5_actor_027019"],
+    "into": "mc_airship_dock_actors",
+    "row": "W4-MC03",
+    "note": "scene airship_dock, bank 4 (849 lines). The Mobile Key / Dr. Leo block (2,965 bytes) is the largest; the others are small."
+  },
+  {
+    "op": "merge",
+    "blocks": ["w5_actor_0269F6", "w5_actor_026E9D", "w5_actor_026F30"],
+    "into": "mc_castle_dungeon_actors",
+    "row": "W4-MC04",
+    "note": "scene castle_dungeon, bank 4 (80 lines). w5_actor_026E9D (three parts) is the BRL caller of mc_return_prompt_and_chest_hint_texts and uses the return-address helper of shared_actor_helpers_bank4."
+  },
+  {
+    "op": "merge",
+    "blocks": ["mc_enemy_0FDE48", "mc_enemy_0FDE71", "mc_enemy_0FDFC3", "mc_enemy_0FE045", "mc_enemy_0FE14E", "mc_enemy_0FE22C", "mc_enemy_0FE236"],
+    "into": "mc_castle_dungeon_enemies",
+    "row": "W4-MC05",
+    "note": "scene castle_dungeon, bank 1F: seven enemy scripts (819 lines). mc_enemy_0FDE71 and 0FDFC3 use the return-address helper code_002D67 (bank 0)."
+  },
+  {
+    "op": "merge",
+    "blocks": ["w5_actor_023FA8", "w5_actor_024027", "w5_actor_0240E4", "w5_actor_0240E5", "w5_actor_024259", "w5_actor_024416", "w5_actor_0244EF", "w5_actor_024597", "w5_actor_02488E", "w5_actor_02494A", "w5_actor_024AF4", "w5_actor_024BC8", "w5_actor_024D59", "w5_actor_024E53", "w5_actor_024F4A", "w5_actor_024FD3", "w5_actor_025080", "w5_actor_02515B", "w5_actor_0251DC", "w5_actor_025302", "w5_actor_0253E2", "w5_actor_0254A2", "w5_actor_025502", "w5_actor_025561", "w5_actor_025AAA"],
+    "into": "mc_castle_actors",
+    "row": "W4-MC06",
+    "note": "scene castle_of_magridd, bank 4: all 25 blocks of the area in one file (1,317 lines). Seven of them use the return-address helper engine_003005 (bank 0)."
+  },
+  {
+    "op": "merge",
+    "blocks": ["w5_actor_026DD7", "w5_actor_026F44"],
+    "into": "mc_castle_towers_actors",
+    "row": "W4-MC07",
+    "note": "scene castle_towers, bank 4 (32 lines, 31 bytes)."
+  },
+  {
+    "op": "merge",
+    "blocks": ["mc_enemy_0FE413", "mc_enemy_0FE4F2", "mc_enemy_0FE610", "mc_enemy_0FE61A", "mc_enemy_0FE76C", "mc_enemy_0FE83E", "mc_enemy_0FE88E"],
+    "into": "mc_castle_towers_enemies",
+    "row": "W4-MC08",
+    "note": "scene castle_towers, bank 1F: seven enemy scripts (817 lines). mc_enemy_0FE61A uses the return-address helper code_002D67 (bank 0)."
+  }
+]

@@ -1,0 +1,10 @@
+{
+  "_note": "I046: one correction found while writing docs/code/scene-area-warp-loading.md. The block note of lib_scene_asset_loader said that an actor which warps inside a world writes $0020 to asset_skip_mask, 15 writer sites in 13 files. rg over extracted/ finds 15 STA sites in 10 files (Seabed Sanctuary 0F8D58 x3 and 0F8000 x2, the castle actors, the laboratory actors, the Soul of Mountain House actors x2, we_obj_master_shrine_event x2, gw_woods_actors_01B98D, the Trial room and Lisa/Turbo actors, gv_front_end, and ReleaseLairAtSwitch), and the writers are cutscene scripts and one engine routine, not 'actors that warp inside a world': the Phoenix scene of the Soul of Mountain House writes the mask and then goes to the World of Evil (area $14 scene 3), and the end of the Master's Shrine event goes to the hub and the castle town. InitSceneState is the only clear (STZ).",
+
+  "library/lib_scene_asset_loader.asm": {
+    "blockNote": { "edit": [
+      { "find": "an actor that warps inside a world writes $0020 before the scene change so that the music is not reloaded (15 writer sites in 13 files)",
+        "with": "a cutscene script (or ReleaseLairAtSwitch for the return trip) writes $0020 just before its scene change so that the music is not reloaded, even when the warp goes to another world (15 writer sites in 10 files; the Phoenix scene of the Soul of Mountain House goes to the World of Evil this way)" }
+    ] }
+  }
+}

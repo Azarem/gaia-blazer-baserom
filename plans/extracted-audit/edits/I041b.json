@@ -1,0 +1,60 @@
+{
+  "_note": "I041b: PC annotate actor batch common (actor_shared), files 2-3 of 3: shared_actor_helpers_bank3 and shared_actor_helpers_bank4 (fairy gem setup and idle loop, the captive's plea, the Mountain of Souls gem texts). Names applied first by renames/apply-I041c_names.json. Evidence: the asm of both files, docs/cop/index.md (COP A8, 15, 2E, 80, 82, 1F, 01, BRA loops), the callers (12 actor files call the bank 03 setup; ms_multi_area_actors uses the bank 04 gem texts), w2_shared_0FA945 (the St. Elles copy of the idle loop: 'the fairies look at the hero'), ms_multi_area_actors block note (the gem's EXP and return prompt).",
+
+  "actor_shared/shared_actor_helpers_bank3.asm": {
+    "blockNote": [
+      "The shared fairy-gem and captive helpers of bank 03 (file offsets 110945-111094 and 113032-113036, SNES $03:B161-$B1F6 and $03:B988-$B98C; bank 03).",
+      "",
+      "=== WHAT RUNS HERE ===",
+      "- cm_npc_fairy_gem_setup_01B161: the JSL that every fairy gem runs once (12 actor files of Grass Valley, GreenWood, St. Elles, Magridd's Castle, Leo's Lab and the Mountain of Souls call it): it selects the effect animation table $0E:8000, sets animation 7 step 0, draws the first frame, copies the sprite attributes of the scene and blocks the tiles under the gem (COP 15).",
+      "- cm_npc_fairy_gem_idle_01B17C: the gem's idle loop: animation 7 until the hero is inside the box widened by $18 pixels, then animation $0C once. Bank 04 holds the same code (cm_npc_fairy_gem_idle_022289) and St. Elles holds a third copy (w2_obj_fairy_idle_loop_0FA945): the three do the same, so the copy a script uses follows the file it was extracted from, not its behaviour.",
+      "- cm_npc_captive_plea_01B191: a random plea of a captive creature, shown by COP 01 with a random choice of three texts (COP 1F; the low 2 bits of rng_state+1: 0 'Please release me, someone help me!', 1 'Someone help me!', 2 and 3 'Please, someone help me!'). Bank 04 holds a second set with other words.",
+      "- asciistring_01B988: the common tail of the three pleas ([12] waits for a key, [08:408] erases the dialogue window).",
+      "",
+      "=== OPEN ===",
+      "Which creatures use each plea set is not traced (the callers name them in their own files). The gems of the Mountain of Souls give EXP and offer a ride back: ms_multi_area_actors."
+    ],
+    "partNotes": {
+      "cm_npc_fairy_gem_setup_01B161": "The one-time setup of a fairy gem.\n\nWhen: called with JSL by the root of every fairy gem, before its idle loop.\nSees: the gem sprite (animation 7, step 0) drawn at once.\nWhy: the setup is the same in every world, so it lives here.\nIn: JSL from the gem's script, X = D = the gem's slot.\nOut: COP A8 selects the effect animation table $0E:8000; $1E = 7, $20 = 0, SetActorAnimFrame draws the frame; $1C = scene_sprite_attr; COP 15 marks the tiles under the gem solid; RTL.\nClobbers: A, Y.",
+      "cm_npc_fairy_gem_idle_01B17C": "The idle loop of a fairy gem: it looks at the hero.\n\nWhen: the loop the gem runs after its setup (reached by a pushed RTL address).\nSees: animation 7 while the hero is away; when he comes inside the box widened by $18 pixels, animation $0C once.\nWhy: the gem reacts to the hero before it is spoken to.\nIn: X = own slot.\nOut: loops forever (COP 82 yields).\nClobbers: A, Y.",
+      "cm_npc_fairy_gem_idle_near_01B18A": "The near branch: animation $0C plays once (COP 80, COP 82), then the loop restarts.",
+      "cm_npc_captive_plea_01B191": "A captive's random plea.\n\nWhen: the talk handler of a captive creature runs it (COP 01 with a text chosen at random).\nSees: one of three texts: 'Please release me, someone help me!', 'Someone help me!' or 'Please, someone help me!' (the last twice as likely).\nWhy: the variety keeps the repeated talks from always sounding the same.\nIn: X = own slot.\nOut: COP 1F steps rng_state; its second byte AND 3 picks the text: 0 release, 1 short, 2 and 3 the plain one. RTL after the text.\nClobbers: A.",
+      "cm_npc_captive_plea_release_01B1A3": "Branch 0: 'Please release me, someone help me!', then RTL.",
+      "cm_npc_captive_plea_short_01B1A8": "Branch 1: 'Someone help me!', then RTL.",
+      "asciistring_01B988": "The common tail of the three pleas.\n\nWhen: jumped to by [JMP] from asciistring_01B1AD, asciistring_01B1C7 and asciistring_01B1E6, and from the texts of other files that end the same way.\nSees: the box waits for a key ([12]) and is erased ([08:408]).\nWhy: one tail for all of them.\nIn: n/a (data). Out: n/a.\nClobbers: n/a."
+    },
+    "comments": {
+      "110945": { "text": "the effect animation table: animation 7 is the gem, $0C the gem when the hero is near", "expect": "COP [A8]" },
+      "110972": { "text": "the hero inside the gem's box widened by $18 pixels?", "expect": "COP [2E]" },
+      "110995": { "text": "COP 1F stepped the generator: the low 2 bits pick the text (0 release, 1 short, 2 and 3 the plain one)", "expect": "LDA $rng_state+1" }
+    }
+  },
+
+  "actor_shared/shared_actor_helpers_bank4.asm": {
+    "blockNote": [
+      "The shared fairy-gem idle loop, the captive's second plea set and the Mountain of Souls gem texts of bank 04 (file offsets 139913-140041 and 140442-140578, SNES $04:A289-$A309 and $04:A49A-$A522; bank 04).",
+      "",
+      "=== WHAT RUNS HERE ===",
+      "- cm_npc_fairy_gem_idle_022289: the same idle loop as shared_actor_helpers_bank3.cm_npc_fairy_gem_idle_01B17C (animation 7, animation $0C when the hero is inside the box widened by $18 pixels). The Mountain of Souls gems start it by a pushed RTL address after the bank 03 setup.",
+      "- cm_npc_captive_plea_02229E: the second plea of a captive, chosen at random by the low 2 bits of rng_state+1 (0 'I want to return to my real form-', 1 'Ow----', 2 and 3 'Ouch---- it hurts! Somebody please help me!').",
+      "- asciistring_02249A and its neighbours: the two fairy gems of the Mountain of Souls ($3E and $3F, ms_multi_area_actors): 'I am watching the world- Here, take this- <name> received EXP!', the question 'Would you like to return to the location of the Mountain of Souls?', the answers 'Good luck then-' and 'Return to me when you are ready-'.",
+      "- asciistring_02251E: the common tail ([12] key, [08:408] erase window) that many texts of the Mountain of Souls areas jump to ([JMP]), among them the dungeon and the Soul of the Mountain house.",
+      "",
+      "=== OPEN ===",
+      "The wording of the gem texts is OQ-I037-14; which creatures use the plea set is not traced."
+    ],
+    "partNotes": {
+      "cm_npc_fairy_gem_idle_022289": "The idle loop of a fairy gem, the bank 04 copy.\n\nWhen: the loop the gems run after the bank 03 setup (reached by a pushed RTL address).\nSees: animation 7 while the hero is away; animation $0C once when he is inside the box widened by $18 pixels.\nWhy: the same behaviour, instruction for instruction, as cm_npc_fairy_gem_idle_01B17C.\nIn: X = own slot.\nOut: loops forever (COP 82 yields).\nClobbers: A, Y.",
+      "cm_npc_fairy_gem_idle_near_022297": "The near branch: animation $0C plays once (COP 80, COP 82), then the loop restarts.",
+      "cm_npc_captive_plea_02229E": "A captive's second random plea.\n\nWhen: the talk handler of a captive creature runs it (COP 01 with a text chosen at random).\nSees: 'I want to return to my real form-', 'Ow----' or 'Ouch---- it hurts! Somebody please help me!' (the last twice as likely).\nWhy: the same trick as cm_npc_captive_plea_01B191 with other words.\nIn: X = own slot.\nOut: COP 1F steps rng_state; its second byte AND 3 picks the text: 0 real form, 1 Ow, 2 and 3 the long one. RTL after the text.\nClobbers: A.",
+      "cm_npc_captive_plea_real_form_0222B0": "Branch 0: 'I want to return to my real form-', then RTL.",
+      "cm_npc_captive_plea_ow_0222B5": "Branch 1: 'Ow----', then RTL.",
+      "asciistring_02249A": "The gem texts of the Mountain of Souls and the common tail (file offsets 140442-140578).\n\nWhen: asciistring_02249A is the gift text of both gems (the first talk, before the EXP is given), asciistring_0224C2 the question, asciistring_0224F4 the answer of Go back and asciistring_022507 the answer of Stay (ms_multi_area_actors).\nSees: 'I am watching the world- Here, take this- <name> received EXP!', 'Would you like to return to the location of the Mountain of Souls?', 'Good luck then-' and 'Return to me when you are ready-'.\nWhy: both gems share the texts; the EXP and the flags are in the gems' scripts.\nIn: n/a (data). Out: n/a.\nClobbers: n/a.",
+      "asciistring_02251E": "The common tail of the texts of the Mountain of Souls: the box waits for a key ([12]) and is erased ([08:408]); many strings of the dungeon and of the Soul of the Mountain house end by a [JMP] to it."
+    },
+    "comments": {
+      "139913": { "text": "the hero inside the gem's box widened by $18 pixels?", "expect": "COP [2E]" },
+      "139936": { "text": "COP 1F stepped the generator: the low 2 bits pick the text (0 real form, 1 Ow, 2 and 3 the long one)", "expect": "LDA $rng_state+1" }
+    }
+  }
+}

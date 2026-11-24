@@ -1,0 +1,15 @@
+[
+    { "op": "split-part", "part": "HandleIrq", "at": 2612, "name": "DetectHitSourceCollisions", "to": "engine_combat_hits", "create": { "group": "system" }, "row": "I042-C1" },
+    { "op": "split-part", "part": "DetectHitSourceCollisions", "at": 3880, "name": "MoveActorWithTileCollision", "to": "engine_tile_collision", "create": { "group": "system" }, "row": "I042-C1" },
+    { "op": "rename", "block": "engine_scheduler_sprites_combat_collision", "to": "engine_actor_scheduler_and_sprites", "row": "I042-C1" },
+    { "op": "rename", "block": "engine_003005", "to": "engine_player_death_and_actor_helpers", "row": "I042-C2" },
+    { "op": "rename", "block": "w1_actor_01E4BB", "to": "gw_actor_fixed_gem_pickup", "row": "I042-D1" },
+    { "op": "rename", "block": "w2_actor_0FA6F5", "to": "w2_effect_player_overlay", "row": "I042-D1" },
+    { "op": "rename", "block": "w2_shared_0FA945", "to": "w2_obj_fairy_idle_loop", "row": "I042-D1" },
+    { "op": "rename", "block": "w6_actor_01EC4B", "to": "we_obj_master_shrine_event", "row": "I042-D1" },
+    { "op": "rename", "block": "w6_actor_01F14F", "to": "we_fx_battle_bg2_hofs_bands", "row": "I042-D1" },
+    { "op": "rename", "block": "se_enemy_0FBB78", "to": "se_unused_enemy_drifting", "row": "I042-D1" },
+    { "op": "rename", "block": "ms_enemy_0FCFD6", "to": "ms_enemy_ice_maker", "row": "I042-D1" },
+    { "op": "rename", "block": "ms_enemy_0FD058", "to": "ms_enemy_ice_crystal", "row": "I042-D1" },
+    { "op": "rename", "block": "gv_enemy_0FAA49", "to": "gv_enemy_green_humanoid", "row": "I042-D1" }
+]

@@ -1,0 +1,127 @@
+{
+  "_note": "I030: PC annotate batch A8 (library 014F-0175): the choice menu (RunChoiceMenu, BlinkChoiceCursor) and its five option strings, the item name list and its 65 strings, the chest and lair message strings, the staff roll text. WeaponMinLevelBcd and MapPatchRectsAndMapSizes were already named and noted by I026 and are not touched. No actor is in this batch, so the light actor depth does not apply. Cross-batch edits: the Cop1A part note, the cop_items_stats_text block note, the lib_menus block note and the gv_epilogue_texts block note only had their stale string references corrected.",
+
+  "actor_shared/shared_choice_prompt_texts.asm": {
+    "blockNote": [
+      "Option windows of the choice menus: Yes / No, Yes, Record / Move / Quit, Record / Quit and Stay / Go back (file offsets 85762-85875, SNES $02:CF02-$CF73, bank 02).",
+      "",
+      "=== MODEL ===",
+      "A string here is only the option window, never the question: the question is the COP [01] dialogue printed just before. Cop1A_ChoiceMenu (27 scripts: 18 Yes / No, 6 Stay / Go back, 1 each of the other three) prints the string with PrintTextString, then calls RunChoiceMenu with the option count from its own operand, and stores the chosen index in choice_result ($03D0). Cop02_PromptYesNo (no script uses it) always prints ChoiceYesNoText.",
+      "Layout rule shared by all five strings: [CUR:o] is the window origin (BG3 byte offset, row = o / $40, column = (o mod $40) / 2; every window starts in column 4 and ends on tile row 15: origin row + h + 1 = 15), [07:w,h] draws the frame (w equals the widest option line including its leading blank, h is two tile rows per option), and every option is one text line with a leading blank (the arrow cell). Options are separated by [N][N] because a text line is two tiles tall. The trailing [CUR:c] draws nothing: c = origin + $82 (one row-pair down, one column right) is the cursor cell of the first option, and PrintTextString returns it in X, which is exactly what RunChoiceMenu expects.",
+      "The option count in the COP operand must equal the number of lines in the string: the string does not carry it.",
+      "",
+      "=== NOTES ===",
+      "- Which actor asks which string is documented at each part; the questions themselves are in the actor files.",
+      "- 'Record' is the walkthrough's saving at the Master's Shrine ('go there to heal and save if wanted', 06-dr-leos-lab.md). The 'Move' entry of ChoiceRecordMoveQuitText is not described by the walkthrough (OQ-I030-1)."
+    ],
+    "partNotes": {
+      "ChoiceYesNoText": "Yes / No option window (2 options).\n\nWhen: Cop1A_ChoiceMenu with count 2 in 18 scripts (16 actor scripts of all six worlds, plus the two questions 'Is this okay?' and 'Do you wish to continue?' of the Master's menu in shared_actor_helpers_bank0) and the fixed prompt of Cop02_PromptYesNo (no script uses it).\nSees: a window at row 10, column 4 (4 x 4) with ' Yes' and ' No'; the arrow starts on Yes.\nWhy: the common confirmation window, so a script supplies only the question.\nIn: n/a (data). Printed with Y = this string; the trailing [CUR:30A] is the arrow cell of Yes.\nOut: n/a. Index 0 = Yes, 1 = No; Cop1A stores the index in choice_result, Cop02 skips its jump on Yes; Y (cancel) takes the cancel pointer of Cop1A or the jump of Cop02.\nClobbers: n/a.",
+      "ChoiceYesOnlyText": "Single-option window with only 'Yes' (1 option).\n\nWhen: Cop1A_ChoiceMenu with count 1 in one script: the dream character's plea in the Underground Castle actors (gv_underground_castle_actors, code_01A491), which ends 'Please promise me that you will one day return-'.\nSees: a window at row 12, column 4 (4 x 2) holding ' Yes'.\nWhy: a promise that can only be accepted; there is no No. The window sits lower than the Yes / No window so that its bottom edge is on the same row (15) as every other choice window.\nIn: n/a (data). The trailing [CUR:38A] is the arrow cell.\nOut: n/a. Index 0 is the only answer; Y (cancel) takes the cancel pointer of the script (code_01A4B1).\nClobbers: n/a.",
+      "ChoiceRecordMoveQuitText": "Record / Move / Quit option window (3 options): the Master's menu once 'Move' is available.\n\nWhen: Cop1A_ChoiceMenu with count 3 in code_00769C of shared_actor_helpers_bank0 (the Master's menu actor code_00766C): reached when COP [07] ( #$9B00 ) finds event flag $1B00 set.\nSees: a window at row 8, column 4 (7 x 6) with ' Record', ' Move ' and ' Quit', after the Master's 'how can I help you?'.\nWhy: the Master offers saving at any time; Move is the third entry that is added later in the game.\nIn: n/a (data). The trailing [CUR:28A] is the arrow cell of Record.\nOut: n/a. Index 0 Record (asks 'I will record all you have accomplished- Is this okay?' and calls lib_save_system.code_0270E4), 1 Move (sets scene_next = 9 and warp_dest_x / warp_dest_y from data_0076D3 by world_index; what it does in game is OQ-I030-1), 2 Quit (and Y) = the farewell code_007754.\nClobbers: n/a.",
+      "ChoiceRecordQuitText": "Record / Quit option window (2 options): the Master's menu before 'Move' is available.\n\nWhen: Cop1A_ChoiceMenu with count 2 in code_00767F of shared_actor_helpers_bank0 (the Master's menu actor code_00766C), when event flag $1B00 is clear.\nSees: a window at row 10, column 4 (7 x 4) with ' Record' and ' Quit'.\nWhy: the same menu as ChoiceRecordMoveQuitText without the third entry.\nIn: n/a (data). The trailing [CUR:30A] is the arrow cell of Record.\nOut: n/a. Index 0 Record (code_0076EF), any other answer and Y = the farewell code_007754.\nClobbers: n/a.",
+      "ChoiceStayGoBackText": "Stay / Go back option window (2 options): the return-to-hub prompt of each world.\n\nWhen: Cop1A_ChoiceMenu with count 2 in six hub-return scripts, one per world, each after the question '[10]Would you like to return to <place>?' (the places printed by the strings next to the scripts: Grass Valley, GreenWood, the Seabed Palace, the location of the Mountain of Souls, Dr-Leo s Laboratory, the outside of Magridd Castle; the St. Elles and Mountain of Souls prompts are the Fairy Gem prompts of OQ-I017-1 and OQ-I017-2).\nSees: a window at row 10, column 4 (8 x 4) with ' Stay' and ' Go back'.\nWhy: the same two answers for every world, so the shared string is used six times.\nIn: n/a (data). The trailing [CUR:30A] is the arrow cell of Stay.\nOut: n/a. Index 0 Stay prints a 'Come back whenever you feel like returning' line (Y, the cancel pointer of every one of the six scripts, runs the same Stay code); index 1 Go back prints 'Allright, please continue-', increments contact_lock and warps with COP [10] to the hub of the world: area $01, $04, $06, $0A, $0D and $10 (words $0101, $0104, $0106, $010A, $010D, $0110; scene $01).\nClobbers: n/a."
+    }
+  },
+
+  "library/lib_012281.asm": {
+    "blockNote": [
+      "Choice menu: the arrow cursor list of every question window (file offsets 74369-74506, SNES $02:A281-$A30A, bank 02).",
+      "",
+      "=== MODEL ===",
+      "RunChoiceMenu is called by Cop1A_ChoiceMenu (27 scripts) and Cop02_PromptYesNo (no script uses it) after the option window of shared_choice_prompt_texts has been printed. A = number of options (8 bit), the high byte of A (read with XBA) = the start index (both callers pass 0), X = BG3 byte offset of the first option's arrow cell. Options are $80 bytes apart (two tile rows). The selected index is kept on the stack ($01,S) for the whole menu; menu_count ($03C4) holds the option count and menu_blink ($03C6) the blink frame counter.",
+      "The arrow is the glyph tile $2B, two tiles tall like every glyph: the lower half at X in the BG3 buffer ($7F7000) and the upper half one row above (X - $40, the buffer base $7F6FC0 + X). Only the tile byte is written, the attribute stays. Blank is tile $20.",
+      "Flow: (1) DrawChoiceCursor writes the arrow and sets vram_upload_flags bit 0. (2) WaitChoiceKeysUp calls WaitFrameReadButtons and BlinkChoiceCursor until a frame reports no new button press, so the press that opened the question cannot answer it. (3) PollChoiceKeys reads one frame at a time (joy_pressed+1: $08 Up, $04 Down, $40 Y, $80 B); any other frame runs BlinkChoiceCursor and polls again. Up on the first option and Down on the last go back to step 2 (the move is ignored). A move erases the arrow (tile $20 in both halves), plays BRK #$07, resets menu_blink, moves the cell by $80 and redraws.",
+      "Exit: B plays BRK #$18 and returns carry clear, Y plays BRK #$07 and returns carry set. In both cases the arrow stays drawn (tile $2B) on the current option, A = the index pulled off the stack and X = its arrow cell. The callers then erase the window (EraseWindowFrame at text_last_window_origin, $03F7), set vram_upload_flags = 1 and either store the index in choice_result ($03D0) or, on cancel, take the cancel pointer.",
+      "",
+      "=== NOTES ===",
+      "- B = confirm and Y = cancel match the walkthrough ('Press the B Button twice to equip ... Press the Y Button to exit the menu', 01-in-the-beginning.md). The other buttons are ignored here.",
+      "- ChooseMenuRow and ChooseMenuRowAtTable (lib_0118FC_part2) are the same loop for the equipment, file-select and erase menus with their own row spacing and page swap; they share BlinkChoiceCursor with this routine.",
+      "- Nothing limits the option count except the window: the largest in use is 3."
+    ],
+    "partNotes": {
+      "RunChoiceMenu": "Runs one choice menu: moves the arrow between the options until B confirms or Y cancels.\n\nWhen: Cop1A_ChoiceMenu (27 scripts) and Cop02_PromptYesNo, right after PrintTextString has drawn the option window.\nSees: an arrow (the ► glyph, tile $2B) in front of an option that blinks and steps with Up and Down; it stays on the answer when the menu closes.\nWhy: every question window of the game uses the same keys and the same arrow, so one routine serves all of them.\nIn: long call (JSL); M = 8; A = number of options, high byte of A = start index; X = BG3 byte offset of the first option's arrow cell (the trailing [CUR] of the option string).\nOut: carry clear = B (BRK #$18), carry set = Y (BRK #$07); A = chosen index; X = the arrow cell of that option; the arrow stays drawn.\nClobbers: A, X, Y; menu_count, menu_blink, vram_upload_flags bit 0; P is not preserved (the stack is balanced)."
+    },
+    "comments": {
+      "74373": { "text": "the start index (high byte of A) stays at $01,S for the whole menu", "expect": "PHA" },
+      "74392": { "text": "wait until a frame shows no new button press, so the press that opened the question does not answer it", "expect": "JSR" },
+      "74405": { "text": "joy_pressed+1: $08 Up, $04 Down, $40 Y (cancel), $80 B (confirm)", "expect": "BIT #$08" },
+      "74434": { "text": "confirm and cancel both leave the arrow drawn on the current option", "expect": "LDA #$2B" },
+      "74446": { "text": "Up on the first option is ignored", "expect": "LDA $01, S" },
+      "74459": { "text": "one option = two text rows = $80 bytes of the BG3 buffer", "expect": "SBC #$0080" },
+      "74470": { "text": "Down on the last option is ignored", "expect": "CMP $menu_count" },
+      "74490": { "text": "erase the old arrow (tile $20) in both halves before moving", "expect": "LDA #$20" }
+    }
+  },
+
+  "library/lib_shared_01230B.asm": {
+    "blockNote": [
+      "Blink step of the arrow cursor, shared by the choice menu and the menu-row choosers (file offsets 74507-74537, SNES $02:A30B-$A329, bank 02).",
+      "",
+      "=== MODEL ===",
+      "One call per frame while a chooser waits for a key. menu_blink ($03C6) counts the calls: the low 5 bits below $18 draw the arrow (tile $2B, 24 frames), $18-$1F draw a blank (tile $20, 8 frames), so the period is 32 frames. The chooser resets the counter to 0 on every move so that the arrow is visible right after a step. Callers: RunChoiceMenu (2 sites) and the four wait loops of ChooseMenuRow and ChooseMenuRowAtTable in lib_0118FC_part2."
+    ],
+    "partNotes": {
+      "BlinkChoiceCursor": "Draws the arrow or a blank in the cursor cell and advances the blink counter.\n\nWhen: once per frame from the wait loops of RunChoiceMenu (2 sites) and ChooseMenuRow / ChooseMenuRowAtTable (4 sites).\nSees: the arrow blinks: on for 24 frames, off for 8.\nWhy: tells the player which option is selected and that the menu waits for a key.\nIn: near call (JSR); M = 8; X = BG3 byte offset of the arrow cell.\nOut: the tile byte ($2B or $20) written to the lower half (buffer + X) and the upper half ($7F6FC0 + X); menu_blink + 1; vram_upload_flags bit 0 set. X is preserved.\nClobbers: A."
+    },
+    "comments": {
+      "74510": { "text": "the low 5 bits of the counter give a 32-frame blink period", "expect": "AND #$1F" },
+      "74512": { "text": "counter 0-$17: arrow (24 frames); $18-$1F: blank (8 frames)", "expect": "CMP #$18" }
+    }
+  },
+
+  "library/lib_menus.asm": {
+    "blockNote": {
+      "edit": [
+        { "find": "and 87358-90589; bank 02)", "with": "85876-86757 (ItemNameList and the item names) and 87358-90589; bank 02)" },
+        { "find": "The item names (ItemNameList and its strings, file offsets 85876-86758) belong to another batch.", "with": "The item names (ItemNameList and its 65 strings, file offsets 85876-86757) are noted in the ItemNameList part (batch A8)." }
+      ]
+    },
+    "partNotes": {
+      "ItemNameList": "Pointer list of the 65 item name strings, indexed by item id (0 = 'not equipped').\n\nWhen: every [TBL:&ItemNameList,addr] print: the four equipped names of StatusScreenText and of EquipMenuFrameText, the first line of the description records (through NameIndexCells), and ChestItemReceivedText (text_arg = the item id the chest holds).\nSees: the item name on the status screen, in the equipment menu and in 'recieved' chest messages.\nWhy: the item id doubles as the inventory slot id and as the string number, so the equipped cells ($1B5E-$1B64) and the chest content byte are used as the index with no conversion. The empty equipment slot is id 0, whose name is 'not equipped'.\nIn: n/a (data). 65 words (ids $00-$40), each the address of an ASCII string in bank $02 (the ItemName parts that follow, 752 bytes in total).\nOut: n/a. Ids: $01-$08 swords, $09-$10 armors, $11-$18 magic, $19-$40 items (the grouping of docs/walkthrough/items.md). Some strings use dictionary bytes (so their size is below the printed length plus one, for example 'not equipped' = 'not ' and 'equipped' in 10 bytes). The ROM text differs from the walkthrough in a few places (the four possessive names print a blank where the walkthrough has an apostrophe, the emblems read 'Emblem A' to 'Emblem H' without 'Master s', id $26 reads 'Leaves' like id $1E, articles and capitals differ): OQ-I004-6, OQ-I027-3; the labels keep the id and the string keeps the ROM text.\nClobbers: n/a.",
+      "ItemName00": "Name of id 0: the empty equipment slot.\n\nWhen: printed through ItemNameList whenever an equipped cell holds 0 (nothing equipped, or an empty slot confirmed in the equipment menu).\nSees: 'not equipped' on the status screen and next to Wep- / Arm- / Mag- / Item in the equipment menu.\nWhy: id 0 is 'no item', so the same table serves empty and filled slots.\nIn: n/a (data). 'not ' is a dictionary byte, then 'equipped'.\nOut: n/a.\nClobbers: n/a.",
+      "ItemName26": "Name of id $26: the second item printed 'Leaves'.\n\nWhen: printed through ItemNameList for the item id $26.\nSees: 'Leaves', the same text as id $1E (ItemName1E).\nWhy: unknown; the walkthrough lists id $1E as 'Leaves' and this item as 'Actinidia Leaves'.\nIn: n/a (data).\nOut: n/a. The ROM text is kept as printed (OQ-I004-6).\nClobbers: n/a."
+    }
+  },
+
+  "library/lib_tile_triggers_and_lair_return.asm": {
+    "blockNote": {
+      "edit": [
+        { "find": "SNES $02:D2E6; LocationAreaScene", "with": "SNES $02:D2E6; the five chest and lair messages LairNpcNotRecalledText to ChestGemsFoundText at 90590-90723, SNES $02:E1DE-$E263; LocationAreaScene" },
+        { "find": "=== NOTES ===", "with": "=== MESSAGES ===\nThe five strings of the chest and lair messages share one tail: ChestGemsFoundText holds the Gems line and, from its [::] marker (the '+M' entry), the key wait ([12]) and the erase of the dialogue box ([08:408]). The other four (LairNpcNotRecalledText, LairNpcReleasedText, ChestItemReceivedText, ChestEmptyText) end with [JMP:&ChestGemsFoundText+M]. text_arg ($03C8) is the one parameter: the NPC name index (lair record +9) for the two lair strings (through NpcNameStrings), the item id (through ItemNameList) for ChestItemReceivedText and the Gem amount as packed BCD ([06:3,03C8]) for ChestGemsFoundText; TryOpenChest picks the string by the content byte of the chest row (0 empty, $FF Gems, else an item id).\n\n=== NOTES ===" }
+      ]
+    },
+    "partNotes": {
+      "LairNpcNotRecalledText": "'<NPC> cannot be recalled yet!' message.\n\nWhen: RunLairReleaseOnReturn, in the home location of a freed NPC, when the tile under the player is not the type-1 marker that ReleaseLairAtSwitch left on the NPC's home tile (so the release scene cannot play).\nSees: the standard dialogue box with the NPC's description in the highlight attribute ($24) and 'cannot be recalled yet!'.\nWhy: the return trip is only completed on the home tile; anywhere else the player is told so.\nIn: n/a (data). text_arg = the NPC name index (lair record +9); [TBL:&NpcNameStrings,03C8] prints it.\nOut: n/a. Ends through [JMP:&ChestGemsFoundText+M]: key wait and box erase.\nClobbers: n/a.",
+      "LairNpcReleasedText": "'<hero> released <NPC>-' message.\n\nWhen: PlayLairReleaseScene, once the freed NPC has appeared at its home tile.\nSees: the player name ([02:2]) followed by 'released' and, on the next line, the NPC's description.\nWhy: the Monster Lair release has no script, so the engine prints the message itself.\nIn: n/a (data). text_arg = the NPC name index (lair record +9).\nOut: n/a. Ends through [JMP:&ChestGemsFoundText+M].\nClobbers: n/a.",
+      "ChestItemReceivedText": "'<hero> recieved <item>-' chest message (the ROM spells it 'recieved').\n\nWhen: TryOpenChest, when the chest content byte is an item id; after StoreInventoryEntry has stored the item.\nSees: the player name, 'recieved' and the item name on the second line.\nWhy: every chest uses this one string; the item changes through text_arg.\nIn: n/a (data). text_arg = the item id; [TBL:&ItemNameList,03C8] prints its name.\nOut: n/a. Ends through [JMP:&ChestGemsFoundText+M].\nClobbers: n/a.",
+      "ChestEmptyText": "' Nothing inside-' chest message.\n\nWhen: TryOpenChest, when the content byte of the chest row is 0.\nSees: 'Nothing inside-' in the dialogue box.\nWhy: an empty chest still opens and needs a message.\nIn: n/a (data).\nOut: n/a. Ends through [JMP:&ChestGemsFoundText+M].\nClobbers: n/a.",
+      "ChestGemsFoundText": "'<hero> found <n> GEMs-' chest message and the shared tail of the five chest and lair messages.\n\nWhen: TryOpenChest, when the content byte is $FF (the amount is the word at row +4, added to the Gem counter by lib_player_stats.code_0276A5); the other four strings jump into its '+M' entry.\nSees: the player name, 'found' and the amount with ' GEMs-' on the second line ([03:24] sets the highlight attribute for the number); then the box waits for a key and disappears. The ROM text spells 'GEMs', the walkthrough 'Gems'.\nWhy: the key wait and box erase are written once, in the part that every message reaches.\nIn: n/a (data). text_arg = the Gem amount as packed BCD, 3 digits ([06:3,03C8]); entered at [::] by the other messages, where text_arg means something else.\nOut: n/a. [12] waits for a key, [08:408] erases the dialogue box window, [END].\nClobbers: n/a."
+    }
+  },
+
+  "grass_valley/front_end/gv_epilogue_texts.asm": {
+    "blockNote": {
+      "edit": [
+        { "find": "The staff roll string StaffRollText in this file is not part of A7 and is unannotated (OQ-I029-5).", "with": "The staff roll string StaffRollText (file offsets 90724-92320, SNES $02:E264-$E8A0) is noted in its own part (batch A8; answers OQ-I029-5)." }
+      ]
+    },
+    "partNotes": {
+      "StaffRollText": "The staff roll text: the credits scrolled up BG3 after the ending.\n\nWhen: printed once by the credits actor of gv_front_end (code_007638, PHX, Y = this string) through ScrollStaffRollText. After the roll the actor waits $F0 frames (COP [1B]), fades the music (COP [31], track 0), waits $F0 frames again and changes scene with COP [10] to area $00, scene $0D (arrival animation 2, x = y = 0).\nSees: the credits roll upward: the heading 'The staff of Soul Blazer', then one block per role (scenario, programming, graphics, music composed, arranged, sound, music coordinated, scenario assistant, English text, three staff groups of the Japanese and American company, special thanks, assistant producer, director, producer, publisher), the copyright lines and 'Licensed by NINTENDO' and 'Presented by'.\nWhy: the roll is far longer than the 32-row BG3 page; ScrollStaffRollText prints it line by line while scrolling.\nIn: n/a (data). 1597 bytes. 218 [N] line breaks (each scrolls the layer 32 pixels in 32 frames, so about 6976 frames, roughly 116 seconds at 60 frames per second, before the end delays); [14:n] indents a line (n tiles, hex) to centre it. The company-name glyph runs (5 and 6 glyphs, printed as symbols such as the run '·\"▼ˮ?') are font tiles, not letters (OQ-I010-11).\nOut: n/a. 0 ends the string. Spellings are kept as printed: 'Soul Blader' (second copyright block) and 'COPORATION' (twice); the walkthrough (08-world-of-evil.md) only says 'Enjoy the credits' and does not quote the text (OQ-I010-11, OQ-I030-2).\nClobbers: n/a."
+    }
+  },
+
+  "cop_handlers/cop_items_stats_text.asm": {
+    "blockNote": {
+      "edit": [
+        { "find": "(014F02 ' Yes / No' with 2 entries, 014F15 a single 'Yes', 014F23 'Record / Move / Quit' with 3 entries)", "with": "(ChoiceYesNoText ' Yes / No' with 2 entries, ChoiceYesOnlyText a single 'Yes', ChoiceRecordMoveQuitText 'Record / Move / Quit' with 3 entries, ChoiceRecordQuitText 'Record / Quit' with 2, ChoiceStayGoBackText 'Stay / Go back' with 2; layout rule in the block note of shared_choice_prompt_texts)" }
+      ]
+    },
+    "partNotes": {
+      "Cop1A_ChoiceMenu": {
+        "edit": [
+          { "find": "Yes/No questions (ChoiceYesNoText, 014F43, 014F5B), a single 'Yes' (014F15) and 'Record / Move / Quit' (014F23).", "with": "18 Yes / No questions (ChoiceYesNoText), 6 Stay / Go back return prompts (ChoiceStayGoBackText), a single 'Yes' (ChoiceYesOnlyText), 'Record / Move / Quit' (ChoiceRecordMoveQuitText) and 'Record / Quit' (ChoiceRecordQuitText)." }
+        ]
+      }
+    }
+  }
+}

@@ -113,8 +113,8 @@ mc_obj_floor_spikes_026F30 {
 ; Hurts the hero on a spike metatile.
 ; 
 ; When: from mc_obj_floor_spikes_026F30 when the Elemental Mail is not equipped.
-; Sees: IsPlayerOnMetatile with metatile $88; on a hit COP 39 #3 (3 points of damage with the knock-back of Cop39_DamagePlayer).
-; Why: the damage floor; the knock-back gives the hero a few frames before the next test.
+; Sees: IsPlayerOnMetatile with metatile $88; on a hit COP 39 #3 (3 points of damage; Cop39_DamagePlayer sets the hit stun and moves nothing, OQ-I047-6).
+; Why: the damage floor; the hit stun gives the hero a few frames before the next test (IsPlayerOnMetatile answers 'no' while he is stunned).
 ; In: X = D = the slot.
 ; Out: the hero's HP, $0332 and $16 are changed on a hit; carry is used as the answer.
 ; Clobbers: A.
